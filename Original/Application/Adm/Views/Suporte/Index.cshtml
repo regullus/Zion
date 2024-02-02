@@ -1,0 +1,127 @@
+﻿@model PagedList.IPagedList<Sistema.Models.SuporteViewModel>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+      var idiomas = (IEnumerable<Core.Entities.Idioma>)ViewBag.Idiomas;
+
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"><i class="fa fa-reorder"></i> @traducaoHelper["SUPORTE"]</div>
+        <div class="tools">
+            <a href='@Url.Action("Index", "Suporte")' class="atualizar" title="@traducaoHelper["RELER"]"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <div class="input-group">
+                            @using (Html.BeginForm("Index", "Suporte", FormMethod.Get))
+                            {
+                                @Html.DropDownList("NumeroPaginas", null, htmlAttributes: new { @class = "form-control input-small input-inline marginB05" })
+                                <input class="btn purple form-control input-small input-inline fontPlaceHolderIcon" id="Atualizar" name="Atualizar" value="&#xf021; @traducaoHelper["ATUALIZAR"]" type="submit" />
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    @using (Html.BeginForm("Index", "Suporte", FormMethod.Get))
+                    {
+                        <div class="form-group pull-right">
+                            <div class="input-group">
+                                @Html.TextBox("ProcuraLogin", ViewBag.CurrentProcuraLogin as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["LOGIN"] })
+                                @Html.TextBox("ProcuraTexto", ViewBag.CurrentProcuraDescricao as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["TITULO"] })
+
+                                <select name="ProcuraIdioma" class="form-control input-small input-inline fontPlaceHolderIcon marginB05">
+                                    <option value="0">@traducaoHelper["TODOS_IDIOMAS"]</option>
+                                    @foreach (var item in idiomas)
+                                    {
+                                        <option value="@item.ID" @(item.ID == ViewBag.ProcuraIdioma ? "SELECTED" : "")>@item.Nome</option>
+                                    }
+                                </select>
+
+                                <input class="btn blue-madison form-control input-small input-inline fontPlaceHolderIcon" id="Procura" name="Procura" value="&#xf002; @traducaoHelper["PROCURAR"]" type="submit" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, SortOrder = ViewBag.CurrentSort, CurrentProcuraDescricao = ViewBag.CurrentProcuraDescricao, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize, ProcuraIdioma = ViewBag.ProcuraIdioma, ProcuraLogin = ViewBag.ProcuraLogin, ProcuraTexto = ViewBag.ProcuraTexto }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"] @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) @traducaoHelper["DE"] @Model.PageCount &nbsp;</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-scrollable">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["ACOES"]&nbsp;</th>
+                        <th scope="col">@traducaoHelper["ASSUNTO"]</th>
+                        <th scope="col">@traducaoHelper["USUARIO"]</th>
+                        <th scope="col">@traducaoHelper["IDIOMAS"]</th>
+                        <th scope="col">@traducaoHelper["DATA"]</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["ACOES"]&nbsp;</th>
+                        <th scope="col">@traducaoHelper["ASSUNTO"]</th>
+                        <th scope="col">@traducaoHelper["USUARIO"]</th>
+                        <th scope="col">@traducaoHelper["IDIOMAS"]</th>
+                        <th scope="col">@traducaoHelper["DATA"]</th>
+                    </tr>       
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.ActionLink("Edit", "ler", new { id = item.ID }, new { @class = "gridEdit", title = traducaoHelper["EDITAR"] })
+                            </td>
+                            <td>
+                                @Html.Raw(item.Assunto)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Nome)<br />
+                                @Html.DisplayFor(modelItem => item.Email)<br />
+                                @Html.DisplayFor(modelItem => item.Login)<br />
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Idioma)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Data)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="border-gridFooter">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, SortOrder = ViewBag.CurrentSort, CurrentProcuraDescricao = ViewBag.CurrentProcuraDescricao, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize, ProcuraIdioma = ViewBag.ProcuraIdioma, ProcuraLogin = ViewBag.ProcuraLogin, ProcuraTexto = ViewBag.ProcuraTexto }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"]  @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) @traducaoHelper["DE"]  @Model.PageCount &nbsp;</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

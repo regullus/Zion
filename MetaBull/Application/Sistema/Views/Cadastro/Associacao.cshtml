@@ -1,0 +1,290 @@
+﻿@model Core.Entities.Usuario
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Cadastro.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["CONFIRMACAO_REGISTRO"].ToString().ToLower();
+
+    var produtos = (IEnumerable<Core.Entities.Produto>)ViewBag.Produtos;
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    #endregion
+
+}
+
+@section pageStyles {
+<style>
+    .bg-new-cascade {
+        background: #484848 !important;
+    }
+    .aumentadiv {
+        height: 200px!important;
+    }
+</style>
+
+}
+
+@section head {
+
+}
+
+@section pageScripts {
+
+}
+
+@section PageLevelScripts{
+
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+   <div class="portlet-body">
+
+      <div class="page-head">
+         <!-- BEGIN PAGE TITLE -->
+         <div class="page-title">
+            <h2>@ViewBag.Title <small></small></h2>
+         </div>
+         <!-- END PAGE TITLE -->
+      </div>
+
+      <ul class="page-breadcrumb breadcrumb">
+         <li>
+            <a href="@Url.Action("Index", "Home")">home</a>
+            <i class="fa fa-angle-right"></i>
+         </li>
+         <li>
+            <a href="#">@ViewBag.Title</a>
+         </li>
+      </ul>
+   </div>
+</div>
+
+<div class="portlet aba box backWrite grey-gallery">
+
+   <div class="portlet-title">
+      <div class="caption"></div>
+      <div class="tools">
+
+      </div>
+      <div class="actions">
+         <a href='#'>&nbsp;</a>
+         <label>&nbsp;</label>
+      </div>
+   </div>
+
+   <div class="portlet solid grey-cararra">
+
+      <div class="portlet-title">
+         <div class="caption padding-Left-20">
+            <i class="fa fa-user"></i>@traducaoHelper["CADASTRO"]
+         </div>
+      </div>
+
+      <div class="portlet-body">
+
+         <div class="tiles" id="tipoPagamento">
+            @foreach (var produto in produtos)
+           
+                {
+                    <div id="modalListaProdutos@(produto.ID)" class="modal fade">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title">@produto.Nome</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>@produto.Descricao</p>
+                                    @if (produto.Composto)
+                                    {
+                                        <p class="h5">@traducaoHelper["COMPOSICAO"]:</p>
+                                        <div class="scroller" style="height:250px">
+                                            @if (produto.ProdutoItem != null)
+                                            {
+                                                foreach (var i in produto.ProdutoItem)
+                                                {
+                                                    <span style="font-size:11px">&nbsp;&nbsp;@i.Quantidade.ToString("00") @i.Produto1.Nome</span><br />
+                                                }
+                                            }
+                                        </div>
+                                    }
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    var valorMinimo = produto.ValorMinimo(Model);
+                    var foto = produto.Fotos.FirstOrDefault();
+
+               <div class="tile double bg-new-cascade  @(produto.Composto?"aumentadiv":"")">
+                  <div class="tile-body">
+                     <div class="row">
+                        <div class="col-md-12">
+                           @if (foto != null)
+                           {
+                              <img src="@foto" alt="@produto.Nome" class="pull-right" style="max-width: 96px;" title="@produto.Chamada">
+                           }
+                           else
+                           {
+                            <img src="@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/produtoPadrao.png")" alt="@produto.Nome" class="pull-right" style="max-width: 96px;">
+                           }
+                           <h4><strong>@produto.Nome</strong></h4>
+                           @*<p>&nbsp;</p>*@
+                           <p>@produto.Descricao</p>
+                        </div>
+                     </div>
+                     @if (valorMinimo != null)
+                     {
+                        if (!produto.Composto)
+                        {
+                           <p>&nbsp;</p>
+                           <p class="h5">@traducaoHelper["COMPOSICAO"]</p>
+                           <div class="scroller" style="height:44px">
+                              @if (produto.ProdutoItem != null)
+                              {
+                                 foreach (var i in produto.ProdutoItem)
+                                 {
+                                    <p>&nbsp;&nbsp;@i.Quantidade.ToString("00") @i.Produto1.Nome</p>
+                                 }
+                              }
+                           </div>
+                        }
+                        @*<p>&nbsp;</p>*@
+                        <a href="#modalListaProdutos@(produto.ID)" role="button" data-toggle="modal" style="color:white;text-decoration:underline;float:right;">Ver composição</a><br />
+                        <h4><strong>@moedaPadrao.Simbolo @valorMinimo.Valor.Value.ToString(moedaPadrao.MascaraOut)</strong></h4>
+                     }
+                  </div>
+
+                  <div class="tile-object">
+                     <div class="name ">
+                        <i class="fa fa-gift" title="@produto.Chamada"><span class="h6">&nbsp;@traducaoHelper["ASSOCIACAO"]</span></i>
+                     </div>
+                     <div class="number ">
+                        @if (@Core.Helpers.ConfiguracaoHelper.GetString("MEIO_PGTO_DEPOSITO_ATIVO") == "true")
+                        {
+                           <a href="@Url.Action("associar", "cadastro", new { login = Model.Login, produtoID = produto.ID, meioPagamento = Core.Entities.PedidoPagamento.MeiosPagamento.Deposito.GetHashCode()})" class="btn green" title="@traducaoHelper["DEPOSITO_CONTA"]">Depósito</a>
+                        }
+
+                        @if (@Core.Helpers.ConfiguracaoHelper.GetString("MEIO_PGTO_BOLETO_ATIVO") == "true")
+                        {
+                           <a href="@Url.Action("associar", "cadastro", new { login = Model.Login, produtoID = produto.ID, meioPagamento = Core.Entities.PedidoPagamento.MeiosPagamento.Boleto.GetHashCode() })" class="btn green" title="@traducaoHelper["PAGAR_BOLETO"]">Boleto</a>
+                        }
+                     </div>
+                  </div>
+               </div>
+            }
+         </div>
+      </div>
+   </div>
+</div>
+
+
+<div class="box hide" id="dadosCartao" style="background:#ffffff !important;">
+
+   <div style="width: 760px;">
+      <div style="padding: 10px; background-color:#eee; border: 1px solid #ccc;">
+         <div class="row">
+            <div style="width: 100px; float: left;"><span class="label">&nbsp;</span></div>
+            <div style="float: right;">
+               <p>
+                  <span class="pull-right">
+                     <img src="~/Content/img/cc/ico-visa.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-mastercard.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-american-express.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-elo.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-diners.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-discover.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-jcb.jpg" width="41" height="25" alt="" />
+                     <img src="~/Content/img/cc/ico-aura.jpg" width="41" height="25" alt="" />
+                  </span>
+               </p>
+            </div>
+         </div>
+         <div class="row" style="padding: 10px; margin-top: 40px;">
+
+            <form action="@Url.Action("PagamentoCartao")" method="post">
+               <fieldset style="border: none;">
+                  <input type="hidden" name="ccProduto" id="ccProduto" value="@ViewBag.CartaoProduto" />
+                  <input type="hidden" name="ccLogin" id="ccLogin" value="@ViewBag.CartaoLogin" />
+                  <div class="form-body">
+
+                     <div style="float: left; margin: 10px 0;">
+                        <span class="label">@traducaoHelper["CARTAO_CREDITO_DADOS"]</span>
+                     </div>
+
+                     <div style="float: left;">
+                        <span class="labelCartao">@traducaoHelper["CARTAO_CREDITO_NOME"]</span>
+                        <input required type="text" id="ccNome" name="ccNome" value="@ViewBag.CartaoNome" style="width:680px;">
+                     </div>
+
+                     <div style="float: left;">
+                        <span class="labelCartao">@traducaoHelper["CARTAO_CREDITO_BANDEIRA"]</span>
+                        @Html.DropDownList("ccBandeira", null, htmlAttributes: new { @style = "width:700px;" })
+                     </div>
+
+                     <div style="width: 700px;">
+                        <div style="float: left;">
+                           <span class="labelCartao">@traducaoHelper["CARTAO_CREDITO_NUMERO"]</span>
+                           <input required type="text" style="width:440px;" name="ccNumero" id="ccNumero" value="@ViewBag.CartaoNumero" />
+                        </div>
+
+                        <div style="float: right;">
+                           <span class="labelCartao">@traducaoHelper["CARTAO_CREDITO_COD_SEGURANCA"]</span>
+                           <input required type="text" style="width:200px;" name="ccCodSeguranca" id="ccCodSeguranca" value="@ViewBag.CartaoCodSeguranca" />
+                        </div>
+                     </div>
+
+                     <div style="float: left; margin: 10px 0;">
+                        <span class="label">@traducaoHelper["VALIDADE"]</span>
+                     </div>
+
+                     <div style="width: 700px;">
+
+                        <div style="float: left;">
+                           <span class="labelCartao">@traducaoHelper["MES"]</span>
+                           @Html.DropDownList("ccMes", null, htmlAttributes: new { @style = "width:460px;" })
+                        </div>
+
+                        <div style="float: right;">
+                           <span class="labelCartao">@traducaoHelper["ANO"]</span>
+                           @Html.DropDownList("ccAno", null, htmlAttributes: new { @style = "width:200px;" })
+                        </div>
+
+
+                     </div>
+
+                     <div style="width: 700px;">
+                        <div style="float: right; margin: 10px;">
+                           <button type="submit" class="submit fundo"><i class="fa fa-check"></i> &nbsp; @traducaoHelper["ENVIAR"]</button>
+                        </div>
+                        <div style="float: right;  margin: 10px;">
+                           <button class="submit fundo" onclick="cartaoVoltar()"><i class="fa fa-arrow-left"></i> &nbsp; @traducaoHelper["VOLTAR"]</button>
+                        </div>
+                     </div>
+                  </div>
+                  <br />
+               </fieldset>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+

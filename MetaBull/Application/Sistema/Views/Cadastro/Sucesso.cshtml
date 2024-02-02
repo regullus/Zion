@@ -1,0 +1,37 @@
+﻿@model Core.Entities.Usuario
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Cadastro.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["SUCESSO"].ToString().ToLower();
+
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+
+}
+
+<div class="box">
+    <h1 class="cor">@traducaoHelper["OBRIGADO_INSCRICAO"]</h1>
+    <span class="label">
+        @traducaoHelper["NECESSARIO_REALIZAR_ATIVACAO"]
+        <br /><br />
+        <a href="@Url.Action("enviar-validacao-email", new { login = Model.Login })" class="button fundo" style="width:800px;">@traducaoHelper["ENVIAR_NOVAMENTE_ATIVACAO"]</a>
+    </span>
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />

@@ -1,0 +1,27 @@
+﻿@{
+
+   #region Layout
+
+   Layout = null;
+
+   #endregion
+
+   #region ViewBags
+
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   //ViewBag.Title = traducaoHelper["BOLETO"].ToString().ToLower();
+
+   var boleto = ViewBag.Boleto;
+
+   #endregion
+
+   #region Variaveis
+
+   boleto = boleto.Replace("\\n", "<br />");
+   boleto = boleto.Replace("Boleto.Net", Core.Helpers.ConfiguracaoHelper.GetString("NOME_SITE"));
+
+   #endregion
+   
+}
+
+@Html.Raw(boleto)

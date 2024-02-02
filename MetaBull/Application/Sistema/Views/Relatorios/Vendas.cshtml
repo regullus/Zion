@@ -1,0 +1,284 @@
+﻿@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["VENDAS_REDE"].ToString().ToLower();
+
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+    var pagamentos = (IEnumerable<Core.Entities.PedidoPagamento>)ViewBag.pagamentos;
+
+    // Rede Linear
+    var acumuladoValor = ViewBag.AcumuladoValor;
+    var acumuladoBonus = ViewBag.AcumuladoBonus;
+
+    // Rede Binaria
+    var acumuladoValorEsquerda = ViewBag.AcumuladoValorEsquerda;
+    var acumuladoBonusEsquerda = ViewBag.AcumuladoBonusEsquerda;
+    var acumuladoValorDireita = ViewBag.AcumuladoValorDireita;
+    var acumuladoBonusDireita = ViewBag.AcumuladoBonusDireita;
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+    var dias = pagamentos.GroupBy(p => new DateTime(p.UltimoStatus.Data.Year, p.UltimoStatus.Data.Month, p.UltimoStatus.Data.Day)).OrderByDescending(d => d.Key);
+
+    var active = true;
+    var contador = 1;
+
+    #endregion
+
+    #region ViewBags
+
+    ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
+    if (ViewBag.MascaraData == null)
+    {
+        ViewBag.MascaraData = "dd/MM/yyyy";
+    }
+
+    #endregion
+
+}
+
+@section pageStyles {
+   @Styles.Render("~/Content/table")
+}
+
+@section head {
+   <!--Table Left-->
+   @Styles.Render("~/Content/tableLeft")
+   <!--Table Left-->
+}
+
+@section pageScripts {
+   @Scripts.Render("~/scripts/table")
+}
+
+@section PageLevelScripts{
+
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+   <div class="portlet-body">
+
+      <div class="page-head">
+         <!-- BEGIN PAGE TITLE -->
+         <div class="page-title">
+            <h2>@ViewBag.Title <small></small></h2>
+         </div>
+         <!-- END PAGE TITLE -->
+      </div>
+
+      <ul class="page-breadcrumb breadcrumb">
+         <li>
+            <a href="@Url.Action("Index", "Home")">home</a>
+            <i class="fa fa-angle-right"></i>
+         </li>
+         <li>
+            <a href="#">@ViewBag.Title</a>
+         </li>
+      </ul>
+   </div>
+</div>
+
+<div class="portlet aba box backWrite grey-gallery">
+
+   <div class="portlet-title">
+      <div class="caption"></div>
+      <div class="tools">
+         <a href='@Url.Action("vendas")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+         <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+      </div>
+      <div class="actions">
+         <a href="#" class="btn yellow-casablanca hide">
+            <i class="fa fa-star"></i> xxx
+         </a>
+         <label>&nbsp;</label>
+      </div>
+   </div>
+
+   <div class="portlet-body" style="background-color: #eee;">
+      @if (ViewBag.SemDados == "false")
+      {
+
+         <div class="tabbable tabs-left">
+
+            <ul class="nav nav-tabs">
+               @foreach (var dia in dias)
+               {
+                  <li class="@(active ? "active" : "")">
+                     <a href="#Dia@(contador)" data-toggle="tab">@dia.Key.ToString(ViewBag.MascaraData)</a>
+                  </li>
+                  contador++;
+                  active = false;
+               }
+            </ul>
+
+            <div class="tab-content">
+               @{
+                  active = true;
+                  contador = 1;
+               }
+               @foreach (var dia in dias)
+               {
+                  if (ViewBag.RedeBinaria)
+                  {  // inicio Rede Binaria
+                     var valorEsquerda = dia.Where(d => d.Usuario.Assinatura.StartsWith(usuario.Assinatura + "0")).Sum(d => d.Pedido.PedidoItem.Sum(i => i.Quantidade * i.ValorUnitario));
+                     var bonusEsquerda = dia.Where(d => d.Usuario.Assinatura.StartsWith(usuario.Assinatura + "0")).Sum(d => d.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
+                     var valorDireita = dia.Where(d => d.Usuario.Assinatura.StartsWith(usuario.Assinatura + "1")).Sum(d => d.Pedido.PedidoItem.Sum(i => i.Quantidade * i.ValorUnitario));
+                     var bonusDireita = dia.Where(d => d.Usuario.Assinatura.StartsWith(usuario.Assinatura + "1")).Sum(d => d.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
+                     <div id="Dia@(contador)" class="tab-pane @(active ? "active" : "")">
+                        <div class="inner-spacer">
+                           <table class="table table-striped table-bordered table-hover">
+                              <thead>
+                                 <tr>
+                                    <th colspan="2" style="text-align: center;"></th>
+                                    <th colspan="2" style="text-align: center;">@traducaoHelper["ESQUERDA"]</th>
+                                    <th colspan="2" style="text-align: center;">@traducaoHelper["DIREITA"]</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <tr>
+                                    <td colspan="2" style="font-weight:bold;">@traducaoHelper["ACUMULADO"]</td>
+                                    <td style="font-weight: bold; text-align: center;">@moedaPadrao.Simbolo @acumuladoValorEsquerda.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@acumuladoBonusEsquerda.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@moedaPadrao.Simbolo @acumuladoValorDireita.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@acumuladoBonusDireita.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                 </tr>
+                                 <tr>
+                                    <td colspan="2" style="font-weight:bold;">@traducaoHelper["TOTAL"]</td>
+                                    <td style="font-weight: bold; text-align: center;">@moedaPadrao.Simbolo @valorEsquerda.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@bonusEsquerda.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@moedaPadrao.Simbolo @valorDireita.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@bonusDireita.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                 </tr>
+                              </tbody>
+                              <thead>
+                                 <tr>
+                                    <th style="width: 20%;">@traducaoHelper["LOGIN"]</th>
+                                    <th style="width: 40%;">@traducaoHelper["PRODUTO"]</th>
+                                    <th style="width: 10%;">@traducaoHelper["VALOR"]</th>
+                                    <th style="width: 10%;">@traducaoHelper["BONUS"]</th>
+                                    <th style="width: 10%;">@traducaoHelper["VALOR"]</th>
+                                    <th style="width: 10%;">@traducaoHelper["BONUS"]</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 @foreach (var pagamento in dia)
+                                 {
+                                    foreach (var item in pagamento.Pedido.PedidoItem)
+                                    {
+                                       var esquerda = pagamento.Usuario.Assinatura.StartsWith(usuario.Assinatura + "0");
+                                       var direita = pagamento.Usuario.Assinatura.StartsWith(usuario.Assinatura + "1");
+                                       var valor = item.Quantidade * item.ValorUnitario;
+                                       var bonus = item.Quantidade * item.BonificacaoUnitaria;
+                                       if (esquerda || direita)
+                                       {
+                                          <tr>
+                                             <td>@pagamento.Pedido.Usuario.Login</td>
+                                             <td>@(item.Quantidade)x @item.Produto.Nome</td>
+                                             <td>@(esquerda ? moedaPadrao.Simbolo + valor.Value.ToString(moedaPadrao.MascaraOut) : "")</td>
+                                             <td>@(esquerda ? bonus.Value.ToString(moedaPadrao.MascaraOut) : "")</td>
+                                             <td>@(direita ? moedaPadrao.Simbolo + valor.Value.ToString(moedaPadrao.MascaraOut) : "")</td>
+                                             <td>@(direita ? bonus.Value.ToString(moedaPadrao.MascaraOut) : "")</td>
+                                          </tr>
+                                       }
+                                    }
+                                 }
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
+                     contador++;
+                     active = false;
+                     acumuladoValorEsquerda -= valorEsquerda;
+                     acumuladoBonusEsquerda -= bonusEsquerda;
+                     acumuladoValorDireita -= valorDireita;
+                     acumuladoBonusDireita -= bonusDireita;
+                  }  // fim Rede Binaria
+                  else
+                  {  // inicio Rede Linear
+                     var valor = dia.Where(d => d.Usuario.Assinatura.StartsWith(usuario.Assinatura) &&
+                                                d.Usuario.Assinatura != usuario.Assinatura).Sum(d => d.Pedido.PedidoItem.Sum(i => i.Quantidade * i.ValorUnitario));
+                     var bonus = dia.Where(d => d.Usuario.Assinatura.StartsWith(usuario.Assinatura) &&
+                                                d.Usuario.Assinatura != usuario.Assinatura).Sum(d => d.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
+
+                     <div id="Dia@(contador)" class="tab-pane @(active ? "active" : "")">
+                        <div class="inner-spacer">
+                           <table class="table table-striped table-bordered table-hover">
+                              <thead>
+                                 <tr>
+                                    <th colspan="2" style="text-align: center;"></th>
+                                    <th colspan="2" style="text-align: center;">@traducaoHelper["REDE"]</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <tr>
+                                    <td colspan="2" style="font-weight:bold;">@traducaoHelper["ACUMULADO"]</td>
+                                    <td style="font-weight: bold; text-align: center;">@moedaPadrao.Simbolo @acumuladoValor.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@acumuladoBonus.ToString(moedaPadrao.MascaraOut)</td>
+                                 </tr>
+                                 <tr>
+                                    <td colspan="2" style="font-weight:bold;">@traducaoHelper["TOTAL"]</td>
+                                    <td style="font-weight: bold; text-align: center;">@moedaPadrao.Simbolo @valor.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    <td style="font-weight: bold; text-align: center;">@bonus.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                 </tr>
+                              </tbody>
+                              <thead>
+                                 <tr>
+                                    <th style="width: 20%;">@traducaoHelper["LOGIN"]</th>
+                                    <th style="width: 40%;">@traducaoHelper["PRODUTO"]</th>
+                                    <th style="width: 10%;">@traducaoHelper["VALOR"]</th>
+                                    <th style="width: 10%;">@traducaoHelper["BONUS"]</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 @foreach (var pagamento in dia)
+                                 {
+                                    foreach (var item in pagamento.Pedido.PedidoItem)
+                                    {
+                                       var esquerda = pagamento.Usuario.Assinatura.StartsWith(usuario.Assinatura + "");
+                                       var totalValor = item.Quantidade * item.ValorUnitario;
+                                       var totalBonus = item.Quantidade * item.BonificacaoUnitaria;
+                                       if (esquerda)
+                                       {
+                                          <tr>
+                                             <td>@pagamento.Pedido.Usuario.Login</td>
+                                             <td>@(item.Quantidade)x @item.Produto.Nome</td>
+                                             <td>@(esquerda ? moedaPadrao.Simbolo + totalValor.Value.ToString(moedaPadrao.MascaraOut) : "")</td>
+                                             <td>@(esquerda ? totalBonus.Value.ToString(moedaPadrao.MascaraOut) : "")</td>
+                                          </tr>
+                                       }
+                                    }
+                                 }
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
+                     contador++;
+                     active = false;
+                     acumuladoValor -= valor;
+                     acumuladoBonus -= bonus;
+                  }  // Fim Rede Linear
+               }
+            </div>
+         </div>
+                  }
+                  else
+                  {
+                     <h3>@traducaoHelper["SEM_DADOS"]</h3>
+                  }
+   </div>
+</div>

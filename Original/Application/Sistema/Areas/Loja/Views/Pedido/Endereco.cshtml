@@ -1,0 +1,418 @@
+﻿@model Core.Models.Loja.CarrinhoModel
+@{
+   #region Layout
+
+   Layout = "~/Views/Shared/_Layout.cshtml";
+
+   #endregion
+
+   #region ViewBags
+
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   ViewBag.Title = traducaoHelper["FINALIZAR_COMPRA"].ToString().ToLower();
+
+   var cepBuscaEndereco = Core.Helpers.ConfiguracaoHelper.GetBoolean("CADASTRO_CEP_BUSCA_ENDERECO");
+   var numMaximoEndereco = Core.Helpers.ConfiguracaoHelper.GetInt("CADASTRO_NUMERO_MAXIMO_ENDERECO") - 1;
+   if (numMaximoEndereco == -1)
+   {
+      numMaximoEndereco = 100;
+   }
+   var cidades = (IEnumerable<Core.Entities.Cidade>)ViewBag.Cidades;
+   var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+
+   #endregion
+
+   #region Variaveis
+
+   #endregion
+
+}
+
+@section pageStyles {
+
+   @Styles.Render("~/Content/meusDados")
+
+}
+
+@section head {
+
+}
+
+@section pageScripts {
+
+}
+
+@section PageLevelScripts{
+   @Scripts.Render("~/scripts/meusDados")
+
+   <script type="text/javascript">
+      $(document).ready(function () {
+
+         function limpa_formulário_cep() {
+            // Limpa valores do formulário de cep.
+            $("#Logradouro").val("");
+            $("#Distrito").val("");
+         }
+
+         $('#form-cadastro').validate({
+            errorElement: 'span',
+            rules: {
+               Nome: 'required',
+               CodigoPostal: 'required',
+               Logradouro: 'required',
+               Numero: 'required',
+               Distrito: 'required',
+               EstadoID: 'required',
+               CidadeID: 'required'
+            },
+            messages: {
+               Nome: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               CodigoPostal: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               Logradouro: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               Numero: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               Distrito: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               EstadoID: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               CidadeID: '@traducaoHelper["CAMPO_REQUERIDO"]'
+            },
+            errorPlacement: function (error, element) {
+               error.addClass("help-block");
+               error.insertAfter(element);
+            }
+
+         });
+         //Validacao Fim
+
+      });
+
+      function GetEndereco(enderecoID) {
+         $.post('@Url.Action("getEndereco")', { enderecoID: enderecoID }, function (data) {
+            $("#ID").val(data[0]);
+            $("#Nome").val(data[1]);
+            $("#Observacoes").val(data[2]);
+            $("#CodigoPostal").val(data[3]);
+            $("#Logradouro").val(data[4]);
+            $("#Numero").val(data[5]);
+            $("#Complemento").val(data[6]);
+            $("#Distrito").val(data[7]);
+            $("#EstadoID").val(data[8]);
+            $("#CidadeID").val(data[9]);
+            $("#Principal").val(data[10]);
+
+            $.post('@Url.Action("CidadesToUF", "cadastro", new { area = "" })', { uf: data[11], cidade: data[12] }, function (data) {
+                $('#CidadeID').html(data);
+                window.setTimeout(function () {
+                    Metronic.unblockUI('#divCidade');
+                }, 2000);
+            });
+         });
+
+         $("#dvEdicao").show();
+      }
+
+    function somenteNumeros(num) {
+        var er = /[^0-9.]/;
+        er.lastIndex = 0;
+        var campo = num;
+        if (er.test(campo.value)) {
+          campo.value = "";
+        }
+    }
+   </script>
+
+   <!--Alertas-->
+   @if (ViewBag.AlertErro != null)
+   {
+      <script>
+         errorAlert('@ViewBag.AlertErroTitulo', '@ViewBag.AlertErro');
+      </script>
+   }
+
+   @if (ViewBag.AlertSucesso != null)
+   {
+      <script>
+         successAlert('@ViewBag.AlertSucessoTitulo', '@ViewBag.AlertSucesso');
+      </script>
+   }
+
+   @if (ViewBag.AlertInfo != null)
+   {
+      <script>
+         infoAlert('@ViewBag.AlertInfoTitulo', '@ViewBag.AlertInfo');
+      </script>
+   }
+   <!--Fim Alertas-->
+
+   <script type="text/javascript">
+         function Cidades() {
+            var estado = $('#EstadoID').val();
+
+            if (estado != '') {
+               $.post('@Url.Action("cidades", "cadastro", new { area = "" })', { estadoID: estado }, function (data) {
+               var html = '<option value="">Selecione uma opção</option>';
+               for (var i in data) {
+                  html += '<option value="' + data[i].ID + '">' + data[i].Nome + '</option>';
+               }
+               $('#CidadeID').html(html);
+               window.setTimeout(function () {
+                  Metronic.unblockUI('#divCidade');
+               }, 2000);
+            });
+         }
+      }
+   </script>
+
+   @if (@cepBuscaEndereco == true)
+   {
+      <script type="text/javascript">
+         //Quando o campo cep perde o foco.
+
+         $("#CodigoPostal").blur(function () {
+            //Nova variável "cep" somente com dígitos.
+            var cep = $(this).val().replace(/\D/g, '');
+
+            //Verifica se campo cep possui valor informado.
+            if (cep != "") {
+               //Expressão regular para validar o CEP.
+               var validacep = /^[0-9]{8}$/;
+
+               //Valida o formato do CEP.
+               if (validacep.test(cep)) {
+
+                  $("#Logradouro").val('@traducaoHelper["CARREGANDO"]');
+                  $("#Distrito").val('@traducaoHelper["CARREGANDO"]');
+
+                  //Consulta o webservice viacep.com.br/
+                  $.getJSON("//viacep.com.br/ws/" + cep + "/json/?callback=?", function (dados) {
+
+                     if (!("erro" in dados)) {
+                        var est = 0;
+                        //Atualiza os campos com os valores da consulta.
+                        $("#Logradouro").val(dados.logradouro);
+                        $("#Distrito").val(dados.bairro);
+                        $("#Distrito").focus();
+                        $("#Logradouro").focus();
+                        $.post('@Url.Action("estadoID", "cadastro", new { area = "" })', { uf: dados.uf }, function (data) {
+                           $("#EstadoID").val(data);
+                           est = $('#EstadoID').val();
+                        });
+
+                        $.post('@Url.Action("CidadesToUF", "cadastro", new { area = "" })', { uf: dados.uf, cidade: dados.localidade }, function (data) {
+                           $('#CidadeID').html(data);
+                           window.setTimeout(function () {
+                              Metronic.unblockUI('#divCidade');
+                           }, 2000);
+                        });
+                     } //end if.
+                     else {
+                        //CEP pesquisado não foi encontrado.
+                        limpa_formulário_cep();
+                        alert("CEP não encontrado.");
+                     }
+                  });
+               } //end if.
+               else {
+                  //cep é inválido.
+                  limpa_formulário_cep();
+                  alert("Formato de CEP inválido.");
+               }
+            } //end if.
+            else {
+               //cep sem valor, limpa formulário.
+               limpa_formulário_cep();
+            }
+         });
+      </script>
+   }
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+   <div class="portlet-body">
+
+      <div class="page-head">
+         <!-- BEGIN PAGE TITLE -->
+         <div class="page-title">
+            <h2>@ViewBag.Title <small></small></h2>
+         </div>
+         <!-- END PAGE TITLE -->
+      </div>
+
+      <ul class="page-breadcrumb breadcrumb">
+         <li>
+            <a href="@Url.Action("Index", "Home")">home</a>
+            <i class="fa fa-angle-right"></i>
+         </li>
+         <li>
+            <a href="#">@ViewBag.Title</a>
+         </li>
+      </ul>
+   </div>
+</div>
+
+<div class="portlet aba box backWrite grey-gallery">
+
+   <div class="portlet-title">
+      <div class="caption"></div>
+      <div class="tools">
+         <a href='@Url.Action("Endereco")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+         <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+      </div>
+      <div class="actions">
+         <a href='#'>&nbsp;</a>
+         <label>&nbsp;</label>
+      </div>
+   </div>
+
+   <div class="portlet-body">
+      <div class="row ">
+         <div class="col-md-4">
+            <div class="portlet bg-grey-cararra alturaendereco">
+               <div class="portlet-title padding-lateral-20">
+                  <div class="caption font-green">
+                     <i class="fa fa-reorder font-green"></i>
+                     <span class="caption-subject bold uppercase"> @traducaoHelper["ENDERECOS"]</span>
+                  </div>
+                  <div class="actions">
+                     @if (usuario.Enderecos.Count <= numMaximoEndereco)
+                     {
+                        <a href="@Url.Action("Endereco", new { novo = 1 })" class="btn btn-circle green btn-outline btn-sm">
+                           <i class="fa fa-plus"></i> @traducaoHelper["NOVO"]
+                        </a>
+                     }
+                  </div>
+               </div>
+
+               <div class="portlet-body form padding-lateral-20">
+                  <div class="form-group form-md-radios">
+                     <div class="md-radio-list">
+                        @foreach (var endereco in usuario.Enderecos)
+                        {
+                           <div class="md-radio">
+                              <input type="radio" id="@("rd" + endereco.ID)" name="EnderecoEntrega" class="md-radiobtn" onclick="GetEndereco(@endereco.ID)">
+                              <label for="@("rd" + endereco.ID)">
+                                 <span></span>
+                                 <span class="check"></span>
+                                 <span class="box"></span>
+                                  <strong>@endereco.Nome: </strong><br>
+                                 @endereco.EnderecoCompleto - @endereco.Cidade.Nome/@endereco.Estado.Sigla - @endereco.CodigoPostal
+                              </label>
+                           </div>
+                        }
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <div class="col-md-8">
+            <div class="portlet bg-grey-cararra">
+               <div class="portlet-body form" id="dvEdicao" @(ViewBag.Novo ? "" : "hidden")>
+                  <form action="@Url.Action("SalvarEndereco")" method="post" id="form-cadastro" name="form-cadastro">
+                     <div class="form-body">
+                        <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                           <input type="text" class="form-control" id="ID" name="ID">
+                           <label for="ID">@traducaoHelper["ID"]</label>
+                           <span class="help-block"></span>
+                        </div>
+                        <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                           <input type="text" class="form-control" id="Principal" name="Principal">
+                           <label for="ID">@traducaoHelper["PRINCIPAL"]</label>
+                           <span class="help-block"></span>
+                        </div>
+
+                        <div class="row">
+                           <div class="col-md-3">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="Nome" name="Nome" maxlength="20">
+                                 <label for="Nome">@traducaoHelper["NOME"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                           <div class="col-md-9">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="Observacoes" name="Observacoes">
+                                 <label for="Observacoes">@traducaoHelper["OBSERVACAO"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div class="row">
+                           <div class="col-md-2">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="CodigoPostal" name="CodigoPostal" maxlength="8" onkeyup="somenteNumeros(this);">
+                                 <label for="CodigoPostal">@traducaoHelper["CODIGO_POSTAL"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                           <div class="col-md-8">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="Logradouro" name="Logradouro">
+                                 <label for="Logradouro">@traducaoHelper["LOGRADOURO"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                           <div class="col-md-2">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="Numero" name="Numero" maxlength="5" onkeyup="somenteNumeros(this);">
+                                 <label for="Numero">@traducaoHelper["NUMERO"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div class="row">
+                           <div class="col-md-5">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="Complemento" name="Complemento">
+                                 <label for="Complemento">@traducaoHelper["COMPLEMENTO"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                           <div class="col-md-7">
+                              <div class="form-group form-md-line-input ">
+                                 <input type="text" class="form-control" id="Distrito" name="Distrito">
+                                 <label for="Distrito">@traducaoHelper["BAIRRO"]</label>
+                                 <span class="help-block"></span>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div class="row">
+                           <div class="col-md-5">
+                              <div class="form-group form-md-line-input has-info">
+                                 <select class="form-control dropone" id="EstadoID" name="EstadoID" onchange="Cidades()">
+                                    <option value="">Selecione seu Estado</option>
+                                    @foreach (var estado in usuario.Pais.Estados.OrderBy(e => e.Nome))
+                                    {
+                                       <option value="@estado.ID">@estado.Nome</option>
+                                    }
+                                 </select>
+                                 <label for="EstadoID">@traducaoHelper["ESTADO"]</label>
+                              </div>
+                           </div>
+
+                           <div class="col-md-7">
+                              <div class="form-group form-md-line-input has-info" id="divCidade">
+                                 <select class="form-control" id="CidadeID" name="CidadeID"></select>
+                                 <label id="lblCidade" for="CidadeID">@traducaoHelper["CIDADE"]</label>
+                              </div>
+
+                              <button type="submit" class="btn blue pull-right"> @traducaoHelper["SALVAR"]</button>
+
+                              @*<a href="@Url.Action("Endereco")" class="btn red pull-left" style="color:#ffffff;float:right;">@traducaoHelper["CANCELAR"]</a>*@
+                           </div>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <a href="@Url.Action("EntregaEFaturamento")" class="btn btn-lg btn-info" style="color:#ffffff;margin:10px;">@traducaoHelper["VOLTAR"]</a>
+   </div>
+</div>

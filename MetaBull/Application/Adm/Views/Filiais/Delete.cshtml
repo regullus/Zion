@@ -1,0 +1,81 @@
+﻿@model Core.Entities.Filial
+@{
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   ViewBag.Title = ViewBag.Title = traducaoHelper["EXCLUIR"];
+   Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="portlet box grey-gallery">
+
+   <div class="portlet-title">
+      <div class="caption">
+         <i class="fa fa-eraser"></i>@traducaoHelper["EXCLUIR"]
+      </div>
+      <div class="tools">
+         <a href="javascript:;" class="collapse"></a>
+      </div>
+   </div>
+
+   <div class="portlet-body form">
+      <div class="form-body">
+         <div class="row">
+            <div class="col-md-10"><h4>@traducaoHelper["FILIAL"]</h4></div>
+            <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+         </div>
+         <h3 class="text-danger">@traducaoHelper["TEM_CERTEZA_QUE_DESEJA_EXLUIR_ESTE_ITEM"]</h3>
+         <hr />
+         <dl class="dl-horizontal">
+            <dt>@traducaoHelper["NOME"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Nome)
+            </dd>
+            <dt>@traducaoHelper["NOME_FANTASIA"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.NomeFantasia)
+            </dd>
+            <dt>@traducaoHelper["ESTADO"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Estado.Nome)
+            </dd>
+            <dt>@traducaoHelper["CIDADE"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Cidade.Nome)
+            </dd>
+            <dt>@traducaoHelper["LOGRADOURO"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Logradouro)
+            </dd>
+            <dt>@traducaoHelper["NUMERO"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Numero)
+            </dd>
+            <dt>@traducaoHelper["COMPLEMENTO"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Complemento)
+            </dd>
+            <dt>@traducaoHelper["DISTRITO"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Distrito)
+            </dd>
+            <dt>@traducaoHelper["CODIGOPOSTAL"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.CodigoPostal)
+            </dd>
+            <dt>@traducaoHelper["OBSERVACOES"]</dt>
+            <dd>
+               @Html.DisplayFor(model => model.Observacoes)
+            </dd>
+            <dd>
+            </dd>
+         </dl>
+
+         @using (Html.BeginForm())
+         {
+            @Html.AntiForgeryToken()
+            <div class="form-actions no-color">
+               <input type="submit" value="@traducaoHelper["EXCLUIR"]" class="btn btn-danger" id="confirm_button" />
+            </div>
+         }
+      </div>
+   </div>
+</div>

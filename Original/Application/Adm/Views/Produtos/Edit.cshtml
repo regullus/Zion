@@ -1,0 +1,485 @@
+﻿@model Core.Entities.Produto
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var itens = ViewBag.ProdutoItens;
+    var produtoTipos = ViewBag.TipoID;
+    var produtoCategorias = ViewBag.ProdutoCategoriaID;
+    var niveisAssociacao = ViewBag.NivelAssociacao;
+    var produtoEdit = ViewBag.ProdutoEdit;
+    var cadastroResunido = ViewBag.CadastroResunido;
+
+    ViewBag.Title = traducaoHelper["EDITAR"];
+
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+
+}
+
+@section pageStyles {
+    @*@Styles.Render("~/Content/table")*@
+
+    @Styles.Render("~/Content/meusDados")
+    <!--BEGIN CROP-->
+    @Styles.Render("~/Content/crop")
+    <!--END CROP-->
+}
+
+@section head {
+}
+
+@section pageScripts {
+    @*@Scripts.Render("~/scripts/table")
+        @Scripts.Render("~/scripts/validationPlugin")*@
+
+    @Scripts.Render("~/scripts/meusDados")
+    <!--BEGIN CROP-->
+    @Scripts.Render("~/scripts/crop")
+    <!--END CROP-->
+
+    <script type="text/javascript">
+
+      function linkUp(unusedIndex, container) {
+
+         //Altura e lagura imagem final
+         var largura = 800;
+         var altura = 800;
+         var larguraPreview = 400;
+         var alturaPreview = 400;
+
+         container = $(container); //jquery object
+
+         //a img scr deve ter na class image, essa é q que será manipulada
+         var image = container.find("img.image");
+
+         //Ratio q a imagem deve ter
+         var originalRatio = (largura / altura);
+         //Força a manter um ratio
+         var keepRatio = true;
+         var forcedRatio = keepRatio ? originalRatio : null;
+
+         //Obtem a url da imagem sem a querystring.
+         var path = image.attr('src');
+         if (path.indexOf('?') > 0) path = path.substr(0, path.indexOf('?'));
+         if (path.indexOf(';') > 0) path = path.substr(0, path.indexOf(';'));
+         var cloudFront = image.attr('src').indexOf(';') > -1;
+
+         //Verifica se ha div preview, onde será exibida a imagem
+         var divPreview = container.find("div.preview");
+
+         //Tamanho da preview se não informado no style da div
+         var previewFallbackWidth = 100;
+         var previewFallbackHeight = 100;
+         //Caso informado no style altera o widht e height da div do preview
+         var previewMaxWidth = (divPreview.attr('style') != null && divPreview.attr('style').indexOf('width') > -1) ? divPreview.width() : previewFallbackWidth;
+         var previewMaxHeight = (divPreview.attr('style') != null && divPreview.attr('style').indexOf('height') > -1) ? divPreview.height() : previewFallbackHeight;
+         divPreview.css({
+            width: previewMaxWidth + 'px',
+            height: previewMaxHeight + 'px',
+            overflow: 'hidden'
+         });
+
+         //Cria outra div para jogar a img do preview
+         var innerPreview = $('<div />').css({
+            overflow: 'hidden'
+         }).addClass('innerPreview').appendTo(divPreview);
+         //Joga a img do preview na nova div
+         $('<img />').attr('src', image.attr('src')).appendTo(innerPreview);
+
+         //Procura a href que tenha result, é um link para exibir a imagem resultante do crop
+         var links = container.find('a.result');
+         //Procura input que tenha result, o input submet um form para captura da imagem resultante do crop
+         var inputs = container.find('input.result');
+
+
+         //Essa função irá dar o update no link, no input e na div de preview da imagem
+         var update = function (coords) {
+            if (parseInt(coords.w) <= 0 || parseInt(coords.h) <= 0) return; //width e height devem ser validos
+
+            //Ratio para o cropping rectangle
+            var cropRatio = keepRatio ? originalRatio : (coords.w / coords.h);
+
+            //Para o ratio changes, the preview clipping area has to also.
+            //Calculate the width and height.
+
+            var innerWidth = cropRatio >= (previewMaxWidth / previewMaxHeight) ? previewMaxWidth : previewMaxHeight * cropRatio;
+            var innerHeight = cropRatio < (previewMaxWidth / previewMaxHeight) ? previewMaxHeight : previewMaxWidth / cropRatio;
+
+            innerPreview.css({
+               width: Math.ceil(innerWidth) + 'px',
+               height: Math.ceil(innerHeight) + 'px',
+               marginTop: (previewMaxHeight - innerHeight) / 2 + 'px',
+               marginLeft: (previewMaxWidth - innerWidth) / 2 + 'px',
+               overflow: 'hidden'
+            });
+            //Set the outer div's padding so it stays centered
+            divPreview.css({
+
+            });
+
+            //Calculate how much we are shrinking the image inside the preview window
+            var scalex = innerWidth / coords.w;
+            var scaley = innerHeight / coords.h;
+
+            //Set the width and height of the image so the right areas appear at the right scale appear.
+            innerPreview.find('img').css({
+               width: Math.round(scalex * image.width()) + 'px',
+               height: Math.round(scaley * image.height()) + 'px',
+               marginLeft: '-' + Math.round(scalex * coords.x) + 'px',
+               marginTop: '-' + Math.round(scaley * coords.y) + 'px'
+            });
+
+            //Calculate the querystring
+            var query = '?';
+            var query = '?';
+            query += 'imagePath=' + path + '&';
+            query += 'x1=' + coords.x + '&';
+            query += 'y1=' + coords.y + '&';
+            query += 'x2=' + coords.x2 + '&';
+            query += 'y2=' + coords.y2 + '&';
+            query += 'largura=' + largura + '&';
+            query += 'altura=' + altura + '&';
+            query += 'larguraPreview=' + larguraPreview + '&';
+            query += 'alturaPreview=' + alturaPreview + '&';
+            query += 'larguraImagem=' + image.width() + '&';
+            query += 'alturaImagem=' + image.height() + '&';
+            query += 'coordsw=' + coords.w + '&';
+            query += 'coordsh=' + coords.h + '&';
+            query += 'cropRatio=' + cropRatio;
+
+            //Add crop rectangle
+            //query += 'crop=(' + coords.x + ',' + coords.y + ',' + coords.x2 + ',' + coords.y2 + ')&cropxunits=' + image.width() + '&cropyunits=' + image.height()
+            //Replace ? and & with ; if using Amazon Cloudfront
+
+            if (cloudFront) query = query.replace(/\?\&/g, ';');
+
+            //Chamada da action para salvar imagem crop
+            var pathCrop = '@Url.Action("CropImage", "produtos")';
+            //Now, update the links and input values.
+            links.attr('href', pathCrop + query);
+            inputs.attr('value', query);
+
+         }
+
+         //Start up jCrop
+         var jcrop_reference = $.Jcrop(image);
+         jcrop_reference.setOptions({
+            onChange: update,
+            onSelect: update,
+            aspectRatio: forcedRatio,
+            bgColor: 'black',
+            bgOpacity: 0.6
+
+         });
+
+         //Call the function to init the preview windows
+         update({ x: 0, y: 0, x2: image.width(), y2: image.height(), w: image.width(), h: image.height() });
+
+      }
+
+      // Remember to invoke within jQuery(window).load(...)
+      // If you don't, Jcrop may not initialize properly
+      jQuery(window).load(function () {
+         $('.image-cropper').each(linkUp);
+      });
+
+    </script>
+
+    <script type="text/javascript">
+
+      $(document).ready(function () {
+         $('#produto form').validate({
+            errorElement: 'span',
+            rules: {
+               SKU: 'required',
+               TipoID: 'required',
+               Nome: 'required',
+               Peso: 'required',
+               LimitePorUsuario: 'required',
+               LimitePorPedido: 'required',
+               Estoque: 'required',
+               ProdutoCategoriaID: 'required'
+            },
+            messages: {
+               SKU: '@traducaoHelper["NOME_REQUERIDO"]',
+               TipoID: '@traducaoHelper["NOME_REQUERIDO"]',
+               Nome: '@traducaoHelper["NOME_REQUERIDO"]',
+               Peso: '@traducaoHelper["NOME_REQUERIDO"]',
+               LimitePorUsuario: '@traducaoHelper["NOME_REQUERIDO"]',
+               LimitePorPedido: '@traducaoHelper["NOME_REQUERIDO"]',
+               Estoque: '@traducaoHelper["NOME_REQUERIDO"]',
+               ProdutoCategoriaID: '@traducaoHelper["NOME_REQUERIDO"]'
+            },
+            errorPlacement: function (error, element) {
+               error.addClass("help-block");
+               error.insertAfter(element);
+            }
+         });
+      });
+
+    </script>
+}
+
+@section PageLevelScripts {
+    @Scripts.Render("~/scripts/validationScript")
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-plus"></i>@traducaoHelper["EDITAR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-md-10"><h4> @traducaoHelper["PRODUTO"] </h4></div>
+                <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+            </div>
+            <hr />
+        </div>
+
+        <div class="portlet-body" id="produto">
+            @using (Html.BeginForm("SalvarGeral", "Produtos", FormMethod.Post, new { role = "formGeral" }))
+            {
+                @Html.AntiForgeryToken()
+                @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <input type="text" class="form-control" required name="Nome" id="Nome" value="@Model.Nome">
+                                <label for="Nome">@traducaoHelper["NOME"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <select class="form-control" name="ProdutoTipo">
+                                    @foreach (var item in produtoTipos)
+                                    {
+                                        <option value="@item.Value" @(item.Value == Model.ProdutoTipo.ID.ToString() ? "selected" : "")>@item.Text</option>
+                                    }
+                                </select>
+                                <label for="ProdutoTipo">@traducaoHelper["TIPO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <input type="text" class="form-control" required name="Chamada" id="Chamada" value="@Model.Chamada">
+                                <label for="Chamada">@traducaoHelper["CHAMADAS"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <input type="text" class="form-control" required name="Descricao" id="Descricao" value="@Model.Descricao">
+                                <label for="Descricao">@traducaoHelper["DESCRICAO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <select class="form-control" name="ProdutoCategoria">
+                                    @foreach (var item in produtoCategorias)
+                                    {
+                                        <option value="@item.Value" @(item.Value == Model.ProdutoCategoria.ID.ToString() ? "selected" : "")>@item.Text</option>
+                                    }
+                                </select>
+                                <label for="ProdutoCategoria">@traducaoHelper["PRODUTO_CATEGORIA"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <select class="form-control" name="NivelAssociacao">
+                                    @foreach (var item in niveisAssociacao)
+                                    {
+                                        <option value="@item.Value" @(item.Value == Model.NivelAssociacao.ToString() ? "selected" : "")>@item.Text</option>
+                                    }
+                                </select>
+                                <label for="NivelAssociacao">@traducaoHelper["ASSOCIACAO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <input type="text" class="form-control" name="Observacao" id="Observacao" value="@Model.Observacao">
+                                <label for="Observacao">@traducaoHelper["OBSERVACOES"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <input type="text" class="form-control" name="CodigoExterno" id="CodigoExterno" value="@Model.CodigoExterno">
+                                <label for="Observacao">@traducaoHelper["CODIGO_EXTERNO"]</label>
+                            </div>
+                            <div class="form-group form-md-radios">
+                                <label for="VendaDireta">@traducaoHelper["VENDA_DIRETA"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="VendaDireta" @(Model.VendaDireta ? "checked" : "") data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+                            <div class="form-group form-md-radios">
+                                <label for="Publicado">@traducaoHelper["PUBLICADO"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="Publicado" @(Model.Publicado ? "checked" : "") data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+
+                            @*Cadastro Completo*@
+                            <div class="form-group form-md-radios" @(cadastroResunido ? "hidden" : "")>
+                                <label for="Destaque">@traducaoHelper["DESTAQUE"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="Destaque" @(Model.Destaque ? "checked" : "") data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" @(cadastroResunido ? "hidden" : "")>
+                                <input type="number" class="form-control" required name="LimitePorPedido" id="LimitePorPedido" min="0" value="@Model.LimitePorPedido">
+                                <label for="LimitePorPedido">@traducaoHelper["LIMITE_POR_PEDIDO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" @(cadastroResunido ? "hidden" : "")>
+                                <input type="number" class="form-control" required name="LimitePorUsuario" id="LimitePorUsuario" min="0" value="@Model.LimitePorUsuario">
+                                <label for="LimitePorUsuario">@traducaoHelper["LIMITE_POR_USUARIO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" @(cadastroResunido ? "hidden" : "")>
+                                <input type="number" class="form-control" required name="Peso" id="Peso" min="0" value="@Model.Peso">
+                                <label for="Peso">@traducaoHelper["PESO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" @(cadastroResunido ? "hidden" : "")>
+                                <input type="text" class="form-control" required name="Dimensoes" id="Dimensoes" value="@Model.Dimensoes">
+                                <label for="Observacao">@traducaoHelper["DIMENSOES"]</label>
+                            </div>
+                            <div class="form-group form-md-radios" @(cadastroResunido ? "hidden" : "")>
+                                <label for="ControlaEstoque">@traducaoHelper["CONTROLA_ESTOQUE"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="ControlaEstoque" @(Model.ControlaEstoque ? "checked" : "") data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" @(cadastroResunido ? "hidden" : "")>
+                                <input type="number" class="form-control" required name="Estoque" id="Estoque" min="0" value="@Model.Estoque">
+                                <label for="Estoque">@traducaoHelper["ESTOQUE"]</label>
+                            </div>
+
+                            @*Campos Escondidos*@
+                            <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                                <input type="text" class="form-control" required name="ID" id="ID" value="@Model.ID">
+                                <label for="Nome">@traducaoHelper["ID"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                                <input type="text" class="form-control" required name="SKU" id="SKU" value="@Model.SKU">
+                                <label for="Nome">@traducaoHelper["SKU"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                                <input type="datetime" class="form-control" required name="DataCriacao" id="DataCriacao" value="@Model.DataCriacao">
+                                <label for="DataCriacao">@traducaoHelper["DATA_CRIACAO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                                <input type="datetime" class="form-control" required name="DataPublicacao" id="DataPublicacao" value="@Model.DataPublicacao">
+                                <label for="DataPublicacao">@traducaoHelper["DATA_PUBLICACAO"]</label>
+                            </div>
+                            <div class="form-group form-md-radios" hidden>
+                                <label for="AtivoMensal">@traducaoHelper["ATIVO_MENSAL"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="AtivoMensal" @(Model.AtivoMensal ? "checked" : "") data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+                            <div class="form-group form-md-radios" hidden>
+                                <label for="Composto">@traducaoHelper["COMPOSTO"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="Composto" @(Model.Composto ? "checked" : "") data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 padding-0">
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-offset-10 col-md-2">
+                                    <input type="submit" value="@traducaoHelper["EDITAR"]" class="btn btn-success" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @using (Html.BeginForm("GravarImagem", "Produtos", FormMethod.Post, new { enctype = "multipart/form-data", role = "formGeral" }))
+            {
+                <div class="form-group form-md-line-input form-md-floating-label" hidden>
+                    <input type="text" class="form-control" required name="UsuarioID" id="UsuarioID" value="@Model.ID">
+                </div>
+
+                <div class="form-body" id="foto">
+                    <div class="form-horizontal">
+                        <div class="form-group image-cropper">
+                            <div class="col-md-12">
+                                <div class="form-horizontal">
+                                    <div class="row">
+                                        <div class="col-md-12">                                      
+                                            <div class="col-md-10"><h4> @traducaoHelper["IMAGEM"] </h4></div>
+                                            @*<div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>*@
+                                        </div>
+                                    </div>
+                                    <hr />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h4>@traducaoHelper["TRABALHE_IMAGEM"]</h4>
+                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                    <div class="fileinput-new thumbnail" style="padding:0;">
+                                        @if (String.IsNullOrEmpty(ViewBag.Foto))
+                                        {
+                                            <img src="~/Content/img/none.png" alt="" class="image" id="produtoFoto" style="background-color:#ddd; height: 400px; " />
+                                        }
+                                        else
+                                        {
+                                            <img src="@(ViewBag.Foto)" alt="" class="image" id="produtoFoto" style="background-color:#ddd; height: 400px; " />
+                                        }
+                                    </div>
+                                    <div class="fileinput-preview fileinput-exists thumbnail" style="height: 400px;">
+
+                                    </div>
+                                    <div>
+                                        <span class="btn default btn-file">
+                                            <span class="fileinput-new">
+                                                @traducaoHelper["ESCOLHA_IMAGEM"]
+                                            </span>
+                                            <span class="fileinput-exists">
+                                                @traducaoHelper["MUDAR_IMAGEM"]
+                                            </span>
+                                            <input type="file" id="imgFoto" name="imgFoto">
+                                        </span>
+                                        <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput">
+                                            @traducaoHelper["REMOVER_IMAGEM"]
+                                        </a>
+                                        <input type="submit" value="Obter" class="btn btn-info pull-right fileinput-exists" />
+                                        <a class="btn btn-info pull-right fileinput-new result" href="">@traducaoHelper["SALVAR_IMAGEM"]</a>
+                                    </div>
+                                </div>
+                                <p>&nbsp;</p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h4>@traducaoHelper["PREVISAO"]</h4>
+                                <div class="preview" style="width: 233px; height: 200px; border: 1px solid #eee;"></div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="help-block">
+                                    <span class="label label-danger">
+                                        @traducaoHelper["ALERTA"] <i class="fa fa-exclamation"></i>
+                                    </span>
+                                    <p style="padding-top: 5px;">@traducaoHelper["MENSAGEM1_IMAGEM"]</p>
+                                    <p>@traducaoHelper["MENSAGEM2_IMAGEM"]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+

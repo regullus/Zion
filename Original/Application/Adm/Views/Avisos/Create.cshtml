@@ -1,0 +1,453 @@
+﻿@model Core.Entities.Aviso
+
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["CRIAR"];
+
+}
+
+@section pageStyles {
+    <link href="~/Content/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+}
+
+@section head {
+}
+
+@section pageScripts {
+
+
+    <script src="~/Content/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+
+        var usuarioIDsInput = $("#UsuarioIDs");
+        var usuarioIDs = usuarioIDsInput.val().split(',');
+
+        function formatRepoSelection(repo) {
+            usuarioIDs.push(repo.id)
+            usuarioIDs = Array.from(new Set(usuarioIDs));
+            setUsuarioIDsInput()
+            return repo.full_name || repo.text;
+        }
+
+        function setUsuarioIDsInput() {
+            var value = '';
+            var coma = '';
+            for(let i of usuarioIDs)
+            {
+                value += coma + i;
+                coma = ',';
+            }
+            usuarioIDsInput.val(value);
+        }
+
+        $("#Video").on('change', e => {
+            setVideo(e);
+        });
+
+        $("#Video").on('paste', e => {
+            setVideo(e);
+        });
+
+        function setVideo(e) {
+
+            setTimeout(() => {
+
+                var value = e.target.value;
+
+                if (value) {
+
+                    var isYoutube = value.toLowerCase().indexOf('youtube') > 0;
+
+                    if (isYoutube) {
+
+                        var isWatch = value.indexOf('watch') > 0;
+
+                        if (isWatch) {
+                            var url = new URL(value);
+                            var v = url.searchParams.get("v");
+                            value = 'https://www.youtube.com/embed/' + v;
+                            $("#Video").val(value);
+                        }
+                        setVideo(value);
+
+                        $("#div-video iframe").attr("src", value);
+                        $("#div-video").show();
+                    }
+                    else {
+                        $("#Video").val('');
+                    }
+
+                }
+                else {
+                    $("#div-video").hide();
+                    $("#div-video iframe").removeAttr("src");
+                }
+
+
+            }, 200);
+
+        }
+
+        $('.js-data-example-ajax').on('select2:unselect', function (e) {
+            var value =  e.params.data.id
+            usuarioIDs = usuarioIDs.filter(item => item !== value);
+            setUsuarioIDsInput();
+        });
+
+       $('.js-data-example-ajax').select2({
+            ajax: {
+                url: "@Url.Action("GetUsuarios", "Avisos")",
+                dataType: 'json',
+               delay: 250,
+                data: function(params) {
+                     return {
+                            search: params.term // , // search term
+                            //page: params.page
+                     };
+                },
+               processResults: function (data) { //, page) {
+                    return {
+                        results: data,
+                        pagination: {
+                            more: true
+                        }
+                    };
+               },
+                cache: true
+            },
+            escapeMarkup: function(markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 3,
+            templateResult: formatRepo,
+            templateSelection: formatRepoSelection,
+            language: {
+                errorLoading:    function ()  { return '@traducaoHelper["O_RESULTADO_NAO_PODE_SER_LIDO"]';},
+                inputTooLong:    function (e) { var t = e.input.length - e.maximum, n = '@traducaoHelper["POR_FAVOR_APAGUE_X_CARACTERES"]'.replace('{0}', t); return n },
+                inputTooShort:   function (e) { var t = e.minimum - e.input.length, n = '@traducaoHelper["POR_FAVOR_ENTRE_COM_X_OU_MAIS_CARACTERES"]'.replace('{0}', t); return n },
+                loadingMore:     function ()  { return '@traducaoHelper["LENDO_MAIS_RESULTADOS"]'; },
+                maximumSelected: function (e) { return '@traducaoHelper["VOCE_SO_PODE_SELECIONAR_X_ITENS"]'.replace('{0}', e.maximum);},
+                noResults:       function ()  { return '@traducaoHelper["NENHUM_RESULTADO_ENCONTRADO"]'; },
+                searching:       function ()  { return '@traducaoHelper["PESQUISANDO"]'; }
+            }
+       });
+
+            $('.js-data-example-ajax').val([1945, 2253]);
+            $('.js-data-example-ajax').trigger('change');
+
+            var items = @(ViewBag.UsuariosJson == null ? "[]" : Html.Raw(ViewBag.UsuariosJson));
+
+            for(var item of items) {
+                let newOption = new Option(item.Name, item.id, false, true);
+                $('.js-data-example-ajax').append(newOption).trigger('change');
+            }
+
+
+        function formatRepo(repo) {
+            if (repo.loading) return repo.text;
+
+            var markup =
+                "<div class='select2-result-repository clearfix'>" +
+                //"<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url + "' /></div>" +
+                "<div class='select2-result-repository__meta'>" +
+                "<div class='select2-result-repository__title'>" + repo.text + "</div>";
+
+
+
+            //    "<div class='select2-result-repository clearfix'>" +
+            //    "<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url + "' /></div>" +
+            //    "<div class='select2-result-repository__meta'>" +
+            //    "<div class='select2-result-repository__title'>" + repo.full_name + "</div>";
+
+            //if (repo.description) {
+            //    markup += "<div class='select2-result-repository__description'>" + repo.description + "</div>";
+            //}
+
+            //markup += "<div class='select2-result-repository__statistics'>" +
+            //    "<div class='select2-result-repository__forks'><span class='glyphicon glyphicon-flash'></span> " + repo.forks_count + " Forks</div>" +
+            //    "<div class='select2-result-repository__stargazers'><span class='glyphicon glyphicon-star'></span> " + repo.stargazers_count + " Stars</div>" +
+            //    "<div class='select2-result-repository__watchers'><span class='glyphicon glyphicon-eye-open'></span> " + repo.watchers_count + " Watchers</div>" +
+            //    "</div>" +
+            //    "</div></div>";
+
+            return markup;
+            }
+
+
+    </script>
+
+
+}
+
+@section PageLevelScripts{
+}
+
+
+
+
+@section jQueryRead {
+
+}
+
+
+<div class="portlet box grey-gallery">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-plus"></i>@traducaoHelper["CRIAR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- Inicio FORM-->
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-body">
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-10"><h4> @traducaoHelper["AVISO"] </h4></div>
+                        <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                    </div>
+
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group form-md-line-input form-md-floating-label">
+                            <input type="text" class="form-control" name="Titulo" id="Titulo" maxlength="100" value="@Model.Titulo">
+                            <label for="Nome">@traducaoHelper["TITULO"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group form-md-line-input form-md-floating-label">
+                            <select class="form-control" id="TipoID" name="TipoID">
+                                @foreach (var item in ViewBag.TipoID)
+                                {
+                                    <option value="@item.Value" @(Model.TipoID.ToString() == item.Value ? "selected" : "")>@item.Text</option>
+                                }
+
+                            </select>
+                            <label for="IdiomaID">@traducaoHelper["TIPO"]</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    @*<div class="col-md-6">
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <select class="form-control" id="TipoID" name="TipoID">
+                                    @foreach (var item in ViewBag.TipoID)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                                <label for="IdiomaID">traducaoHelper["TIPO"]</label>
+                            </div>
+                        </div>*@
+
+                    <div class="col-md-3">
+                        <div class="form-group form-md-line-input form-md-floating-label">
+                            <select class="form-control" id="IdiomaID" name="IdiomaID">
+                                @foreach (var item in ViewBag.IdiomaID)
+                                {
+                                    <option value="@item.Value" @(Model.IdiomaID.ToString() == item.Value ? "selected" : "")>@item.Text</option>
+                                }
+                            </select>
+                            <label for="IdiomaID">@traducaoHelper["LANGUAGE"]</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group form-md-radios">
+                                    <label for="Publicado">@traducaoHelper["URGENTE"]</label>
+                                    <div class="md-radio">
+                                        <input type="checkbox" class="make-switch" name="Urgente" value="True" checked="@Model.Urgente" id="Urgente" data-on-text="@traducaoHelper["SIM"]" data-off-text="@traducaoHelper["NAO"]" data-size="small">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="col-md-6">
+                                    <div class="form-group form-md-line-input ">
+                                        @{
+                                            var inicio = Model.DataInicio.HasValue ? Model.DataInicio.Value.Date.ToString("s") : "";
+                                            var fim = Model.DataFim.HasValue ? Model.DataFim.Value.Date.ToString("s") : "";
+                                        }
+                                        <input type="datetime-local" class="form-control" id="DataInicio" name="DataInicio" value="@inicio" />
+                                        <label for="DataDivulgacao">@traducaoHelper["INICIO"]</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group form-md-line-input ">
+                                        <input type="datetime-local" class="form-control" id="DataFim" name="DataFim" value="@fim" />
+                                        <label for="DataDivulgacao">@traducaoHelper["FIM"]</label>
+                                    </div>
+                                </div>
+
+
+                                @*<div class="form-group form-md-radios">
+                                        <label>traducaoHelper["PERIODO"]</label>
+                                        <div class="form-group form-md-line-input form-md-floating-label padding-0 ">
+                                            <div class="input-group input-large date-picker  input-daterange" style="border-bottom: 2px solid #45b6af;" data-date-format="dd/mm/yyyy">
+                                                <input type="text" class="form-control" id="cadastroDe" name="cadastroDe" value="@ViewBag.CadastroDe">
+                                                <span class="input-group-btn">
+                                                    <button id="btnCadastroDe" name="btnCadastroDe" class="btn default" onclick="getfocus('cadastroDe')" type="button"><i class="fa fa-calendar"></i></button>
+                                                </span>
+
+                                                <span class="input-group-addon">traducaoHelper["ATE"]</span>
+
+                                                <input type="text" class="form-control" id="cadastroAte" name="cadastroAte" value="@ViewBag.CadastroAte">
+                                                <span class="input-group-btn">
+                                                    <button id="btnCadastroAte" name="btnCadastroAte" class="btn default" onclick="getfocus('cadastroAte')" type="button"><i class="fa fa-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>*@
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        @*<div class="form-group form-md-line-input form-md-floating-label">
+                                <textarea rows="2" type="text" class="form-control" id="Login" name="Login"></textarea>
+                                <label for="Login">traducaoHelper["LOGIN"]</label>
+                            </div>*@
+
+
+
+                        <div class="form-group form-md-line-input">
+                            <select id="Usuarios" name="Usuarios" class="form-control js-data-example-ajax" multiple="multiple">
+                                @*@{
+                                        if(ViewBag.UsuariosIDs != null)
+                                        {
+                                            foreach(var item in ViewBag.UsuariosIDs)
+                                            {
+                                                <option value="@item.id">@item.Name</option>
+                                            }
+                                        }
+                                    }*@
+
+                            </select>
+                            <label for="Usuarios">@traducaoHelper["USUARIOS"]</label>
+                            <input type="hidden" name="UsuarioIDs" id="UsuarioIDs" value="@Model.UsuarioIDs" />
+                        </div>
+
+                        <div class="form-group form-md-line-input form-md-floating-label" style="display:none">
+                            <select id="select2-button-addons-single-input-group-sm" class="form-control select2-multiple" multiple>
+                                <option value="2126244">twbs/bootstrap</option>
+                                <option value="3620194" selected="selected">select2/select2</option>
+                            </select>
+                            <label for="select2-button-addons-single-input-group-sm">@traducaoHelper["ASSOCIACAO"]</label>
+                        </div>
+
+                        <div class="form-group form-md-line-input form-md-floating-label">
+                            <textarea rows="2" cols="200" type="text" class="form-control" id="Texto" name="Texto">@Model.Texto</textarea>
+                            <label for="Email">@traducaoHelper["TEXTO"]</label>
+                        </div>
+
+
+                        <div class="form-group form-md-line-input form-md-floating-label">
+                            <input type="text" class="form-control" name="Video" id="Video" maxlength="255" value="@Model.Video">
+                            <label for="Video">@traducaoHelper["VIDEO_YOUTUBE"]</label>
+                        </div>
+
+                        <div id="div-video" class="form-group center" style=@(string.IsNullOrEmpty(Model.Video) ? "display:none" : "")>
+                            <iframe width="420" height="315" src="@Model.Video">
+                            </iframe>
+                        </div>
+
+
+
+
+                        @*<div class="form-group">
+                                <label class="control-label col-md-2" for="atualizacao">traducaoHelper["LANGUAGE"]</label>
+                                <div class="col-md-10">
+                                    @Html.DropDownList("IdiomaID", null, htmlAttributes: new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.IdiomaID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+
+                        @*<div class="form-group">
+                                <label class="control-label col-md-2" for="atualizacao">traducaoHelper["TIPO"]</label>
+                                <div class="col-md-10">
+                                    @Html.DropDownList("TipoID", null, htmlAttributes: new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TipoID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+
+                        @*<div class="form-group">
+                                <label class="control-label col-md-2" for="atualizacao">traducaoHelper["LOGIN"]</label>
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+
+                        @*<div class="form-group">
+                                <label class="control-label col-md-2" for="atualizacao">traducaoHelper["EMAIL"]</label>
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+
+                    </div>
+                </div>
+
+                @*<div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group form-md-radios">
+                                <label for="Publicado">traducaoHelper["URGENTE"]</label>
+                                <div class="md-radio">
+                                    <input type="checkbox" class="make-switch" name="Publicado" data-on-text="traducaoHelper["SIM"]" data-off-text="traducaoHelper["NAO"]" data-size="small">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group form-md-line-input ">
+                                <input type="datetime-local" class="form-control" id="DataDivulgacao" name="DataDivulgacao">
+                                <label for="DataDivulgacao">traducaoHelper["DATA_DIVULGACAO"]</label>
+                            </div>
+                        </div>
+                    </div>*@
+
+                @*<div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">traducaoHelper["DATA_DIVULGACAO"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.DataDivulgacao, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.DataDivulgacao, "", new { @class = "text-danger" })
+                        </div>
+                    </div>*@
+
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="@traducaoHelper["CRIAR"]" class="btn btn-success" />
+                    </div>
+                </div>
+            </div>
+        }
+        <!-- Fim FORM-->
+    </div>
+</div>
+

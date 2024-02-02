@@ -1,0 +1,290 @@
+﻿@using System.Web.Optimization
+@using Core.Helpers
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var fundos = (IEnumerable<string>)ViewBag.Fundos;
+}
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head @(ViewBag.OpenGraph == null ? null : Html.OpenGraphNamespace((OpenGraphMetadata)ViewBag.OpenGraph))>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@traducaoHelper["ACESSO_AREA_RESTRITA"] - @traducaoHelper["NOME_SITE"]</title>
+    <title>@Helpers.Local.Cliente </title>
+    <link rel="apple-touch-icon" sizes="57x57" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-57x57.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="60x60" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-60x60.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="72x72" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-72x72.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="76x76" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-76x76.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="114x114" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-114x114.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="120x120" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-120x120.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="144x144" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-144x144.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="152x152" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-152x152.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="180x180" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-180x180.png")?v=@Helpers.Local.Versao">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-32x32.png")?v=@Helpers.Local.Versao" sizes="32x32">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-192x192.png")?v=@Helpers.Local.Versao" sizes="192x192">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-96x96.png")?v=@Helpers.Local.Versao" sizes="96x96">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-16x16.png")?v=@Helpers.Local.Versao" sizes="16x16">
+    <link href="@Url.Content("~/Content/global/plugins/font-awesome/css/font-awesome.min.css")" rel="stylesheet" />
+
+    <link rel="manifest" href="@Url.RouteUrl(HomeControllerRoute.GetManifestJson)">
+    <meta name="theme-color" content="#1E1E1E">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,300,600,700&subset=all" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
+
+    <meta name="x-font-awesome-stylesheet-fallback-test" class="fa">
+    <!-- BEGIN CSS -->
+    @Styles.Render("~/css/theme/Login")
+    @Styles.Render("~/css/theme/type")
+    <!-- END Less -->
+
+    <meta name="x-font-awesome-stylesheet-fallback-test" class="fa">
+    <meta name="description">
+    <link href="/feed/" rel="alternate" title="ASP.NET MVC Sistema Feed" type="application/atom+xml">
+    <link href="/opensearch.xml" rel="search" title="Sistema" type="application/opensearchdescription+xml">
+
+    <link rel="shortcut icon" type="image/x-icon" href="@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Favicon.ico")" />
+
+    @RenderSection("head", required: false)
+
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
+    <style>
+      body {
+         background: url('@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/LoginBG.jpg?v=" + @Helpers.Local.Versao)') no-repeat center center fixed;
+         -webkit-background-size: cover;
+         -moz-background-size: cover;
+         -o-background-size: cover;
+         background-size: cover;
+      }
+
+      .panel-default {
+         opacity: 0.9;
+         margin-top: 30px;
+      }
+
+      .form-group.last {
+         margin-bottom: 0px;
+      }
+    </style>
+</head>
+<body>
+    <div class="login">
+        <div id="particles-js" style="z-index: -10"></div>
+
+        <!-- BEGIN LOGO -->
+        <div class="logo margem-10">
+            <img src="@(Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/logo-login.png") + "?v=" + Helpers.Local.Versao)" alt="logo" />
+        </div>
+        <!-- Fim LOGO -->
+        <!-- BEGIN LOGIN -->
+        <div class="content">
+            @RenderBody()
+        </div>
+        <!-- END LOGIN -->
+        <!-- BEGIN COPYRIGHT -->
+        <div class="copyright">
+            &copy; @Core.Helpers.App.DateTimeZion.Year - @Helpers.Local.Cliente - @Helpers.Local.Versao
+        </div>
+        <!-- END COPYRIGHT -->
+        <!-- BEGIN ALTERT -->
+        <div id="modAlert" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">@ViewBag.PopupTitle</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            @ViewBag.PopupMessage
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-success">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fim ALERT -->
+        <!--Modal Termo de Aceite-->
+        <div id="modTermo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">@traducaoHelper["TERMO_ACEITE"]</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            @traducaoHelper["CONFIRMA_LEITURA_TERMO_ACEITE"]
+                        </p><br />
+                        <div>
+                            <input type="checkbox" id="chkTermos" name="chkTermos" onclick="ValidaCheckTermos();">
+                            @traducaoHelper["ACEITA_TERMOS"] <a href="@traducaoHelper["ACEITA_TERMOS_URL"]" target="_blank"><b>@traducaoHelper["ACEITA_TERMOS_TERMO"]</b> <i class="fa fa-download"></i></a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-success">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Fim Modal Termo de Aceite-->
+        @*Tema Inicio JS*@
+
+        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+        <!-- BEGIN CORE PLUGINS -->
+        <!--[if lt IE 9]>
+        <script src="Content/theme/global/plugins/respond.min.js"></script>
+        <script src="Content/theme/global/plugins/excanvas.min.js"></script>
+        <![endif]-->
+
+        @Scripts.Render("~/scripts/theme/comum")
+        @Scripts.Render("~/scripts/theme/login")
+
+        <!--Call Popup Message -->
+        @if (ViewBag.PopupShow == "OK")
+        {
+            <script type="text/javascript">
+                $('#modAlert').modal('show');
+            </script>
+        }
+        @if (ViewBag.ExibeTermoAceite == "true")
+        {
+            <script type="text/javascript">
+                $('#modTermo').modal('show');
+            </script>
+        }
+
+        <script>
+            jQuery(document).ready(function () {
+                //Metronic.init(); // init metronic core components
+                //Layout.init(); // init current layout
+                //Login.init();
+                //Demo.init();
+            });
+        </script>
+
+        <script>
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": {
+                        "value": 147,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        },
+                        "image": {
+                            "src": "img/github.svg",
+                            "width": 100,
+                            "height": 100
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 6,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": false,
+                            "mode": "bubble"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 400,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        </script>
+        <!-- END JAVASCRIPTS -->
+     
+        @RenderSection("scripts", required: false)
+
+    </div>
+</body>
+</html>

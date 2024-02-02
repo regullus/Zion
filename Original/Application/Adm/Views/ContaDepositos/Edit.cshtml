@@ -1,0 +1,157 @@
+﻿@model Core.Entities.ContaDeposito
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = "Editar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="portlet box grey-gallery">
+
+   <div class="portlet-title">
+      <div class="caption">
+         <i class="fa fa-reorder"></i>Editar
+      </div>
+      <div class="tools">
+         <a href="javascript:;" class="collapse"></a>
+      </div>
+   </div>
+
+   <div class="portlet-body form">
+      <!-- BEGIN FORM-->
+      @using (Html.BeginForm())
+      {
+         @Html.AntiForgeryToken()
+         <div class="form-body">
+             <div class="form-horizontal">
+                 <div class="row">
+                     <div class="col-md-10"><h4>Contas para Depósito</h4></div>
+                     <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                 </div>
+                 <hr />
+                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                 @Html.HiddenFor(model => model.ID)
+
+                 <div class="form-group hide">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["USUARIO"]</label>
+                     <div class="col-md-10">
+                         @Html.DropDownList("IDUsuario", null, htmlAttributes: new { @class = "form-control" })
+                         @Html.ValidationMessageFor(model => model.IDUsuario, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["TIPO_CONTA"]</label>
+                     <div class="col-md-10">
+                         @Html.DropDownList("IDTipoConta", null, htmlAttributes: new { @class = "form-control" })
+                         @Html.ValidationMessageFor(model => model.IDTipoConta, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["INSTITUICAO"]</label>
+                     <div class="col-md-10">
+                         @Html.DropDownList("IDInstituicao", null, htmlAttributes: new { @class = "form-control" })
+                         @Html.ValidationMessageFor(model => model.IDInstituicao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["AGENCIA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Agencia, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Agencia, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["CONTA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Conta, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Conta, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DIGITO_CONTA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DigitoConta, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DigitoConta, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PROPRIETARIO_CONTA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.ProprietarioConta, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.ProprietarioConta, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["IDENTIFICACAO_PROPRIETARIO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.IdentificacaoProprietario, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.IdentificacaoProprietario, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_CRIACAO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DataCriacao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DataCriacao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["CPF"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.CPF, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.CPF, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["CNPJ"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.CNPJ, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.CNPJ, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["MEIO_PAGAMENTO"]</label>
+                     <div class="col-md-10">
+                         @Html.DropDownList("IDMeioPagamento", null, htmlAttributes: new { @class = "form-control" })
+                         @Html.ValidationMessageFor(model => model.IDMeioPagamento, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">Litecoin</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Litecoin, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Litecoin, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["CRIPTOMOEDA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Bitcoin, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Bitcoin, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <div class="col-md-offset-2 col-md-10">
+                         <input type="submit" value="Salvar" class="btn btn-default" />
+                     </div>
+                 </div>
+             </div>
+         </div>
+         }
+   </div>
+ </div>
+

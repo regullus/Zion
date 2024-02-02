@@ -1,0 +1,584 @@
+﻿@model Core.Entities.Usuario
+@{
+   #region Layout
+   Layout = "~/Views/Shared/_Layout.cshtml";
+   #endregion
+
+   #region ViewBags
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   ViewBag.Title = traducaoHelper["EDITAR"];
+   #endregion
+
+   #region Variaveis
+   #endregion
+
+}
+
+@section pageStyles {
+   <!--BEGIN Cadastro-->
+   @Styles.Render("~/Content/cadastro")
+   <!--END Cadastro-->
+}
+
+@section head {
+}
+
+@section pageScripts {
+   <!--BEGIN Cadastro-->
+   @Scripts.Render("~/scripts/cadastro")
+   <!--END Cadastro-->
+}
+
+@section PageLevelScripts{
+
+   <script type="text/javascript">
+      //Read
+      //$(document).ready(function () {
+
+      //   $('#DataNascimento').mask('99/99/9999');
+
+      //   $('#Documento').mask('999.999.999-99');
+
+      //});
+      //fim Read
+
+      $('#form-usuario').validate({
+         errorElement: 'span',
+         rules: {
+            Nome: {
+               required: true,
+               minlength: 3
+            },
+            DataNascimento: {
+               required: true,
+               remote: '@Url.Action("DataValidar", "usuarios")'
+            },
+            Documento: {
+               required: true,
+               remote: '@Url.Action("DocumentoValidar", "usuarios")'
+            },
+            Email: {
+               required: true,
+               email: true,
+               remote: '@Url.Action("EmailValidar", "usuarios")'
+            }
+         },
+         messages: {
+            Nome: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]'
+            },
+            DataNascimento: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               remote: '@traducaoHelper["DATA_INVALIDA"]'
+            },
+            Documento: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               remote: 'CPF em uso'
+            },
+            Email: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
+               remote: '@traducaoHelper["EMAIL_EM_USO"]'
+            }
+         },
+         errorPlacement: function (error, element) {
+            error.addClass("help-block");
+            error.insertAfter(element);
+         }
+      });
+      //Validacao Fim
+
+
+
+      @*$('#form-usuario').validate({
+         errorElement: 'span',
+         rules: {
+            Nome: {
+               required: true,
+               minlength: 3
+            },
+            DataNascimento: {
+               required: true,
+               remote: '@Url.Action("DataValidar", "cadastro")'
+            },
+            Documento: {
+               required: true,
+               remote: '@Url.Action("DocumentoValidar", "cadastro")'
+            },
+            EstadoID: 'required',
+            CidadeID: 'required',
+            Logradouro: 'required',
+            Celular: {
+               required: true,
+               minlength: 6
+            },
+            Email: {
+               required: true,
+               email: true,
+               remote: '@Url.Action("EmailValidar", "cadastro")'
+            },
+            ConfirmarEmail: {
+               equalTo: '#Email'
+            },
+            Login: {
+               required: true,
+               minlength: 3,
+               remote: '@Url.Action("LoginValidar", "cadastro")'
+            },
+            Senha: {
+               required: true,
+               minlength: 6,
+               password: true
+            },
+            ConfirmarSenha: {
+               equalTo: '#Senha'
+            }
+         },
+         messages: {
+            Nome: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]'
+            },
+            DataNascimento: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               remote: '@traducaoHelper["DATA_INVALIDA"]'
+            },
+            Documento: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               remote: 'CPF em uso'
+            },
+            EstadoID: '@traducaoHelper["CAMPO_REQUERIDO"]',
+            CidadeID: '@traducaoHelper["CAMPO_REQUERIDO"]',
+            Logradouro: '@traducaoHelper["CAMPO_REQUERIDO"]',
+            Celular: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               minlength: '@traducaoHelper["CELULAR_INVALIDO"]'
+            },
+            Email: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
+               remote: '@traducaoHelper["EMAIL_EM_USO"]'
+            },
+            ConfirmarEmail: {
+               email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
+               equalTo: '@traducaoHelper["DIGITE_MESMO_EMAIL"]'
+            },
+            Login: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]',
+               remote: '@traducaoHelper["LOGIN_EM_USO"]'
+            },
+            Senha: {
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               minlength: '@traducaoHelper["SENHA_DEVE_CONTER_6_CARACTERES"]',
+               password: '@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]'
+            },
+            ConfirmarSenha: {
+               equalTo: '@traducaoHelper["DIGITE_MESMA_SENHA"]',
+               required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+               minlength: '@traducaoHelper["SENHA_DEVE_CONTER_6_CARACTERES"]',
+               password: '@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]'
+            }
+         },
+         errorPlacement: function (error, element) {
+            error.addClass("help-block");
+            error.insertAfter(element);
+         }*@
+
+   </script>
+
+}
+
+@section jQueryRead {
+   FormValidation.init();
+}
+
+<div class="portlet box grey-gallery">
+   <div class="portlet-title">
+      <div class="caption">
+         <i class="fa fa-pencil"></i>@traducaoHelper["EDITAR"]
+      </div>
+      <div class="tools">
+         <a href="javascript:;" class="collapse"></a>
+      </div>
+   </div>
+
+   <div class="portlet-body form">
+      <!-- BEGIN FORM-->
+      @using (Html.BeginForm(new { id = "form-usuario", name = "form-usuario" }))
+      {
+         @Html.AntiForgeryToken()
+         <div class="form-body">
+             <div class="form-horizontal">
+                 <div class="row">
+                     <div class="col-md-10"><h4>@traducaoHelper["USUARIOS"]</h4></div>
+                     <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                 </div>
+                 <hr />
+
+                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                 @Html.HiddenFor(model => model.ID)
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["LOGIN"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", id = "Login" } })
+                         @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["APELIDO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Apelido, new { htmlAttributes = new { @class = "form-control", id = "Apelido" } })
+                         @Html.ValidationMessageFor(model => model.Apelido, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NOME"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control", id = "Nome" } })
+                         @Html.ValidationMessageFor(model => model.Nome, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NOME_FANTASIA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.NomeFantasia, new { htmlAttributes = new { @class = "form-control", id = "NomeFantasia" } })
+                         @Html.ValidationMessageFor(model => model.NomeFantasia, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DOCUMENTO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Documento, new { htmlAttributes = new { @class = "form-control", id = "Documento" } })
+                         @Html.ValidationMessageFor(model => model.Documento, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["EMAIL"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", id = "Email" } })
+                         @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["TELEFONE"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Telefone, new { htmlAttributes = new { @class = "form-control", id = "Telefone" } })
+                         @Html.ValidationMessageFor(model => model.Telefone, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["CELULAR"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Celular, new { htmlAttributes = new { @class = "form-control", id = "Celular" } })
+                         @Html.ValidationMessageFor(model => model.Celular, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["FILIAL"]</label>
+                     <div class="col-md-10">
+                         @Html.DropDownList("FilialID", null, htmlAttributes: new { @class = "form-control" })
+                         @Html.ValidationMessageFor(model => model.FilialID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_NASCIMENTO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DataNascimento, new { htmlAttributes = new { @class = "form-control", id = "DataNascimento" } })
+                         @Html.ValidationMessageFor(model => model.DataNascimento, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["SEXO"]</label>
+                     <div class="col-md-2">
+                         <select name="Sexo" class="form-control">
+                             <option value="M" @(Model.Sexo == "M" || Model.Sexo == "" ? "SELECTED" : "")>@traducaoHelper["MASCULINO"]</option>
+                             <option value="F" @(Model.Sexo == "F" ? "SELECTED" : "") >@traducaoHelper["FEMININO"]</option>
+                         </select>
+                     </div>
+                 </div>
+
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["GERA_BONUS"]</label>
+                     <div class="col-md-1">
+                         @Html.EditorFor(model => model.GeraBonus, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.GeraBonus, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["RECEBE_BONUS"]</label>
+                     <div class="col-md-1">
+                         @Html.EditorFor(model => model.RecebeBonus, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.RecebeBonus, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["BLOQUEADO"]</label>
+                     <div class="col-md-1">
+                         @Html.EditorFor(model => model.Bloqueado, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Bloqueado, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["OCULTO"]</label>
+                     <div class="col-md-1">
+                         @Html.EditorFor(model => model.Oculto, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Oculto, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["EXIBE_SAQUE"]</label>
+                     <div class="col-md-1">
+                         <input type="checkbox" value="1" class="form-control  pull-left" name="ExibeSaque" @(Model.ExibeSaque.HasValue ? (Model.ExibeSaque == 1 ? "CHECKED" : "") : "") />
+                     </div>
+                 </div>
+
+
+
+
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["SENHA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Senha, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Senha, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["ENTRADA"]</label>
+                     <div class="col-md-10">
+                         @*@Html.DropDownList("EntradaID", null, htmlAttributes: new { @class = "form-control" })*@
+                         @Html.EditorFor(model => model.EntradaID, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.EntradaID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["ASSINATURA"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Assinatura, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Assinatura, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PAIS"]</label>
+                     <div class="col-md-10">
+                         @Html.DropDownList("PaisID", null, htmlAttributes: new { @class = "form-control" })
+                         @Html.ValidationMessageFor(model => model.PaisID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 @*<div class="form-group" hidden>
+           <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PATROCINADOR_DIRETO"]</label>
+           <div class="col-md-10">
+              @Html.DropDownList("PatrocinadorDiretoID", null, htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.PatrocinadorDiretoID, "", new { @class = "text-danger" })
+           </div>
+        </div>
+
+        <div class="form-group" hidden>
+           <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PATROCINADOR_POSICAO"]</label>
+           <div class="col-md-10">
+              @Html.DropDownList("PatrocinadorPosicaoID", null, htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.PatrocinadorPosicaoID, "", new { @class = "text-danger" })
+           </div>
+        </div>
+
+        <div class="form-group" hidden>
+           <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["ULTIMO_DIREITA"]</label>
+           <div class="col-md-10">
+              @Html.DropDownList("UltimoDireitaID", null, htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.UltimoDireitaID, "", new { @class = "text-danger" })
+           </div>
+        </div>
+
+        <div class="form-group" hidden>
+           <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["ULTIMO_ESQUERDA"]</label>
+           <div class="col-md-10">
+              @Html.DropDownList("UltimoEsquerdaID", null, htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.UltimoEsquerdaID, "", new { @class = "text-danger" })
+           </div>
+        </div>*@
+
+                 <div class="=form-group" hidden>
+                     @Html.EditorFor(model => model.PatrocinadorDiretoID, new { htmlAttributes = new { @class = "form-control" } })
+                 </div>
+                 <div class="=form-group" hidden>
+                     @Html.EditorFor(model => model.PatrocinadorPosicaoID, new { htmlAttributes = new { @class = "form-control" } })
+                 </div>
+                 <div class="=form-group" hidden>
+                     @Html.EditorFor(model => model.UltimoDireitaID, new { htmlAttributes = new { @class = "form-control" } })
+                 </div>
+                 <div class="=form-group" hidden>
+                     @Html.EditorFor(model => model.UltimoEsquerdaID, new { htmlAttributes = new { @class = "form-control" } })
+                 </div>
+                 <div class="=form-group" hidden>
+                     @Html.EditorFor(model => model.IdAutenticacao, new { htmlAttributes = new { @class = "form-control" } })
+                     @Html.EditorFor(model => model.TermoAceite, new { htmlAttributes = new { @class = "form-control" } })
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NIVEL_ASSOCIACAO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.NivelAssociacao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.NivelAssociacao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NIVEL_CLASSIFICACAO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.NivelClassificacao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.NivelClassificacao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PROFUNDIDADE_REDE"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.ProfundidadeRede, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.ProfundidadeRede, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DERRAMAMENTO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DerramamentoID, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DerramamentoID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 @* CRIAR TABELA de TIPOS para Usuario
+           <div class="form-group">
+           <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["TIPO"]</label>
+           <div class="col-md-10">
+              @Html.DropDownList("TipoID", null, htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.TipoID, "", new { @class = "text-danger" })
+           </div>
+        </div>*@
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">Status</label>
+                     <div class="col-md-10">
+                         @*@Html.DropDownList("StatusID", null, htmlAttributes: new { @class = "form-control" })*@
+                         @Html.EditorFor(model => model.StatusID, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.StatusID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["STATUS_CELULAR"]</label>
+                     <div class="col-md-10">
+                         @*@Html.DropDownList("StatusCelularID", null, htmlAttributes: new { @class = "form-control" })*@
+                         @Html.EditorFor(model => model.StatusCelularID, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.StatusCelularID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["STATUS_EMAIL"]</label>
+                     <div class="col-md-10">
+                         @*@Html.DropDownList("StatusEmailID", null, htmlAttributes: new { @class = "form-control" })*@
+                         @Html.EditorFor(model => model.StatusEmailID, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.StatusEmailID, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["SENHA_LEGADO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.SenhaLegado, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.SenhaLegado, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_ATIVACAO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DataAtivacao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DataAtivacao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_VALIDADE"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DataValidade, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DataValidade, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_ATUALIZACAO_GANHO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DataMigracao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DataMigracao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["TIPO_ATIVACAO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.TipoAtivacao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.TipoAtivacao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 @*<div class="form-group" hidden>
+           <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["AUTENTICACAO"]</label>
+           <div class="col-md-10">
+              @Html.DropDownList("IdAutenticacao", null, htmlAttributes: new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.IdAutenticacao, "", new { @class = "text-danger" })
+           </div>
+        </div>*@
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["QUANTIDADE_DIRETOS"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.QtdeDiretos, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.QtdeDiretos, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group" hidden>
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_ATUALIZACAO_GANHO"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.DataCriacao, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.DataCriacao, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <div class="col-md-offset-2 col-md-10">
+                         <input type="submit" value="@traducaoHelper["EDITAR"]" class="btn green-haze" />
+                     </div>
+                 </div>
+             </div>
+         </div>
+      }
+
+   </div>
+</div>
+

@@ -1,0 +1,79 @@
+﻿@model Core.Entities.Classificacao
+
+@{
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   ViewBag.Title = traducaoHelper["EDITAR"];
+   Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="portlet box grey-gallery">
+
+   <div class="portlet-title">
+      <div class="caption">
+         <i class="fa fa-pencil"></i>@traducaoHelper["EDITAR"]
+      </div>
+      <div class="tools">
+         <a href="javascript:;" class="collapse"></a>
+      </div>
+   </div>
+
+   <div class="portlet-body form">
+      <!-- BEGIN FORM-->
+      @using (Html.BeginForm())
+      {
+         @Html.AntiForgeryToken()
+         <div class="form-body">
+             <div class="form-horizontal">
+                 <div class="row">
+                     <div class="col-md-10"><h4>@traducaoHelper["CLASSIFICACAO"]</h4></div>
+                     <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                 </div>
+                 <hr />
+                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                 @Html.HiddenFor(model => model.ID)
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NOME"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Nome, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NIVEL"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Nivel, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Nivel, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PONTOS"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.Pontos, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.Pontos, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["BONUS"]</label>
+                     <div class="col-md-10">
+                         @Html.EditorFor(model => model.ValorBonus, new { htmlAttributes = new { @class = "form-control" } })
+                         @Html.ValidationMessageFor(model => model.ValorBonus, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <div class="col-md-offset-2 col-md-10">
+                         <input type="submit" value="@traducaoHelper["EDITAR"]" class="btn green-haze" />
+                     </div>
+                 </div>
+             </div>
+         </div>
+      }
+   </div>
+
+</div>
+

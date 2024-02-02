@@ -1,0 +1,570 @@
+﻿@model Core.Entities.Usuario
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    var associacoes = (IEnumerable<Core.Entities.Associacao>)ViewBag.Associacoes;
+    var associacao = associacoes.FirstOrDefault(a => a.Nivel == Model.NivelAssociacao);
+    var produtos = (IEnumerable<Core.Entities.Produto>)ViewBag.Produtos;
+    var enderecoCompleto = "";
+
+    try
+    {
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.Logradouro != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.Logradouro + ", ";
+        }
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.Numero != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.Numero + " ";
+        }
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.Complemento != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.Complemento + " ";
+        }
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.Distrito != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.Distrito + " ";
+        }
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.Cidade != null && Model.EnderecoPrincipal.Cidade.Nome != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.CidadeNome + " - ";
+        }
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.Estado != null && Model.EnderecoPrincipal.Estado.Sigla != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.Estado.Sigla + " ";
+        }
+        if (Model.EnderecoPrincipal != null && Model.EnderecoPrincipal.CodigoPostal != null)
+        {
+            enderecoCompleto += Model.EnderecoPrincipal.CodigoPostal;
+        }
+    }
+    catch (Exception)
+    {
+        enderecoCompleto = "";
+    }
+
+    ViewBag.Title = traducaoHelper["DETALHES"];
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/sweetAlert")
+}
+
+@section head {
+}
+
+@section pageScripts {
+    <script type="text/javascript">
+
+      @*function AlterarPlanoHandler() {
+         $('#divLoadingAlterarPlano').show();
+         $('#btnAlterarPlanoSim').hide();
+         $('#btnAlterarPlanoNao').hide();
+
+         var cod = '@Model.ID';
+         var perfil = $('#ddlPerfilAlterarPlano').val();
+
+         $.ajax({
+            url: '@Url.Action("AlterarPlano")',
+            type: 'POST',
+            data: { 'cf': cod, 'perfil': perfil },
+            success: function (data) { SuccessAlterarPlanoHandler(data); },
+            error: function (data) { OnFailAlterarPlanoHandler(data); }
+         });
+         return false;
+      }
+      function SuccessAlterarPlanoHandler(data) {
+         $('#divLoadingAlterarPlano').hide();
+         $('#btnAlterarPlanoHideModal').click();
+         alert('Plano alterado com sucesso');
+         document.location.reload();
+      }
+      function OnFailAlterarPlanoHandler(data) {
+         $('#divLoadingAlterarPlano').hide();
+         $('#btnAlterarPlanoHideModal').click();
+         alert('erro ao alterar plano do usuario: ' + data);
+      }*@
+
+      function Bloquear() {
+         swal({
+            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+            text: '@Html.Raw(Model.Bloqueado?traducaoHelper["DESBLOQUEAR_USUARIO"]:traducaoHelper["BLOQUEAR_USUARIO"])',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+            closeOnConfirm: false,
+            closeOnCancel: false
+         },
+         function (isConfirm) {
+            if (isConfirm) {
+               var cod = '@Model.ID';
+               $.ajax({
+                  url: '@Url.Action("Bloquear")',
+                  type: 'POST',
+                  data: { 'cf': cod },
+                  success: function (data) {
+                     if (data == 'OK') {
+                        swal({
+                           title: '@Html.Raw(traducaoHelper["SUCESSO"])',
+                           text: '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])',
+                           type: 'success'
+                        },
+                        function (isConfirm) {
+                           if (isConfirm) {
+                              document.location.reload();
+                           }
+                        });
+                     }
+                     else {
+                        swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                     }
+                  },
+                  error: function (data) {
+                     swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                  }
+               });
+            } else {
+               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
+            };
+         });
+      };
+
+      function Excluir() {
+         swal({
+            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+            text: '@Html.Raw(traducaoHelper["EXCLUIR_USUARIO"])',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+            closeOnConfirm: false,
+            closeOnCancel: false
+         },
+         function (isConfirm) {
+            if (isConfirm) {
+               var cod = '@Model.ID';
+               $.ajax({
+                  url: '@Url.Action("Excluir")',
+                  type: 'POST',
+                  data: { 'cf': cod },
+                  success: function (data) {
+                     if (data == 'OK') {
+                        swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])', 'success');
+                        swal({
+                           title: '@Html.Raw(traducaoHelper["SUCESSO"])',
+                           text: '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])',
+                           type: 'success'
+                        },
+                        function (isConfirm) {
+                           if (isConfirm) {
+                              window.location.href = "@Url.Action("index", "usuarios")";
+                           }
+                        });
+                     }
+                     else {
+                        swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                     }
+                  },
+                  error: function (data) {
+                     swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                  }
+               });
+            } else {
+               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
+            };
+         });
+      };
+
+      function Email() {
+         swal({
+            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+            text: '@Html.Raw(traducaoHelper["ENVIAR_EMAIL_ATIVACAO_USUARIO"])',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+            closeOnConfirm: false,
+            closeOnCancel: false
+         },
+         function (isConfirm) {
+            if (isConfirm) {
+               var cod = '@Model.ID';
+               $.ajax({
+                  url: '@Url.Action("Email")',
+                  type: 'POST',
+                  data: { 'cf': cod },
+                  success: function (data) {
+                     if (data == 'OK') {
+                        swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])', 'success');
+                     }
+                     else {
+                        swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                     }
+                  },
+                  error: function (data) {
+                     swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                  }
+               });
+            } else {
+               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
+            };
+         });
+      };
+
+      function Movimento() {
+         swal({
+            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+            text: '@Html.Raw(traducaoHelper["INSERIR_MOVIMENTACAO_FINANCEIRA"])',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+            closeOnConfirm: false,
+            closeOnCancel: false
+         },
+         function (isConfirm) {
+            if (isConfirm) {
+               document.location = '@Url.Action("incluir", "movimentacoes", new { id = Model.ID })';
+            } else {
+               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
+            };
+         });
+      };
+
+      function ContaAdminstrativa() {
+         swal({
+            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+            text: '@Html.Raw(traducaoHelper["ALTERAR_USUARIO_CONTA_ADMINISTRATIVA"])',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+            closeOnConfirm: false,
+            closeOnCancel: false
+         },
+         function (isConfirm) {
+            if (isConfirm) {
+               var cod = '@Model.ID';
+               $.ajax({
+                  url: '@Url.Action("ContaAdminstrativa")',
+                  type: 'POST',
+                  data: { 'cf': cod },
+                  success: function (data) {
+                     if (data == 'OK') {
+
+                        swal({
+                           title: '@Html.Raw(traducaoHelper["SUCESSO"])',
+                           text: '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])',
+                           type: 'success'
+                        },
+                        function (isConfirm) {
+                           if (isConfirm) {
+                              document.location.reload();
+                           }
+                        });
+                     }
+                     else {
+                        swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                     }
+                  },
+                  error: function (data) {
+                     swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
+                  }
+               });
+            } else {
+               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
+            };
+         });
+      };
+
+    </script>
+}
+
+@section PageLevelScripts {
+    @Scripts.Render("~/scripts/sweetAlert")
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-book "></i>@traducaoHelper["DETALHES"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+        <div class="actions">
+            <input type="button" value="@(Model.Bloqueado ? traducaoHelper["DESBLOQUEAR"] : traducaoHelper["BLOQUEAR"])" class="btn green-haze" onclick="return Bloquear();" />
+
+            @if (Model.Status != Core.Entities.Usuario.TodosStatus.Associado && Model.Status != Core.Entities.Usuario.TodosStatus.Bloqueado)
+            {
+                <input type="button" value="@(traducaoHelper["EXCLUIR"])" class="btn green-haze" onclick="return Excluir();" />
+                <input type="button" value="@(traducaoHelper["ENVIAR_EMAIL_ATIVACAO"])" class="btn green-haze" onclick="return Email();" />
+            }
+
+            @if (Model.Status == Core.Entities.Usuario.TodosStatus.Associado)
+            {
+                <input type="button" value="@(traducaoHelper["INSERIR_MOVIMENTACAO_FINANCEIRA"])" class="btn green-haze" onclick="return Movimento();" />
+            }
+
+            @if (Model.DataValidade != DateTime.Parse("2100-01-01 00:00:00"))
+            {
+                <input type="button" value="@(traducaoHelper["CONTA_ADMINISTRATIVA"])" class="btn green-haze" onclick="return ContaAdminstrativa();" />
+            }
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+        <div class="form-body">
+            <div class="row">
+                <div class="col-md-10"><h4>@traducaoHelper["USUARIOS"]</h4></div>
+                <div class="col-md-2">
+                    @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
+                    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }, new { @class = "Editar pull-right", title = traducaoHelper["EDITAR"] })
+                </div>
+            </div>
+            <hr />
+
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["LOGIN"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Login)
+                </dd>
+                <dt>@traducaoHelper["NOME"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Nome)
+                </dd>
+                <dt>@traducaoHelper["DOCUMENTO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Documento)
+                </dd>
+                <dt>@traducaoHelper["APELIDO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Apelido)
+                </dd>
+                <dt>@traducaoHelper["NOME_FANTASIA"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.NomeFantasia)
+                </dd>
+                <dt>@traducaoHelper["EMAIL"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+                <dt>@traducaoHelper["CELULAR"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Celular)
+                </dd>
+                <dt>@traducaoHelper["TELEFONE"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Telefone)
+                </dd>
+                <dt>@traducaoHelper["ENDERECO_COMPLETO"]</dt>
+                <dd>
+                    @enderecoCompleto
+                </dd>
+                <dt>@traducaoHelper["DATA_NASCIMENTO"]</dt>
+                <dd>
+                    @Model.DataNascimento.ToString("dd/MM/yyyy")
+                </dd>
+                <dt>@traducaoHelper["ASSOCIACAO"]</dt>
+                <dd>
+                    @(associacao != null ? associacao.Nome : "-")
+                </dd>
+                <dt>@traducaoHelper["GERA_BONUS"]</dt>
+                <dd>
+                    @(Model.GeraBonus ? "Sim" : "Não")
+                </dd>
+                <dt>@traducaoHelper["RECEBE_BONUS"]</dt>
+                <dd>
+                    @(Model.RecebeBonus ? "Sim" : "Não")
+                </dd>
+                <dt>@traducaoHelper["FILIAL"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Filial.Nome)
+                </dd>
+                <dt>@traducaoHelper["DATA_CRIACAO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.DataCriacao)
+                </dd>
+                <dt>@traducaoHelper["STATUS"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+                <dt>@traducaoHelper["BLOQUEADO"]</dt>
+                <dd>
+                    @(Model.Bloqueado ? "Sim" : "Não")
+                </dd>
+                <dt>@traducaoHelper["SOLICITA_SAQUE"]</dt>
+                <dd>
+                    @(Model.ExibeSaque != 0 ? "Sim" : "Não")
+                </dd>
+                <dt>@traducaoHelper["CONTA_ADMINISTRATIVA"]</dt>
+                <dd>
+                    @(Model.DataValidade == DateTime.Parse("2100-01-01 00:00:00") ? "Sim" : "Não")
+                </dd>
+            </dl>
+
+            @*<br />
+
+                <div class="row">
+                   <div style="float:left; position: relative; margin-left: 10px;">
+                      <button type="button" class="btn btn-default" onclick="return Confirmar(1);">@(Model.Bloqueado ? "Desbloquear" : "Bloquear")</button>
+                   </div>
+                   @if (Model.Status != Core.Entities.Usuario.TodosStatus.Associado && Model.Status != Core.Entities.Usuario.TodosStatus.Bloqueado)
+                   {
+                      <div style="float:left; position: relative; margin-left: 10px;">
+                         <button type="button" class="btn btn-default" style="background-color:rgb(255, 110, 110);" onclick="return Confirmar(2);">Excluir</button>
+                      </div>
+                      <div style="float:left; position: relative; margin-left: 10px;">
+                         <button type="button" class="btn btn-default" style="background-color:#d4d0c5;" onclick="return Confirmar(4);">Reenviar e-mail ativação</button>
+                      </div>
+                   }
+
+                   @if (Model.Status == Core.Entities.Usuario.TodosStatus.Associado)
+                   {
+                      <div style="float:left; position: relative; margin-left: 10px; ">
+                         <button type="button" class="btn btn-default" ; style="background-color:rgb(126, 230, 126)" onclick="return Confirmar(5);">Inserir Movimentação Financeira</button>
+                      </div>*@
+
+
+            @*<div style="float:left; position: relative; margin-left: 10px; ">
+                   <button type="button" class="btn btn-default" ; style="background-color:grey" onclick="return Confirmar(6);">Alterar Plano</button>
+                </div>*@
+            @*}
+                </div>*@
+        </div>
+    </div>
+
+    <div id="modalConfirm" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Ativar Usuário</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Selecione o perfil/kit de ativação:</p>
+                    <p>
+                        <select name="ddlPerfil" id="ddlPerfil">
+
+                            @foreach (var produto in produtos)
+                            {
+                                //var valorMinimo = produto.ValorMinimo(Model);
+                                <option value="@produto.SKU">@produto.Nome</option>
+                            }
+
+                            <!--option value="1">Member</option>
+                            <option value="2">Start</option>
+                            <option value="3">Partner</option>
+                            <option value="4">Executive</option>
+                            <option value="5">Elite</option>
+                            <option value="6">Pro</option-->
+                        </select>
+                    </p>
+                    <br />
+                    <p>Forma de pagamento:</p>
+                    <p>
+                        <select name="ddlFormaPagamento" id="ddlFormaPagamento">
+                            <!--option value="1" selected>Boleto</option-->
+                            <option value="4">Deposito</option>
+                            <option value="2">Paypal</option>
+                            <option value="0">Outros</option>
+                            <!--option value="3">Saldo</option-->
+                        </select>
+                    </p>
+                    <br />
+                    <p>É Standby/Conta de Avaliação?</p>
+                    <p><input type="checkbox" id="chkStandby" name="chkStandby" /></p>
+                    <br />
+                    <p>É ativação com Pontos? (ativacao com pontos nao geram bonus nem qualificação)</p>
+                    <p><input type="checkbox" id="chkAtivacaoPontos" name="chkAtivacaoPontos" /></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnAtivarNao" class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+                    <button id="btnAtivarSim" class="btn btn-primary" onclick="AtivarHandler();">Confirmar</button>
+                    <div style="display:none">
+                        <button id="btnAtivarHideModal" class="btn" data-dismiss="modal">.</button>
+                    </div>
+                    <div id="divLoading" style="display: none">
+                        Aguarde...
+                        <img src="@Url.Content("~/Content/admin/layout/img/loading.gif")" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAlterarPlano" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Alterar Plano</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Selecione o novo perfil/kit de ativação do Usuario:</p>
+                    <p>
+                        <select name="ddlPerfilAlterPlano" id="ddlPerfilAlterarPlano">
+
+                            @foreach (var a in associacoes)
+                            {
+                                <option value="@a.Nivel">@a.Nome</option>
+                            }
+
+                            <!--option value="1">Member</option>
+                            <option value="2">Start</option>
+                            <option value="3">Partner</option>
+                            <option value="4">Executive</option>
+                            <option value="5">Elite</option>
+                            <option value="6">Pro</option-->
+                        </select>
+                    </p>
+                    <br />
+                </div>
+                <div class="modal-footer">
+                    <button id="btnAlterarPlanoNao" class="btn" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+                    <button id="btnAlterarPlanoSim" class="btn btn-primary" onclick="AlterarPlanoHandler();">Confirmar</button>
+                    <div style="display:none">
+                        <button id="btnAlterarPlanoHideModal" class="btn" data-dismiss="modal">.</button>
+                    </div>
+                    <div id="divLoadingAlterarPlano" style="display: none">
+                        Aguarde...
+                        <img src="@Url.Content("~/Content/admin/layout/img/loading.gif")" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

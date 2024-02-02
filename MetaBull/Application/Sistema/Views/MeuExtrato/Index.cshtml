@@ -1,0 +1,390 @@
+﻿
+@{
+    #region Layout
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    #endregion
+
+    #region ViewBags
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["MEU_EXTRATO"].ToString().ToLower();
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+    #endregion
+
+    #region Variaveis
+    var contas = ViewBag.Contas;
+    var contasLancamentos = ViewBag.Contaslancamentos;
+    int intN = 0;
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+    var saldoInvestimento = "";
+
+    var msgRenovacao = traducaoHelper["SOLICITACAO_RENOVACAO_CONFIRMACAO"];
+
+    ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
+    if (ViewBag.MascaraData == null)
+    {
+        ViewBag.MascaraData = "dd/MM/yyyy";
+    }
+        
+    #endregion
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/table")
+    @Styles.Render("~/Content/sweetAlert")
+}
+
+@section head {}
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/table")
+    @Scripts.Render("~/scripts/sweetAlert")
+}
+
+@section PageLevelScripts{
+    <script>
+        var TableExtrato = function () {
+            var initDinheiro = function () {
+            var table = $('#dinheiro');
+            var oTable = table.dataTable({
+                "language": {
+                    "aria": {
+                        "sortAscending": ": activate to sort column ascending",
+                        "sortDescending": ": activate to sort column descending"
+                    },
+                    "emptyTable": "@traducaoHelper["TABELA_SEM_DADOS"]",
+                    "info": "@traducaoHelper["EXIBINDO_DE"] _START_ @traducaoHelper["ATE"] _END_ @traducaoHelper["DE"] _TOTAL_ @traducaoHelper["REGISTROS"]",
+                    "infoEmpty": "@traducaoHelper["SEM_DADOS"]",
+                    "infoFiltered": "(@traducaoHelper["FILTRADO"])",
+                    "lengthMenu": "_MENU_",
+                    "search": "",
+                    "zeroRecords": "@traducaoHelper["TABELA_SEM_DADOS"]"
+                },
+                "order": [
+                    [0, 'asc']
+                ],
+                "lengthMenu": [
+                    [5, 10, 15, 20, -1],
+                    [5, 10, 15, 20, "All"] // change per page values here
+                ],
+                "pageLength": 10, // set the initial value,
+                "columnDefs": [{  // set default column settings
+                    'orderable': false,
+                    'targets': [0]
+                }, {
+                    "searchable": false,
+                    "targets": [0]
+                }],
+                "order": [
+                    [1, "asc"]
+                ]
+            });
+            var oTableColReorder = new $.fn.dataTable.ColReorder(oTable);
+            var tableWrapper = $('#dinheiro_wrapper'); // datatable creates the table wrapper by adding with id {your_table_jd}_wrapper
+            //tableWrapper.find('.dataTables_length select').select2(); // initialize select2 dropdown
+            }
+
+            var initPontos = function () {
+            var table = $('#pontos');
+            var oTable = table.dataTable({
+                "language": {
+                    "aria": {
+                        "sortAscending": ": activate to sort column ascending",
+                        "sortDescending": ": activate to sort column descending"
+                    },
+                    "emptyTable": "@traducaoHelper["TABELA_SEM_DADOS"]",
+                    "info": "@traducaoHelper["EXIBINDO_DE"] _START_ @traducaoHelper["ATE"] _END_ @traducaoHelper["DE"] _TOTAL_ @traducaoHelper["REGISTROS"]",
+                    "infoEmpty": "@traducaoHelper["SEM_DADOS"]",
+                    "infoFiltered": "(@traducaoHelper["FILTRADO"])",
+                    "lengthMenu": "_MENU_",
+                    "search": "",
+                    "zeroRecords": "@traducaoHelper["TABELA_SEM_DADOS"]"
+                },
+                "order": [
+                    [0, 'asc']
+                ],
+                "lengthMenu": [
+                    [5, 10, 15, 20, -1],
+                    [5, 10, 15, 20, "All"] // change per page values here
+                ],
+                "pageLength": 10, // set the initial value,
+                "columnDefs": [{  // set default column settings
+                    'orderable': false,
+                    'targets': [0]
+                }, {
+                    "searchable": false,
+                    "targets": [0]
+                }],
+                "order": [
+                    [1, "asc"]
+                ]
+            });
+
+            var oTableColReorder = new $.fn.dataTable.ColReorder(oTable);
+
+            var tableWrapper = $('#pontos_wrapper'); // datatable creates the table wrapper by adding with id {your_table_jd}_wrapper
+            //tableWrapper.find('.dataTables_length select').select2(); // initialize select2 dropdown
+            }
+
+            return {
+            init: function () {
+                if (!jQuery().dataTable) {
+                    return;
+                }
+                initDinheiro();
+                initPontos();
+            }
+            };
+        }();
+
+        function FormatarDesc(d) {
+            var arguments = d.split("|");
+            var str = this.toString();
+            if (arguments.length) {
+                var str =
+                    'Direto: '     + arguments[0] + '<br>' +
+                    'Nível: '      + arguments[1] + '<br>' +
+                    'Produto: '    + arguments[2] + '<br>' +
+                    'Nível Pago: ' + arguments[3] + '<br>' +
+                    'Afiliado:'    + arguments[4];
+            }
+            str = 'sasasasas';
+            return str;
+        };
+
+        function AbrirRenovacao() {
+            $('#modalRenovacao').modal();
+            $('#formularioRenovacao').show();
+            $('#mensagemRenovacao').hide();
+            $('#token2FARenovacao').val('');
+            $('#validaToken2FARenovacao').text('');
+            $('#validaToken2FARenovacao').css('display', 'none');
+            $('#modalRenovacao div.modal-footer').hide();
+        };
+
+        function efetuarRenovacao(valor, token) {
+            $('#formularioRenovacao').hide();
+            $("#modalRenovacao").modal('show');
+            $('#mensagemRenovacao').show();
+            $('#mensagemRenovacao p').html('@traducaoHelper["AGUARDE"]...');
+
+            $.post('@Url.Action("solicitarRenovacao")', {valor: valor, token: token}, function (data) {
+                if (data == 'OK') {
+                    $('#mensagemRenovacao p').html('@traducaoHelper["RENOVACAO_SOLICITADA_SUCESSO"]');
+                    atualizar = true;
+                } else {
+                    $('#mensagemRenovacao p').html(data);
+                    atualizar = false;
+                }
+                $('#saqueRenovacao div.modal-footer').show();
+            });
+        };
+
+        $(document).ready(function () {
+            $(".solicitarRenovacao").click(function () {
+                var tokenRenovacao = $("#token2FARenovacao").val();
+                var valorRenovacao = $("#valorRenovacao").val();
+                var error = false;
+                if (tokenRenovacao == '') {
+                    $("#validaToken2FARenovacao").css('display', 'block');
+                    $("#validaToken2FARenovacao").text('Token em branco!');
+                    error = true;
+                }
+                if (error) {
+                    return;
+                }
+                else {
+                    $("#modalRenovacao").modal('hide');
+                    swal({
+                        title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+                        text: '@Html.Raw(msgRenovacao)',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+                        cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+                        closeOnConfirm: true,
+                        closeOnCancel: true
+                    },
+                    function (isconfirm) {
+                        if (isconfirm) {
+                            efetuarRenovacao(valorRenovacao, tokenRenovacao);
+                        }
+                        $("#token2FARenovacao").val("");
+                    });
+                }
+            });
+        });
+
+    </script>
+}
+
+@section jQueryRead {
+    TableExtrato.init();
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<ul class="nav nav-tabs tabContatos">
+    @{
+        var i = 1;
+        foreach (var conta in contas)
+        {
+            <li class="@(i==1 ? "active" : "")">
+                <a href="@("#tab_" + @i)" data-toggle="tab">
+                    <i class="fa fa-reorder"></i>
+                    @traducaoHelper[conta.Nome.ToUpper()]
+                </a>
+            </li>
+            i++;
+        }
+    }
+</ul>
+
+<div class="tab-content">
+    @if (contasLancamentos != null)
+    {
+        foreach (IEnumerable<Core.Entities.Lancamento> conta in contasLancamentos)
+        {
+            intN++;
+            <div id="@("tab_" + intN)" class="tab-pane @(intN==1 ? "active" : "")">
+                <div class="portlet aba box backWrite grey-gallery">
+
+                    <div class="portlet-title">
+                        <div class="caption"></div>
+                        <div class="tools">
+                            <a href='@Url.Action("Index")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+                            <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+                        </div>
+                        <div class="actions">
+                            <a href='#'>&nbsp;</a>
+                            <label>&nbsp;</label>
+                            @*@if (intN == 4) //Investimento
+                            {
+                                <a href="javascript:void(0);" onclick="AbrirRenovacao()" class="btn green">
+                                    <i class="fa fa-recycle"></i> @traducaoHelper["RENOVACAO"]
+                                </a>
+                                <label>&nbsp;</label>
+                            }*@
+                        </div>
+                    </div>
+
+                    <div class="portlet-body">
+                        @if (conta != null && conta.Count() > 0)
+                        {
+                            var saldo = conta.Sum(l => l.Valor);
+                            if (intN == 4) //Investimento
+                            {
+                                saldoInvestimento = moedaPadrao.Simbolo + " " + saldo.Value.ToString(moedaPadrao.MascaraOut);
+                            }
+                            <table class="table table-striped table-bordered table-hover" id="@("table_" + intN)">
+                                <thead>
+                                    <tr>
+                                        <th>@traducaoHelper["DATA"]</th>
+                                        <th>@traducaoHelper["TIPO"]</th>
+                                        <th>@traducaoHelper["CATEGORIA"]</th>
+                                        <th>@traducaoHelper["DESCRICAO"]</th>
+                                        <th>@traducaoHelper["VALOR"]</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px;" colspan="4">@traducaoHelper["SALDO_ATUAL"]</td>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;">@moedaPadrao.Simbolo @saldo.Value.ToString(moedaPadrao.MascaraOut) </td>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px;" colspan="4">@traducaoHelper["SALDO_ATUAL"]</td>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;">@moedaPadrao.Simbolo @saldo.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    @foreach (var lancamento in conta.OrderByDescending(l => l.DataLancamento))
+                                    {
+                                        <tr>
+                                            <td>@lancamento.DataLancamento.ToString(ViewBag.MascaraData)</td>
+                                            <td>@lancamento.Tipo.ToString()</td>
+                                            <td>@(lancamento.Categoria != null ? lancamento.Categoria.Nome : "-")</td>
+                                            <td>
+                                                @lancamento.Descricao.Replace("[NM1]", "Direto: ").Replace("[N]", "Nivel: ").Replace("[P]", "Produto: ").Replace("[NP]", "Nível Pago: ").Replace("[PT]", "Pontos: ").Replace("[%]", "%: ").Replace("[NM]", "Afiliado: ")
+                                            </td>
+                                            <td>@moedaPadrao.Simbolo @lancamento.Valor.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <h3>@traducaoHelper["EXTRATO_VAZIO"].</h3>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div id="modalRenovacao" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">@traducaoHelper["RENOVACAO"]</h4>
+                <h2><span id="idTotalRenovacao" name="idTotalRenovacao">@saldoInvestimento</span></h2>
+            </div>
+            <div class="modal-body" id="formularioRenovacao">
+                <div class="control-group">
+                    <b>@traducaoHelper["INSTRUCOES_RENOVACAO"]</b>
+                </div>
+                <br />
+                <div class="row">
+                    @if (Core.Helpers.ConfiguracaoHelper.GetString("AUTENTICACAO_DOIS_FATORES") == "true")
+                    {
+                        <div class="controls">
+                            <div class="col-sm-12" style="margin-bottom: 2%;">
+                                <img src="~/Content/global/img/google-authenticator.jpg" width="20" style="margin-bottom: 3px; margin-right: 5px;" />Token Google Authenticator<br />
+                                <input type="text" class="form-control" name="token2FARenovacao" id="token2FARenovacao">
+                                <a id="validaToken2FARenovacao" style="display:none; color: red;"></a>
+                                <input type="hidden" class="form-control" name="valorRenovacao" id="valorRenovacao" value="@saldoInvestimento">
+                            </div>
+                        </div>
+                    }
+                    <div class="controls">
+                        <div class="col-sm-12">
+                            <div class="text-center">
+                                <button class="btn btn-success solicitarRenovacao"><i class="icon-ok"></i> @traducaoHelper["RENOVAR"]</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="mensagemRenovacao" class="modal-body" style="display:none;">
+                <p></p>
+            </div>
+            <div class="modal-footer" style="display: none;">
+                <button data-dismiss="modal" class="btn blue" onclick="Fechar()"> @traducaoHelper["FECHAR"]</button>
+            </div>
+        </div>
+    </div>
+</div>

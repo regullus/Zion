@@ -1,0 +1,96 @@
+﻿@model Core.Entities.ProdutoCategoria
+@{
+   #region Layout
+
+   Layout = "~/Views/Shared/_Layout.cshtml";
+
+   #endregion
+
+   #region ViewBags
+
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+   ViewBag.Title = traducaoHelper["EDITAR"];
+
+   #endregion
+
+   #region Variaveis
+
+   #endregion
+}
+
+@section pageStyles {
+}
+
+@section head {
+}
+
+@section pageScripts {
+   @Scripts.Render("~/scripts/validationPlugin")
+
+   <script type="text/javascript">
+
+      $(document).ready(function () {
+         $('#produtoCategoria form').validate({
+            errorElement: 'span',
+            rules: {
+               Nome: 'required'
+            },
+            messages: {
+               Nome: '@traducaoHelper["NOME_REQUERIDO"]'
+            },
+            errorPlacement: function (error, element) {
+               error.addClass("help-block");
+               error.insertAfter(element);
+            }
+         });
+      });
+
+   </script>
+
+}
+
+@section PageLevelScripts {
+   @Scripts.Render("~/scripts/validationScript")
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+   <div class="portlet-title">
+      <div class="caption">
+         <i class="fa fa-pencil"></i>@traducaoHelper["EDITAR"]
+      </div>
+      <div class="tools">
+         <a href="javascript:;" class="collapse"></a>
+      </div>
+   </div>
+
+   <div class="portlet-body" id="produtoCategoria">
+      <!-- BEGIN FORM-->
+      @using (Html.BeginForm("Edit", "ProdutoCategorias", FormMethod.Post, new { role = "form" }))
+      {
+         @Html.AntiForgeryToken()
+         <div class="form-body">
+            <div class="row">
+               <div class="col-md-10"><h4>@traducaoHelper["PRODUTO_CATEGORIA"]</h4></div>
+               <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+            </div>
+            <hr />
+
+            <div class="form-group form-md-line-input form-md-floating-label">
+               <input type="text" class="form-control" required name="Nome" id="Nome" value="@Model.Nome">
+               <label for="Nome">@traducaoHelper["NOME"]</label>
+            </div>
+
+            <div class="row">
+               <div class="col-md-12">
+                  <button type="submit" class="btn green">@traducaoHelper["EDITAR"]</button>
+               </div>
+            </div>
+         </div>
+      }
+      <!-- Fim FORM-->
+   </div>
+</div>

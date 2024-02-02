@@ -1,0 +1,172 @@
+﻿@model  Core.Entities.Usuario
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    var showMessage = (string.IsNullOrEmpty(ViewBag.MensagemAlerta) ? false : true);
+    var categorias = (List<Core.Entities.Categoria>)ViewBag.Categorias;
+
+    ViewBag.Title = traducaoHelper["INCLUIR"];
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    #endregion
+}
+
+@section pageStyles {
+}
+
+@section head {
+}
+
+@section pageScripts
+{
+   <script src="@Url.Content("~/Content/global/plugins/jquery-inputmask/jquery.inputmask.bundle.min.js")"></script>
+
+   <script type="text/javascript">
+      $(document).ready(function () {
+         $("#Valor").inputmask('@moedaPadrao.Simbolo @moedaPadrao.MascaraIn', { numericInput: true });
+         
+      });
+   </script>
+}
+
+@section PageLevelScripts {
+}
+
+@section jQueryRead {
+}
+
+<style>
+   .tdLabel {
+      width: 5%;
+      text-align: right;
+      white-space: nowrap;
+   }
+</style>
+
+<div class="portlet box grey-gallery">
+   <div class="portlet-title">
+      <div class="caption">
+         <i class="fa fa-plus"></i>@traducaoHelper["CRIAR"]
+      </div>
+      <div class="tools">
+         <a href="javascript:;" class="collapse"></a>
+      </div>
+   </div>
+
+   <div class="portlet-body">
+      <!-- BEGIN FORM-->
+      @using (Html.BeginForm("Incluir", "Movimentacoes", FormMethod.Post, new { role = "form" }))
+      {
+         <div class="form-body">
+            <div class="row">
+               <div class="col-md-10"><h4>@traducaoHelper["MOVIMENTACAO_FINANCEIRA"]</h4></div>
+               <div class="col-md-2">
+                  <a href="javascript:history.back()" class="Voltar pull-right" title=@traducaoHelper["VOLTAR_PARA_A_LISTA"]><i class="fa fa-search"></i></a>
+               </div>
+            </div>
+            <hr />
+
+            <input type="hidden" name="Codigo" value="@Model.ID" />
+
+            @if (showMessage)
+            {
+               <div>
+                  <p><b><font color="red">Erro: @ViewBag.MensagemAlerta</font></b></p>
+               </div>
+            }
+
+            <table style="width: 90%; margin-left: 40px; border-spacing: 8px; border-collapse: separate;">
+               <tr>
+                  <td class="tdLabel">
+                     Login:
+                  </td>
+                  <td style="width: 1%">&nbsp;</td>
+                  <td style="width: 77%">
+                     @Model.Login
+                  </td>
+               </tr>
+               <tr>
+                  <td class="tdLabel">
+                     Nome:
+                  </td>
+                  <td></td>
+                  <td>
+                     @Model.Nome
+                  </td>
+               </tr>
+               <tr>
+                  <td class="tdLabel">
+                     Tipo:
+                  </td>
+                  <td></td>
+                  <td>
+                     <select name="Tipo" id="Tipo">
+                        <option value="C">Crédito</option>
+                        <option value="D">Débito</option>
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td class="tdLabel">
+                     Categoria:
+                  </td>
+                  <td></td>
+                  <td>
+                     <select name="Categoria" id="Categoria">
+                        @foreach (var c in categorias)
+                        {
+                           <option value="@c.ID">@c.Nome</option>
+                        }
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td class="tdLabel">
+                     Descrição:
+                  </td>
+                  <td></td>
+                  <td>
+                     <input type="text" name="Descricao" id="Descricao" value="" maxlength="100" style="width: 300px;">
+                  </td>
+               </tr>
+               <tr>
+                  <td class="tdLabel">
+                     Valor:
+                  </td>
+                  <td></td>
+                  <td colspan="4">
+                     <input type="text" name="Valor" id="Valor" style="width: 150px;" autocomplete="off" />
+                  </td>
+               </tr>
+               <tr>
+                  <td class="tdLabel">
+                     Senha Financeira:
+                  </td>
+                  <td></td>
+                  <td>
+                     <input type="password" name="password" id="password" placeholder="Senha" value="" >
+                  </td>
+
+               </tr>
+            </table>
+            <div class="row">
+               <div class="col-md-12">
+                  <input type="submit" value="@traducaoHelper["CRIAR"]" class="btn btn-success" />
+               </div>
+            </div>
+         </div>
+      }
+      <!-- Fim FORM-->
+   </div>
+</div>

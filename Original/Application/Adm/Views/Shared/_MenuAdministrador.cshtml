@@ -1,0 +1,385 @@
+﻿@{
+    Layout = null;
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+}
+<li class="nav-item start">
+    <a href="@Url.Action("index", "home", new { area = "" })" class="nav-link nav-toggle">
+        <i class="fa fa-home"></i>
+        <span class="title">
+            @traducaoHelper["INICIO"]<label class="menuHome">&nbsp;</label>
+        </span>
+    </a>
+</li>
+
+@*ADMINISTRACAO*@
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-money"></i>
+        <span class="title">
+            @traducaoHelper["FINANCEIRO"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("index", "Categorias", new { area = "" })">
+                <i class="fa fa-reorder"></i>
+                <span class="title">
+                    @traducaoHelper["CATEGORIA"]
+                </span>
+            </a>
+        </li>
+        @*<li>
+            <a href="javascript:;">
+                <i class="fa fa-money"></i>
+                <span class="title">
+                    @traducaoHelper["COBRANCA"]
+                </span>
+                <span class="arrow " />
+            </a>
+
+            <ul class="sub-menu">
+                <li>
+                    <a href="@Url.Action("retorno", "Cobrancas")">
+                        <i class="fa fa-reorder"></i>
+                        <span class="title">
+                            @traducaoHelper["ARQUIVO_RETORNO"]
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </li>*@
+        <li>
+            <a href="@Url.Action("index", "Contas", new { area = "" })">
+                <i class="fa fa-user"></i>
+                <span class="title">
+                    @traducaoHelper["CONTA"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "ContaDepositos")">
+                <i class="fa fa-building"></i>
+                <span class="title">
+                    @traducaoHelper["CONTA_DEPOSITO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "Instituicoes", new { area = "" })">
+                <i class="fa fa-th-large"></i>
+                <span class="title">
+                    @traducaoHelper["INSTITUICAO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "MeioPagamentos", new { area = "" })">
+                <i class="fa fa-money"></i>
+                <span class="title">
+                    @traducaoHelper["MEIO_DE_PAGAMENTO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "ConfiguracaoBonusDiario", new { area = "" })">
+                <i class="fa fa-line-chart"></i>
+                <span class="title">
+                    @traducaoHelper["BONUS_DIARIO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "ConfiguracaoBonusCarreira", new { area = "" })">
+                <i class="fa fa-line-chart"></i>
+                <span class="title">
+                    @traducaoHelper["BONUS_CARREIRA"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "Arbitragens", new { area = "" })">
+                <i class="fa fa-line-chart"></i>
+                <span class="title">
+                    @traducaoHelper["ARBITRAGEM"]
+                </span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-globe"></i>
+        <span class="title">
+            @traducaoHelper["GLOBALIZACAO"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("index", "Arquivo")">
+                <i class="fa fa-file-o"></i>
+                <span class="title">
+                    @traducaoHelper["ARQUIVOS"]
+                </span>
+            </a>
+        </li>
+
+        <li>
+            <a href="@Url.Action("index", "Traducoes", new { area = "" })">
+                <i class="fa fa-newspaper-o"></i>
+                <span class="title">
+                    @traducaoHelper["TRADUCAO"]
+                </span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-cart-arrow-down"></i>
+        <span class="title">
+            @traducaoHelper["LOJA"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("index", "ProdutoCategorias", new { area = "" })">
+                <i class="fa fa-reorder"></i>
+                <span class="title">
+                    @traducaoHelper["PRODUTO_CATEGORIA"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "Produtos", new { area = "" })">
+                <i class="fa fa-gift"></i>
+                <span class="title">
+                    @traducaoHelper["PRODUTO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "ProdutoValores", new { area = "" })">
+                <i class="fa fa-money"></i>
+                <span class="title">
+                    @traducaoHelper["PRECO_PRODUTO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="~/Departamentos/">
+                <i class="fa fa-building"></i>
+                <span class="title">
+                    @traducaoHelper["DEPARTAMENTO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("index", "pedidos")">
+                <i class="icon-basket"></i>
+                @traducaoHelper["PEDIDOS"]
+            </a>
+        </li>
+    </ul>
+</li>
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-sitemap"></i>
+        <span class="title">
+            @traducaoHelper["REDE"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="~/Associacoes">
+                <i class="fa fa-black-tie"></i>
+                <span class="title">
+                    @traducaoHelper["ASSOCIACAO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="~/Classificacoes">
+                <i class="fa fa-line-chart"></i>
+                <span class="title">
+                    @traducaoHelper["CLASSIFICACAO"]
+                </span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-users"></i>
+        <span class="title">
+            @traducaoHelper["USUARIOS"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("Index", "Usuarios", new { area = "" })">
+                <i class="fa fa-user"></i>
+                <span class="title">
+                    @traducaoHelper["CADASTRO"]
+                </span>
+            </a>
+        </li>
+
+        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_MENU_AVISO"))
+        {
+            <li>
+                <a href="@Url.Action("Index", "Avisos", new { area = "" })">
+                    <i class="fa fa-bell-o"></i>
+                    <span class="title">
+                        @traducaoHelper["AVISO"]
+                    </span>
+                </a>
+            </li>
+        }
+        @*<li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_ADMIN_AVISO") == "true" ? "" : "hidden")>
+               <a href="@Url.Action("Index", "AvisoTipos", new { area = "" })">
+                  <i class="fa fa-clock-o"></i>
+                  <span class="title">
+                      @traducaoHelper["AVISO_TIPO"]
+                  </span>
+               </a>
+          </li>*@
+    </ul>
+</li>
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-print"></i>
+        <span class="title">
+            @traducaoHelper["RELATORIOS"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("Saldo", "Relatorios", new { area = "" })">
+                <i class="fa fa-dollar"></i>
+                <span class="title">
+                    @traducaoHelper["SALDO"]
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("Pagamento", "Relatorios", new { area = "" })">
+                <i class="fa fa-dollar"></i>
+                <span class="title">
+                    @traducaoHelper["PAGAMENTO"]
+                </span>
+            </a>
+        </li>
+        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_MENU_RELATORIO_PEDIDOS_ADESAO_UPGRADE"))
+        {
+            <li>
+                <a href="@Url.Action("PedidosAdesaoUpgrade", "Relatorios", new { area = "" })">
+                    <i class="fa fa-star"></i>
+                    <span class="title">
+                        @traducaoHelper["ADESAO_UPGRADE"]
+                    </span>
+                </a>
+            </li>
+        }
+        @if (!Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_MENU_RELATORIO_VENDAS"))
+        {
+            <li>
+                <a href="@Url.Action("vendas", "Relatorios", new { area = "" })">
+                    <i class="fa fa-cart-arrow-down"></i>
+                    <span class="title">
+                        @traducaoHelper["VENDAS"]
+                    </span>
+                </a>
+            </li>
+
+            <li>
+                <a href="@Url.Action("vendasComposicao", "Relatorios", new { area = "" })">
+                    <i class="fa fa-cart-arrow-down"></i>
+                    <span class="title">
+                        @traducaoHelper["VENDAS_COMPOSICAO"]
+                    </span>
+                </a>
+            </li>
+
+        }
+        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_MENU_RELATORIO_BONUS_PAGOS"))
+        {
+            <li>
+                <a href="@Url.Action("bonusPagos", "Relatorios", new { area = "" })">
+                    <i class="fa fa-money"></i>
+                    <span class="title">
+                        @traducaoHelper["BONIFICACOES_PAGAS"]
+                    </span>
+                </a>
+            </li>
+        }
+
+        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_MENU_RELATORIO_PONTOS_BINARIO"))
+        {
+            <li>
+                <a href="@Url.Action("pontosBinario", "relatorios", new { area = "" })">
+                    <i class="fa fa-asterisk"></i>
+                    <span class="title">
+                        @traducaoHelper["PONTOS_BINARIO"]
+                    </span>
+                </a>
+            </li>
+        }
+
+    </ul>
+</li>
+
+<li>
+    <a href="@Url.Action("Index", "Saques")">
+        <i class="fa fa-money"></i>
+        <span class="title">
+            @traducaoHelper["SAQUE"]
+        </span>
+    </a>
+</li>
+
+<li>
+    <a href="@Url.Action("GoogleAuthenticator", "Seguranca")">
+        <i class="fa fa-lock"></i>
+        <span class="title">
+            @traducaoHelper["SEGURANCA"]
+        </span>
+    </a>
+</li>
+
+<li>
+    <a href="@Url.Action("Index", "AlterarSenha")">
+        <i class="fa fa-key"></i>
+        <span class="title">
+            @traducaoHelper["ALTERAR_SENHA"]
+        </span>
+    </a>
+</li>
+
+    <li class="last ">
+        <a href="~/Suporte">
+            <i class="fa fa-life-ring"></i>
+            <span class="title">
+                @traducaoHelper["SUPORTE"]
+            </span>
+        </a>
+    </li>
+
+<li class="last ">
+    <a href="~/Account/Login/?Sair=true">
+        <i class="fa fa-sign-out"></i>
+        <span class="title">
+            @traducaoHelper["SAIR"]
+        </span>
+    </a>
+</li>

@@ -1,0 +1,862 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{465F69EB-40A1-4ADD-B7A1-B77B150854E8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Core</RootNamespace>
+    <AssemblyName>YLevel.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Boleto.Net">
+      <HintPath>..\packages\Boleto.Net.2.1.0.186\lib\Boleto.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Canducci.Zip">
+      <HintPath>..\packages\CanducciCep.3.0.1\lib\net45\Canducci.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="DomainExtension, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\DomainExtension.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="MvcExtension, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\MvcExtension.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject, Version=2.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="NReco.PdfGenerator">
+      <HintPath>..\packages\Boleto.Net.2.1.0.186\lib\NReco.PdfGenerator.dll</HintPath>
+    </Reference>
+    <Reference Include="PayPal, Version=1.0.4391.19340, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\PayPal.dll</HintPath>
+    </Reference>
+    <Reference Include="SendGrid">
+      <HintPath>..\packages\Sendgrid.9.8.0\lib\net452\SendGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mvc">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Builders\PedidoBuilder.cs" />
+    <Compile Include="Builders\UsuarioBuilder.cs" />
+    <Compile Include="Entities\Administrador.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Agendamento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AgendamentoItem.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Arbitragem.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ArbitragemPeriodo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Armazem.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Arquivo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ArquivoSecao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ArquivoTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Associacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AssociacaoLimiteGanho.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AtivacaoMensal.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Ativo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Autenticacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Aviso.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AvisoLido.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AvisoTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Banco.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\BitCoinSafe.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\BlockchainLog.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Bloco.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Boleto.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Bonificacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\CartaoCredito.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Categoria.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\CategoriaTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Ciclo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Cidade.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Classificacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Complemento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Configuracao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ConfiguracaoBonusCarreira.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ConfiguracaoBonusDiario.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ConfiguracaoCategoria.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ConfiguracaoTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Conta.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ContaDeposito.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ContaOperacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Cupom.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Departamento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Documento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Empresa.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Endereco.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Estado.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\EstoqueMovimento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\EstoqueSaldo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Filial.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Financeiro\SplitCripto.cs" />
+    <Compile Include="Entities\Financeiro\BitCoinSafe.cs" />
+    <Compile Include="Entities\Financeiro\BlockchainLog.cs" />
+    <Compile Include="Entities\Globalizacao\TraducaoSecao.cs" />
+    <Compile Include="Entities\Globalizacao\MoedaCotacaoTipo.cs" />
+    <Compile Include="Entities\Idioma.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Instituicao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Integracao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\IR.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Lancamento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\LancamentoTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Log.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\LogAcesso.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\LoginExterno.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Loja\Agendamento.cs" />
+    <Compile Include="Entities\Loja\AgendamentoItem.cs" />
+    <Compile Include="Entities\Loja\PedidoUltimoStatus.cs" />
+    <Compile Include="Entities\Loja\ProdutoTipo.cs" />
+    <Compile Include="Entities\MeioPagamento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Moeda.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\MoedaCotacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\MoedaCotacaoTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Motivacard.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\MovimentoConta.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Paginacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Pais.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Pedido.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PedidoItem.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PedidoItemStatus.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PedidoItemStatusEntrega.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PedidoPagamento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PedidoPagamentoStatus.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PedidoTaxa.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Pontos.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\PontosBinario.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Posicao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Produto.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ProdutoCategoria.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ProdutoDepartamento.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ProdutoItem.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ProdutoOpcao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ProdutoTipo.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\ProdutoValor.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Qualificacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\RedeMigracao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Rede\RedeMigracao.cs" />
+    <Compile Include="Entities\Rede\PontosBinario.cs" />
+    <Compile Include="Entities\Rede\AssociacaoLimiteGanho.cs" />
+    <Compile Include="Entities\Rede\Ciclo.cs" />
+    <Compile Include="Entities\Rede\ConfiguracaoBonusDiario.cs" />
+    <Compile Include="Entities\Saque.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\SaqueStatus.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\SharedContext.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\Financeiro\CartaoCredito.cs" />
+    <Compile Include="Entities\Financeiro\Boleto.cs" />
+    <Compile Include="Entities\Financeiro\Categoria.cs" />
+    <Compile Include="Entities\Financeiro\Conta.cs" />
+    <Compile Include="Entities\Financeiro\MeioPagamento.cs" />
+    <Compile Include="Entities\Financeiro\ContaOperacao.cs" />
+    <Compile Include="Entities\Financeiro\ContaDeposito.cs" />
+    <Compile Include="Entities\Financeiro\BancoDeposito.cs" />
+    <Compile Include="Entities\Financeiro\Instituicao.cs" />
+    <Compile Include="Entities\Financeiro\IR.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Entities\Financeiro\SaqueStatus.cs" />
+    <Compile Include="Entities\Financeiro\Saque.cs" />
+    <Compile Include="Entities\Financeiro\Lancamento.cs" />
+    <Compile Include="Entities\Globalizacao\Bloco.cs" />
+    <Compile Include="Entities\Globalizacao\Cidade.cs" />
+    <Compile Include="Entities\Globalizacao\Filial.cs" />
+    <Compile Include="Entities\Globalizacao\MoedaCotacao.cs" />
+    <Compile Include="Entities\Globalizacao\Traducao.cs" />
+    <Compile Include="Entities\Globalizacao\Pais.cs" />
+    <Compile Include="Entities\Globalizacao\Moeda.cs" />
+    <Compile Include="Entities\Globalizacao\Idioma.cs" />
+    <Compile Include="Entities\Globalizacao\Estado.cs" />
+    <Compile Include="Entities\Integracao\CorreioFrete.cs" />
+    <Compile Include="Entities\Integracao\Motivacard.cs" />
+    <Compile Include="Entities\Integracao\MovimentoConta.cs" />
+    <Compile Include="Entities\Loja\Armazem.cs" />
+    <Compile Include="Entities\Loja\EstoqueSaldo.cs" />
+    <Compile Include="Entities\Loja\EstoqueMovimento.cs" />
+    <Compile Include="Entities\Loja\PedidoItemStatusEntrega.cs" />
+    <Compile Include="Entities\Loja\PedidoRelatorio.cs" />
+    <Compile Include="Entities\Loja\Taxa.cs" />
+    <Compile Include="Entities\Loja\ProdutoValor.cs" />
+    <Compile Include="Entities\Loja\ProdutoOpcao.cs" />
+    <Compile Include="Entities\Loja\ProdutoItem.cs" />
+    <Compile Include="Entities\Loja\ProdutoDepartamento.cs" />
+    <Compile Include="Entities\Loja\Produto.cs" />
+    <Compile Include="Entities\Loja\PedidoTaxa.cs" />
+    <Compile Include="Entities\Loja\PedidoPagamentoStatus.cs" />
+    <Compile Include="Entities\Loja\PedidoPagamento.cs" />
+    <Compile Include="Entities\Loja\PedidoItemStatus.cs" />
+    <Compile Include="Entities\Loja\PedidoItem.cs" />
+    <Compile Include="Entities\Loja\Pedido.cs" />
+    <Compile Include="Entities\Loja\Departamento.cs" />
+    <Compile Include="Entities\Loja\Cupom.cs" />
+    <Compile Include="Entities\Rede\Bonificacao.cs" />
+    <Compile Include="Entities\Rede\Associacao.cs" />
+    <Compile Include="Entities\Rede\Classificacao.cs" />
+    <Compile Include="Entities\Rede\Posicao.cs" />
+    <Compile Include="Entities\Sincronizacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Sistema\ArquivoSecao.cs" />
+    <Compile Include="Entities\Sistema\ArquivoTipo.cs" />
+    <Compile Include="Entities\Sistema\Integracao.cs" />
+    <Compile Include="Entities\Sistema\Log.cs" />
+    <Compile Include="Entities\Sistema\Administrador.cs" />
+    <Compile Include="Entities\Sistema\Configuracao.cs" />
+    <Compile Include="Entities\GenericRepository.cs" />
+    <Compile Include="Abstract\IRepository.cs" />
+    <Compile Include="Entities\Sistema\Arquivo.cs" />
+    <Compile Include="Entities\Sistema\Suporte.cs" />
+    <Compile Include="Entities\Sistema\SuporteMensagem.cs" />
+    <Compile Include="Entities\spC_AtivoMensal_Result.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\spC_ObtemDiretos_Result.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\SplitCripto.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\spOC_US_ObtemAvisoNaoLidos_Result.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\spOC_US_ObtemAvisos_Result.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\spPontuacaoPosicao_Result.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Suporte.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\SuporteMensagem.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Taxa.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\TipoConta.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Traducao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\TraducaoSecao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Usuario.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\UsuarioAssociacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\UsuarioClassificacao.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\UsuarioDerramamentoLog.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\UsuarioGanho.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\UsuarioStatus.cs">
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Usuario\AtivacaoMensal.cs" />
+    <Compile Include="Entities\Usuario\Aviso.cs" />
+    <Compile Include="Entities\Usuario\AvisoTipo.cs" />
+    <Compile Include="Entities\Usuario\Banco.cs" />
+    <Compile Include="Entities\Usuario\Complemento.cs" />
+    <Compile Include="Entities\Usuario\LogAcesso.cs" />
+    <Compile Include="Entities\Usuario\LoginExterno.cs" />
+    <Compile Include="Entities\Usuario\Qualificacao.cs" />
+    <Compile Include="Entities\Usuario\Sincronizacao.cs" />
+    <Compile Include="Entities\Usuario\UsuarioClassificacao.cs" />
+    <Compile Include="Entities\Usuario\UsuarioAssociacao.cs" />
+    <Compile Include="Entities\Usuario\UsuarioGanho.cs" />
+    <Compile Include="Entities\Usuario\UsuarioRelatorio.cs" />
+    <Compile Include="Entities\Usuario\UsuarioDerramamentoLog.cs" />
+    <Compile Include="Entities\Usuario\UsuarioStatus.cs" />
+    <Compile Include="Entities\Usuario\Usuario.cs" />
+    <Compile Include="Entities\Usuario\Endereco.cs" />
+    <Compile Include="Entities\Usuario\Documento.cs" />
+    <Compile Include="Entities\YLevelEntities.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>YLevelEntities.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\YLevelEntities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>YLevelEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\YLevelEntities.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>YLevelEntities.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Factories\PedidoFactory.cs" />
+    <Compile Include="Entities\Factories\UsuarioFactory.cs" />
+    <Compile Include="Helpers\BitCoinHelper.cs" />
+    <Compile Include="Helpers\ConfiguracaoHelper.cs" />
+    <Compile Include="Helpers\Funcoes.cs" />
+    <Compile Include="Helpers\CriptografiaHelper.cs" />
+    <Compile Include="Helpers\EnumHelper.cs" />
+    <Compile Include="Helpers\PayPalHelper.cs" />
+    <Compile Include="Helpers\ProcedureHelper.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
+    <Compile Include="Helpers\TraducaoHelper.cs" />
+    <Compile Include="Models\Financeiro\SolicitacaoSaqueModel.cs" />
+    <Compile Include="Models\Geral\Data.cs" />
+    <Compile Include="Models\Loja\CarrinhoTaxaModel.cs" />
+    <Compile Include="Models\Loja\CarrinhoItemModel.cs" />
+    <Compile Include="Models\Loja\CarrinhoModel.cs" />
+    <Compile Include="Models\Loja\CarrinhoPagamentoModel.cs" />
+    <Compile Include="Models\Relatorio\RelatorioPagamentoModel.cs" />
+    <Compile Include="Models\Relatorio\RelatorioBonusPagos.cs" />
+    <Compile Include="Models\Relatorio\RelatorioPedidos.cs" />
+    <Compile Include="Models\Relatorio\RelatorioPontosBinario.cs" />
+    <Compile Include="Models\Relatorio\RelatorioSaldo.cs" />
+    <Compile Include="Models\Relatorio\RelatorioSaldoItem.cs" />
+    <Compile Include="Models\Relatorio\RelatorioPontos.cs" />
+    <Compile Include="Models\Relatorio\RelatorioSaldoResumo.cs" />
+    <Compile Include="Models\StoredProcedures\spC_AtivoMensal.cs" />
+    <Compile Include="Models\StoredProcedures\spC_ObtemDiretos.cs" />
+    <Compile Include="Models\StoredProcedures\spOC_US_ObtemAvisoNaoLidos.cs" />
+    <Compile Include="Models\StoredProcedures\spOC_US_ObtemAvisos.cs" />
+    <Compile Include="Models\StoredProcedures\spPontuacaoPosicao.cs" />
+    <Compile Include="Modules\NinjectModule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Proxies\ProdutoProxy.cs" />
+    <Compile Include="Repositories\CachedRepository.cs" />
+    <Compile Include="Repositories\Financeiro\SplitCriptoRepository.cs" />
+    <Compile Include="Repositories\Financeiro\BitCoinSafeRepository.cs" />
+    <Compile Include="Repositories\Financeiro\BlockchainRepository.cs" />
+    <Compile Include="Repositories\Financeiro\MeioPagamentoRepository.cs" />
+    <Compile Include="Repositories\Financeiro\CartaoCreditoRepository.cs" />
+    <Compile Include="Repositories\Financeiro\BoletoRepository.cs" />
+    <Compile Include="Repositories\Financeiro\CategoriaRepository.cs" />
+    <Compile Include="Repositories\Financeiro\ContaOperacaoRepository.cs" />
+    <Compile Include="Repositories\Financeiro\ContaRepository.cs" />
+    <Compile Include="Repositories\Financeiro\ContaDepositoRepository.cs" />
+    <Compile Include="Repositories\Financeiro\IRRepository.cs" />
+    <Compile Include="Repositories\Financeiro\SaqueStatusRepository.cs" />
+    <Compile Include="Repositories\Financeiro\SaqueRepository.cs" />
+    <Compile Include="Repositories\Financeiro\LancamentoRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\FilialRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\BlocoRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\CidadeRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\TraducaoSecaoRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\MoedaCotacaoTipoRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\MoedaCotacaoRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\TraducaoRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\PaisRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\MoedaRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\IdiomaRepository.cs" />
+    <Compile Include="Repositories\Globalizacao\EstadoRepository.cs" />
+    <Compile Include="Repositories\Integracao\MotivacardRepository.cs" />
+    <Compile Include="Repositories\Integracao\MovimentoContaRepository.cs" />
+    <Compile Include="Repositories\Loja\AgendamentoItemRepository.cs" />
+    <Compile Include="Repositories\Loja\AgendamentoRepository.cs" />
+    <Compile Include="Repositories\Loja\Estoque\ArmazemRepository.cs" />
+    <Compile Include="Repositories\Loja\Estoque\EstoqueSaldoRepository.cs" />
+    <Compile Include="Repositories\Loja\Estoque\EstoqueMovimentoRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoItemStatusEntregaRepository.cs" />
+    <Compile Include="Repositories\Loja\ProdutoTipoRepository.cs" />
+    <Compile Include="Repositories\Loja\TaxaRepository.cs" />
+    <Compile Include="Repositories\Loja\ProdutoValorRepository.cs" />
+    <Compile Include="Repositories\Loja\ProdutoOpcaoRepository.cs" />
+    <Compile Include="Repositories\Loja\ProdutoItemRepository.cs" />
+    <Compile Include="Repositories\Loja\ProdutoDepartamentoRepository.cs" />
+    <Compile Include="Repositories\Loja\ProdutoRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoTaxaRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoPagamentoStatusRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoPagamentoRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoItemStatusRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoItemRepository.cs" />
+    <Compile Include="Repositories\Loja\PedidoRepository.cs" />
+    <Compile Include="Repositories\Loja\DepartamentoRepository.cs" />
+    <Compile Include="Repositories\Loja\CupomRepository.cs" />
+    <Compile Include="Repositories\Rede\AssociacaoLimiteGanhoRepository.cs" />
+    <Compile Include="Repositories\Rede\RedeMigracaoRepository.cs" />
+    <Compile Include="Repositories\Rede\AssociacaoRepository.cs" />
+    <Compile Include="Repositories\Rede\PontosBinariosRepository.cs" />
+    <Compile Include="Repositories\Rede\CicloRepository.cs" />
+    <Compile Include="Repositories\Rede\ClassificacaoRepository.cs" />
+    <Compile Include="Repositories\Rede\BonificacaoRepository.cs" />
+    <Compile Include="Repositories\Rede\PosicaoRepository.cs" />
+    <Compile Include="Repositories\Relatorios\RelatorioRepository.cs" />
+    <Compile Include="Repositories\Sistema\ArquivoSecaoRepository.cs" />
+    <Compile Include="Repositories\Sistema\ArquivoTipoRepository.cs" />
+    <Compile Include="Repositories\Sistema\IntegracaoRepository.cs" />
+    <Compile Include="Repositories\Sistema\Log.cs" />
+    <Compile Include="Repositories\Sistema\AdministradorRepository.cs" />
+    <Compile Include="Repositories\Sistema\ArquivoRepository.cs" />
+    <Compile Include="Repositories\Sistema\ConfiguracaoRepository.cs" />
+    <Compile Include="Repositories\Sistema\SuporteMensagemRepository.cs" />
+    <Compile Include="Repositories\Sistema\SuporteRepository.cs" />
+    <Compile Include="Repositories\Usuario\AtivacaoMensalRepository.cs" />
+    <Compile Include="Repositories\Usuario\AvisoRepository.cs" />
+    <Compile Include="Repositories\Usuario\BancoRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioComplementoRepository.cs" />
+    <Compile Include="Repositories\Usuario\LogAcessoRepository.cs" />
+    <Compile Include="Repositories\Usuario\QualificacaoRepository.cs" />
+    <Compile Include="Repositories\Usuario\SincronizacaoRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioClassificacaoRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioGanhoRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioLoginExternoRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioAssociacaoRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioDerramamentoLogRepository.cs" />
+    <Compile Include="Repositories\Usuario\UsuarioStatusRepository.cs" />
+    <Compile Include="Repositories\Usuario\EnderecoRepository.cs" />
+    <Compile Include="Repositories\Usuario\DocumentoRepository.cs" />
+    <Compile Include="Repositories\Usuario\ValidacaoCadastroRepository.cs" />
+    <Compile Include="Services\Financeiro\SplitCriptoService.cs" />
+    <Compile Include="Services\Sistema\InvestigacaoLog.cs" />
+    <Compile Include="Services\MeioPagamento\CartaoCreditoService.cs" />
+    <Compile Include="Services\Financeiro\SaqueStatusService.cs" />
+    <Compile Include="Services\Financeiro\SaqueService.cs" />
+    <Compile Include="Services\Financeiro\ImpostoService.cs" />
+    <Compile Include="Services\Globalizacao\GeolocalizacaoService.cs" />
+    <Compile Include="Services\Globalizacao\MoedaService.cs" />
+    <Compile Include="Services\Integracao\CorreiosService.cs" />
+    <Compile Include="Services\Integracao\MotivacardService.cs" />
+    <Compile Include="Services\Loja\EstoqueService.cs" />
+    <Compile Include="Services\Loja\PedidoService.cs" />
+    <Compile Include="Services\Loja\Produtos\AssociacaoService.cs" />
+    <Compile Include="Services\Loja\Produtos\BaseService.cs" />
+    <Compile Include="Services\Loja\Produtos\AtivoMensalService.cs" />
+    <Compile Include="Services\Loja\Produtos\RenovacaoAssinaturaService.cs" />
+    <Compile Include="Services\Loja\Produtos\ProdutoVirtualService.cs" />
+    <Compile Include="Services\Loja\Produtos\HintMeService.cs" />
+    <Compile Include="Services\Loja\Produtos\UpgradeService.cs" />
+    <Compile Include="Services\Loja\Produtos\ProdutoFisicoService.cs" />
+    <Compile Include="Services\MeioPagamento\BlockchainService.cs" />
+    <Compile Include="Services\MeioPagamento\BoletoService.cs" />
+    <Compile Include="Services\MeioPagamento\FlowBtcService.cs" />
+    <Compile Include="Services\MeioPagamento\PayPalService.cs" />
+    <Compile Include="Services\Sistema\CurlService.cs" />
+    <Compile Include="Services\Sistema\EmailService.cs" />
+    <Compile Include="Services\Sistema\SendGridService.cs" />
+    <Compile Include="Services\Usuario\UsuarioService.cs" />
+    <Compile Include="Web References\br.com.correios.ws\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Entities\YLevelEntities.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>YLevelEntities.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Entities\YLevelEntities.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>YLevelEntities.edmx</DependentUpon>
+      <LastGenOutput>YLevelEntities.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Entities\YLevelEntities.edmx.diagram">
+      <DependentUpon>YLevelEntities.edmx</DependentUpon>
+    </None>
+    <None Include="Entities\YLevelEntities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>YLevelEntities.edmx</DependentUpon>
+      <LastGenOutput>YLevelEntities.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\br.com.correios.ws\CalcPrecoPrazo.wsdl" />
+    <None Include="Web References\br.com.correios.ws\cResultado.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\br.com.correios.ws\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\br.com.correios.ws\</RelPath>
+      <UpdateFromURL>http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>YLevel_Core_br_com_correios_ws_CalcPrecoPrazoWS</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web References\br.com.correios.ws\CalcPrecoPrazo.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Boleto.Net.dll" />
+    <Content Include="Resources\DomainExtension.dll" />
+    <Content Include="Resources\MvcExtension.dll" />
+    <Content Include="Resources\Newtonsoft.Json.dll" />
+    <Content Include="Resources\Newtonsoft.Json.xml" />
+    <Content Include="Resources\Ninject.dll" />
+    <Content Include="Resources\NReco.PdfGenerator.dll" />
+    <Content Include="Resources\PayPal.dll" />
+    <Content Include="Resources\TronTokenClient.dll" />
+    <Content Include="StoredProcedures\11Novas\sp_XS_Cotacao.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_XS_Classificacao.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_XS_Bonus_Classificacao.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_XS_BitcoinSafeDecimais.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_XS_AtualizaQualificacaoBinario.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_ValidacaoCadastro_Select.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_ValidacaoCadastro_Insert.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_OC_SUP_Resposta.sql" />
+    <Content Include="StoredProcedures\11Novas\sp_OC_SUP_NovoChamado.sql" />
+    <Content Include="StoredProcedures\XSinergia\spOC_LO_ListaPedidosVendaComposicao.sql" />
+    <Content Include="StoredProcedures\Zion\Function\StringToListInt.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\Bonus\spDG_RE_GeraBonusBinario.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\Bonus\spDG_RE_GeraBonusClassificacao.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\Bonus\spDG_RE_GeraBonusVenda.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\Bonus\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\Classificacao\spDG_RE_Classificacao.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spC_VerificaDiretoAssociado.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_FI_RelatorioPagamento.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOG_RE_GeraUsuariosMigracaoRede.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_LO_ListaPedidosAdesaoUpgrade.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_RE_ListaBonusPagos.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_ObtemTotalPontuacao.sql" />
+    <Content Include="StoredProcedures\19L\spOC_ObtemPontosUsuarioCiclo.sql" />
+    <Content Include="StoredProcedures\19L\spC_ObtemDiretos.sql" />
+    <Content Include="StoredProcedures\19L\spC_ObtemTotalAfiliadosRede.sql" />
+    <Content Include="StoredProcedures\19L\spDG_FI_GeraLancamentos.sql" />
+    <Content Include="StoredProcedures\19L\spDG_RE_GeraBonusMovimento.sql" />
+    <Content Include="StoredProcedures\19L\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_AtivacaoMensa.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_Classificacao.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_Classificacao_Geral.sql" />
+    <Content Include="StoredProcedures\19L\spDG_RE_GeraPontos.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_LO_ListaPedidosVenda.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_ObtemTotalUsuarioAssociadosDia.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_ObtemTotalUsuarioAssoc.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_ObtemMaximaPontuacao.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_RedeUpline_Ciclo.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_CalculaPontos.sql" />
+    <Content Include="StoredProcedures\19L\spOC_US_ObtemPontuacaoCiclo.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spDG_FI_GeraLancamentos.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spDG_RE_GeraBonusAtivoMensal.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spDG_RE_GeraBonusCompartilhamento.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spDG_RE_GeraBonusConsumo.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spOC_FI_RelatorioPagamento.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spOC_LO_ObtemPedidosPendentesPgto.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spOC_US_ObtemUsuariosInativos.sql" />
+    <Content Include="StoredProcedures\AtivaBox\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\JB\spOC_US_ObtemBonusTetoGanhoAlavancagem.sql" />
+    <Content Include="StoredProcedures\JB\spOC_US_ObtemBonusTetoGanhoTotal.sql" />
+    <Content Include="StoredProcedures\MinersBits\spDG_FI_GeraLancamentos.sql" />
+    <Content Include="StoredProcedures\MinersBits\spDG_FI_GeraSaques.sql" />
+    <Content Include="StoredProcedures\MinersBits\spDG_RE_GeraBonusBinario.sql" />
+    <Content Include="StoredProcedures\MinersBits\spDG_RE_GeraBonusClassificacao.sql" />
+    <Content Include="StoredProcedures\MinersBits\spDG_RE_GeraBonusDiario.sql" />
+    <Content Include="StoredProcedures\MinersBits\spOC_US_ObtemPontuacao.sql" />
+    <Content Include="StoredProcedures\Nextter\uspMG_US_GeraClassificacaoUsuario.sql" />
+    <Content Include="StoredProcedures\Nextter\uspDG_FI_GeraLancamentos.sql" />
+    <Content Include="StoredProcedures\Nextter\uspDG_RE_GeraSaldoVendas.sql" />
+    <Content Include="StoredProcedures\Nextter\uspDG_RE_GeraBonusSobreMensalidade.sql" />
+    <Content Include="StoredProcedures\Nextter\uspDG_RE_GeraBonusAlavancagem.sql" />
+    <Content Include="StoredProcedures\Nextter\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\XSinergia\spOC_LO_ListaPedidosVenda.sql" />
+    <Content Include="StoredProcedures\XSinergia\spDG_RE_GeraBonusAustraliano.sql" />
+    <Content Include="StoredProcedures\XSinergia\spOC_RE_ObtemPontosBinarioUsuario.sql" />
+    <Content Include="StoredProcedures\XSinergia\spDG_RE_GeraBonusLancamentoArbitragemA.sql" />
+    <Content Include="StoredProcedures\XSinergia\spDG_RE_GeraBonusLancamentoArbitragem.sql" />
+    <Content Include="StoredProcedures\Zion\Function\ValidaCarcacterZion.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spC_ObtemDiretos.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spC_ObtemSuperiores.sql" />
+    <Content Include="StoredProcedures\Original\AtualizarLancamentos1.sql" />
+    <Content Include="StoredProcedures\Original\BonusBinario1.sql" />
+    <Content Include="StoredProcedures\Original\BonusBinarioOnLine.sql" />
+    <Content Include="StoredProcedures\Original\BonusIndicacao.sql" />
+    <Content Include="StoredProcedures\Original\spC_AtivoMensal.sql" />
+    <Content Include="StoredProcedures\Original\spC_ObtemDiretos.sql" />
+    <Content Include="StoredProcedures\Original\spC_ObtemSuperiores.sql" />
+    <Content Include="StoredProcedures\Original\spG_AtivoMensalPagamento.sql" />
+    <Content Include="StoredProcedures\Original\spG_AtivoMensalValidade.sql" />
+    <Content Include="StoredProcedures\Original\spPontuacaoPosicao.sql" />
+    <Content Include="StoredProcedures\spDG_RE_GeraBonusAtivoMensal.sql" />
+    <Content Include="StoredProcedures\spDG_RE_GeraBonusBinario.sql" />
+    <Content Include="StoredProcedures\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\spG_AtivoMensalValidade.sql" />
+    <Content Include="StoredProcedures\spG_AtivoMensalPagamento.sql" />
+    <Content Include="StoredProcedures\spPontuacaoPosicao.sql" />
+    <Content Include="StoredProcedures\spC_AtivoMensal.sql" />
+    <Content Include="StoredProcedures\Zion\Function\GetDateZion.sql" />
+    <Content Include="StoredProcedures\Zion\Function\TruncZion.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_FI_BuscarSolicitacoesSaque.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_LO_ObtemProdutoSemValor.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_US_ObtemAvisos.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_US_ObtemAvisoNaoLidos.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_US_ObtemPatrocinadorDiretoMigrado.sql" />
+    <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_US_ObtemUltimaAssinaturaPerna.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CoinpaymentsApi\CoinpaymentsApi.csproj">
+      <Project>{aeff78b5-f458-4929-9dd2-1447f16d13f6}</Project>
+      <Name>CoinpaymentsApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cpUtilities\cpUtilities.csproj">
+      <Project>{BBEAE12F-8B0D-4703-B137-B6569E1A4312}</Project>
+      <Name>cpUtilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

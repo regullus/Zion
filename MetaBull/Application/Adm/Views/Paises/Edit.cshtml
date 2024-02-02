@@ -1,0 +1,124 @@
+﻿@model Core.Entities.Pais
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["EDITAR"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-pencil"></i>@traducaoHelper["EDITAR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-body">
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-10"><h4>@traducaoHelper["PAIS"]</h4></div>
+                        <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                    </div>
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.ID)
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["SIGLA"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Sigla, new { htmlAttributes = new { @class = "form-control", @maxlength = 3 } })
+                            @Html.ValidationMessageFor(model => model.Sigla, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NOME"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Nome, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["BLOCO"]</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("BlocoID", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.BlocoID, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["LANGUAGE"]</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("IdiomaID", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.IdiomaID, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["MOEDA"]</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("MoedaID", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.MoedaID, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["MASCARA_TELEFONE"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.MascaraTel, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.MascaraTel, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["MASCARA_CELULAR"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.MascaraCel, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.MascaraCel, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["MASCARA_CEP"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.MascaraCep, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.MascaraCep, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PADRAO"]</label>
+                       
+                            <div class="col-md-1">
+                                @Html.EditorFor(model => model.Padrao, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Padrao, "", new { @class = "text-danger" })
+                            </div>
+                  
+                        </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DISPONIVEL"]</label>
+                        <div class="col-md-1">
+                            @Html.EditorFor(model => model.Disponivel, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Disponivel, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="@traducaoHelper["EDITAR"]" class="btn green-haze" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+

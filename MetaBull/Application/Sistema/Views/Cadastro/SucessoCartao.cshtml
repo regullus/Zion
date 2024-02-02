@@ -1,0 +1,31 @@
+﻿@model Core.Entities.Usuario
+@{
+
+   #region Layout
+
+   Layout = "~/Views/Shared/_Cadastro.cshtml";
+
+   #endregion
+
+   #region ViewBags
+
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   ViewBag.Title = traducaoHelper["SUCESSO"].ToString().ToLower();
+
+   #endregion
+
+   #region Variaveis
+
+   #endregion
+
+}
+
+<div class="box" style="background:#ffffff !important;">
+   <h1 class="cor">@traducaoHelper["OBRIGADO_INSCRICAO"]</h1>
+   <span class="label">
+      @traducaoHelper["OBRIGADO_SUA_INSCRICAO"]
+      <br /><br />
+      <a href="/Login" class="submit fundo" style="width:250px;">Login</a>
+   </span>
+</div>
+

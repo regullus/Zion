@@ -1,0 +1,69 @@
+﻿@model Sistema.Models.LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Login.cshtml";
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var fundos = (IEnumerable<string>)ViewBag.Fundos;
+    var captchaKey = Core.Helpers.ConfiguracaoHelper.GetString("RECAPTCHA_SITE_KEY"); // "6LegpsUUAAAAACAAg-PdfR7OZE-N2cp1-XtA8JKd";
+}
+
+@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <h4 class="form-title text-center">@traducaoHelper["ACESSO_AREA_RESTRITA"]</h4>
+    <div class="alert alert-danger display-hide">
+        <span>
+            @traducaoHelper["INFORME_LOGIN_SENHA"]
+        </span>
+    </div>
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9">Usuário</label>
+        <div class="input-icon">
+            <i class="fa fa-user"></i>
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control placeholder-no-fix", @id = "nome", @autofocus = "" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9">Senha</label>
+        <div class="input-icon">
+            <i class="fa fa-lock"></i>
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control placeholder-no-fix", @id = "senha" })
+            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    @:
+    if (Helpers.Local.Ambiente != "dev")
+    {
+        <div class="form-group">
+            <div class="g-recaptcha" data-sitekey="@captchaKey")"></div>
+        </div>
+    }
+    <div class="form-actions" style="height: 46px;">
+        <button type="submit" class="btn green-haze pull-right btn-login" id="Entrar" style="color: #000;">
+            @traducaoHelper["ENTRAR"] <i class="m-icon-swapright m-icon-black" ></i>
+        </button>
+    </div>
+    <div class="forget-password" style="text-align: center;">
+        <h4>@traducaoHelper["ESQUECEU_SUA_SENHA"]</h4>
+        @if (@Core.Helpers.ConfiguracaoHelper.GetString("PERMITE_TROCAR_SENHA") == "true")
+        {
+            <p>
+                @traducaoHelper["NAO_SE_PREOCUPE"] @Html.ActionLink(@traducaoHelper["AQUI"], "Index", "Account/ForgotPassword", routeValues: null, htmlAttributes: new { title = "click" })
+                @traducaoHelper["PARA_ENVIAR_POR_EMAIL"]
+            </p>
+        }
+        else
+        {
+            <p>
+                @traducaoHelper["ENTRE_EM_CONTATO_COM_ADM"]
+            </p>
+        }
+    </div>
+}
+

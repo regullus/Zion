@@ -1,0 +1,75 @@
+﻿@model  Core.Entities.Usuario
+@{
+    Layout = null;
+    var conta = Model.ContaDeposito.FirstOrDefault(c => c.IDTipoConta == 2);
+}
+
+@if (conta == null)
+{
+   <p>Nenhuma conta cadastrada.</p>
+}
+else
+{
+    var dados = conta.Conta.Split('|');
+    var tipo = dados.Length > 0 ? dados[0] : "";
+    var numero = dados.Length > 1 ? dados[1] : conta.Conta;
+
+
+    switch (tipo)
+    {
+        case "1":
+            tipo = "Conta Corrente";
+            break;
+        case "2":
+            tipo = "Conta Poupança";
+            break;
+    }
+
+   <p>Instituição: <b>@conta.Instituicao.CodigoInstituicao - @conta.Instituicao.Descricao</b></p>
+   <p>Agência: <b>@conta.Agencia</b></p>
+   if (!String.IsNullOrEmpty(tipo))
+   {
+      <p>Tipo da Conta: <b>@tipo</b></p>
+   }
+   <p>Conta: <b>@numero</b> - Dígito: <b>@conta.DigitoConta</b></p>
+   if (!String.IsNullOrEmpty(conta.ProprietarioConta))
+   {
+      <p>Proprietário: <b>@conta.ProprietarioConta</b></p>
+   }
+   if (!String.IsNullOrEmpty(conta.CPF))
+   {
+      if (conta.CPF.Length > 0)
+      {
+         <p>CPF: <b>@conta.CPF</b></p>
+      }
+   }
+   if (!String.IsNullOrEmpty(conta.CNPJ))
+   {
+      if (conta.CNPJ.Length > 0)
+      {
+         <p>CNPJ: <b>@conta.CNPJ</b></p>
+      }
+   }
+   <p>Meio de Pagamento: <b>@conta.MeioPagamento.Descricao</b></p>
+   if (!String.IsNullOrEmpty(conta.IdentificacaoProprietario))
+   {
+      <p>Email Neteller: <b>@conta.IdentificacaoProprietario</b></p>
+   }
+   if (!String.IsNullOrEmpty(conta.Bitcoin))
+   {
+      if (@conta.Bitcoin.Length > 0)
+      {
+         <p>Criptomoeda: <b>@conta.Bitcoin</b></p>
+      }
+
+   }
+   if (!String.IsNullOrEmpty(conta.Litecoin))
+   {
+      if (@conta.Litecoin.Length > 0)
+      {
+         <p>Skrill: <b>@conta.Litecoin</b></p>
+      }
+
+   }
+   
+}

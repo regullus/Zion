@@ -1,0 +1,454 @@
+﻿@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var usuarioAtual = (Core.Entities.Usuario)ViewBag.Nivel1;
+
+    ViewBag.Title = "REDE".ToLower();
+
+
+    List<Core.Entities.Usuario> meusDiretos1 = ViewBag.MeusDiretos1;
+    List<Core.Entities.Usuario> meusDiretos2 = ViewBag.MeusDiretos2;
+    List<Core.Entities.Usuario> meusDiretos3 = ViewBag.MeusDiretos3;
+
+    #endregion
+
+    #region ViewBags
+
+    ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
+    if (ViewBag.MascaraData == null)
+    {
+        ViewBag.MascaraData = "dd/MM/yyyy";
+    }
+
+    #endregion
+
+}
+
+@section pageStyles {
+
+    <link href="~/Content/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .tree li div .pintadivcinza {
+            background: dimgrey;
+            border-radius: 0% !important;
+            top: 10px;
+            width: 100px;
+            height: 20px;
+            font-weight: bold;
+            color: aliceblue !important;
+            font-weight: bold;
+            border-bottom-right-radius: 8px !important;
+            border-bottom-left-radius: 8px !important;
+        }
+
+        @@media (max-width: 1200px) {
+            /* 1260px */
+            #contentpanel {
+                min-width: 920px;
+            }
+        }
+
+        @@media (max-width: 780px) {
+            /* 1260px */
+            .page-content {
+                min-width: 920px;
+                border-radius: 4px;
+                background-color: rgba(0,0,0,.5);
+                -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+            }
+
+            .cabecalho {
+                width: 299px;
+            }
+        }
+    </style>
+}
+
+@section head {
+}
+
+@section pageScripts {
+
+    <script src="~/Content/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#primeiroNivel').hover(function () {
+                $('.userprimeironivel').css('border-color', 'rgb(255, 80, 0)');
+                $('.pintadivcinza').css('background-color', 'rgb(255, 80, 0)');
+            }, function () {
+                $('.userprimeironivel').css('border-color', 'lightgray');
+                $('.pintadivcinza').css('background-color', 'dimgrey');
+            });
+        });
+
+        function SelecionaCard(elem) {
+            var parent = elem.parentNode.parentNode;
+            var cinza = parent.querySelectorAll('.pintadivcinza');
+            for (i = 0; i < cinza.length; i++) {
+                cinza[i].style.backgroundColor = "rgb(255, 80, 0)";
+            }
+        }
+
+        function RemoveSelecaoCard(elem) {
+            var parent = elem.parentNode.parentNode;
+            var cinza = parent.querySelectorAll('.pintadivcinza');
+            for (i = 0; i < cinza.length; i++) {
+                cinza[i].style.backgroundColor = "dimgrey";
+            }
+        }
+
+       $('.js-data-example-ajax').select2({
+            ajax: {
+                url: "@Url.Action("GetUsuarios", "MinhaRede")",
+                dataType: 'json',
+               delay: 250,
+                data: function(params) {
+                     return {
+                            search: params.term // , // search term
+                            //page: params.page
+                     };
+                },
+               processResults: function (data) { //, page) {
+                    return {
+                        results: data,
+                        pagination: {
+                            more: true
+                        }
+                    };
+               },
+                cache: true
+            },
+            escapeMarkup: function(markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 3,
+            templateResult: formatRepo,
+            templateSelection: formatRepoSelection,
+            language: {
+                errorLoading:    function ()  { return '@traducaoHelper["O_RESULTADO_NAO_PODE_SER_LIDO"]';},
+                inputTooLong:    function (e) { var t = e.input.length - e.maximum, n = '@traducaoHelper["POR_FAVOR_APAGUE_X_CARACTERES"]'.replace('{0}', t); return n },
+                inputTooShort:   function (e) { var t = e.minimum - e.input.length, n = '@traducaoHelper["POR_FAVOR_ENTRE_COM_X_OU_MAIS_CARACTERES"]'.replace('{0}', t); return n },
+                loadingMore:     function ()  { return '@traducaoHelper["LENDO_MAIS_RESULTADOS"]'; },
+                maximumSelected: function (e) { return '@traducaoHelper["VOCE_SO_PODE_SELECIONAR_X_ITENS"]'.replace('{0}', e.maximum);},
+                noResults:       function ()  { return '@traducaoHelper["NENHUM_RESULTADO_ENCONTRADO"]'; },
+                searching:       function ()  { return '@traducaoHelper["PESQUISANDO"]'; }
+            }
+       });
+
+        function formatRepoSelection(repo) {
+
+            console.log("REPO (formatRepoSelection)", repo)
+
+            BuscaRedeForm.submit();
+
+            return repo.full_name || repo.text;
+        }
+
+
+        function formatRepo(repo) {
+
+            if (repo.loading) return repo.text;
+
+            var markup =
+                "<div class='select2-result-repository clearfix'>" +
+                "<div class='select2-result-repository__meta'>" +
+                "<div class='select2-result-repository__title'>" + repo.text + "</div>";
+            return markup;
+            }
+
+    </script>
+
+}
+
+@section PageLevelScripts{
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="contentpanel" class="portlet light">
+    @*style="width: max-content;  min-width: 100%;"*@
+    <div class="table-toolbar" style="margin-bottom: 0px !important; padding-bottom: 0px !important;">
+        <div class="row cabecalho">
+
+            <div class="col-md-6">
+                <div class="form-group pull-left" style="margin-left: 15px;">
+                    @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("REDE_BINARIA"))
+                    {
+                        <div class="row margin-bottom-5">
+                            <a href="@Url.Action("Rede", "MinhaRede", new { topo = ViewBag.UltimoEsquerda })" class="btn btn-default @(ViewBag.UltimoEsquerda == 0 ? "disabled" : "")" style="width: 135px;">@traducaoHelper["ULTIMO_ESQUERDA"]</a>
+                            <a href="@Url.Action("Rede", "MinhaRede", new { topo = ViewBag.UltimoDireita })" class="btn btn-default @(ViewBag.UltimoDireita == 0 ? "disabled" : "")" style="width: 130px;">@traducaoHelper["ULTIMO_DIREITA"]</a>
+                        </div>
+                    }
+                    <div class="row">
+                        <a href="@Url.Action("Rede", "MinhaRede", new { topo = ViewBag.Nivel0 })" class="btn btn-default"><i class="fa fa-angle-up" style="color: orangered;"></i>&nbsp;@traducaoHelper["VOLTAR_UM_NIVEL"]</a>
+                        <a href="@Url.Action("Rede", "MinhaRede", new { topo = 0 })" class="btn btn-default"><i class="fa fa-angle-double-up" style="color: orangered;"></i>&nbsp;@traducaoHelper["VOLTAR_TOPO"]</a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="form-group pull-right" style="margin-right: 0px;">
+                    @using (Html.BeginForm("BuscaRede", "MinhaRede", FormMethod.Post, new { style = "width:100%", id = "BuscaRedeForm" }))
+                    {
+                        <div class="form-group pull-left ">
+                            <label>@traducaoHelper["BUSCA_LOGIN"]</label>
+                            <select id="ProcuraLogin" name="ProcuraLogin" class="form-control js-data-example-ajax input-medium">
+                            </select>
+                        </div>
+
+                        <input type="hidden" name="Atual" value="@usuarioAtual.ID" />
+
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row unilevel-scroll">
+        <div class="portlet light" style="width: max-content; min-width: 100%;">
+            <div class="tree center-block">
+                <ul>
+                    <li>
+                        @{
+                            var usu = (Core.Entities.Usuario)ViewBag.Nivel1;
+                            var usuBinder = new Sistema.ModelBinders.UsuarioBinder();
+                            usuBinder.usuarioId = usu.ID;
+                            var usuFoto = usuBinder.FotoUsuarioId;
+
+                            if (String.IsNullOrEmpty(usuFoto))
+                            {
+                                usuFoto = Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/Homem.png");
+                            }
+                            else
+                            {
+                                usuFoto = Url.Content(usuFoto);
+                            }
+
+                            <div id="primeiroNivel">
+                                <a href="@Url.Action("Rede", "MinhaRede", new {topo = @usu.PatrocinadorDiretoID })">
+                                    <img src="@usuFoto" class="userprimeironivel" style="border: 2px solid lightgray !important;" />
+                                    @*<span class="tooltips"></span>*@
+                                    <span class="row tooltips" style="z-index: 1001; left: 100px;">
+                                        <span class="col-sm-3">
+                                            <img style="margin: 15px 5px 10px 0px; height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@usuFoto">
+                                        </span>
+                                        <span class="col-sm-9 text-justify">
+                                            <i class="fa fa-user"></i>Login: @usu.Login <br />
+                                            <i class="fa fa-calendar"></i>Activation: @(usu.DataAtivacao != null ? @usu.DataAtivacao.Value.ToString(ViewBag.MascaraData) : "") <br />
+                                            <i class="fa fa-shopping-cart"></i>Product: @usu.Apelido - @(usu.NivelAssociacao != 0 ? usu.Status.ToString() : "") <br />
+                                            <i class="fa fa-diamond"></i>Ranking: @usu.NivelClassificacao <i class="fa fa-line-chart" style="margin-left: 20px;"></i>Points: 0<br />
+                                            <i class="fa fa-expand"></i>Upgrade: Yes
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                        }
+
+                        @if (meusDiretos1 != null && meusDiretos1.Count > 0)
+                        {
+                            var filtro1 = meusDiretos1.Where(x => x.Assinatura == usu.Assinatura + "0" || x.Assinatura == usu.Assinatura + "1" || x.Assinatura == usu.Assinatura + "2").OrderBy(x => x.Assinatura).ToList();
+                            if (filtro1 != null && filtro1.Count > 0)
+                            {
+                                <ul>
+                                    <li>
+                                        <ul>
+                                            @foreach (var usuario1 in filtro1)
+                                            {
+                                                <li>
+                                                    <div style="width: 100px; height: 62px !important;" onclick="window.location = '@Url.Action("Rede", "MinhaRede", new { topo = usuario1.ID })'">
+                                                        @{
+                                                            var imagePath1 = Core.Helpers.ConfiguracaoHelper.GetString("IMAGEM_NIVEL_ASSOCIACAO_" + usuario1.NivelAssociacao);
+
+                                                            if (imagePath1 == null || imagePath1 == "")
+                                                            {
+                                                                imagePath1 = Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/associacao/1.png");
+                                                            }
+                                                            else
+                                                            {
+                                                                imagePath1 = Url.Content(imagePath1);
+                                                            }
+                                                            <div id="cardPrincipal" onmouseenter="SelecionaCard(this);" onmouseleave="RemoveSelecaoCard(this);" style="width: 100px; height: 62px; border-width: 1px; padding: 0px; margin: 0px; background: lightgrey; border-radius: 10% !important;">
+                                                                @if (usuario1.NivelAssociacao == 0)
+                                                                {
+                                                                    <i class="fa fa-times-circle" aria-hidden="true" style="left: 0px; position: absolute; font-size: 20px; margin-top: 5px; color: red;"></i>
+                                                                }
+                                                                <div style="border-radius: 0% !important; height: 0px; top: -10px; z-index: 1000;">
+                                                                    <img style="height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@imagePath1">
+                                                                </div>
+                                                                <div class="pintadivcinza">@usuario1.Login</div>
+                                                            </div>
+                                                            @*<span class="tooltips" style="z-index: 1001; left: 100px;"></span>*@
+                                                            <span class="row tooltips" style="z-index: 1001; left: 100px;">
+                                                                <span class="col-sm-3">
+                                                                    <img style="margin: 15px 5px 10px 0px; height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@usuFoto">
+                                                                </span>
+                                                                <span class="col-sm-9 text-justify">
+                                                                    <i class="fa fa-user"></i>Login: @usuario1.Login <br />
+                                                                    <i class="fa fa-calendar"></i>Activation: @(usuario1.DataAtivacao != null ? @usuario1.DataAtivacao.Value.ToString(ViewBag.MascaraData) : "") <br />
+                                                                    <i class="fa fa-shopping-cart"></i>Product: @usuario1.Apelido - @(usuario1.NivelAssociacao != 0 ? usuario1.Status.ToString() : "") <br />
+                                                                    <i class="fa fa-diamond"></i>Ranking: @usuario1.NivelClassificacao <i class="fa fa-line-chart" style="margin-left: 20px;"></i>Points: 0 <br />
+                                                                    <i class="fa fa-expand"></i>Upgrade: Yes
+                                                                </span>
+                                                            </span>
+                                                        }
+                                                    </div>
+
+                                                    @if (meusDiretos2 != null && meusDiretos2.Count > 0)
+                                                    {
+                                                        var filtro2 = meusDiretos2.Where(x => x.Assinatura == usuario1.Assinatura + "0" || x.Assinatura == usuario1.Assinatura + "1" || x.Assinatura == usuario1.Assinatura + "2").OrderBy(x => x.Assinatura).ToList();
+                                                        if (filtro2 != null && filtro2.Count > 0)
+                                                        {
+                                                            <ul>
+                                                                <li>
+                                                                    <ul>
+                                                                        @foreach (var usuario2 in filtro2)
+                                                                        {
+                                                                            <li>
+                                                                                <div style="width: 100px; height: 62px !important;" onclick="window.location = '@Url.Action("Rede", "MinhaRede", new { topo = usuario2.ID })'">
+                                                                                    @{
+                                                                                        var imagePath2 = Core.Helpers.ConfiguracaoHelper.GetString("IMAGEM_NIVEL_ASSOCIACAO_" + usuario2.NivelAssociacao);
+
+                                                                                        if (imagePath2 == null || imagePath2 == "")
+                                                                                        {
+                                                                                            imagePath2 = Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/associacao/1.png");
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            imagePath2 = Url.Content(imagePath2);
+                                                                                        }
+                                                                                        <div id="cardPrincipal" onmouseenter="SelecionaCard(this);" onmouseleave="RemoveSelecaoCard(this);" style="width: 100px; height: 62px; border-width: 1px; padding: 0px; margin: 0px; background: lightgrey; border-radius: 10% !important;">
+                                                                                            @if (usuario2.NivelAssociacao == 0)
+                                                                                            {
+                                                                                                <i class="fa fa-times-circle" aria-hidden="true" style="left: 0px; position: absolute; font-size: 20px; margin-top: 5px; color: red;"></i>
+                                                                                            }
+                                                                                            <div style="border-radius: 0% !important; height: 0px; top: -10px; z-index: 1000;">
+                                                                                                <img style="height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@imagePath2">
+                                                                                            </div>
+                                                                                            <div class="pintadivcinza">@usuario2.Login</div>
+                                                                                        </div>
+                                                                                        @*<span class="tooltips" style="z-index: 1001; left: 100px;"></span>*@
+                                                                                        <span class="row tooltips" style="z-index: 1001; left: 100px;">
+                                                                                            <span class="col-sm-3">
+                                                                                                <img style="margin: 15px 5px 10px 0px; height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@usuFoto">
+                                                                                            </span>
+                                                                                            <span class="col-sm-9 text-justify">
+                                                                                                <i class="fa fa-user"></i>Login: @usuario2.Login <br />
+                                                                                                <i class="fa fa-calendar"></i>Activation: @(usuario2.DataAtivacao != null ? @usuario2.DataAtivacao.Value.ToString(ViewBag.MascaraData) : "") <br />
+                                                                                                <i class="fa fa-shopping-cart"></i>Product: @usuario2.Apelido - @(usuario2.NivelAssociacao != 0 ? usuario2.Status.ToString() : "") <br />
+                                                                                                <i class="fa fa-diamond"></i>Ranking: @usuario2.NivelClassificacao <i class="fa fa-line-chart" style="margin-left: 20px;"></i>Points: 0 <br />
+                                                                                                <i class="fa fa-expand"></i>Upgrade: Yes
+                                                                                            </span>
+                                                                                        </span>
+                                                                                    }
+                                                                                </div>
+
+                                                                                @if (meusDiretos3 != null && meusDiretos3.Count > 0)
+                                                                                {
+                                                                                    var filtro3 = meusDiretos3.Where(x => x.Assinatura == usuario2.Assinatura + "0" || x.Assinatura == usuario2.Assinatura + "1" || x.Assinatura == usuario2.Assinatura + "2").OrderBy(x => x.Assinatura).ToList();
+                                                                                    if (filtro3 != null && filtro3.Count > 0)
+                                                                                    {
+                                                                                        <ul>
+                                                                                            <li>
+                                                                                                <ul>
+                                                                                                    @foreach (var usuario3 in filtro3)
+                                                                                                    {
+                                                                                                        <li>
+                                                                                                            <div style="width: 100px; height: 62px !important;" onclick="window.location = '@Url.Action("Rede", "MinhaRede", new { topo = usuario3.ID })'">
+                                                                                                                @{
+                                                                                                                    var imagePath3 = Core.Helpers.ConfiguracaoHelper.GetString("IMAGEM_NIVEL_ASSOCIACAO_" + usuario3.NivelAssociacao);
+
+                                                                                                                    if (imagePath3 == null || imagePath3 == "")
+                                                                                                                    {
+                                                                                                                        imagePath3 = Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/associacao/1.png");
+                                                                                                                    }
+                                                                                                                    else
+                                                                                                                    {
+                                                                                                                        imagePath3 = Url.Content(imagePath3);
+                                                                                                                    }
+                                                                                                                    <div id="cardPrincipal" onmouseenter="SelecionaCard(this);" onmouseleave="RemoveSelecaoCard(this);" style="width: 100px; height: 62px; border-width: 1px; padding: 0px; margin: 0px; background: lightgrey; border-radius: 10% !important;">
+                                                                                                                        @if (usuario3.NivelAssociacao == 0)
+                                                                                                                        {
+                                                                                                                            <i class="fa fa-times-circle" aria-hidden="true" style="left: 0px; position: absolute; font-size: 20px; margin-top: 5px; color: red;"></i>
+                                                                                                                        }
+                                                                                                                        <div style="border-radius: 0% !important; height: 0px; top: -10px; z-index: 1000;">
+                                                                                                                            <img style="height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@imagePath3">
+                                                                                                                        </div>
+                                                                                                                        <div class="pintadivcinza">@usuario3.Login</div>
+                                                                                                                    </div>
+                                                                                                                    @*<span class="tooltips" style="z-index: 1001; left: 100px;"></span>*@
+                                                                                                                    <span class="row tooltips" style="z-index: 1001; left: 100px;">
+                                                                                                                        <span class="col-sm-3">
+                                                                                                                            <img style="margin: 15px 5px 10px 0px; height: 55px !important; width:55px !important; border-radius: 50% !important;" src="@usuFoto">
+                                                                                                                        </span>
+                                                                                                                        <span class="col-sm-9 text-justify">
+                                                                                                                            <i class="fa fa-user"></i>Login: @usuario3.Login <br />
+                                                                                                                            <i class="fa fa-calendar"></i>Activation: @(usuario3.DataAtivacao != null ? @usuario3.DataAtivacao.Value.ToString(ViewBag.MascaraData) : "") <br />
+                                                                                                                            <i class="fa fa-shopping-cart"></i>Product: @usuario3.Apelido - @(usuario3.NivelAssociacao != 0 ? usuario3.Status.ToString() : "") <br />
+                                                                                                                            <i class="fa fa-diamond"></i>Ranking: @usuario3.NivelClassificacao <i class="fa fa-line-chart" style="margin-left: 20px;"></i>Points: 0 <br />
+                                                                                                                            <i class="fa fa-expand"></i>Upgrade: Yes
+                                                                                                                        </span>
+                                                                                                                    </span>
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                        </li>
+                                                                                                    }
+                                                                                                </ul>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    }
+                                                                                }
+
+                                                                            </li>
+                                                                        }
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        }
+                                                    }
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            }
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,450 @@
+﻿@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    ViewBag.Title = traducaoHelper["UNILEVEL"].ToString().ToLower();
+
+
+    List<Core.Models.StoredProcedures.spC_ObtemDiretos> meusDiretos1 = ViewBag.MeusDiretos1;
+    List<Core.Models.StoredProcedures.spC_ObtemDiretos> meusDiretos2 = ViewBag.MeusDiretos2;
+    List<Core.Models.StoredProcedures.spC_ObtemDiretos> meusDiretos3 = ViewBag.MeusDiretos3;
+
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+
+}
+
+@section pageStyles {
+}
+
+@section head {
+}
+
+@section pageScripts {
+
+    <script type="text/javascript">
+        $(function () {
+            $('#Procura').click(function (event) {
+                event.preventDefault();
+                var form = document.getElementById('frmBusca');
+                var data = $(form).serialize();
+
+                Js.Util.AbrirLoading();
+                $.get(form.action, data, function (data) {
+                    if (data) {
+                        $('#divResultadoBusca').html(data); s
+                        Js.Util.FecharLoading();
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+
+@section PageLevelScripts{
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="portlet light" style="width: 100%;  min-width: 100%; ">
+    @*<div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-8">
+                    @using (Html.BeginForm("BuscarUnilevel", "MinhaRede", FormMethod.Get, new { id = "frmBusca", style = "width:100%" }))
+                    {
+                        <div class="form-group pull-right">
+                            <div class="input-group">
+                                @Html.TextBox("ProcuraLogin", ViewBag.CurrentProcuraLogin as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = "Login" })
+                                @Html.TextBox("ProcuraNome", ViewBag.CurrentProcuraNome as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["NOME"] })
+                                <input class="btn blue-madison form-control input-small input-inline fontPlaceHolderIcon" id="Procura" name="Procura" value="&#xf002; @traducaoHelper["PROCURAR"]" type="button" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>*@
+
+    @*<div class="row rowcards">
+        <div class="col cardcolumns">
+            <div class="container dashbody">
+                <div class="row">
+                    @using (Html.BeginForm("BuscarUnilevel", "MinhaRede", FormMethod.Get, new { id = "frmBusca", style = "width:100%" }))
+                    {
+                        @*<div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            @Html.Hidden("chave", (string)ViewBag.Chave)
+                            @Html.Hidden("topo", (int)ViewBag.Topo)
+                            <div class="container generic-container dashbody">
+                                <div class="d-inline-block" style="width:190px;height:90px;">
+                                    <label class="labelsmall">Login: </label>
+                                    @Html.TextBox("Login", "", new { @class = "form-control", style = "width:175px;" })
+                                </div>
+                                <div class="d-inline-block" style="width:190px;height:90px;">
+                                    <label class="labelsmall">Nome: </label>
+                                    @Html.TextBox("Nome", "", new { @class = "form-control", style = "width:175px;" })
+                                </div>
+                                <div class="d-inline-block" style="width:115px;height:90px;">
+                                    <label class="hidden-md-down hide-md-down"> </label>
+                                    <button class="btn btn-light form-control btn-gradient" type="button" style="width:104px;margin-right:20px;" id="btnBuscar">
+                                        <i class="fa fa-search icon-button"></i>Buscar
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>*@
+    @*<div class="col-sm-12 col-md-12 col-lg-12 col-xl-12" id="divResultadoBusca">
+            @{
+                Html.RenderPartial("UnilevelResultadoBusca");
+            }
+        </div>*@
+    @*}
+        </div>*@
+
+    <div class="row unilevel-scroll">
+        <div class="portlet light" style="width: max-content; min-width: 100%;">
+            <div class="tree center-block">
+                <ul>
+                    <li>
+                        @{
+                            var usu = ViewBag.Nivel1;
+                            var usuBinder = new Sistema.ModelBinders.UsuarioBinder();
+                            usuBinder.usuarioId = usu.ID;
+                            var usuFoto = usuBinder.FotoUsuarioId;
+
+                            if (String.IsNullOrEmpty(usuFoto))
+                            {
+                                usuFoto = Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/icoNivel2ativa.png");
+                            }
+                            else
+                            {
+                                usuFoto = Url.Content(usuFoto);
+                            }
+
+                            <div id="primeiroNivel">
+                                <a href="@Url.Action("Unilevel", "MinhaRede", new {topo = @usu.PatrocinadorDiretoID })">
+                                    <img src="@usuFoto" class="userprimeironivel" />
+                                    <span class="tooltips">Usuario1</span>
+                                    <span class="tooltips">
+                                        Nome: @usu.Nome
+                                        <br />Login: @usu.Login
+                                    </span>
+                                </a>
+                            </div>
+                        }
+
+                        @if (meusDiretos1 != null && meusDiretos1.Count > 0)
+                        {
+                            <ul>
+                                <li>
+                                    <ul>
+                                        @foreach (var usuario1 in meusDiretos1)
+                                        {
+                                            <li>
+                                                <div>
+                                                    @{
+                                                        //var usuarioBinder1 = new Sistema.ModelBinders.UsuarioBinder();
+                                                        //usuarioBinder1.usuarioId = usuario1.IDAfiliado;
+                                                        //var imagePath1 = usuarioBinder1.FotoUsuarioId;
+
+                                                        var imagePath1 = Core.Helpers.ConfiguracaoHelper.GetString("IMAGEM_NIVEL_ASSOCIACAO_" + usuario1.AssociacaoID);
+                                                        if (imagePath1 == null || imagePath1 == "")
+                                                        {
+                                                            imagePath1 = "~/Content/img/" + Helpers.Local.Cliente + "/associacao/1.png";
+                                                        }
+                                                        imagePath1 = Url.Content(imagePath1);
+
+                                                        if (String.IsNullOrEmpty(imagePath1))
+                                                        {
+                                                            imagePath1 = Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/icoNivel2ativa.png");
+                                                        }
+                                                        else
+                                                        {
+                                                            imagePath1 = Url.Content(imagePath1);
+                                                        }
+
+                                                        imagePath1 = Url.Content(imagePath1);
+
+                                                        <a href="@Url.Action("Unilevel", "MinhaRede", new { topo = usuario1.IDAfiliado })">
+                                                            <img src="@imagePath1" class="userseguintes" />
+                                                            <span class="tooltips">
+                                                                Nome: @usuario1.Nome
+                                                                <br />Login: @usuario1.Login
+                                                                <br />Associação: @usuario1.NomeAssociacao
+                                                            </span>
+                                                        </a>
+                                                    }
+                                                </div>
+
+                                                @if (meusDiretos2 != null && meusDiretos2.Count > 0)
+                                                {                                                                                             
+                                                    var filtro2 = meusDiretos2.Where(x => x.PatrocinadorDiretoID == usuario1.IDAfiliado).ToList();
+                                                    if (filtro2 != null && filtro2.Count > 0)
+                                                    {
+                                                        <ul>
+                                                            <li>
+                                                                <ul>
+                                                                    @foreach (var usuario2 in filtro2)
+                                                                    {
+                                                                        <li>
+                                                                            <div>
+                                                                                @{
+                                                                                    //ar usuarioBinder2 = new Sistema.ModelBinders.UsuarioBinder();
+                                                                                    //usuarioBinder2.usuarioId = usuario2.IDAfiliado;
+                                                                                    //var foto2 = usuarioBinder2.FotoUsuarioId;
+
+                                                                                    //if (String.IsNullOrEmpty(foto2))
+                                                                                    //{
+                                                                                    //    foto2 = Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/icoNivel2ativa.png");
+                                                                                    //}
+                                                                                    //else
+                                                                                    //{
+                                                                                    //    foto2 = Url.Content(foto2);
+                                                                                    //}
+
+                                                                                    var imagePath2 = Core.Helpers.ConfiguracaoHelper.GetString("IMAGEM_NIVEL_ASSOCIACAO_" + usuario2.AssociacaoID);
+                                                                                    if (imagePath2 == null || imagePath2 == "")
+                                                                                    {
+                                                                                        imagePath2 = "~/Content/img/" + Helpers.Local.Cliente + "/associacao/1.png";
+                                                                                    }
+                                                                                    imagePath2 = Url.Content(imagePath2);
+
+                                                                                    <a href="@Url.Action("Unilevel", "MinhaRede", new { topo = usuario2.IDAfiliado })">
+                                                                                        <img src="@imagePath2" class="userseguintes" />
+                                                                                        <span class="tooltips">
+                                                                                            Nome: @usuario2.Nome
+                                                                                            <br />Login: @usuario2.Login
+                                                                                            <br />Associação: @usuario2.NomeAssociacao
+                                                                                        </span>
+                                                                                    </a>
+                                                                                }
+                                                                            </div>
+
+                                                                            @if (meusDiretos3 != null && meusDiretos3.Count > 0)
+                                                                            {
+                                                                                var filtro3 = meusDiretos2.Where(x => x.PatrocinadorDiretoID == usuario2.IDAfiliado).ToList();
+                                                                                if (filtro3 != null && filtro3.Count > 0)
+                                                                                {
+                                                                                    <ul>
+                                                                                        <li>
+                                                                                            <ul>
+                                                                                                @foreach (var usuario3 in filtro3)
+                                                                                                {
+                                                                                                    <li>
+                                                                                                        <div>
+                                                                                                            @{
+                                                                                                                //var usuarioBinder3 = new Sistema.ModelBinders.UsuarioBinder();
+                                                                                                                //usuarioBinder3.usuarioId = usuario3.IDAfiliado;
+                                                                                                                //var foto3 = usuarioBinder3.FotoUsuarioId;
+
+                                                                                                                //if (String.IsNullOrEmpty(foto3))
+                                                                                                                //{
+                                                                                                                //    foto3 = Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/icoNivel2ativa.png");
+                                                                                                                //}
+                                                                                                                //else
+                                                                                                                //{
+                                                                                                                //    foto3 = Url.Content(foto3);
+                                                                                                                //}
+
+                                                                                                                var imagePath3 = Core.Helpers.ConfiguracaoHelper.GetString("IMAGEM_NIVEL_ASSOCIACAO_" + usuario3.AssociacaoID);
+                                                                                                                if (imagePath3 == null || imagePath3 == "")
+                                                                                                                {
+                                                                                                                    imagePath3 = "~/Content/img/" + Helpers.Local.Cliente + "/associacao/1.png";
+                                                                                                                }
+                                                                                                                imagePath3 = Url.Content(imagePath3);
+
+                                                                                                                <a href="@Url.Action("Unilevel", "MinhaRede", new { topo = usuario3.IDAfiliado })">
+                                                                                                                    <img src="@imagePath3" class="userseguintes" />
+                                                                                                                    <span class="tooltips">
+                                                                                                                        Nome: @usuario3.Nome
+                                                                                                                        <br />Login: @usuario3.Login
+                                                                                                                        <br />Associação: @usuario3.NomeAssociacao
+                                                                                                                    </span>
+                                                                                                                </a>
+                                                                                                            }
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                 }
+                                                                                            </ul>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                }
+                                                                             }
+
+                                                                        </li>
+                                                                     }
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    }
+                                                 }
+                                            </li>
+                                         }
+                                    </ul>
+                                </li>
+                            </ul>
+                         }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="portlet light text-center">
+        <a href="@Url.Action("Unilevel", "MinhaRede", new { topo = ViewBag.Nivel0  })" class="btn btn-default"><i class="fa fa-angle-up" style="color: orangered;"></i>&nbsp;@traducaoHelper["VOLTAR_UM_NIVEL"]</a>
+        <a href="@Url.Action("Unilevel", "MinhaRede", new { topo = 0})" class="btn btn-default"><i class="fa fa-angle-double-up" style="color: orangered;"></i>&nbsp;@traducaoHelper["VOLTAR_TOPO"]</a>
+    </div>
+
+
+    @*<div class="row">
+            @if (ViewBag.Topo != 0)
+            {
+                <div class="col-10 col-md-10 col-xl-12 offset-md-1 offset-xl-0" style="height:auto;padding-top:10px;padding-bottom:10px;">
+                    <span>Unilevel</span>
+                    <div class="tree2">
+                        <ul>
+                            @{
+                                int iNivel = 0;
+                                for (int i = ViewBag.Upline.Count - 1; i >= 0; i--)
+                                {
+                                    <li>
+                                        <div>
+                                            <a href="@Url.Action("Unilevel", "MinhaRede", new { chave = ViewBag.Chave, topo = ViewBag.Upline[i].ID })">
+                                                <div id="posativa"></div>
+                                                <div id="logins">@ViewBag.Upline[i].Login.ToLower() <br />Nível @iNivel</div>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    iNivel++;
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+                                }
+            <div class="col-10 col-md-10 col-xl-12 offset-md-1 offset-xl-0" style="height:auto;padding-top:10px;padding-bottom:10px;">
+                <div class="tabelatitulo">Nível @ViewBag.SeqNivelAtual</div>
+                <div class="tree2">
+                    <ul>
+                        @foreach (var usuario in ViewBag.NivelAtual)
+                        {
+                            <li>
+                                <div>
+                                    <a href="@Url.Action("Unilevel", "MinhaRede", new { chave = ViewBag.Chave, topo = usuario.IDAfiliado })">
+                                        <div id="posativa"></div>
+                                        <div id="logins">@usuario.Login.ToLower()</div>
+                                    </a>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>*@
+
+    @*<div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12" id="divResultado">
+                @{
+                    Html.RenderPartial("UnilevelResultado");
+                }
+            </div>
+        </div>*@
+
+    @*</div>
+            </div>
+        </div>*@
+</div>
+<div style="height:auto;min-height:400px;margin-top:-4px;background-color:#ffffff;z-index:-1;">
+    <table class="table table-striped table-bordered table-hover table-responsive-lg">
+        <thead>
+            <tr>
+                <th>@traducaoHelper["NIVEL"] </th>
+                <th>@traducaoHelper["LOGIN"] </th>
+                <th>@traducaoHelper["NOME"] </th>
+                <th>@traducaoHelper["ATIVO_MENSAL"] </th>
+                <th>@traducaoHelper["DATA_ATIVACAO"] </th>
+                <th>@traducaoHelper["PLANO"] </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (meusDiretos1 != null && meusDiretos1.Count > 0)
+                {
+                    foreach (var usuario1 in meusDiretos1)
+                    {
+                        <tr>
+                            <td>1 </td>
+                            <td>@usuario1.Login </td>
+                            <td>@usuario1.Nome </td>
+                            <td>@(usuario1.DataValidade >= Core.Helpers.App.DateTimeZion ? traducaoHelper["SIM"] : traducaoHelper["NAO"])</td>
+                            <td>@usuario1.DataAtivacao </td>
+                            <td>@usuario1.NomeAssociacao </td>
+                        </tr>
+                    }
+                }
+                if (meusDiretos2 != null && meusDiretos2.Count > 0)
+                {
+                    foreach (var usuario2 in meusDiretos2)
+                    {
+                        <tr>
+                            <td>2 </td>
+                            <td>@usuario2.Login </td>
+                            <td>@usuario2.Nome </td>
+                            <td>@(usuario2.DataValidade >= Core.Helpers.App.DateTimeZion ? traducaoHelper["SIM"] : traducaoHelper["NAO"])</td>
+                            <td>@usuario2.DataAtivacao </td>
+                            <td>@usuario2.NomeAssociacao </td>
+                        </tr>
+                    }
+                }
+                if (meusDiretos3 != null && meusDiretos3.Count > 0)
+                {
+                    foreach (var usuario3 in meusDiretos3)
+                    {
+                        <tr>
+                            <td>3 </td>
+                            <td>@usuario3.Login </td>
+                            <td>@usuario3.Nome </td>
+                            <td>@(usuario3.DataValidade >= Core.Helpers.App.DateTimeZion ? traducaoHelper["SIM"] : traducaoHelper["NAO"])</td>
+                            <td>@usuario3.DataAtivacao </td>
+                            <td>@usuario3.NomeAssociacao </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>

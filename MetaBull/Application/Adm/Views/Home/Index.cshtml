@@ -1,0 +1,157 @@
+﻿@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    ViewBag.Title = "Admin";
+    ViewBag.Description = "Sistema";
+    ViewBag.Author = "Nextter Digital";
+    ViewBag.ReferrerMode = ReferrerMode.OriginWhenCrossOrigin;
+    ViewBag.TwitterCard = new SummaryLargeImageTwitterCard("@marcelo");
+
+    ViewBag.OpenGraph = new OpenGraphWebsite(
+        ViewBag.Title,
+        new OpenGraphImage(Url.AbsoluteContent("~/content/icons/open-graph-1200x630.png")) { Height = 630, Type = ContentType.Png, Width = 1200 })
+    {
+        Determiner = OpenGraphDeterminer.Blank,
+        SiteName = Application.Name
+    };
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var usuariosNivel = ViewBag.UsuariosNivel;
+    var usuariosAssocDia = ViewBag.UsuariosAssocDia;
+    var usuariosAssocDiaPer = ViewBag.UsuariosAssocDiaPer;
+ 
+    ViewBag.Title = traducaoHelper["DOCUMENTOS"].ToString().ToLower();
+
+    #endregion
+
+}
+
+@section pageStyles {
+
+
+}
+
+@section head {
+}
+
+@section pageScripts {
+}
+
+@section PageLevelScripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+
+        if ('@usuariosNivel' != null) {
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(drawChartUsuariosNivel);
+        }
+        function drawChartUsuariosNivel() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Nivel');
+            data.addColumn('number', 'Qtde');
+
+            var dados = JSON.parse('@Html.Raw(Json.Encode(@usuariosNivel))')
+            var total = 0;
+
+            for (var i = 0; i < dados.Data.length; i++) {
+                data.addRow([dados.Data[i].Name, dados.Data[i].Value]);
+                total = total + dados.Data[i].Value;
+            }
+
+            var options = {
+                title: '@traducaoHelper["TOTAL_USUARIOS"]' +  ' ' + total,
+                legend: 'bottom',
+                is3D: true,
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('chartUsuarioNivel'));
+            chart.draw(data, options);
+        }
+
+
+        if ('@usuariosAssocDiaPer' != null) {
+            google.charts.load('current', { 'packages': ['line'] });
+            google.charts.setOnLoadCallback(drawChartUsuariosAssocDia);
+        }
+        function drawChartUsuariosAssocDia() {
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '@usuariosAssocDiaPer' );
+            data.addColumn('number', '');
+
+            var dados = JSON.parse('@Html.Raw(Json.Encode(@usuariosAssocDia))')
+
+            for (var i = 0; i < dados.Data.length; i++) {
+                data.addRow([dados.Data[i].Name, dados.Data[i].Value]);
+            }
+
+            var options = {
+                //chart: {
+                //    title: 'Box Office Earnings in First Two Weeks of Opening',
+                //    //subtitle: 'in millions of dollars (USD)'
+                //},
+
+                //width: 900,
+                //height: 500
+            };
+
+            var chart = new google.charts.Line(document.getElementById('linechart_material'));
+            chart.draw(data, google.charts.Line.convertOptions(options));
+        };
+
+    </script>
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="row">
+            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_USUARIOS_ASSOCIACAO"))
+            {
+                <div class="col-md-6">
+                    <div class="portlet light portlet-fit bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class=" icon-layers font-green"></i>
+                                <span class="caption-subject font-green bold ">@traducaoHelper["DISTRIBUICAO_USUARIO_ASSOCIACAO"]</span>
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+                            <div id="chartUsuarioNivel" style="height:300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_EVOLUCAO_USUARIOS_ASSOCIADOS"))
+            {
+                <div class="col-md-6">
+                    <div class="portlet light portlet-fit bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class=" icon-layers font-green"></i>
+                                <span class="caption-subject font-green bold ">@traducaoHelper["EVOLUCAO_USUARIOS_ASSOCIADOS"]</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="linechart_material" style="height:300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

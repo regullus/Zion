@@ -1,0 +1,257 @@
+﻿@{
+    /**/
+
+
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["GANHOS"].ToString().ToLower();
+
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+    var categorias = (IEnumerable<Core.Entities.Categoria>)ViewBag.Categorias;
+    var usuarios = (IEnumerable<Core.Entities.Usuario>)ViewBag.Usuarios;
+    var pedidos = (IEnumerable<Core.Entities.Pedido>)ViewBag.Pedidos;
+    var bonificacoesAll = (IEnumerable<Core.Entities.Bonificacao>)ViewBag.bonificacoesAll;
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+    var bonificacoes = usuario.Bonificacao.Where(b => b.StatusID == (int)Core.Entities.Bonificacao.TodosStatus.Processado);
+    var dias = bonificacoes.GroupBy(b => new DateTime(b.Data.Year, b.Data.Month, b.Data.Day)).OrderByDescending(d => d.Key);
+    var active = true;
+    var contador = 1;
+
+    #endregion
+
+    #region ViewBags
+
+    ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
+    if (ViewBag.MascaraData == null)
+    {
+        ViewBag.MascaraData = "dd/MM/yyyy";
+    }
+
+    #endregion
+
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/table")
+}
+
+@section head {
+    <!--Table Left-->
+    @Styles.Render("~/Content/tableLeft")
+    <!--Table Left-->
+}
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/table")
+}
+
+@section PageLevelScripts{
+
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<ul class="nav nav-tabs tabContatos">
+    <li class="active"><a class="tab-lista-dados" href="#Acumulado" data-toggle="tab" style="text-transform:capitalize"><i class="fa fa-cubes"></i> @traducaoHelper["ACUMULADO"]</a></li>
+    <li><a class="tab-lista-dados" href="#Data" data-toggle="tab" style="text-transform:capitalize"><i class="fa fa-calendar"></i> @traducaoHelper["DATA"]</a></li>
+</ul>
+
+<div class="tab-content">
+
+    <div id="Acumulado" class="tab-pane active" style="padding:0; margin: 0; border: none;">
+
+        <div class="portlet aba box backWrite grey-gallery">
+
+            <div class="portlet-title">
+                <div class="caption"></div>
+                <div class="tools">
+                    <a href='@Url.Action("Index")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+                    <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+                </div>
+                <div class="actions">
+                    <a href='#'>&nbsp;</a>
+                    <label>&nbsp;</label>
+                </div>
+            </div>
+
+            <div class="portlet-body">
+                @if (categorias.Count() > 0)
+                {
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th width="60%">@traducaoHelper["TIPO_BONIFICACAO"]</th>
+                                <th width="40%">@traducaoHelper["ACUMULADO"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var categoria in categorias)
+                            {
+                                var valor = usuario.Lancamento.Where(l => l.ContaID == 1 && l.CategoriaID == categoria.ID && l.TipoID == (int)Core.Entities.Lancamento.Tipos.Bonificacao).Sum(l => l.Valor);
+                                <tr>
+                                    <td><h4>@categoria.Nome</h4></td>
+                                    <td><h4>@moedaPadrao.Simbolo @valor.Value.ToString(moedaPadrao.MascaraOut) </h4></td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th style="text-align:right;"><h4>@traducaoHelper["TOTAL"]</h4></th>
+                                <th><h4>@moedaPadrao.Simbolo @usuario.Lancamento.Where(l => l.ContaID == 1 && l.TipoID == (int)Core.Entities.Lancamento.Tipos.Bonificacao).Sum(l => l.Valor).Value.ToString(moedaPadrao.MascaraOut) </h4></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+                else
+                {
+                    <h3>@traducaoHelper["SEM_DADOS"]</h3>
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="Data" class="tab-pane" style="padding:0; margin: 0; border: none;">
+
+        <div class="portlet aba box backWrite grey-gallery">
+
+            <div class="portlet-title">
+                <div class="caption"></div>
+                <div class="tools">
+                    <a href='@Url.Action("Ganhos")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+                    <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+                </div>
+                <div class="actions">
+                    <a href='#'>&nbsp;</a>
+                    <label>&nbsp;</label>
+                </div>
+            </div>
+
+            <div class="portlet-body">
+                @if (dias.Count() > 0)
+                {
+                    <div class="tabbable tabs-left">
+                        <ul class="nav nav-tabs">
+                            @foreach (var dia in dias)
+                            {
+                                <li class="@(active ? "active" : "")"><a href="#Dia@(contador)" data-toggle="tab">@dia.Key.ToString(ViewBag.MascaraData)</a></li>
+                                contador++;
+                                active = false;
+                            }
+                        </ul>
+                        <div class="tab-content">
+                            @{
+                                active = true;
+                                contador = 1;
+                            }
+                            @foreach (var dia in dias)
+                            {
+                                <div id="Dia@(contador)" class="tab-pane @(active ? "active" : "")">
+                                    <div class="inner-spacer">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: center; width: 25%;">@traducaoHelper["TIPO_BONIFICACAO"]</th>
+                                                    <th style="text-align: center; width: 20%;">@traducaoHelper["VALOR"]</th>
+                                                    <th style="text-align: center; width: 20%;">@traducaoHelper["ORIGEM"]</th>
+                                                    <th style="text-align: center; width: 35%;">@traducaoHelper["DESCRICAO"]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var bonificacao in dia)
+                                                {
+                                                    //Core.Entities.Usuario referencia = null;
+
+                                                    //switch (bonificacao.CategoriaID)
+                                                    //{
+                                                    //    case 1: //indicacao
+                                                    //    case 2: //formador de bronze
+                                                    //        referencia = usuarios.FirstOrDefault(u => u.ID == bonificacao.ReferenciaID);
+                                                    //        break;
+                                                    //    default:
+                                                    //        referencia = usuarios.FirstOrDefault(u => u.ID == bonificacao.ReferenciaID);
+                                                    //        break;
+                                                    //}
+
+                                                <tr>
+                                                    <td>@bonificacao.Categoria.Nome</td>
+                                                    <td style="text-align: center;">@moedaPadrao.Simbolo @bonificacao.Valor.Value.ToString(moedaPadrao.MascaraOut) </td>
+                                                    @if (bonificacao.Pedido != null)
+                                                    {
+                                                        <td>Pedido: @bonificacao.Pedido.Codigo | Valor: @moedaPadrao.Simbolo @bonificacao.Pedido.Total.Value.ToString(moedaPadrao.MascaraOut) </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @*<td>@(referencia != null ? referencia.Login : "")</td>*@
+                                                    @if (bonificacao.Descricao != null)
+                                                    {
+                                                        <td>@bonificacao.Descricao.Replace("[NM1]", "Direto: ").Replace("[N]", "Nivel: ").Replace("[P]", "Produto: ").Replace("[NP]", "Nível Pago: ").Replace("[PT]", "Pontos: ").Replace("[%]", "%: ").Replace("[NM]", "Afiliado: ")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                contador++;
+                                active = false;
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h3>@traducaoHelper["SEM_DADOS"]</h3>
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

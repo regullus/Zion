@@ -1,0 +1,204 @@
+﻿@model IEnumerable<Sistema.Containers.UsuarioContainer>
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var associacoes = (IEnumerable<Core.Entities.Associacao>)ViewBag.Associacoes;
+    ViewBag.Title = traducaoHelper["BUSCAR"].ToString().ToLower();
+    var exibeResultado = true;
+
+    if (Model == null)
+    {
+        exibeResultado = false;
+    }
+
+    #endregion
+
+    #region ViewBags
+
+    ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
+    if (ViewBag.MascaraData == null)
+    {
+        ViewBag.MascaraData = "dd/MM/yyyy";
+    }
+
+    #endregion
+
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/detalhes")
+}
+
+@section head {
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/plugins/datatable/TableTools.css")">
+}
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/detalhes")
+}
+
+@section PageLevelScripts {
+    <script src="@Url.Content("~/Content/js/plugins/datatable/jquery.dataTables.min.js")"></script>
+    @if (!ViewBag.Resultado)
+    {
+        <script>
+         infoAlert('@ViewBag.Title', '@traducaoHelper["BUSCA_SEM_RESULTADO"].ToString().ToLower()');
+        </script>
+    }
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+
+<div class="portlet aba box backWrite grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"></div>
+        <div class="tools">
+            <a href='@Url.Action("buscar")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+            <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+        </div>
+        <div class="actions">
+            <a href='#'>&nbsp;</a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        <form class="form-search" action="@Url.Action("buscar")" method="get">
+            <div class="row" style="padding: 10px 20px;">
+                <div class="col-md-6 pull-right">
+                    <div class="input-group">
+                        <input type="text" id="q" name="q" data-provide="typeahead" class="form-control" placeholder="buscar..." value="@ViewBag.Termo">
+                        <span class="input-group-btn">
+                            <input type="submit" class="btn btn-danger" value="Buscar">
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </form>
+        @if (exibeResultado)
+        {
+            <div class="tiles">
+
+                @foreach (var franqueado in Model)
+                {
+
+                    var classe = "";
+                    switch (franqueado.Usuario.Status)
+                    {
+                        case Core.Entities.Usuario.TodosStatus.Indefinido:
+                        case Core.Entities.Usuario.TodosStatus.NaoAssociado:
+                            classe = "warning";
+                            break;
+                        case Core.Entities.Usuario.TodosStatus.Bloqueado:
+                            classe = "danger";
+                            break;
+                        case Core.Entities.Usuario.TodosStatus.Associado:
+                            classe = "success";
+                            break;
+                    }
+
+                    var usuarioBinder = new Sistema.ModelBinders.UsuarioBinder();
+                    usuarioBinder.Usuario = franqueado.Usuario;
+                    var foto = usuarioBinder.Foto;
+                    if (String.IsNullOrEmpty(foto))
+                    {
+                        foto = Url.Content("~/Content/img/" + (franqueado.Usuario.Sexo == "M" ? "homem" : "mulher") + ".png");
+                    }
+                    else
+                    {
+                        foto = Url.Content(foto);
+                    }
+
+                    var associacao = associacoes.FirstOrDefault(a => a.Nivel == franqueado.Usuario.NivelAssociacao);
+
+                    <div class="profile-sidebar" style="max-width:250px;">
+                        <!-- PORTLET MAIN -->
+                        <div class="portlet bg-grey-steel profile-sidebar-portlet">
+                            <!-- SIDEBAR USERPIC -->
+                            <div class="profile-userpic">
+                                <img src="@foto" class="img-responsive" alt="">
+                            </div>
+                            <!-- END SIDEBAR USERPIC -->
+                            <!-- SIDEBAR USER TITLE -->
+                            <div class="profile-usertitle">
+                                <div class="profile-usertitle-name" style="height: 60px;">
+                                    @franqueado.Usuario.Nome
+                                </div>
+                                <div class="profile-usertitle-job">
+                                    <span class="label label-@classe">@associacao.Nome</span>
+                                </div>
+                            </div>
+                            <!-- END SIDEBAR USER TITLE -->
+                            <!-- SIDEBAR BUTTONS -->
+                            @*<div class="profile-userbuttons">
+                                   <button type="button" class="btn btn-circle green-haze btn-sm">Follow</button>
+                                   <button type="button" class="btn btn-circle btn-danger btn-sm">Message</button>
+                                </div>*@
+                            <!-- END SIDEBAR BUTTONS -->
+                            <!-- SIDEBAR MENU -->
+                            <div class="profile-usermenu">
+                                <ul class="nav">
+                                    <li>
+                                        <a href="#">
+                                            <i class="icon-login"></i>
+                                            <strong>@traducaoHelper["LOGIN"]:</strong> @franqueado.Usuario.Login
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="icon-calendar"></i>
+                                            <strong>@traducaoHelper["CADASTRADO"]:</strong> @franqueado.Usuario.DataCriacao.ToString(ViewBag.MascaraData)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("detalhes", new { id = franqueado.Usuario.ID })">
+                                            <i class="icon-tag"></i>
+                                            @traducaoHelper["DETALHES"]
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- END MENU -->
+                        </div>
+                        <!-- END PORTLET MAIN -->
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
