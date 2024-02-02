@@ -1,0 +1,117 @@
+﻿@{
+    Layout = null;
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+}
+<li class="nav-item start">
+    <a href="@Url.Action("index", "home", new { area = "" })" class="nav-link nav-toggle">
+        <i class="fa fa-home"></i>
+        <span class="title">
+            @traducaoHelper["INICIO"]<label class="menuHome">&nbsp;</label>
+        </span>
+    </a>
+</li>
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-shopping-cart"></i>
+        <span class="title">
+            @traducaoHelper["LOJA"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("index", "home", new {area="loja"})">
+                <i class="fa fa-rocket"></i>
+                <span class="title">
+                    @traducaoHelper["LOJA_PACK"]
+                </span>
+            </a>
+        </li>
+
+    </ul>
+</li>
+
+<li>
+    <a href="@Url.Action("index", "meus-dados", new { area = "" })">
+        <i class="fa fa-user"></i>
+        <span class="title">
+            @traducaoHelper["MEUS_DADOS"]
+        </span>
+    </a>
+</li>
+
+
+<li>
+    <a href="javascript:;">
+        <i class="fa fa-file-text-o"></i>
+        <span class="title">
+            @traducaoHelper["PEDIDOS"]
+        </span>
+        <span class="arrow " />
+    </a>
+    <ul class="sub-menu">
+        <li>
+            <a href="@Url.Action("index", "meus-pedidos", new { area = "" })">
+                <i class="fa fa-gift"></i>
+                <span class="title">
+                    @traducaoHelper["MEUS_PEDIDOS"]
+                </span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+<li>
+    <a href="@Url.Action("index", "documento", new { area = "" })">
+        <i class="fa fa-files-o"></i>
+        <span class="title">
+            @traducaoHelper["DOCUMENTOS"]
+        </span>
+    </a>
+</li>
+
+@if (Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_EM_USO").ToLower() == "true")
+{
+    <li>
+        <a href="@Url.Action("mediatron", "home")">
+            <i class="fa fa-share-alt"></i>
+            <span class="title">
+                MediaTron
+            </span>
+        </a>
+    </li>
+}
+
+@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_SEGURANCA"))
+{
+    <li>
+        <a href="@Url.Action("googleauthenticator", "seguranca", new { area = "" })">
+            <i class="fa fa-lock"></i>
+            <span class="title">
+                @traducaoHelper["SEGURANCA"]
+            </span>
+        </a>
+    </li>
+}
+
+@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ZENDESK_ATIVO"))
+{
+    <li class="last ">
+        <a href="~/Suporte">
+            <i class="fa fa-life-ring"></i>
+            <span class="title">
+                @traducaoHelper["SUPORTE"]
+            </span>
+        </a>
+    </li>
+}
+
+<li class="last ">
+    <a href="~/Account/Login/?Sair=true">
+        <i class="fa fa-sign-out"></i>
+        <span class="title">
+            @traducaoHelper["SAIR"]
+        </span>
+    </a>
+</li>

@@ -1,0 +1,86 @@
+<html> <head> <META http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /> <link rel=stylesheet HREF="../textstyles.css" type="text/css">   <title>{0}({1})</title> <script type='text/javascript' src='../global.js'></script><script src='../js/jquery-1.11.1.min.js' type='text/javascript'></script></head><body><div display='no'><span id='prevProblem' onclick='prevProblem()'></span><span id='nextProblem' onclick='nextProblem()'></span><span id='prevSibling' onclick='prevSibling()'></span><span id='nextSibling' onclick='nextSibling1()'></span><span id='prevBookmark' onclick='prevBookmark()'></span><span id='nextBookmark' onclick='nextBookmark()'></span><span id='clearBookmarks' onclick='clearBookmarks()'></span></div><div class='unselectedDiv1' ID='acb52830f-f1ef-41cb-a984-20862bfcd991' onclick='refl("a72c2c6d8-f40e-43ab-963c-4251539095f7||c5c1d01a-42b7-46fc-94b7-cc4a6712e386");oc(event,"acb52830f-f1ef-41cb-a984-20862bfcd991"); '  ><div class='unselectedDiv2' ID='a958ff68a-43a8-4d8f-8ab3-d2be36ca4cea' onclick='refl("abd0a3f69-953d-4c24-9fc4-a99a0147388e");oc(event,"a958ff68a-43a8-4d8f-8ab3-d2be36ca4cea"); '  ><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;1</code>
+CREATE TABLE <span class='local' ID="aa0c4c687-645f-4ae0-99f4-fc50b9898083"  >xsinergmysql</span>.<span class='local' ID="aa7894aa0-c212-4dcf-ab5c-bf8622981612"  >mlm_payment_config</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;2</code>
+(<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;3</code>
+<em class='pl'></em><span class='local' ID="a5bddddec-5f64-4b5e-b385-c96dff67339a"  >id</span><span class='local' > </span><span class='local' ID="a77e2a66a-d827-46a4-a41c-ed3886ac0f32"  >int</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' > </span>IDENTITY(2<span class='local' >, </span>1)<span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;4</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;5</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;6</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;7</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;8</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;&nbsp;9</code>
+<em class='pl'></em><span class='local' ID="a29fb218b-5d7a-4440-baaa-a240b473b78e"  >paypal_api_username</span><span class='local' > </span><span class='local' ID="ac81185ef-7ee9-4939-ad2d-8b174855a01b"  >varchar(200)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;10</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;11</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;12</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;13</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;14</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;15</code>
+<em class='pl'></em><span class='local' ID="a52977255-4f40-41a5-9530-615e1c1d5fa1"  >paypal_api_password</span><span class='local' > </span><span class='local' ID="add332ba7-b616-4138-8ca5-4587fb923749"  >varchar(200)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;16</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;17</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;18</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;19</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;20</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;21</code>
+<em class='pl'></em><span class='local' ID="aaa856845-3c84-45a9-9652-429f196554f6"  >paypal_signater</span><span class='local' > </span><span class='local' ID="ad3c1b88d-f730-453e-879b-8967a77e84d1"  >varchar(300)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;22</code>
+<em class='pl'></em><span class='local' ID="a6626bdb4-d3e7-4282-98ac-e027900ea13b"  >paypal_production</span><span class='local' > </span><span class='local' ID="a35e86ff4-4604-4dac-b589-50cea8fbd805"  >smallint</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;23</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;24</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;25</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;26</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;27</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;28</code>
+<em class='pl'></em><span class='local' ID="ac857ec7f-84ef-4960-a2d9-1a2c94ff207d"  >bank_name</span><span class='local' > </span><span class='local' ID="af1697862-eeb8-4701-91df-4997d3f4124b"  >varchar(30)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;29</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;30</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;31</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;32</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;33</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;34</code>
+<em class='pl'></em><span class='local' ID="afd81ae84-66ef-4772-9584-3f0ff6274d2b"  >bank_holder_name</span><span class='local' > </span><span class='local' ID="abf3ae640-d8e3-4cd0-8e78-7f65f2bc65a1"  >varchar(100)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;35</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;36</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;37</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;38</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;39</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;40</code>
+<em class='pl'></em><span class='local' ID="ab20c534c-15dc-4348-9f27-19f5cd7fecae"  >bank_ac_number</span><span class='local' > </span><span class='local' ID="a18981388-10b0-490e-9c03-8f818b4969a2"  >varchar(100)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;41</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;42</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;43</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;44</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;45</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;46</code>
+<em class='pl'></em><span class='local' ID="af26e2b5a-66bf-49a9-b5d8-00426f70efcb"  >bank_branch</span><span class='local' > </span><span class='local' ID="ab80e2c72-2bd0-4ad5-9b3e-21f69fc7949d"  >varchar(100)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;47</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;48</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;49</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;50</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;51</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;52</code>
+<em class='pl'></em><span class='local' ID="a27957194-28a3-41ae-b078-6c74843dc4d7"  >bank_ifsc</span><span class='local' > </span><span class='local' ID="a526dc096-4bf9-43ef-9256-e93944d4ab6b"  >varchar(10)</span><span class='local' > </span><span class='local' >NOT NULL</span><span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;53</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;54</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;55</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;56</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;57</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;58</code>
+<em class='pl'></em><span class='local' ID="a711f9c09-e406-4f56-8868-4f2ca12b0347"  >blocktrail_api_key</span><span class='local' > </span><span class='local' ID="afc857af6-fc44-4c8e-a136-aa9b28ddd5de"  >varchar(100)</span><span class='local' > </span><span class='local' >NULL</span><span class='local' > </span>DEFAULT NULL<span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;59</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;60</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;61</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;62</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;63</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;64</code>
+<em class='pl'></em><span class='local' ID="abb702d56-0cce-4e4b-8007-5a73e948d17c"  >blocktrail_api_secret</span><span class='local' > </span><span class='local' ID="adaff0de0-a14a-4d0b-a862-3d9f0f2f3440"  >varchar(100)</span><span class='local' > </span><span class='local' >NULL</span><span class='local' > </span>DEFAULT NULL<span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;65</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;66</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;67</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;68</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;69</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;70</code>
+<em class='pl'></em><span class='local' ID="a6db43f05-143f-42b9-b011-3b529d644c51"  >blocktrail_wallet_identifier</span><span class='local' > </span><span class='local' ID="a81c1bbae-6f41-423b-899d-cce3a4d41bb0"  >varchar(100)</span><span class='local' > </span><span class='local' >NULL</span><span class='local' > </span>DEFAULT NULL<span class='local' >, </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;71</code>
+<em class='pl'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;72</code>
+<em class='pl'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;73</code>
+<em class='pl'></em>*   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;74</code>
+<em class='pl'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;75</code>
+</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;76</code>
+<em class='pl'></em><span class='local' ID="a7b8d7f51-09f8-4605-8dc5-0c4c5bc74d89"  >blocktrail_wallet_pass</span><span class='local' > </span><span class='local' ID="ac5a27587-ba25-47ea-9a05-5b06270f36cb"  >varchar(100)</span><span class='local' > </span><span class='local' >NULL</span><span class='local' > </span>DEFAULT NULL<span class='local' >, </span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;77</code>
+<em class='pl'></em><span class='local' ID="a9107e25c-c720-4e91-be48-27b7432bcc1f"  >blocktrail_production</span><span class='local' > </span><span class='local' ID="a57d149cf-b7e0-46f1-b924-fa8be24fd736"  >smallint</span><span class='local' > </span><span class='local' >NULL</span><span class='local' > </span><err category = '2'/><span class='errMessage' ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;78</code>
+<em class='pl2'></em>/*<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;79</code>
+<em class='pl2'></em>*   SSMA informational messages:<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;80</code>
+<em class='pl2'></em>*   M2SS0052: string literal was converted to NUMERIC literal<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;81</code>
+<em class='pl2'></em>*/<br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;82</code>
+</span>DEFAULT 1<span class='local' >, </span><span class='unselectedSpan' ID='aac90c718-32df-4f62-be97-b2e9b99bbef6' onclick='refl("a90f8c513-ca93-4b75-9476-3a9bf0583195");oc(event,"aac90c718-32df-4f62-be97-b2e9b99bbef6"); '  ><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;83</code>
+<em class='pl'></em>CONSTRAINT <span class='local' ID="a7e8a0bd6-30c8-45bb-b9e1-0f55848fbeea"  >[PK_mlm_payment_config_id]</span><span class='local' > </span>PRIMARY KEY (<span class='local' ID="ada0574c5-1a05-4168-b124-a0cd18459527"  >id</span>)</span><br><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;84</code>
+)</div></div><code><img class='bookmark' src='../img/empty.gif'  />&nbsp;85</code>
+GO</body></html>

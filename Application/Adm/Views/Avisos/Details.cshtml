@@ -1,0 +1,112 @@
+﻿@model Core.Entities.Aviso
+@using System.Linq;
+@using Sistema.Models;
+@using System.Collections.Generic;
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["DETALHES"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-book "></i>@traducaoHelper["DETALHES"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+
+        <div class="form-body">
+            <div class="row">
+                <div class="col-md-10"><h4>@traducaoHelper["ATIVOS"]</h4></div>
+                <div class="col-md-2">
+                    @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
+                    @Html.ActionLink("Edit", "create", new { id = Model.ID }, new { @class = "Editar pull-right", title = traducaoHelper["EDITAR"] })
+                </div>
+            </div>
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["TITULO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Titulo)
+                </dd>
+                <dd>
+                </dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["DESCRICAO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Texto)
+                </dd>
+                <dd>
+                </dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["URGENTE"]</dt>
+                @{
+                    if (Model.Urgente)
+                    {
+                        <dd>@traducaoHelper["SIM"]</dd>
+                    }
+                    else
+                    {
+                        <dd>@traducaoHelper["NAO"]</dd>
+                    }
+                }
+                <dd>
+                </dd>
+            </dl>
+
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["INICIO"] / @traducaoHelper["FIM"]</dt>
+
+                @{
+                    if (Model.DataInicio.HasValue)
+                    {
+                        <dd>@Model.DataInicio e @Model.DataFim</dd>
+                    }
+                    else
+                    {
+                        <dd>-</dd>
+                    }
+                }
+
+                <dd>
+                </dd>
+            </dl>
+
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["USUARIOS"]</dt>
+                <dd>
+
+                    @{
+                        if (ViewBag.UsuariosIDs != null && ((List<ItemViewModel>)ViewBag.UsuariosIDs).Any())
+                        {
+                            <ul>
+                                @foreach (var item in ViewBag.UsuariosIDs)
+                                {
+                                    <li>@item.Name</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            @traducaoHelper["TODOS"]
+                        }
+                    }
+
+
+                </dd>
+                <dd>
+                </dd>
+            </dl>
+
+        </div>
+    </div>
+</div>

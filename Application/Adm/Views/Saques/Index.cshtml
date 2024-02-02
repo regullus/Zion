@@ -1,0 +1,511 @@
+﻿@model PagedList.IPagedList<Core.Models.Financeiro.SolicitacaoSaqueModel>
+@using PagedList.Mvc;
+@{
+    #region Layout
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["SAQUE"];
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    #endregion
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/dateRangePicker")
+    @Styles.Render("~/Content/sweetAlert")
+}
+
+@section head {
+}
+
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/dataPicker")
+    @Scripts.Render("~/scripts/sweetAlert")
+    <script type="text/javascript">
+        function Dados(id) {
+            $('#DadosBancarios').modal('show');
+            $('#DadosBancarios .carregando').show();
+            $('#DadosBancarios .conteudo').hide();
+
+            $.ajax({
+                url: '@Url.Action("DadosBancarios", "Usuarios")',
+                data: { id },
+                type: 'GET',
+                success: function (data) {
+                    $('#DadosBancarios .carregando').hide();
+                    $('#DadosBancarios .conteudo .titular').html((data.IdentificacaoProprietario ? data.IdentificacaoProprietario : '-'));
+                    var resultCarteira = "";
+                    if (data.Bitcoin) {
+                        resultCarteira = 'BTC ' + data.Bitcoin;
+                    }
+                    if (data.Litecoin) {
+                        if (resultCarteira != '') {
+                            resultCarteira += '<br/>' + 'LTC ' + data.Litecoin;
+                        } else {
+                            resultCarteira = 'LTC ' + data.Litecoin;
+                        }
+                    }
+                    if (data.Tether) {
+                        if (resultCarteira != '') {
+                            resultCarteira += '<br/>' + 'Tether ' + data.Tether;
+                        } else {
+                            resultCarteira = 'Tether ' + data.Tether;
+                        }
+                    }
+                    if (data.Bitcoin || data.Litecoin || data.Tether) {
+                        $('#DadosBancarios .conteudo-btc').show();
+                        $('#DadosBancarios .conteudo .dados').html(resultCarteira);
+                    }
+                    else {
+                        $('#DadosBancarios .conteudo-banco').show();
+                        /*$('#DadosBancarios .conteudo .dados').html('Agência: ' + data.Agencia + '&nbsp;&nbsp;/&nbsp;&nbsp;' + 'Conta: ' + data.Conta + '-' + data.DigitoConta);*/
+                        $('#DadosBancarios .conteudo .dados').html('Sem Dados');
+                    }
+                },
+                error: function (erro) {
+                    $('#DadosBancarios .carregando').hide();
+                    $('#DadosBancarios .conteudo-erro .dados').html("Erro ao exibir dados bancários");
+                    $('#DadosBancarios .conteudo-erro').show();
+                }
+            });
+        }
+
+        function DadosPago(hash) {
+            $('#DadosPago-hash').text(hash);
+            $('#DadosPago-hash').attr('href', "https://www.blockchain.com/btc/tx/" + hash);
+            $('#DadosPago').modal('show');
+
+        }
+
+    </script>
+
+}
+
+@section PageLevelScripts {
+    @Scripts.Render("~/scripts/dataTimePickerComponent")
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".pagarTodosSaques").click(function () {
+
+                var checkbox = $(this);
+                var checked = checkbox.is(":checked");
+                var tabela = $("table .pagarSaque");
+
+                $.each(tabela, function (i, val) {
+                    $(val).attr('checked', checked);
+                });
+                $(".pagarTodosSaques").attr('checked', checked);
+                ExibirBotaoPagamento();
+            });
+
+            $(".pagarSaque").click(function () {
+                console.log('clicado');
+                ExibirBotaoPagamento();
+            });
+
+            $(".resumo").click(function () {
+                Resumo();
+            });
+
+            $(".ConfirmarAtivar").click(function () {
+
+                $(".resumo").modal('hide');
+
+                swal({
+                    title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+                    text: '@Html.Raw(traducaoHelper["SOLICITACAO_SAQUE_CONFIRMACAO"])',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+                    cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+                    closeOnConfirm: true,
+                    closeOnCancel: true
+                },
+              function (isconfirm) {
+                  if (isconfirm) {
+                      var saques = SelecionarSaques();
+                      $.post("@Url.Action("PagarSaques")", { SaquesID: saques }, function (data) {
+
+                          if (data === "ERROR") {
+                              Retorno("Pagamentos com erro.", "Ocorreram erros durante o pagamento de alguns saques. Estes pagamentos estão marcados com o status de REPROCESSANDO.", "warning");
+                          } else {
+                              Retorno("Pagamentos efetuados com sucesso.", "Todos os pagamentos foram efetuados com sucesso.", "info");
+                          }
+
+                      }
+                    );
+                  }
+              });
+            });
+        });
+
+        function ExibirBotaoPagamento() {
+            var exibir = false;
+            var tabela = $("table .pagarSaque");
+
+            $.each(tabela, function (i, val) {
+                if ($(val).attr('checked')) {
+                    exibir = true;
+                }
+            });
+
+            if (exibir) {
+                $(".pagar").css("display", "block");
+            }
+            else {
+                $(".pagar").css("display", "none");
+            }
+        }
+
+        function Resumo() {
+
+            $(".ConfirmarAtivar").hide();
+            $('.total-pagamentos').html("");
+            $('.total-saldo').html("");
+
+            var saques = SelecionarSaques();
+
+            jQuery.ajaxSettings.traditional = true
+            $.getJSON("@Url.Action("Resumo")", { SaquesID: saques }, function (data) {
+                $('.total-pagamentos').html(data.Pagamentos);
+                $('.total-saldo').html(data.Saldo);
+
+                if (parseFloat(data.Pagamentos) < parseFloat(data.Saldo)) {
+                     $(".ConfirmarAtivar").show();
+                }
+            });
+        }
+
+        function SelecionarSaques() {
+            var saques = [];
+            var tabela = $("table .pagarSaque");
+
+            $.each(tabela, function (i, val) {
+                var checkbox_cell_is_checked = $(this).is(':checked');
+                if (checkbox_cell_is_checked) {
+                    saques.push(parseInt($(this).data("saqueid")));
+                }
+            });
+            return saques;
+        }
+
+        function Retorno(titulo, texto, tipo) {
+            swal({
+                title: titulo,
+                text: texto,
+                type: tipo,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                closeOnConfirm: true
+            },
+           function (isconfirm) {
+               if (isconfirm) {
+                   location.reload();
+               }
+           });
+        }
+
+    </script>
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"><i class="fa fa-reorder"></i> @traducaoHelper["SAQUE"]</div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
+            @*<a href='@Url.Action("Reload", "saques")' class="atualizar" title="@traducaoHelper["RELER"]" />*@
+        </div>
+        @*<div class="actions">
+                <a href='@Url.Action("Excel", "saques")' class="btn btn-sm yellow-casablanca">
+                    <i class="fa fa-file-excel-o"></i> Excel
+                </a>
+                <label>&nbsp;</label>
+            </div>*@
+        <div class="actions pagar" style="display:none;">
+            <a class="btn btn-sm yellow-casablanca resumo" data-toggle="modal" href="#resumo">
+                <i class="fa fa-money"></i> Pagar
+            </a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+
+                <div class="col-md-12">
+                    @using (Html.BeginForm("Index", "saques", FormMethod.Get))
+                    {
+
+                        <div class="form-group pull-right">
+                            <div class="input-group">
+                                <select name="ProcuraStatus" id="ProcuraStatus" class="form-control input-small">
+                                    <option @(ViewBag.CurrentProcuraStatus == 0 ? "SELECTED" : "") value="0">Todos</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 1 ? "SELECTED" : "") value="1">Solicitado</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 8 ? "SELECTED" : "") value="8">Pago</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 2 ? "SELECTED" : "") value="2">Processando</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 3 ? "SELECTED" : "") value="3">Efetuado</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 4 ? "SELECTED" : "") value="4">Cancelado</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 5 ? "SELECTED" : "") value="5">Estornado</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 6 ? "SELECTED" : "") value="6">Aprovado</option>
+                                    <option @(ViewBag.CurrentProcuraStatus == 10 ? "SELECTED" : "") value="10">Reprocessando</option>
+                                </select>
+                                <input class="btn blue-madison form-control input-small input-inline fontPlaceHolderIcon" id="Procura" name="Procura" value="&#xf002; @traducaoHelper["PROCURAR"]" type="submit" />
+
+                            </div>
+                        </div>
+
+                        <div class="form-group pull-right" style="margin-right: 1%;">
+                            <div class="input-group">
+                                @Html.TextBox("ProcuraLogin", ViewBag.CurrentProcuraLogin as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["LOGIN"] })
+                            </div>
+                        </div>
+
+                        <div class="form-group pull-right" style="margin-right: 1%;">
+                            <div class="input-group">
+                                <div class="input-group date-picker input-daterange" data-date="10/11/2012" data-date-format="dd/mm/yyyy">
+                                    <input type="text" class="form-control input-small" name="de" value="@(ViewBag.De as string)">
+                                    <span class="input-group-addon">@traducaoHelper["ATE"] </span>
+                                    <input type="text" class="form-control input-small" name="ate" value="@(ViewBag.Ate as string)">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, SortOrder = ViewBag.CurrentSort, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize, de = ViewBag.De, ate = ViewBag.Ate, ProcuraStatus = ViewBag.ProcuraStatus }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"] @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) @traducaoHelper["DE"] @Model.PageCount &nbsp;</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-3">
+                    <span class="pull-right">Total @moedaPadrao.Simbolo @ViewBag.Total.ToString(moedaPadrao.MascaraOut)</span>
+                </div>
+                @*<div class="col-md-3">
+                    <span class="pull-right">Total BTC @ViewBag.TotalBTC.ToString()</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="pull-right">Total LTC @ViewBag.TotalLTC.ToString()</span>
+                </div>*@
+            </div>
+        </div>
+
+        <div class="table-scrollable">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">
+                            @Html.CheckBox("pagarTodosSaques", new { @class = "pagarTodosSaques" })
+                        </th>
+                        <th scope="col" class="text-center" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["ACOES"]&nbsp;</th>
+                        <th scope="col" class="text-center">
+                            @Html.ActionLink(traducaoHelper["USUARIO"], "Index", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize, de = ViewBag.De, ate = ViewBag.Ate })
+                            @switch ((string)ViewBag.CurrentSort.ToString())
+                            {
+                                case "login":
+                                    {<i class="fa fa-chevron-down"></i>}
+                                    break;
+                                case "login_desc":
+                                    {<i class="fa fa-chevron-up"></i>}
+                                    break;
+                            }
+                        </th>
+                        <th scope="col" class="text-center">@traducaoHelper["DATA"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["LIQUIDO"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["BITCOIN"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["LITECOIN"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["STATUS"]</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th scope="col" class="text-center">
+                            @Html.CheckBox("pagarTodosSaques", new { @class = "pagarTodosSaques" })
+                        </th>
+                        <th scope="col" class="text-center" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["ACOES"]&nbsp;</th>
+                        <th scope="col" class="text-center">
+                            @Html.ActionLink(traducaoHelper["USUARIO"], "Index", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize, de = ViewBag.De, ate = ViewBag.Ate })
+                            @switch ((string)ViewBag.CurrentSort.ToString())
+                            {
+                                case "login":
+                                    {<i class="fa fa-chevron-down"></i>}
+                                    break;
+                                case "login_desc":
+                                    {<i class="fa fa-chevron-up"></i>}
+                                    break;
+                            }
+                        </th>
+                        <th scope="col" class="text-center">@traducaoHelper["DATA"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["LIQUIDO"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["BITCOIN"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["LITECOIN"]</th>
+                        <th scope="col" class="text-center">@traducaoHelper["STATUS"]</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var saque in Model)
+                    {
+                        var label = "label-default";
+                        var status = saque.Status;
+                        var statusNome = string.Empty;
+
+                        switch (status)
+                        {
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Estornado:
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Indefinido:
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Processando:
+                                label = "label-default";
+                                statusNome = Enum.GetName(typeof(Core.Entities.SaqueStatus.TodosStatus), Core.Entities.SaqueStatus.TodosStatus.Processando);
+                                break;
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Solicitado:
+                                label = "label-warning";
+                                statusNome = Enum.GetName(typeof(Core.Entities.SaqueStatus.TodosStatus), Core.Entities.SaqueStatus.TodosStatus.Solicitado);
+                                break;
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Cancelado:
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Reprovado:
+                                label = "label-danger";
+                                statusNome = Enum.GetName(typeof(Core.Entities.SaqueStatus.TodosStatus), Core.Entities.SaqueStatus.TodosStatus.Cancelado);
+                                break;
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Efetuado:
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Aprovado:
+                                label = "label-success";
+                                statusNome = Enum.GetName(typeof(Core.Entities.SaqueStatus.TodosStatus), Core.Entities.SaqueStatus.TodosStatus.Aprovado);
+                                break;
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Reprocessando:
+                                label = "label-success";
+                                statusNome = Enum.GetName(typeof(Core.Entities.SaqueStatus.TodosStatus), Core.Entities.SaqueStatus.TodosStatus.Reprocessando);
+                                break;
+                            case (int)Core.Entities.SaqueStatus.TodosStatus.Pago:
+                                label = "label-success";
+                                statusNome = Enum.GetName(typeof(Core.Entities.SaqueStatus.TodosStatus), Core.Entities.SaqueStatus.TodosStatus.Pago);
+                                break;
+
+                        }
+
+                    <tr>
+                        <td class="text-center">
+                            @if (status == (int)Core.Entities.SaqueStatus.TodosStatus.Solicitado || status == (int)Core.Entities.SaqueStatus.TodosStatus.Reprocessando)
+                            {
+                                @Html.CheckBox("pagarSaque", new { @class = "pagarSaque", data_saqueid = saque.Codigo });
+                            }
+                        </td>
+                        <td class="text-center">
+
+                            @if (status == (int)Core.Entities.SaqueStatus.TodosStatus.Solicitado || status == (int)Core.Entities.SaqueStatus.TodosStatus.Reprocessando)
+                            {
+                                @Html.ActionLink("Aprovar", "Aprovar", new { id = saque.Codigo }, new { @class = "gridNovo", title = traducaoHelper["APROVAR"] })
+                                @Html.ActionLink("Reprovar", "Reprovar", new { id = saque.Codigo }, new { @class = "gridDelete", title = traducaoHelper["REPROVAR"] })
+                                <a href="javascript:void(0)" onclick="Dados(@saque.UsuarioID)" class="gridDetail" title=@traducaoHelper["DADOS_BANCARIOS"]><i class="fa fa-search"></i></a>
+                            }
+                            else if (status == (int)Core.Entities.SaqueStatus.TodosStatus.Reprovado)
+                            {
+                                @Html.ActionLink("Cancelar", "Cancelar", new { id = saque.Codigo }, new { @class = "gridDelete", title = traducaoHelper["CANCELAR_APROVACAO"] })
+                            }
+                            else if (status == (int)Core.Entities.SaqueStatus.TodosStatus.Pago)
+                            {
+                                <a href="javascript:void(0)" onclick="DadosPago('@saque.Mensagem')" class="gridDetail" title=@traducaoHelper["DETALHES"]><i class="fa fa-search"></i></a>
+
+                            }
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => saque.Nome)<br />
+                            <i>@Html.DisplayFor(modelItem => saque.Login)</i>
+                        </td>
+
+                        <td class="text-center">@saque.Data.ToShortDateString()</td>
+                        <td class="text-center">@moedaPadrao.Simbolo @saque.Liquido.ToString(moedaPadrao.MascaraOut)</td>
+                        <td class="text-center">BTC @(saque.TotalBTC.HasValue ? saque.TotalBTC.Value.ToString() : "0")</td>
+                        <td class="text-center">LTC @(saque.TotalLTC.HasValue ? saque.TotalLTC.Value.ToString() : "0")</td>
+                        <td class="text-center">
+                            <span class="label label-sm @label">
+                                @statusNome
+                            </span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="border-gridFooter">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, SortOrder = ViewBag.CurrentSort, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize, de = ViewBag.De, ate = ViewBag.Ate }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"]  @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) @traducaoHelper["DE"]  @Model.PageCount &nbsp;</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="DadosBancarios" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none; ">
+        <div class="modal-dialog modal-sm" style="min-width: 380px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">@traducaoHelper["PAGAMENTO"]</h4>
+                </div>
+                <div class="modal-body">
+                    <h2 class="carregando" style="text-align:center;"><i class="fa fa-refresh fa-spin fa-2x"></i></h2>
+                    <div class="conteudo conteudo-btc">
+                        <b>Titular</b><p class="titular"></p><br />
+                        <b>Carteira</b><p class="dados"></p>
+                    </div>
+                    <div class="conteudo conteudo-banco">
+                        <b>Titular</b><p class="titular"></p><br />
+                        <b>Dados</b><p class="dados"></p>
+                    </div>
+                    <div class="conteudo conteudo-erro">
+                        <p class="dados"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="DadosPago" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none; ">
+        <div class="modal-dialog modal-lg" style="min-width: 380px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">@traducaoHelper["DADOS_DO_PAGAMENTO"]</h4>
+                </div>
+                <div class="modal-body">
+                    <b>@traducaoHelper["HASH_PAGAMENTO"]</b><br />
+                    <a href="" id="DadosPago-hash" target="_blank"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @Html.Partial("_Resumo", traducaoHelper)
+
+</div>

@@ -1,0 +1,33 @@
+﻿@{
+    Layout = null;
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+}
+<li class="start">
+    <a href="@Url.Action("index", "home", new { area = "" })">
+        <i class="fa fa-home"></i>
+        <span class="title">
+            @traducaoHelper["INICIO"]<label class="menuHome">&nbsp;</label>
+        </span>
+    </a>
+</li>
+
+@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ZENDESK_ATIVO"))
+{
+    <li class="last ">
+        <a href="~/Suporte">
+            <i class="fa fa-life-ring"></i>
+            <span class="title">
+                @traducaoHelper["SUPORTE"]
+            </span>
+        </a>
+    </li>
+}
+
+<li class="last ">
+    <a href="~/Account/Login/?Sair=true">
+        <i class="fa fa-sign-out"></i>
+        <span class="title">
+            @traducaoHelper["SAIR"]
+        </span>
+    </a>
+</li>

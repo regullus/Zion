@@ -1,0 +1,184 @@
+﻿@model Core.Entities.Produto
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var itens = ViewBag.ProdutoItens;
+    var cadastroResunido = ViewBag.CadastroResunido;
+
+    ViewBag.Title = traducaoHelper["DETALHES"];
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+}
+
+@section pageStyles {
+}
+
+@section head {
+}
+
+@section pageScripts {
+}
+
+@section PageLevelScripts {
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-book "></i>@traducaoHelper["DETALHES"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+
+        <div class="form-body">
+            <div class="row">
+                <div class="col-md-10"><h4>@traducaoHelper["PRODUTO"]</h4></div>
+                <div class="col-md-2">
+                    @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
+                    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }, new { @class = "Editar pull-right", title = traducaoHelper["EDITAR"] })
+                </div>
+            </div>
+
+            <div class="portlet-body">
+                <div class="form-body">
+                    <dl class="dl-horizontal">
+                        <dt>@traducaoHelper["SKU"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.SKU)
+                        </dd>
+                        <dt>@traducaoHelper["NOME"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Nome)
+                        </dd>
+                        <dt>@traducaoHelper["TIPO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.ProdutoTipo.Nome)
+                        </dd>
+                        <dt>@traducaoHelper["CHAMADAS"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Chamada)
+                        </dd>
+                        <dt>@traducaoHelper["DESCRICAO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Descricao)
+                        </dd>
+                        <dt>@traducaoHelper["PRODUTO_CATEGORIA"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.ProdutoCategoria.Nome)
+                        </dd>
+                        <dt>@traducaoHelper["ASSOCIACAO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.NivelAssociacao)
+                        </dd>
+                        <dt>@traducaoHelper["OBSERVACOES"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Observacao)
+                        </dd>
+                        <dt>@traducaoHelper["CODIGO_EXTERNO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.CodigoExterno)
+                        </dd>
+                        <dt>@traducaoHelper["VENDA_DIRETA"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.VendaDireta)
+                        </dd>
+                        <dt>@traducaoHelper["PUBLICADO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Publicado)
+                        </dd>
+                        <dt>@traducaoHelper["DATA_PUBLICACAO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.DataPublicacao)
+                        </dd>
+
+                        @if (cadastroResunido)
+                        {
+                            <dt>@traducaoHelper["DESTAQUE"]</dt>
+                            <dd>
+                                @Html.DisplayFor(model => model.Destaque)
+                            </dd>
+                                <dt>@traducaoHelper["LIMITE_POR_USUARIO"]</dt>
+                                <dd>
+                                    @Html.DisplayFor(model => model.LimitePorUsuario)
+                                </dd>
+                                <dt>@traducaoHelper["LIMITE_POR_PEDIDO"]</dt>
+                                <dd>
+                                    @Html.DisplayFor(model => model.LimitePorPedido)
+                                </dd>
+                                <dt>@traducaoHelper["PESO"]</dt>
+                                <dd>
+                                    @Html.DisplayFor(model => model.Peso)
+                                </dd>
+                                <dt>@traducaoHelper["DIMENSOES"]</dt>
+                                <dd>
+                                    @Html.DisplayFor(model => model.Dimensoes)
+                                </dd>
+                                <dt>@traducaoHelper["CONTROLA_ESTOQUE"]</dt>
+                                <dd>
+                                    @Html.DisplayFor(model => model.ControlaEstoque)
+                                </dd>
+                                <dt>@traducaoHelper["ESTOQUE"]</dt>
+                                <dd>
+                                    @Html.DisplayFor(model => model.Estoque)
+                                </dd>
+                        }
+
+                        <dt>@traducaoHelper["DATA_CRIACAO"]</dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.DataCriacao)
+                        </dd>
+
+                        @if (Model.Composto)
+                        {
+                            <dt>@traducaoHelper["COMPOSICAO"]</dt>
+                            <dd>
+
+                                <div class="tab-pane" id="tab_1_2">
+                                    <p></p>
+                                    <div class="scroller" style="height: 150px; Line-height: 5%; " data-always-visible="1" data-rail-visible1="1">
+                                        <p></p>
+                                        @foreach (var i in Model.ProdutoItem)
+                                        {
+                                            <p>@i.Quantidade.ToString("00") @i.Produto1.Nome</p>
+                                        }
+                                    </div>
+                                </div>
+
+                            </dd>
+                        }
+                        @{
+                            var foto = Model.Fotos.FirstOrDefault();
+                            if (foto != null)
+                            {
+                                <dt>@traducaoHelper["IMAGEM"]</dt>
+                                <dd class="scroller">
+                                    <div class="col-md-6">
+                                        <img src="@foto" alt="@Model.Nome" class="pull-right">
+                                    </div>
+                                </dd>
+                            }
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+﻿<div style="height:auto;margin-top:-4px;z-index:-1;">
+    <table class="table table-striped table-bordered table-hover table-responsive-lg">
+        <thead class="card-dash txtdash3">
+            <tr>
+                <th># </th>
+                <th>LOGIN </th>
+                <th>NOME </th>
+                <th>ATIVO </th>
+                <th>QUALIFICAÇÃO </th>
+                @*<th># </th>
+                <th>NÍVEL </th>
+                <th>LOGIN </th>
+                <th>NOME </th>
+                <th>ATIVO </th>
+                <th>VP </th>
+                <th>VML </th>
+                <th>VT </th>
+                <th>VQ </th>
+                <th>QUALIFICAÇÃO </th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (ViewBag.Busca != null)
+                {
+                    var iCount = 1;
+                    foreach (var busca in ViewBag.Busca)
+                    {
+                        <tr>
+                            <td>@iCount </td>
+                            <td>
+                                <a href="@Url.Action("Unilevel", "MinhaRede", new { chave = ViewBag.Chave, topo = busca.ID })">
+                                    @busca.Login.ToLower()
+                                </a>
+                            </td>
+                            <td>@busca.Nome </td>
+                            <td>@busca.AtivacaoMensal </td>
+                            <td>@busca.Classificacao </td>
+                        </tr>
+
+                        @*<tr>
+                            <td>@iCount </td>
+                            <td>@direto.Nivel </td>
+                            <td>@direto.Login</td>
+                            <td>@direto.Nome</td>
+                            <td>@(direto.Ativo ? "Sim" : "Não" ) </td>
+                            <td>@direto.VP </td>
+                            <td>@direto.VPM </td>
+                            <td>@direto.VT </td>
+                            <td>@direto.VQ </td>
+                            <td>@direto.NomeClassificacao </td>
+                        </tr>
+                        iCount++;*@
+
+                    iCount++;
+                }
+            }
+            }
+        </tbody>
+    </table>
+</div>
+

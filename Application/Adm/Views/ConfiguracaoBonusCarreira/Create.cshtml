@@ -1,0 +1,98 @@
+﻿@model Core.Entities.ConfiguracaoBonusCarreira
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["CRIAR"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    function mascara(o, f) {
+        v_obj = o;
+        v_fun = f;
+        setTimeout("execmascara()", 1);
+    };
+
+    function execmascara() {
+        v_obj.value = v_fun(v_obj.value);
+    };
+
+    function mvirgula(v) {
+        v = v.replace(/[^\d,]/g, "");
+        return v;
+    };
+</script>
+
+<div class="portlet box grey-gallery">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-plus"></i>@traducaoHelper["CRIAR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- Inicio FORM-->
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-body">
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-10"><h4>@traducaoHelper["BONUS_CARREIRA"]</h4></div>
+                        <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                    </div>
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    @if (User.IsInRole("perfilMaster"))
+                    {
+                    }
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA_REFERENCIA"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.DataReferencia, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                            @Html.ValidationMessageFor(model => model.DataReferencia, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["VALOR"] BTC</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Valor, new { htmlAttributes = new { @class = "form-control", @onkeypress = "mascara(this,mvirgula);" } })
+                            @Html.ValidationMessageFor(model => model.Valor, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PLANO_CARREIRA"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.CarreiraID, new { htmlAttributes = new { @class = "form-control", MIN = "0" } })
+                            @Html.ValidationMessageFor(model => model.CarreiraID, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["QUANTIDADE_PESSOAS"]</label>
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.QuantidadePessoas, new { htmlAttributes = new { @class = "form-control" ,  MIN="0"} })
+                            @Html.ValidationMessageFor(model => model.QuantidadePessoas, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="@traducaoHelper["CRIAR"]" class="btn btn-success" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+        <!-- Fim FORM-->
+    </div>
+
+</div>
+

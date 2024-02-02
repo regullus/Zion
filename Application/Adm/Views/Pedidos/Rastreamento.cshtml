@@ -1,0 +1,90 @@
+﻿@model Core.Entities.Pedido
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["EDITAR"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class=""></i>@traducaoHelper["RASTREAMENTO"]
+        </div>        
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->                  
+        <div class="form-body">            
+            <div class="form-horizontal">
+                <div class="row">
+                    <div class="col-md-10"><h4> @traducaoHelper["PEDIDO"] <small> @("#" + Model.Codigo)</small> </h4></div>
+                    <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                </div>
+                <hr />
+
+                @using (Html.BeginForm("SalvarRastreamento", "Pedidos", FormMethod.Post, new { role = "formGeral" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.ID)
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["PRODUTO"]</label>
+                        <div class="col-md-10">
+                            <select class="form-control dropone" id="PedidoItemID" name="PedidoItemID">
+                                @*<option value="">Selecione o Item</option>*@
+                                <option value="Todos">Todos</option>
+                                @foreach (var item in Model.PedidoItem)
+                                {
+                                    <option value="@item.ID">@item.Produto.Nome (@item.Pedido.DataCriacao)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["TRASPORTADORA"]</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="Transportadora" id="Transportadora">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["CODIGO"]</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="CodigoR" id="CodigoR">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["OBSERVACAO"]</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="Observacao" id="Observacao">
+                        </div>
+                    </div>
+
+                    <div class="form-group" hidden>
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["DATA"]</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="DataCricacao" id="DataCricacao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="@traducaoHelper["SALVAR"]" class="btn green-haze" />
+                        </div>
+                    </div>
+                }
+            </div>
+          </div>        
+    </div>
+</div>
+

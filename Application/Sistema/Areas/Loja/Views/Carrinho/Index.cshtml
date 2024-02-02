@@ -1,0 +1,246 @@
+﻿@model Core.Models.Loja.CarrinhoModel
+@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["CARRINHO"].ToString().ToLower();
+
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+    #endregion
+
+}
+
+@section pageStyles {
+
+}
+
+@section head {
+
+}
+
+@section pageScripts {
+
+}
+
+@section PageLevelScripts{
+    <script type="text/javascript">
+      function Atualizar(id, quantidade) {
+         $.post('@Url.Action("atualizar")', { id: id, quantidade: quantidade }, function () {
+            window.location = '@Url.Action("Index")';
+         });
+      }
+    </script>
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="portlet aba box backWrite grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"></div>
+        @*<div class="tools">
+                <a href='@Url.Action("Index")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+                <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+            </div>*@
+        <div class="actions">
+            <a href='#'>&nbsp;</a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        <div class="row padding-20">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        @if (@Core.Helpers.ConfiguracaoHelper.GetBoolean("LOJA_BONUS_EXIBE"))
+                        {
+                            <tr>
+                                <th width="52%">@traducaoHelper["PRODUTO"]</th>
+                                <th width="12%" colspan="2" style="text-align:center;">@traducaoHelper["QUANTIDADE"]</th>
+                                <th width="12%" style="text-align:center;"></th>
+                                <th width="12%" style="text-align:center;"></th>
+                                <th width="12%" style="text-align:center;">@traducaoHelper["PONTOS"]</th>
+                            </tr>
+                        }
+                        else
+                        {
+                            if (@Core.Helpers.ConfiguracaoHelper.GetBoolean("PRODUTO_VALOR_VARIAVEL"))
+                            {
+                                <tr>
+                                    <th width="64%">@traducaoHelper["PRODUTO"]</th>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <th width="64%">@traducaoHelper["PRODUTO"]</th>
+                                    <th width="12%" colspan="2" style="text-align:center;">@traducaoHelper["QUANTIDADE"]</th>
+                                    <th width="12%" style="text-align:center;">@traducaoHelper["VALOR_UNITARIO"]</th>
+                                    <th width="12%" style="text-align:center;">@traducaoHelper["TOTAL"]</th>
+                                </tr>
+                            }
+                        }
+                    </thead>
+                    <tbody>
+                        @{
+                            var contador = 1;
+                            double dblValor = 0.0;
+                        }
+                        @foreach (var item in Model.Itens)
+                        {
+                            foreach (var i in item.Produto.ProdutoValor)
+                            {
+                                if (i.Valor.HasValue)
+                                {
+                                    dblValor += i.Valor.Value;
+                                }
+                            }
+                            <tr>
+                                <td>
+                                    <div class="product-name">
+                                        @*<div class="product-num">@contador</div>*@
+                                        <h4>@item.Produto.Nome</h4>
+                                        <p>@String.Format(@item.Produto.Chamada, ViewBag.ValorMinimo)</p>
+                                        @*<div id="modalListaProdutos@(item.Produto.ID)" class="modal fade">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                            <h4 class="modal-title">@item.Produto.Nome</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>@item.Produto.Descricao</p>
+                                                            @if (item.Produto.Composto)
+                                                            {
+                                                                <p class="h5">@traducaoHelper["COMPOSICAO"]:</p>
+                                                                <div class="scroller" style="height:250px">
+                                                                    @if (item.Produto.ProdutoItem != null)
+                                                                    {
+                                                                        foreach (var i in item.Produto.ProdutoItem)
+                                                                        {
+                                                                            <span style="font-size:11px">&nbsp;&nbsp;@i.Quantidade.ToString("00") @i.Produto1.Nome</span><br />
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal">@traducaoHelper["FECHAR"]</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>*@
+                                    </div>
+                                    @*@if (item.Produto.Composto)
+                                        {
+                                            <a href="#modalListaProdutos@(item.Produto.ID)" role="button" data-toggle="modal" style="color:black;text-decoration:underline;float:right;margin-right:435px">@traducaoHelper["VER_COMPOSICAO"]</a><br />
+                                            <small>&nbsp;</small>
+                                        }
+                                        <h6 class="text margem-0"><b>@traducaoHelper["OBSERVACAO"]:</b></h6>
+                                        <small>@item.Produto.Observacao</small>*@
+
+                                </td>
+                                <td style="width:0px;"></td>
+
+                                @if (!@Core.Helpers.ConfiguracaoHelper.GetBoolean("PRODUTO_VALOR_VARIAVEL"))
+                                {
+                                    <td style="text-align:left; width: 12px;">
+                                        @item.Quantidade
+                                        @*<div class="row">
+                                                <label class="input">
+                                                    <input type="text" value="@item.Quantidade" style="text-align:center;" onchange="Atualizar(@item.Produto.ID, this.value);" />
+                                                </label>
+                                            </div>*@
+                                    </td>
+                                    @*<td style="width:20px;"><a href="@Url.Action("remover", new { id = item.Produto.ID })" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></a></td>*@
+                                    <td style="text-align:center;"></td>
+                                    <td style="text-align:center;"></td>
+                                }
+                                @if (@Core.Helpers.ConfiguracaoHelper.GetBoolean("LOJA_BONUS_EXIBE"))
+                                {
+                                    <td style="text-align:center;">@((item.Quantidade * item.Valor.Bonificacao).Value.ToString(moedaPadrao.MascaraOut))</td>
+                                }
+                            </tr>
+                            contador++;
+                        }
+                        <tr></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="noborders" colspan="2" rowspan="1">&nbsp;</td>
+                            @if (!@Core.Helpers.ConfiguracaoHelper.GetBoolean("PRODUTO_VALOR_VARIAVEL"))
+                            {
+                                <td colspan="2">@traducaoHelper["SUBTOTAL"]</td>
+                            }
+                            <td style="text-align:center;"></td>
+                            @if (@Core.Helpers.ConfiguracaoHelper.GetBoolean("LOJA_BONUS_EXIBE"))
+                            {
+                                <td style="text-align:center;">@Model.SubtotalBonificacao.Value.ToString(moedaPadrao.MascaraOut)</td>
+                            }
+                        </tr>
+                        @foreach (var taxa in Model.Taxas.Where(t => t.Valor != 0 && t.Taxa.CategoriaID != 22))
+                        {
+                            <tr>
+                                <td class="noborders" colspan="2" rowspan="1">&nbsp;</td>
+                                <td colspan="2">@taxa.Taxa.Nome</td>
+                                <td style="text-align:center;">@moedaPadrao.Simbolo @taxa.Valor.ToString(moedaPadrao.MascaraOut)</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td class="noborders" colspan="2" rowspan="1">&nbsp;</td>
+                            <td colspan="2">@traducaoHelper["TOTAL"]</td>
+                            <td style="text-align:center;">@moedaPadrao.Simbolo @dblValor.ToString(moedaPadrao.MascaraOut)</td>
+                            @if (@Core.Helpers.ConfiguracaoHelper.GetBoolean("LOJA_BONUS_EXIBE"))
+                            {
+                                <td style="text-align:center;">@Model.TotalBonificacao.ToString(moedaPadrao.MascaraOut)</td>
+                            }
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            @*<a href="@Url.Action("Index", "Home")" class="btn btn-lg btn-info">@traducaoHelper["CONTINUAR_COMPRANDO"]</a>*@
+            <a href="@Url.Action("resumo", "pedido")" class="btn btn-lg btn-success" style="float:right;">@traducaoHelper["FINALIZAR_COMPRA"]</a>
+        </div>
+
+    </div>
+
+</div>

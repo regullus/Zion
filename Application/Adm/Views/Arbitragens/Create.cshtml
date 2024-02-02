@@ -1,0 +1,248 @@
+﻿@model Core.Entities.Arbitragem
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["CRIAR"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section pageStyles{
+    @Styles.Render("~/Content/sweetAlert") 
+
+    <style>
+        .cel {
+            padding: 0 !important;
+            border: 0;
+        }
+
+            .cel input {
+                padding: 0;
+                border: 0;
+                text-align: center !important;
+                font-size: 16px !important;
+            }
+    </style>
+
+}
+
+@section head{
+}
+
+@section PageScripts{
+
+    <script src="~/Content/global/plugins/Inputmask-4.x1111/dist/jquery.inputmask.bundle.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.percetual').inputmask('99,99 %', { numericInput: true, reverse: true });
+        });
+
+
+        function Gavar() {
+            $.ajax({
+                url: '@Url.Action("Gavar")',
+                type: 'post',
+                dataType: 'json',
+                data: getDadosTabela(),
+                //beforeSend: function (data) {
+                //    Metronic.blockUI({
+                //        animate: true,
+                //        boxed: true,
+                //        cenrerY: true
+                //    });
+                //},
+                success: function (data) {
+                    //Metronic.blockUI({
+                    //    animate: false
+                    //});
+                    if (data == 'OK') {
+                        swal('@traducaoHelper["SUCESSO"]', '@traducaoHelper["DADOS_SALVOS_SUCESSO"]', "success");
+      
+                        window.location = '@Url.Action("Index")';
+                    }
+                    else {
+                        swal('@traducaoHelper["ERRO"]', data, "error");                    
+                    }
+                },
+                error: function () {
+                    //Metronic.blockUI({
+                    //    animate: false
+                    //});
+                    swal('@traducaoHelper["ERRO"]', '@traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]', "error");
+          
+                }
+            });
+        };
+
+        function getDadosTabela() {
+            var strJson = '{' +
+                '"dtInicio":"' + $("#dtInicio").text() + '",' +
+                '"dtfim":"'    + $("#dtfim").text() + '",' +
+                '"itens":[';
+            for (var i = 1; i <= @ViewBag.QuantidadeLinhas; i++) {
+                strJson += '{' +
+                    '"nivelAssoc":"' + $("#nivelAssoc_" + i).text() + '",' +
+                    '"percSeg":"' + $("#percSeg_" + i).val().replace(/_/g, '0').replace(',', '').replace('%', '').replace(' ', '') + '",' +
+                    '"percTer":"' + $("#percTer_" + i).val().replace(/_/g, '0').replace(',', '').replace('%', '').replace(' ', '') + '",' +
+                    '"percQua":"' + $("#percQua_" + i).val().replace(/_/g, '0').replace(',', '').replace('%', '').replace(' ', '') + '",' +
+                    '"percQui":"' + $("#percQui_" + i).val().replace(/_/g, '0').replace(',', '').replace('%', '').replace(' ', '') + '",' +
+                    '"percSex":"' + $("#percSex_" + i).val().replace(/_/g, '0').replace(',', '').replace('%', '').replace(' ', '') +
+                '"}';
+
+                if(i < @ViewBag.QuantidadeLinhas)
+                {
+                    strJson += ',';
+                }
+            }
+            strJson += ']}';
+
+            //console.log(strJson);
+
+            return strJson;
+        };
+
+         function copiarLinha() {
+             for (var i = 2; i <= @ViewBag.QuantidadeLinhas; i++) {
+                 $("#percSeg_" + i).val($("#percSeg_1").val());
+                 $("#percTer_" + i).val($("#percTer_1").val());
+                 $("#percQua_" + i).val($("#percQua_1").val());
+                 $("#percQui_" + i).val($("#percQui_1").val());
+                 $("#percSex_" + i).val($("#percSex_1").val());
+             };
+        };
+
+         function limparLinha() {
+             for (var i = 1; i <= @ViewBag.QuantidadeLinhas; i++) {
+                 $("#percSeg_" + i).val("");
+                 $("#percTer_" + i).val("");
+                 $("#percQua_" + i).val("");
+                 $("#percQui_" + i).val("");
+                 $("#percSex_" + i).val("");
+             };
+        };
+
+    </script>
+}
+
+@section PageLevelScripts{
+
+    @Scripts.Render("~/scripts/sweetAlert")
+}
+
+@section jQueryRead{
+}
+
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-plus"></i>@traducaoHelper["CRIAR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+        <div class="actions">
+            <a href='javascript:limparLinha()' class="btn green-meadow">
+                <i class="fa fa-eraser"></i> @traducaoHelper["LIMPAR"]
+            </a>
+            <a href='javascript:copiarLinha()' class="btn green-meadow">
+                <i class="fa fa-copy"></i> @traducaoHelper["COPIAR"]
+            </a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+        <!-- Inicio FORM-->
+
+        <div class="form-body">
+            @using (Html.BeginForm())
+            {
+                @*@Html.AntiForgeryToken()*@
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-10"><h4>@traducaoHelper["ARBITRAGEM"] - <samp id="dtInicio">@ViewBag.DataInicio</samp> @traducaoHelper["ATE"] <samp id="dtfim">@ViewBag.DataFim</samp></h4></div>
+                        <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                    </div>
+                    <hr />
+
+                </div>
+            }
+
+            @if (ViewBag.Associacoes != null)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover" id="tabelaConfig">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="25%" id="Associacao">@traducaoHelper["ASSOCIACAO"]</th>
+                                        <th scope="col" width="15%" id="percent2">@traducaoHelper["SEGUNDA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent3">@traducaoHelper["TERCA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent4">@traducaoHelper["QUARTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent5">@traducaoHelper["QUINTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent6">@traducaoHelper["SEXTA_FEIRA"]</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th scope="col" width="25%" id="Associacao">@traducaoHelper["ASSOCIACAO"]</th>
+                                        <th scope="col" width="15%" id="percent2">@traducaoHelper["SEGUNDA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent3">@traducaoHelper["TERCA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent4">@traducaoHelper["QUARTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent5">@traducaoHelper["QUINTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent6">@traducaoHelper["SEXTA_FEIRA"]</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    @{
+                                        int cont = 0;
+                                        foreach (Core.Entities.Associacao item in ViewBag.Associacoes)
+                                        {
+                                            cont++;
+                                            <tr>
+                                                <td>
+                                                    <div id="nivelAssoc_@cont" hidden>@item.Nivel</div>
+                                                    @item.Nome
+                                                </td>
+                                                <td class="cel">
+                                                    <input type="text" class="form-control percetual" id="percSeg_@cont" value="" />
+                                                </td>
+                                                <td class="cel">
+                                                    <input type="text" class="form-control percetual" id="percTer_@cont" value="" />
+                                                </td>
+                                                <td class="cel">
+                                                    <input type="text" class="form-control percetual" id="percQua_@cont" value="" />
+                                                </td>
+                                                <td class="cel">
+                                                    <input type="text" class="form-control percetual" id="percQui_@cont" value="" />
+                                                </td>
+                                                <td class="cel">
+                                                    <input type="text" class="form-control percetual" id="percSex_@cont" value="" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input type="submit" value="@traducaoHelper["SALVAR"]" class="btn btn-success pull-right" onclick="Gavar();" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- Fim FORM-->
+    </div>
+</div>

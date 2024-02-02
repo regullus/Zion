@@ -1,0 +1,35 @@
+﻿@model int
+@{
+   #region ViewBags
+
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+   
+   #endregion
+
+   #region Variaveis
+
+   #endregion
+
+}
+<ul class="list-inline">
+   <li role="tab" class="first @(Model == 1 ? "current" : Model > 1 ? "done" : "disabled")">
+      <a href="javascript:void(0);">
+         <span class="number">1.</span> @traducaoHelper["RESUMO"]
+      </a>
+   </li>
+   <li role="tab" class="@(Model == 2 ? "current" : Model > 2 ? "done" : "disabled")">
+      <a href="javascript:void(0);">
+         <span class="number">2.</span> @traducaoHelper["ENTREGA_FATURAMENTO"]
+      </a>
+   </li>
+   <li role="tab" class="@(Model == 3 ? "current" : Model > 3 ? "done" : "disabled")">
+      <a href="javascript:void(0);">
+         <span class="number">3.</span> @traducaoHelper["PAGAMENTO"]
+      </a>
+   </li>
+   <li role="tab" class="@(Model == 4 ? "done" : "disabled")">
+      <a href="javascript:void(0);">
+         <span class="number">4.</span> @traducaoHelper["CONCLUIDO"]
+      </a>
+   </li>
+</ul>

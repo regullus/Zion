@@ -1,0 +1,120 @@
+﻿@model Core.Entities.ArbitragemPeriodo
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["DETALHES"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    IQueryable<Core.Entities.Associacao> associacoes = ViewBag.Associacoes;
+}
+
+
+@section pageStyles{
+
+    <style>
+        .cel {
+            /*padding: 0 !important;
+            border: 0;*/
+            text-align: center !important;
+        }
+   
+    </style>
+
+}
+
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-book "></i>@traducaoHelper["DETALHES"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+
+        <div class="form-body">
+            @using (Html.BeginForm())
+            {
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-10"><h4>@traducaoHelper["ARBITRAGEM"] - <samp id="dtInicio">@Model.DataInicio.ToString("dd/MM/yyyy")</samp> @traducaoHelper["ATE"] <samp id="dtfim">@Model.DataFim.ToString("dd/MM/yyyy")</samp></h4></div>
+                        <div class="col-md-2">
+                            @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
+                            @if (Model.DataInicio > Core.Helpers.App.DateTimeZion)
+                            {
+                                @Html.ActionLink("Edit", "Edit", new { id = Model.ID }, new { @class = "Editar pull-right", title = traducaoHelper["EDITAR"] })
+                            }
+                        </div>
+                    </div>
+                    <hr />
+
+                </div>
+            }
+
+            @if (ViewBag.Arbitragens != null)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover" id="tabelaConfig">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="25%" id="Associacao">@traducaoHelper["ASSOCIACAO"]</th>
+                                        <th scope="col" width="15%" id="percent2">@traducaoHelper["SEGUNDA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent3">@traducaoHelper["TERCA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent4">@traducaoHelper["QUARTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent5">@traducaoHelper["QUINTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent6">@traducaoHelper["SEXTA_FEIRA"]</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th scope="col" width="25%" id="Associacao">@traducaoHelper["ASSOCIACAO"]</th>
+                                        <th scope="col" width="15%" id="percent2">@traducaoHelper["SEGUNDA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent3">@traducaoHelper["TERCA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent4">@traducaoHelper["QUARTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent5">@traducaoHelper["QUINTA_FEIRA"]</th>
+                                        <th scope="col" width="15%" id="percent6">@traducaoHelper["SEXTA_FEIRA"]</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    @{
+                                        int cont = 0;
+                                        foreach (Core.Entities.Arbitragem item in ViewBag.Arbitragens)
+                                        {
+                                            cont++;
+                                            <tr>
+                                                <td>
+                                                    @(associacoes.Where(x => x.Nivel == item.NivelAssociacao).FirstOrDefault<Core.Entities.Associacao>().Nome)
+                                                </td>
+                                                <td class="cel">
+                                                    @item.PercentualSegunda.Value.ToString("N2") %
+                                                </td>
+                                                <td class="cel">
+                                                    @item.PercentualTerca.Value.ToString("N2") %
+                                                </td>
+                                                <td class="cel">
+                                                    @item.PercentualQuarta.Value.ToString("N2") %
+                                                </td>
+                                                <td class="cel">
+                                                    @item.PercentualQuinta.Value.ToString("N2") %
+                                                </td>
+                                                <td class="cel">
+                                                    @item.PercentualSexta.Value.ToString("N2") %
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

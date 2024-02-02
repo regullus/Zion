@@ -1,0 +1,151 @@
+﻿@model Core.Entities.PedidoPagamento
+@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Cadastro.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["PEDIDO"].ToString().ToLower();
+    var contaDeposito = (Core.Entities.ContaDeposito)ViewBag.ContaDeposito;
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    #endregion
+}
+
+<div class="portlet solid grey-cararra">
+   <div class="portlet-body">
+      <h2>@traducaoHelper["OBRIGADO_INSCRICAO"]</h2>
+      <p>
+         Parabéns por sua aquisição! <br /><br />
+         Para efetivar sua compra, realize o pagamento.
+      </p>
+
+      <div class="portlet-title">
+         <div class="caption ">
+            <i class="fa fa-user"></i>@traducaoHelper["PEDIDO"] @traducaoHelper["CODIGO"] : <b>@Model.Pedido.Codigo.ToString()</b>
+         </div>
+      </div>
+
+      <table class="table table-striped">
+         <thead>
+            <tr>
+               <th width="64%">@traducaoHelper["PRODUTO"]</th>
+               <th width="12%" style="text-align:center;">@traducaoHelper["QUANTIDADE"]</th>
+               <th width="12%" style="text-align:center;">@traducaoHelper["VALOR_UNITARIO"]</th>
+               <th width="12%" style="text-align:center;">@traducaoHelper["TOTAL"]</th>
+            </tr>
+         </thead>
+         <tbody>
+            @{
+               var contador = 1;
+               var total = 0.00000000;
+            }
+            @foreach (var item in Model.Pedido.PedidoItem)
+            {
+               <tr>
+                  <td>
+                     <div class="product-name">
+                        <div class="product-num">@contador</div>
+                        <h4>@item.Produto.Nome</h4>
+                        <small>@item.Produto.Chamada</small>
+                     </div>
+                  </td>
+                  <td style="text-align:center;">@item.Quantidade</td>
+                  <td style="text-align:center;">@moedaPadrao.Simbolo @item.ValorUnitario.Value.ToString(moedaPadrao.MascaraOut)</td>
+                  <td style="text-align:center;">@moedaPadrao.Simbolo @((item.Quantidade * item.ValorUnitario).Value.ToString(moedaPadrao.MascaraOut))</td>
+               </tr>
+               contador++;
+               total = total + (double)(item.Quantidade * item.ValorUnitario);
+            }
+            <tr></tr>
+         </tbody>
+         <tfoot>
+            <tr>
+               <td class="noborders" colspan="2" rowspan="1">&nbsp;</td>
+               <td colspan="1">@traducaoHelper["TOTAL"]</td>
+               <td style="text-align:center;">@moedaPadrao.Simbolo @total.ToString(moedaPadrao.MascaraOut)</td>
+            </tr>
+         </tfoot>
+      </table>
+
+      <div class="row">
+         <div class="col-lg-12 remittance">
+            <div class="col col-md-4">
+               @if (@Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+               {
+                  <div class="col col-md-10">
+                     <h5>@traducaoHelper["ENDERECO_ENTREGA"]:</h5>
+                     <ul class="list-unstyled">
+                        <li>@Model.Pedido.EnderecoEntrega.EnderecoCompleto</li>
+                        <li>@Model.Pedido.EnderecoEntrega.Distrito - @Model.Pedido.EnderecoEntrega.CodigoPostal</li>
+                        <li>@Model.Pedido.EnderecoEntrega.Cidade.Nome/@Model.Pedido.EnderecoEntrega.Estado.Sigla</li>
+                     </ul>
+                     <h5 style="margin-top:25px;">@traducaoHelper["ENDERECO_FATURAMENTO"]</h5>
+                     @if (Model.Pedido.EnderecoFaturamento != null && Model.Pedido.EnderecoFaturamento.ID != 0)
+                     {
+                        <ul class="list-unstyled">
+                           <li>@Model.Pedido.EnderecoFaturamento.EnderecoCompleto</li>
+                           <li>@Model.Pedido.EnderecoFaturamento.Distrito - @Model.Pedido.EnderecoFaturamento.CodigoPostal</li>
+                           <li>@Model.Pedido.EnderecoFaturamento.Cidade.Nome/@Model.Pedido.EnderecoFaturamento.Estado.Sigla</li>
+                        </ul>
+                     }
+                     else
+                     {
+                        <ul class="list-unstyled">
+                           <li>@Model.Pedido.EnderecoEntrega.EnderecoCompleto</li>
+                           <li>@Model.Pedido.EnderecoEntrega.Distrito - @Model.Pedido.EnderecoEntrega.CodigoPostal</li>
+                           <li>@Model.Pedido.EnderecoEntrega.Cidade.Nome/@Model.Pedido.EnderecoEntrega.Estado.Sigla</li>
+                        </ul>
+                     }
+                  </div>
+               }
+            </div>
+            <div class="col col-md-8">
+               <div class="row" id="tipoPagamento">
+                  <p>
+                     @Html.Raw(traducaoHelper["DADOS_DEPOSITO"])
+                  </p>
+               </div>
+
+               <div class="row">
+                  <p>
+                     Sua compra será confirmada logo após validação do pagamento.
+                  </p>
+
+               </div>
+            </div>
+
+            <img src="@Url.Content("~/Content/admin/img/" + Helpers.Local.Sistema + "/qrCode.png")?vre=@Helpers.Local.Versao" alt="" class="logo-default" />
+         </div>
+      </div>
+       <div class="portlet-body">
+           @using (Html.BeginForm("ReturnAfiliado", "Cadastro"))
+           {
+               <div class="row">
+                   <div class="col-md-12 padding-Right-20">
+                       <div class="form-actions">
+                           <div class="row">
+                               <div class="col-md-offset-4 col-md-8">
+                                   <input type="button" value="Imprimir" onClick="window.print()" class="btn green-haze pull-left" style="margin-left:80%;" />
+                                   <input type="submit" value="@traducaoHelper["VOLTAR"]" class="btn green-haze pull-right" />
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           }
+       </div>
+       </div>
+</div>
+
+

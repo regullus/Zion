@@ -1,0 +1,300 @@
+﻿@using Core.Entities;
+@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["MIGRAR_REDE"].ToString().ToLower();
+
+
+
+    //var lenAssinatura = ViewBag.Assinatura.Length;
+    //var usuarioPerna  = ViewBag.Assinatura.Substring(lenAssinatura - 1, 1);
+    var meusDiretos = (IEnumerable<UsuarioMigrarRede>)ViewBag.MeusDiretos;
+    var linhas = ViewBag.Linhas;
+
+    //int intN = 0;
+
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+
+}
+
+
+@section pageStyles {
+
+    @Styles.Render("~/Content/sweetAlert")
+
+    <style>
+        /*.cel {
+            padding: 0px 0 0px 0 !important;
+            border: 0 !important;
+            text-align: center !important;
+            height: 10px !important;
+        }*/
+
+        /*.cel input {
+                padding: 0;
+                border: 0;
+                text-align: center !important;
+                font-size: 16px !important;
+            }*/
+    </style>
+
+}
+
+@section head {
+
+}
+
+@section pageScripts {
+
+    <script type="text/javascript">
+
+        //$(document).ready(function () {
+        //    $('.percetual').inputmask('99,99 %', { numericInput: true, reverse: true });
+        //});
+
+
+        function Gavar() {
+            $.ajax({
+                url: '@Url.Action("MigerRedeGravar")',
+                type: 'post',
+                dataType: 'json',
+                data: getDadosTabela(),
+                beforeSend: function (data) {
+                    $("#btn-salvar-migracao").hide();
+                    $("#migracao-aguarde").modal();
+                },
+                success: function (data) {
+
+                    $("#migracao-aguarde").modal('hide');
+
+                    if (data == 'OK') {
+                        swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@traducaoHelper["DADOS_SALVOS_SUCESSO"]', "success");
+                        window.location = '@Url.Action("Index", "Home")';
+                    }
+                    else {
+                        swal('@traducaoHelper["ERRO"]', data, "error");
+                        $("#btn-salvar-migracao").show();
+                    }
+                },
+                error: function () {
+                    $("#migracao-aguarde").modal('hide');
+                    $("#btn-salvar-migracao").show();
+
+                    swal('@traducaoHelper["ERRO"]', '@traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]', "error");
+                }
+            });
+        };
+
+        function getDadosTabela() {
+            var strJson = '[';
+            for (var i = 1; i <= @ViewBag.QuantidadeLinhas; i++) {
+                strJson += '{"id":"' + $("#id_" + i).text() + '","usuarioId":"' + $("#usuarioId_" + i).text() + '","linha":"' + $("#linha_" + i).val() + '","ordem":"' + i + '"}';
+
+                if(i < @ViewBag.QuantidadeLinhas)
+                {
+                    strJson += ',';
+                }
+            }
+            strJson += ']';
+
+            //console.log(strJson);
+
+            return strJson;
+        };
+
+    </script>
+
+}
+
+@section PageLevelScripts{
+
+    @Scripts.Render("~/scripts/sweetAlert")
+
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="portlet light">
+
+    @*<div class="portlet-title">
+           <div class="caption"></div>
+           <div class="tools">
+              <a href='@Url.Action("Index")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+              <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+           </div>
+           <div class="actions">
+              <a href='#'>&nbsp;</a>
+              <label>&nbsp;</label>
+           </div>
+        </div>*@
+
+    <div class="portlet-body">
+        <div class="form-body">
+            @*@using (Html.BeginForm())
+                {
+
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-10"><h4>@traducaoHelper["ARBITRAGEM"] - <samp id="dtInicio">@ViewBag.DataInicio</samp> @traducaoHelper["ATE"] <samp id="dtfim">@ViewBag.DataFim</samp></h4></div>
+                            <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+                        </div>
+                        <hr />
+
+                    </div>
+                }*@
+
+            @if (meusDiretos != null)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover" id="tabelaConfig">
+
+
+                                @if (meusDiretos.Any())
+                                {
+
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" width="25%" id="Associacao">@traducaoHelper["LOGIN"]</th>
+                                            @*<th scope="col" width="30%" id="Associacao">@traducaoHelper["NOME"]</th>*@
+                                            <th scope="col" width="25%" id="Associacao">@traducaoHelper["ASSOCIACAO"]</th>
+                                            <th scope="col" width="20%" id="percent2">@traducaoHelper["LINHA"]</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th scope="col" width="25%" id="Associacao">@traducaoHelper["LOGIN"]</th>
+                                            @*<th scope="col" width="30%" id="Associacao">@traducaoHelper["NOME"]</th>*@
+                                            <th scope="col" width="25%" id="Associacao">@traducaoHelper["ASSOCIACAO"]</th>
+                                            <th scope="col" width="20%" id="percent2">@traducaoHelper["LINHA"]</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        @{
+
+
+                                            int cont = 0;
+                                            foreach (Core.Entities.UsuarioMigrarRede item in meusDiretos)
+                                            {
+                                                cont++;
+                                                //var selectLinha =  item.Assinatura.Substring(lenAssinatura, 1) == usuarioPerna? "1": "0";
+                                                <tr>
+                                                    <td class="cel">
+                                                        <div id="id_@cont" hidden>@item.ID</div>
+                                                        <div id="usuarioId_@cont" hidden>@item.UsuarioID</div>
+                                                        @item.Login
+                                                    </td>
+                                                    @*<td>
+                                                            @item.Nome
+                                                        </td>*@
+                                                    <td class="cel">
+                                                        @item.NomeAssociacao
+                                                    </td>
+                                                    <td class="cel">
+
+                                                        <div class="form-group">
+                                                            <select class="form-control" name="Linha" id="linha_@cont">
+                                                                @foreach (var linha in linhas)
+                                                                {
+                                                                    <option value="@linha.Value" @(linha.Value == item.Linha.ToString() ? "selected" : "")>@linha.Text</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+
+
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="cel"><b>@traducaoHelper["MIGRACAO_AVISO_SEM_REDE"]</b></td>
+                                    </tr>
+
+                                }
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                if (meusDiretos.Any())
+                {
+
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <input type="submit" value="@traducaoHelper["SALVAR"]" class="btn btn-success pull-right" id="btn-salvar-migracao" onclick="Gavar();" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+    </div>
+</div>
+
+
+<div id="migracao-aguarde" class="modal" data-keyboard="false" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                @traducaoHelper["AGUARDE"]
+            </div>
+
+            <div class="modal-body">
+                <center>
+                    <img src="~/Content/global/img/ajax-loading.gif" />
+                </center>
+
+            </div>
+        </div>
+    </div>
+</div>
