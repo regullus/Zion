@@ -1,0 +1,112 @@
+﻿@using System.Web.Optimization
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@Helpers.Local.Cliente </title>
+    <link rel="apple-touch-icon" sizes="57x57" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-57x57.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="60x60" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-60x60.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="72x72" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-72x72.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="76x76" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-76x76.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="114x114" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-114x114.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="120x120" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-120x120.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="144x144" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-144x144.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="152x152" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-152x152.png")?v=@Helpers.Local.Versao">
+    <link rel="apple-touch-icon" sizes="180x180" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/apple-touch-icon-180x180.png")?v=@Helpers.Local.Versao">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-32x32.png")?v=@Helpers.Local.Versao" sizes="32x32">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-192x192.png")?v=@Helpers.Local.Versao" sizes="192x192">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-96x96.png")?v=@Helpers.Local.Versao" sizes="96x96">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-16x16.png")?v=@Helpers.Local.Versao" sizes="16x16">
+
+    <link rel="manifest" href="@Url.RouteUrl(HomeControllerRoute.GetManifestJson)">
+    <meta name="theme-color" content="#1E1E1E">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,300,600,700&subset=all" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
+
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    @Styles.Render("~/css/theme/mandatory")
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN PAGE LEVEL PLUGIN STYLES -->
+    @RenderSection("pageStyles", required: false)
+    <!-- END PAGE LEVEL PLUGIN STYLES -->
+    <!-- BEGIN THEME GLOBAL STYLES -->
+    @Styles.Render("~/css/theme/style")
+    <!-- END THEME GLOBAL STYLES -->
+    <!-- BEGIN THEME TYPE -->
+    @Styles.Render("~/css/theme/type")
+    <!-- END THEME TYPE -->
+    <!-- BEGIN CUSTOM -->
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/pagetour")
+    <!-- END CUSTOM -->
+
+    <meta name="description" content="@ViewBag.Description">
+    @if (ViewBag.Author != null)
+    {
+        <meta name="author" content="@ViewBag.Author">
+    }
+    @if (ViewBag.TwitterCard != null)
+    {
+        @Html.TwitterCard((TwitterCard)ViewBag.TwitterCard);
+    }
+    @if (ViewBag.OpenGraph != null)
+    {
+        @Html.OpenGraph((OpenGraphMetadata)ViewBag.OpenGraph);
+    }
+    @if (ViewBag.ReferrerMode != null)
+    {
+        @Html.ReferrerMeta((ReferrerMode)ViewBag.ReferrerMode);
+    }
+    <link href="@Url.RouteUrl(HomeControllerRoute.GetFeed)" rel="alternate" title="@Application.Name Feed" type="application/atom+xml">
+    <link href="@Url.RouteUrl(HomeControllerRoute.GetOpenSearchXml).TrimEnd('/')" rel="search" title="ASP.NET MVC Boilerplate Search" type="application/opensearchdescription+xml">
+    <link rel="shortcut icon" type="image/x-icon" href="@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Favicon.ico")" />
+
+    @RenderSection("head", required: false)
+
+</head>
+
+<body class="page-header-fixed bodyColorBackground" onload="startTime()">
+    <div class="clearfix"></div>
+
+    @RenderBody()
+ 
+    <!-- BEGIN CORE JQUERY -->
+    @Scripts.Render("~/scripts/theme/jquery")
+    <!-- END CORE JQUERY -->
+    <!-- BEGIN CORE PLUGINS -->
+    @Scripts.Render("~/scripts/theme/core")
+    <!-- END CORE PLUGINS -->
+    <!-- BEGIN PAGE SCRIPTS -->
+    @RenderSection("PageScripts", required: false)
+    <!-- END PAGE SCRIPTS -->
+    <!-- BEGIN THEME TYPE -->
+    @*@Scripts.Render("~/scripts/theme/type")*@
+    <!-- END THEME TYPE -->
+    <!-- BEGIN THEME GLOBAL SCRIPTS -->
+    @Scripts.Render("~/scripts/theme/themeglobal")
+    <!-- END THEME GLOBAL SCRIPTS -->
+    <!-- BEGIN THEME LAYOUT SCRIPTS -->
+    @Scripts.Render("~/scripts/theme/themelayout")
+    <!-- END THEME LAYOUT SCRIPTS -->
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    @RenderSection("PageLevelScripts", required: false)
+    <!-- END PAGE LEVEL SCRIPTS -->
+    <!-- BEGIN CUSTOM -->
+    @*@Scripts.Render("~/scripts/custom")*@
+    @Scripts.Render("~/scripts/pagetour")
+    <!-- END CUSTOM -->
+
+    <script>
+      jQuery(document).ready(function () {
+         @RenderSection("jQueryRead", required: false)
+      });
+    </script>
+
+
+</body>
+
+</html>

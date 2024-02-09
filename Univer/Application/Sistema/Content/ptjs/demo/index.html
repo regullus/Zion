@@ -1,0 +1,259 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Demo PageTour.js jQuery-Widget</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <style>
+            body {
+                padding-top: 50px;
+                padding-bottom: 20px;
+            }
+            .ptjs-theme.classic.black .step-container {
+              background-color: rgba(0,0,0,0.8);
+              color: #fff;
+            }
+            .ptjs-theme.classic.black .step-container .step-button-close {
+              background-color: #4dbcc5;
+              color: #fff;
+            }
+            .ptjs-theme.classic.black .step-container .step-button-close:hover {
+              background-color: #399da5;
+            }
+            .ptjs-theme.classic.black .step-container .step-header .title {
+              color: #fff;
+            }
+            .ptjs-theme.classic.black .step-container .step-footer .step-pagination {
+              color: #fff;
+            }
+            .ptjs-theme.classic.black .step-container .step-footer .step-buttons span {
+              background-color: #4dbcc5;
+              border-radius: 5px;
+              color: #fff;
+            }
+            .ptjs-theme.classic.black .step-container .step-footer .step-buttons span:hover {
+              background-color: #399da5;
+            }
+            .ptjs-theme.classic.black.step-arrow-top:after {
+              border-color: rgba(0,0,0,0.8) transparent transparent transparent;
+            }
+            .ptjs-theme.classic.black.step-arrow-bottom:after {
+              border-color: transparent transparent rgba(0,0,0,0.8) transparent;
+            }
+            .ptjs-theme.classic.black.step-arrow-left:after,
+            .ptjs-theme.classic.black.step-arrow-ct-l-m:after,
+            .ptjs-theme.classic.black.step-arrow-cb-l-m:after {
+              border-color: transparent transparent transparent rgba(0,0,0,0.8);
+            }
+            .ptjs-theme.classic.black.step-arrow-lb:after,
+            .ptjs-theme.classic.black.step-arrow-lm-t:after {
+              border-color: transparent transparent transparent rgba(0,0,0,0.8);
+            }
+            .ptjs-theme.classic.black.step-arrow-right:after,
+            .ptjs-theme.classic.black.step-arrow-ct-r-m:after,
+            .ptjs-theme.classic.black.step-arrow-cb-r-m:after {
+              border-color: transparent rgba(0,0,0,0.8) transparent transparent;
+            }
+            .ptjs-theme.classic.black.step-arrow-rb:after,
+            .ptjs-theme.classic.black.step-arrow-rm-t:after {
+              border-color: transparent rgba(0,0,0,0.8) transparent transparent;
+            }
+        </style>
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../css/ptjs.min.css">
+        <link rel="stylesheet" type="text/css" href="../themes/classic.min.css">
+        <script type="text/javascript" src="../vendors/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="../vendors/jquery-ui-1-12-1.min.js"></script>
+        <script type="text/javascript" src="../js/ptjs.min.js"></script>
+    </head>
+    <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Demo PageTour.js jQuery-Widget</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input id="element2" type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1 id="element1">Hello, world!</h1>
+        <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <p><a id="run-tour" class="btn btn-success btn-lg" href="#" role="button">Run Tour &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div id="element3" class="col-md-4">
+          <h2>Heading</h2>
+          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div>
+        <div id="element4" class="col-md-4">
+          <h2>Heading</h2>
+          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+       </div>
+        <div id="element5" class="col-md-4">
+          <h2>Heading</h2>
+          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2015</p>
+      </footer>
+    </div> <!-- /container -->
+      
+        <script src="js/vendor/bootstrap.min.js"></script>
+
+        <script src="js/main.js"></script>
+        <script type="text/javaScript">
+          $(function(){
+            'use strict';
+            
+            $('#run-tour').on('click', function(){
+              $.ptJs('start');
+            });
+            $.ptJs({
+              autoDestroy: false,
+              autoStart: true,
+              templateData: {
+                'button-start': 'Start the tour',
+                title: '<img class="img-responsive" style="width:125px; display:block" src="img/logo-blue.png">'
+              },
+              steps: [
+                {
+                  el: document,
+                  overlay:{
+                    mode: 'full'
+                  },
+                  templateData: {
+                    content: 'PageTour.js - A lightweight tour composer to guide your visitors, onboard new users, highlight new features, make your product easier and build a stunning online user experience.'
+                  }
+                },
+                {
+                  el: '#element1',
+                  position:{
+                    location: 'bl'
+                  },
+                  templateData: {
+                    content: 'You can easily highlight elements of your website and choose between 83 slide\'s positions.'
+                  }
+                },
+                {
+                  el: '#element2',
+                  templateData: {
+                    content: 'Teach your users how to use your product.'
+                  }
+                },
+                {
+                  animation:{
+                    enableOnClose: true,
+                    enableOnOpen: true,
+                    name: ['ptJs_bounce','ptJs_roll']
+                  },
+                  el: '#element3',
+                  templateData: {
+                    content: 'Advanced animations to show your feature.'
+                  }
+                },
+                {
+                  el: '#element4',
+                  templateData: {
+                    content: 'Easy DOM manipulations'
+                  }
+                },
+                {
+                  el: '#element5',
+                  templateClass: {
+                    root: 'black'
+                  },
+                  templateData: {
+                    'button-doc':'Check the documentation',
+                    'button-finish':'Finish the tour',
+                    'button-website':'Check the website',
+                    content: 'Easy HTML, call-to-action and theme customization',
+                    title: '<img class="img-responsive" style="width:125px; display:block" src="img/logo-white-black.png">'
+                  },
+                  templateViewWindow: '' +
+                    '<div class="step-container" ptjs-id="ptjs-step-container">\n' +
+                      '<span class="step-button-close" ptjs-id="button-close" ptjs-data="button-close"></span>\n' +
+                      '<div class="step-header">\n' +
+                        '<div class="title" ptjs-data="title"></div>\n' +
+                      '</div>\n' +
+                      '<div class="step-body">\n' +
+                        '<div class="content" ptjs-data="content"></div><br>\n' +
+                        '<div class="well">' +
+                          '<p><a class="btn btn-primary" target="_blank" href="http://www.pagetourjs.com" ptjs-data="button-website" role="button"></a></p>' +
+                          '<p><a class="btn btn-primary" target="_blank" href="http://jquery-widget.pagetourjs.com" ptjs-data="button-doc" role="button"></a></p>' +
+                          '<p><a class="btn btn-default" href="javascript:void(0)" ptjs-id="button-finish" ptjs-data="button-finish" role="button"></a></p>' +
+                        '</div>' +
+                      '</div>\n' +
+                      '<div class="step-footer">\n' +
+                        '<span class="step-pagination" ptjs-id="pagination" ptjs-data="pagination"></span>\n' +
+                        '<div class="step-buttons">\n' +
+                          '<span ptjs-id="button-start" ptjs-data="button-start"></span>\n' +
+                          '<span ptjs-id="button-previous" ptjs-data="button-previous"></span>\n' +
+                          '<span ptjs-id="button-next" ptjs-data="button-next"></span>\n' +
+                          '<span ptjs-id="button-end" ptjs-data="button-end"></span>\n' +
+                        '</div>\n' +
+                      '</div>\n' +
+                    '</div>',
+                }
+              ],
+              onAfterOpen: function(event, data) {
+                var $element = data.step.ptJsStep('info').$element;
+                
+                switch($element.attr('id')){
+                  case 'element4':
+                    $element.css('background-color','#ffcbcb');
+                    break;
+                }
+              },
+              onAfterClose: function(event, data) {
+                var $element = data.step.ptJsStep('info').$element;
+                
+                switch($element.attr('id')){
+                  case 'element4':
+                    $element.css('background-color','#fff');
+                    break;
+                }
+              },
+              onButtonFinishClick: function(event, data) {
+                $.ptJs('end');
+              }
+            });
+          });
+        </script>
+    </body>
+</html>

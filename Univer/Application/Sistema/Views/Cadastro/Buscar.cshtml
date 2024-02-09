@@ -1,0 +1,83 @@
+﻿@model IEnumerable<Core.Entities.Usuario>
+@{
+
+   #region Layout
+
+   Layout = null;
+
+   #endregion
+
+   #region ViewBags
+
+   var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+   #endregion
+
+   #region Variaveis
+
+   #endregion
+
+}
+
+<div class="col-md-2">&nbsp;</div>
+<div class="col-md-8 well bg-grey-steel">
+   @if (Model != null)
+   {
+      if (Model.Any())
+      {
+         foreach (var usuario in Model)
+         {
+            var usuarioBinder = new Sistema.ModelBinders.UsuarioBinder();
+            usuarioBinder.Usuario = usuario;
+
+            var foto = usuarioBinder.Foto;
+            if (String.IsNullOrEmpty(foto))
+            {
+               foto = Url.Content("~/Content/img/" + (usuario.Sexo == "M" ? Helpers.Local.Sistema + "/Homem" : Helpers.Local.Sistema + "/Mulher") + ".png");
+            }
+            else
+            {
+               foto = Url.Content(foto);
+            }
+            var patrocinador = String.Format("ID:{0}, Foto:'{1}', Apelido: '{2}', Nome: '{3}', Login: '{4}', NomeFantasia: '{5}', Celular: '{6}'", usuario.ID, foto, usuario.Apelido, usuario.Nome, usuario.Login, usuario.NomeFantasia, usuario.Celular);
+            <div class="row">
+               <div class="col-md-2">
+                  <img height="52" src="@foto" style="background:#ffffff;" />
+               </div>
+               <div class="col-md-2">
+                  <b>@traducaoHelper["NOME"]</b>
+                  <h5>@usuario.Nome</h5>
+               </div>
+               <div class="col-md-2">
+                  <b>@traducaoHelper["LOGIN"]</b>
+                  <h5>@usuario.Login</h5>
+               </div>
+               <div class="col-md-3">
+                  <b>@traducaoHelper["NOME_FANTASIA"]</b>
+                  <h5>@usuario.NomeFantasia</h5>
+               </div>
+               <div class="col-md-3">
+                  <button class="btn blue-madison pull-right" type="button" onclick="Selecionar({@patrocinador});">
+                     <span>
+                        @traducaoHelper["SELECIONE"]
+                     </span>
+                     <i class="m-icon-swapright m-icon-white"></i>
+                  </button>
+                  <div class="clearfix">&nbsp;</div>
+               </div>
+            </div>
+         }
+      }
+      else
+      {
+         <h3>@traducaoHelper["NENHUM_USUARIO_LOCALIZADO"]</h3>
+      }
+   }
+   else
+   {
+      <h3>@traducaoHelper["RECAPTCHA_NAO_INFORMADO"]</h3>
+   }
+</div>
+<div class="col-md-2">&nbsp;</div>
+
+

@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "Segurança";
+    Layout = "~/Views/Shared/_Login.cshtml";
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    var fundos = (IEnumerable<string>)ViewBag.Fundos;
+}
+
+<h4 class="form-title text-center">
+    <img src="~/Content/global/img/google-authenticator.jpg" width="80" /><br />
+    <b>Google Authenticator</b>
+</h4>
+
+<div class="form-group">
+    <div>
+        <span id="token-invalido" class="hide center-block text-center text-danger">@traducaoHelper["TOKEN_INVALIDO"]</span><br />
+        <span>@traducaoHelper["TOKEN_INSIRA"]</span>
+        <input type="text" id="TokenText" name="TokenText" class="form-control placeholder-no-fix" placeholder="Token" required /><br />
+    </div>
+</div>
+
+<div class="form-actions" style="height: 46px;">
+    <a href="~/account/login">Voltar</a>
+    <button id="btnValidar" class="btn green-haze pull-right">
+        OK <i class="m-icon-swapright m-icon-white"></i>
+    </button>
+</div>
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnValidar").on("click", function () {
+                var _token = $("#TokenText").val();
+                var url = '@Url.Action("SegundaEtapa")';
+                $.post(url, { token: _token }, function (response) {
+                    $("#token-invalido").addClass("hide");
+                    if (response.Ok) {
+                        location.href = "@Url.Action("index", "home")";
+                    }
+                    else {
+                        $("#token-invalido").removeClass("hide");
+                    }
+                })
+            });
+        });
+        $(document).ready(function () {
+            $('#TokenText').keypress(function (e) {
+                if (e.keyCode == 13)
+                    $('#btnValidar').click();
+            });
+        });
+    </script>
+}
+

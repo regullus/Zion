@@ -1,0 +1,315 @@
+﻿@model Core.Entities.Pedido
+@using Core.Entities
+@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = @traducaoHelper["PEDIDO"] + "#" + Model.Codigo;
+
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    #endregion
+
+}
+
+@section PageLevelScripts{
+    <script>
+        $("#detalheLinkCopiar").on('click', function () {
+            var copiadoTemp = 0;
+            var el = document.createElement('textarea');
+            el.value = document.getElementById('enderecoBitCoin').value;
+            el.setAttribute('readonly', '');
+            el.style = { position: 'absolute', left: '-9999px' };
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            $("#copiado").fadeIn();
+            clearTimeout(copiadoTemp);
+            copiadoTemp = setTimeout(function () { $("#copiado").fadeOut(); }, 1000);
+            document.body.removeChild(el);
+        });
+    </script>
+}
+
+<div class="portlet aba box backWrite grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-book"></i>@traducaoHelper["DETALHES"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+
+    <div class="portlet-body">
+        <div class="row">
+            <div class="col-md-10"><h4>@traducaoHelper["PEDIDO"] @Model.Codigo</h4></div>
+            <div class="col-md-2">
+                @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
+                @*@Html.ActionLink("Edit", "Edit", new { id = Model.ID }, new { @class = "Editar pull-right", title = traducaoHelper["EDITAR"] })*@
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-4">
+                <label> <strong>@traducaoHelper["LOGIN"]:</strong> @Model.Usuario.Login </label>
+            </div>
+            <div class="col-md-4">
+                <label> <strong>@traducaoHelper["NOME"]:</strong> @Model.Usuario.Nome </label>
+            </div>
+            <div class="col-md-4">
+                @{var pagamento = Model.PedidoPagamento.FirstOrDefault();
+                    var pgto = (pagamento != null ? pagamento.MeioPagamento.ToString() : "");}
+                <label> <strong>@traducaoHelper["MEIO_PAGAMENTO"]:</strong> @pgto </label>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th width="30%">@traducaoHelper["PRODUTO"]</th>
+                                <th width="15%" style="text-align:center;">@traducaoHelper["STATUS"]</th>
+                                <th width="10%" style="text-align:center;">@traducaoHelper["QUANTIDADE"]</th>
+                                <th width="15%" style="text-align:center;">@traducaoHelper["VALOR_UNITARIO"]</th>
+                                <th width="15%" style="text-align:center;">@traducaoHelper["TOTAL"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var contador = 1;
+                            }
+                            @foreach (var item in Model.PedidoItem)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="product-name">
+                                            <div class="product-num">@contador</div>
+                                            <h4>@item.Produto.Nome</h4>
+                                            <small>@item.Produto.Chamada</small>
+                                        </div>
+                                    </td>
+                                    @{
+                                        var label = "label-default";
+                                        switch (Model.StatusAtual)
+                                        {
+                                            case Core.Entities.PedidoPagamentoStatus.TodosStatus.PagamentoParcial:
+                                            case Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoConfirmacao:
+                                            case Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento:
+                                                label = "label-warning";
+                                                break;
+                                            case Core.Entities.PedidoPagamentoStatus.TodosStatus.Cancelado:
+                                                label = "label-danger";
+                                                break;
+                                            case Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago:
+                                                label = "label-success";
+                                                break;
+                                        }
+                                    }
+
+                                    @{
+                                        var valorUnitario = item.Pedido.PedidoPagamento.Where(w => w.Valor.HasValue).Sum(s => s.Valor).Value;
+                                        var valorTotal = item.Quantidade * valorUnitario;
+                                        var valorTotalBTC = item.Quantidade * item.Pedido.PedidoPagamento.Where(w => w.ValorCripto.HasValue).Sum(s => s.ValorCripto).Value;
+                                    }
+
+                                    <td style="text-align:center;">
+                                        <label class="label @label">@Model.StatusAtual</label>
+
+                                        @if (Model.PedidoPagamento.Any())
+                                        {
+                                            var pedidoPagamento = Model.PedidoPagamento.FirstOrDefault();
+                                            if (Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.PagamentoParcial ||
+                                                Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento)
+                                            {
+
+                                                var statusConsiderar = new List<PedidoPagamentoStatus.TodosStatus> { PedidoPagamentoStatus.TodosStatus.Pago, PedidoPagamentoStatus.TodosStatus.PagamentoParcial };
+
+                                                var totalPagoBTC = pedidoPagamento.PedidoPagamentoStatus.Where(w => w.ValorPago.HasValue && statusConsiderar.Contains(w.Status)).Sum(s => s.ValorPago.Value);
+
+                                                var valorRestante = valorTotalBTC - totalPagoBTC;
+
+                                                if (valorRestante > 0)
+                                                {
+                                                    valorRestante = Math.Round(valorTotal * (1 - (totalPagoBTC / valorTotalBTC)), 4);
+                                                    <br />
+                                                    <br />
+                                                    <label> @traducaoHelper["VALOR_RESTANTE"] @moedaPadrao.Simbolo @valorRestante</label>
+                                                }
+                                            }
+                                            else if (pedidoPagamento.UltimoStatus.Status == PedidoPagamentoStatus.TodosStatus.Pago)
+                                            {
+                                                <br />
+                                                <br />
+                                                <label> @traducaoHelper["DATA"] @pedidoPagamento.UltimoStatus.Data </label><br />
+
+                                                if (@pedidoPagamento.UltimoStatus.Administrador != null)
+                                                {
+                                                    <label>@traducaoHelper["FEITO_MANUALMENTE_POR"] @pedidoPagamento.UltimoStatus.Administrador.Nome </label>
+                                                }
+                                            }
+                                        }
+
+                                    </td>
+                                    <td style="text-align:center;">@item.Quantidade</td>
+                                    <td style="text-align:center;">@moedaPadrao.Simbolo @valorUnitario</td>
+                                    <td style="text-align:center;">@moedaPadrao.Simbolo @(valorTotal)</td>
+                                </tr>
+                                contador++;
+                            }
+
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="noborders" colspan="3" rowspan="1">&nbsp;</td>
+                                <td>@traducaoHelper["TOTAL"]</td>
+                                <td style="text-align:center;">@moedaPadrao.Simbolo @Model.PedidoPagamento.Where(w => w.Valor.HasValue).Sum(s => s.Valor).Value</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="panel-group accordion scrollable" id="accordion2">
+                    @if (@Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+                    {
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_2_1">
+                                        @traducaoHelper["ENDERECO_ENTREGA"]
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse_2_1" class="panel-collapse in">
+                                <div class="panel-body">
+                                    @*<p><b>@Model.EnderecoEntrega.Nome</b></p>*@
+                                    <p>@Model.EnderecoEntrega.EnderecoCompleto</p>
+                                    <p>@Model.EnderecoEntrega.Distrito - @Model.EnderecoEntrega.CodigoPostal</p>
+                                    <p>@Model.EnderecoEntrega.Cidade.Nome/@Model.EnderecoEntrega.Estado.Sigla</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_2_2">
+                                        @traducaoHelper["ENDERECO_FATURAMENTO"]
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse_2_2" class="panel-collapse in">
+                                <div class="panel-body">
+                                    @*<p><b>@Model.EnderecoFaturamento.Nome</b></p>*@
+                                    <p>@Model.EnderecoFaturamento.EnderecoCompleto</p>
+                                    <p>@Model.EnderecoFaturamento.Distrito - @Model.EnderecoFaturamento.CodigoPostal</p>
+                                    <p>@Model.EnderecoFaturamento.Cidade.Nome/@Model.EnderecoFaturamento.Estado.Sigla</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+                    @if (Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento && pagamento.MeioPagamento == Core.Entities.PedidoPagamento.MeiosPagamento.Boleto)
+                    {
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_2_3">
+                                        &nbsp;@traducaoHelper["BOLETO"]
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse_2_2" class="panel-collapse in">
+                                <div class="panel-body">
+                                    <p>&nbsp;</p>
+                                    <p><a href="@Url.Action("gerar", "boleto", new { area = "", pagamentoID = pagamento.ID })" target="_blank" class="btn btn-lg btn-success">@traducaoHelper["GERAR_BOLETO"]</a></p>
+                                    <p>&nbsp;</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento && pagamento.MeioPagamento == Core.Entities.PedidoPagamento.MeiosPagamento.Deposito)
+                    {
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_2_3">
+                                        &nbsp;@traducaoHelper["DEPOSITO"]
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse_2_3" class="panel-collapse in">
+                                <div class="panel-body">
+                                    <p>@Html.Raw(traducaoHelper["DADOS_DEPOSITO"])</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if ((Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento
+                            || Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.PagamentoParcial
+                            || Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.Expirado
+                            || Model.StatusAtual == Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago)
+                    && pagamento.MeioPagamento == Core.Entities.PedidoPagamento.MeiosPagamento.CryptoPayments)
+                    {
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_2_3">
+                                        QR Code e Hash para Pagamento
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse_2_3" class="panel-collapse in">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-5 text-center">
+                                            <span class="title"><strong>@pagamento.ValorCripto.Value.ToString(moedaPadrao.MascaraOut)</strong></span><br>
+                                            <img id="qrCode" src=@String.Format("https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl={0}", @pagamento.Numero) />
+                                        </div>
+                                        <div class="col-md-7 padding-20">
+                                            <i class="fa fa-pencil-square-o"></i>
+                                            <span class="title">Endereço Pagamento:</span>
+                                            <input id="enderecoBitCoin" type="text" data-provide="typeahead" disabled class="form-control" placeholder="" value="@pagamento.Numero">
+                                            <div class="text-center">
+                                                <span class="input-group-btn">
+                                                    <input class="btn btn-success margem-10" id="detalheLinkCopiar" value=" @traducaoHelper["COPIAR"]">
+                                                </span>
+                                                <span id="copiado" hidden>@traducaoHelper["COPIANDO"]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

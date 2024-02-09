@@ -1,0 +1,69 @@
+﻿@model Core.Entities.Arquivo
+
+@{
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = ViewBag.Title = traducaoHelper["EXCLUIR"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-eraser"></i>@traducaoHelper["EXCLUIR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+        <div class="form-body">
+            <div class="row">
+                <div class="col-md-10"><h4>@traducaoHelper["ARQUIVO"]</h4></div>
+                <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+            </div>
+            <h3 class="text-danger">@traducaoHelper["TEM_CERTEZA_QUE_DESEJA_EXLUIR_ESTE_ITEM"]</h3>
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>@traducaoHelper["NOME"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Nome)
+                </dd>
+                <dt>@traducaoHelper["DESCRICAO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Descricao)
+                </dd>
+                <dt>@traducaoHelper["SECAO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.SecaoID)
+                </dd>
+                <dt>@traducaoHelper["TIPO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.TipoID)
+                </dd>
+                <dt>@traducaoHelper["ATIVO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Ativo)
+                </dd>
+                <dt>@traducaoHelper["ATUALIZACAO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Atualizacao)
+                </dd>
+                <dt>@traducaoHelper["OBSERVACAO"]</dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Observacao)
+                </dd>
+                
+            </dl>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-actions no-color">
+                    <input type="submit" value="@traducaoHelper["EXCLUIR"]" class="btn btn-danger" id="confirm_button" />
+                </div>
+            }
+        </div>
+    </div>
+</div>

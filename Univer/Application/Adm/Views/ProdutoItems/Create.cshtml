@@ -1,0 +1,235 @@
+﻿@model Core.Entities.ProdutoItem
+@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    var produtoPai = ViewBag.ProdutoPai;
+    var produtoCategorias = ViewBag.ProdutoCategoriaID;
+
+    ViewBag.Title = traducaoHelper["CRIAR"];
+
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+
+}
+
+@section pageStyles {
+}
+
+@section head {
+}
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/validationPlugin")
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+         $('#produto form').validate({
+            errorElement: 'span',
+            rules: {
+               SKU: 'required',
+               TipoID: 'required',
+               Nome: 'required',
+               Peso: 'required',
+               LimitePorUsuario: 'required',
+               LimitePorPedido: 'required',
+               Estoque: 'required',
+               ProdutoCategoriaID: 'required'
+            },
+            messages: {
+               SKU: '@traducaoHelper["NOME_REQUERIDO"]',
+               TipoID: '@traducaoHelper["NOME_REQUERIDO"]',
+               Nome: '@traducaoHelper["NOME_REQUERIDO"]',
+               Peso: '@traducaoHelper["NOME_REQUERIDO"]',
+               LimitePorUsuario: '@traducaoHelper["NOME_REQUERIDO"]',
+               LimitePorPedido: '@traducaoHelper["NOME_REQUERIDO"]',
+               Estoque: '@traducaoHelper["NOME_REQUERIDO"]',
+               ProdutoCategoriaID: '@traducaoHelper["NOME_REQUERIDO"]'
+            },
+            errorPlacement: function (error, element) {
+               error.addClass("help-block");
+               error.insertAfter(element);
+            }
+         });
+      });
+
+
+        $("#CategoriaId").on("change paste keyup", function () {
+            var produto = '@produtoPai.ID';
+            var categoria = $('#CategoriaId').val();
+            if (categoria != '') {
+                $.post('@Url.Action("Produtos", "ProdutoItems")', { produtoPaiId: produto , categoriaId: categoria }, function (data) {
+               var html = '<option value="">@traducaoHelper["SELECIONAR"]</option>';
+               for (var i in data) {
+                  html += '<option value="' + data[i].ID + '">' + data[i].Nome + '</option>';
+               }
+               $('#ItemID').html(html);
+               window.setTimeout(function () {
+                   Metronic.unblockUI('#divItemID');
+               }, 2000);
+            });
+         }
+
+         window.setTimeout(function () {
+             Metronic.unblockUI('#divItemID');
+         }, 22000);
+        });
+
+    </script>
+}
+
+@section PageLevelScripts {
+    @Scripts.Render("~/scripts/validationScript")
+}
+
+@section jQueryRead {
+}
+<div class="portlet box grey-gallery">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-plus"></i>@traducaoHelper["CRIAR"]
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"></a>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-md-10"><h4> @traducaoHelper["COMPOSICAO_PRODUTO"]: @produtoPai.SKU - @produtoPai.Nome </h4></div>
+                <div class="col-md-2">@Html.ActionLink("Back to List", "Index", new { IdPai = ViewBag.IdPai }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })</div>
+            </div>
+            <hr />
+        </div>
+
+        <div class="portlet-body" id="produto">
+            @*@using (Html.BeginForm("SalvarGeral", "Produtos", FormMethod.Post, new { role = "formGeral" }))*@
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group form-md-line-input has-info" hidden>
+                                <select class="form-control" id="ProdutoID" name="ProdutoID">                                                                       
+                                <option value="@produtoPai.ID">@produtoPai.Nome</option>                                   
+                                </select>
+                                <label for="ProdutoID">@traducaoHelper["PRODUTO_PAI"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input has-info">
+                                <select class="form-control" id="CategoriaId" name="CategoriaId">
+                                    <option value="">@traducaoHelper["SELECIONAR"]</option>
+                                    @foreach (var item in produtoCategorias)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                                <label for="CategoriaId">@traducaoHelper["CATEGORIA"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input has-info" id="divItemID">
+                                <select class="form-control dropone" id="ItemID" name="ItemID"></select>
+                                <label id="lblItemID" for="Produto1">@traducaoHelper["PRODUTO"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label" )>
+                                <input type="number" class="form-control" required name="Quantidade" id="Quantidade" min="0">
+                                <label for="LimitePorPedido">@traducaoHelper["QUANTIDADE"]</label>
+                            </div>
+                            <div class="form-group form-md-line-input form-md-floating-label">
+                                <input type="text" class="form-control" name="Observacao" id="Observacao">
+                                <label for="Observacao">@traducaoHelper["OBSERVACOES"]</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-offset-0 col-md-12">
+                            <input type="submit" value="@traducaoHelper["CRIAR"]" class="btn btn-success" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@*@using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>ProdutoItem</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProdutoID, "ProdutoID", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("ProdutoID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ProdutoID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemID, "ItemID", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("ItemID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ItemID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OpcaoID, "OpcaoID", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("OpcaoID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.OpcaoID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Quantidade, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Quantidade, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Quantidade, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Observacao, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Observacao, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Observacao, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }*@

@@ -1,0 +1,38 @@
+﻿@{ 
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+}
+
+@if (ViewBag.AtingiuLimiteGanhoBonusArbitragem)
+{
+    <div id="limite-bonus-arbitragem-modal" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">@traducaoHelper["AVISO"]</h4>
+                </div>
+                <div class="modal-body">
+                    @traducaoHelper["LIMITE_POR_PLANO"]
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="fecharLimiteBonusArbitragem()" >Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#limite-bonus-arbitragem-modal').modal();
+        });
+
+        function fecharLimiteBonusArbitragem()
+        {
+            $('#limite-bonus-arbitragem-modal').modal('hide');
+        }
+
+    </script>
+
+}

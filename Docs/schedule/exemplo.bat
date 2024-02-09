@@ -1,0 +1,1 @@
+sqlcmd -S database-1.cp5h0mezlaqr.us-east-1.rds.amazonaws.com -d Mettabull -U usMettaBull -P PO17tW5NGEFUsAWYtVEi -i D:\Schedule\producao\exemplo.sql -o D:\Schedule\producao\exemplo.txt

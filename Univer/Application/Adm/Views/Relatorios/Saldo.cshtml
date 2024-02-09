@@ -1,0 +1,242 @@
+﻿@model  Sistema.Models.Relatorio.RelatorioSaldoModel
+
+@using Core.Models.Relatorios
+@using PagedList.Mvc;
+
+@{
+    #region Layout
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    #endregion
+
+    #region ViewBags
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    ViewBag.Title = traducaoHelper["SALDO"];
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/dateRangePicker")
+    @Styles.Render("~/Content/sweetAlert")
+}
+
+@section head {
+}
+
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/dataPicker")
+    @Scripts.Render("~/scripts/sweetAlert")
+
+}
+
+@section PageLevelScripts {
+    @Scripts.Render("~/scripts/dataTimePickerComponent")
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+
+    </script>
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"><i class="fa fa-reorder"></i> @traducaoHelper["SALDO"]</div>
+        <div class="tools"  style="display:none">
+            <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
+            <a href='@Url.Action("Reload", "saques")' class="atualizar" title="@traducaoHelper["RELER"]" />
+        </div>
+        <div class="actions" style="display:none">
+            <a href='@Url.Action("Excel", "saques")' class="btn btn-sm yellow-casablanca">
+                <i class="fa fa-file-excel-o"></i> Excel
+            </a>
+            <label>&nbsp;</label>
+        </div>
+        <div class="actions pagar" style="display:none;">
+            <a class="btn btn-sm yellow-casablanca resumo" data-toggle="modal" href="#resumo">
+                <i class="fa fa-money"></i> Pagar
+            </a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        <div class="table-toolbar">
+
+            <div class="row">
+
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <div class="input-group">
+                            @using (Html.BeginForm("Saldo", "Relatorios", FormMethod.Get))
+                            {
+                            @Html.DropDownList("NumeroPaginas", null, htmlAttributes: new { @class = "form-control input-small input-inline marginB05" })
+                            <input class="btn purple form-control input-small input-inline fontPlaceHolderIcon" id="Atualizar" name="Atualizar" value="&#xf021; @traducaoHelper["ATUALIZAR"]" type="submit" />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="row">
+
+                    @using (Html.BeginForm("Saldo", "Relatorios", FormMethod.Get))
+                    {
+                        <div class="form-group">
+
+                            <input type="hidden" name="Page" value="1" />
+
+                            <div class="input-group  pull-right">
+                                <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2  date-picker input-daterange" data-date="10/11/2012" data-date-format="dd/mm/yyyy">
+                                    @Html.TextBox("de", ViewBag.De as string, new { @class = "form-control input-inline fontPlaceHolderIcon marginB05", @placeholder = string.Concat(traducaoHelper["DE"], " *") })
+                                </div>
+                                <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2  date-picker input-daterange" data-date="10/11/2012" data-date-format="dd/mm/yyyy">
+                                    @Html.TextBox("ate", ViewBag.Ate as string, new { @class = "form-control input-inline fontPlaceHolderIcon marginB05", @placeholder = string.Concat(traducaoHelper["ATE"], " *") })
+                                </div>
+
+                                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
+
+                                    <select name="status" class="form-control input-inline marginB05">
+                                        <option value="1" @(ViewBag.Status == 1 ? " selected " : "")>Solicitado</option>
+                                        <option value="2" @(ViewBag.Status == 2 ? " selected " : "")>Processando</option>
+                                        <option value="3" @(ViewBag.Status == 3 ? " selected " : "")>Efetuado</option>
+                                        <option value="4" @(ViewBag.Status == 4 ? " selected " : "")>Cancelado</option>
+                                        <option value="5" @(ViewBag.Status == 5 ? " selected " : "")>Estornado</option>
+                                        <option value="6" @(ViewBag.Status == 6 ? " selected " : "")>Aprovado</option>
+                                        <option value="7" @(ViewBag.Status == 7 ? " selected " : "")>Reprovado</option>
+                                        <option value="8" @(ViewBag.Status == 8 ? " selected " : "")>Pago</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
+                                    @Html.TextBox("Login", ViewBag.Login as string, new { @class = "form-control input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["LOGIN"] })
+                                </div>
+
+                                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
+                                    <select name="porAssinatura" class="form-control input-inline marginB05">
+                                        <option value="0" @(ViewBag.PorAssinatura == 0 ? " selected " : "")>Por Login</option>
+                                        <option value="1" @(ViewBag.PorAssinatura == 1 ? " selected " : "")>Por Rede do login</option>
+                                    </select>
+
+                                </div>
+                                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-2">
+                                    <input class="btn blue-madison form-control input-inline fontPlaceHolderIcon" id="Procura" name="Procura" value="&#xf002; @traducaoHelper["PROCURAR"]" type="submit" />
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model.Items, page => Url.Action("Saldo", new { page, SortOrder = ViewBag.CurrentSort, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"] @(Model.Items.PageCount < Model.Items.PageNumber ? 0 : Model.Items.PageNumber) @traducaoHelper["DE"] @Model.Items.PageCount &nbsp;</label>
+                </div>
+            </div>
+
+        </div>
+
+
+        <table class="table table-striped table-bordered table-hover" style="display:none">
+            <thead>
+                <tr>
+                    <th style="text-align:center;">Quantidade</th>
+                    <th style="text-align:center;">Líquido</th>
+                    <th style="text-align:center;">Pago BTC</th>
+                    <th style="text-align:center;">Pago MAN</th>
+                    <th style="text-align:center;">Aviso</th>
+                    <th style="text-align:center;">Estornado</th>
+                    <th style="text-align:center;">Cancelado</th>
+                    <th style="text-align:center;">Processando</th>
+                    <th style="text-align:center;">Aprovado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Resumo.QuantidadeTotal</td>
+                    <td>@Model.Resumo.Valorliquido.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalPagoBTC.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalPagoMAN.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalAviso.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalEstornado.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalCancelado.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalProcessando.ToString("N2")</td>
+                    <td>@Model.Resumo.ValorTotalAprovado.ToString("N2")</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+        <div class="table-scrollable">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th style="text-align:center;">Código</th>
+                        <th style="text-align:center;">Local</th>
+                        <th style="text-align:center;">Login</th>
+                        <th style="text-align:center;">Data</th>
+                        <!--<th style="text-align:center;">Valor</th>-->
+                        <th style="text-align:center;">Ganho</th>
+                        <th style="text-align:center;">Saques</th>
+                        <th style="text-align:center;">Transferências</th>
+                        <!--<th style="text-align:center;">Bitcoin</th>-->
+                        <th style="text-align:center;">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-center">@item.Codigo</td>
+                            <td class="text-center">@item.Estado<br />@item.Pais</td>
+                            <td class="text-center">@item.Login</td>
+                            <td class="text-center">@item.Data</td>
+                            <!--<td class="text-center">@item.Valor.ToString("N2")</td>-->
+                            <td class="text-center">@item.Moeda.ToString() @item.Ganho.ToString(moedaPadrao.MascaraOut)</td>
+                            <td class="text-center">@item.Moeda.ToString() @item.Saques.ToString(moedaPadrao.MascaraOut)</td>
+                            <td class="text-center">@item.Moeda.ToString() @item.Transferencias.ToString(moedaPadrao.MascaraOut)</td>
+                            <!--<td class="text-center">@item.Bitcoin</td>-->
+                            <td class="text-center">@item.Moeda.ToString() @item.Valor.ToString(moedaPadrao.MascaraOut)</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-toolbar">
+
+            <div class="row">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model.Items, page => Url.Action("Saldo", new { page, SortOrder = ViewBag.CurrentSort, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"] @(Model.Items.PageCount < Model.Items.PageNumber ? 0 : Model.Items.PageNumber) @traducaoHelper["DE"] @Model.Items.PageCount &nbsp;</label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>

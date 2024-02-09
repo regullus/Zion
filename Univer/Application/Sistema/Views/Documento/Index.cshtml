@@ -1,0 +1,126 @@
+﻿@model List<KeyValuePair<string, string>>
+@{
+
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["DOCUMENTOS"].ToString().ToLower();
+
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+
+    #endregion
+
+    #region Variaveis
+
+    var documentos = ViewBag.Documentos;
+
+    #endregion
+
+}
+
+@section pageStyles {
+
+}
+
+@section head {
+
+}
+
+@section pageScripts {
+
+}
+
+@section PageLevelScripts{
+
+}
+
+@section jQueryRead {
+
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="portlet aba box backWrite grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"></div>
+        <div class="tools">
+            <a href='@Url.Action("Index")' class="atualizar" title="@traducaoHelper["ATUALIZAR"]" />
+            <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+        </div>
+        <div class="actions">
+            <a href='#'>&nbsp;</a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="portlet light portlet-fit bordered">
+
+                    <div class="portlet-body">
+                        <div class="mt-element-card mt-card-round mt-element-overlay">
+                            <div class="row">
+                                @if (documentos != null)
+                                {
+                                    foreach (var documento in documentos)
+                                    {
+                                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                                            <div class="mt-card-item">
+                                                <div class="mt-card-avatar mt-overlay-1">
+                                                    <img src="@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/arquivo.png")" />
+                                                    <div class="mt-overlay">
+                                                        <ul class="mt-info">
+                                                            <li>
+                                                                <a class="btn default btn-outline" href="@(documento.CaminhoVirtual)" target="_blank">
+                                                                    <i class="icon-magnifier"></i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-card-content">
+                                                    <h3 class="mt-card-name">@documento.Descricao</h3>
+                                                    <p class="small">@documento.Observacao</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

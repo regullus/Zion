@@ -1,0 +1,258 @@
+﻿@{
+    ViewBag.Title = "Migração";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["MIGRACAO_REDE"].ToString().ToLower();
+}
+
+@section pageStyles {
+    <link rel="stylesheet" href="~/Content/home/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/global/plugins/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/home/styles.css">
+    <link href="~/Content/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+}
+
+@section pageScripts {
+
+    <script src="~/Content/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+
+
+    <script>
+
+        $('.js-data-example-ajax').select2({
+            ajax: {
+                url: "@Url.Action("GetUsuarios", "Migracao")",
+                dataType: 'json',
+               delay: 250,
+                data: function(params) {
+                     return {
+                            search: params.term // , // search term
+                            //page: params.page
+                     };
+                },
+               processResults: function (data) { //, page) {
+                    return {
+                        results: data,
+                        pagination: {
+                            more: true
+                        }
+                    };
+               },
+                cache: true
+            },
+            escapeMarkup: function(markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 3,
+            placeholder: 'Digite aqui',
+            allowClear    : true,
+            templateResult: formatRepo,
+            templateSelection: formatRepoSelection,
+            language: {
+                errorLoading:    function ()  { return '@traducaoHelper["O_RESULTADO_NAO_PODE_SER_LIDO"]';},
+                inputTooLong:    function (e) { var t = e.input.length - e.maximum, n = '@traducaoHelper["POR_FAVOR_APAGUE_X_CARACTERES"]'.replace('{0}', t); return n },
+                inputTooShort:   function (e) { var t = e.minimum - e.input.length, n = '@traducaoHelper["POR_FAVOR_ENTRE_COM_X_OU_MAIS_CARACTERES"]'.replace('{0}', t); return n },
+                loadingMore:     function ()  { return '@traducaoHelper["LENDO_MAIS_RESULTADOS"]'; },
+                maximumSelected: function (e) { return '@traducaoHelper["VOCE_SO_PODE_SELECIONAR_X_ITENS"]'.replace('{0}', e.maximum);},
+                noResults:       function ()  { return '@traducaoHelper["NENHUM_RESULTADO_ENCONTRADO"]'; },
+                searching:       function ()  { return '@traducaoHelper["PESQUISANDO"]'; }
+            }
+       });
+
+        function formatRepoSelection(repo) {
+
+            console.log("REPO (formatRepoSelection)", repo)
+
+                $('.js-data-example-ajax').val(null);
+
+            if (repo.id) {
+
+                $("#txt-patrocinador-login").text(repo.text);
+                $("#patrocinador-id").val(repo.id);
+                $("#migracao-patrocinador-modal").modal();
+            }
+
+
+            return repo.full_name || repo.text;
+        }
+
+
+        function formatRepo(repo) {
+
+            if (repo.loading) return repo.text;
+
+            var markup =
+                "<div class='select2-result-repository clearfix'>" +
+                "<div class='select2-result-repository__meta'>" +
+                "<div class='select2-result-repository__title'>" + repo.text + "</div>";
+            return markup;
+        }
+
+        function migrarComPatrocinador() {
+
+            var patrocinadorId = $("#patrocinador-id").val();
+
+            $.post('@Url.Action("migrarcompatrocinador")', { patrocinadorId:  patrocinadorId}, trataRetorno);
+
+        }
+
+        function cancelarMigracao() {
+            $('.modal').modal('hide');
+        }
+
+
+        function abrirMigrar() {
+            $("#migracao-modal").modal();
+        }
+
+        function migrar() {
+            
+            $.post('@Url.Action("migrar")', null, trataRetorno);
+
+        }
+
+        function trataRetorno(data) {
+
+            $(".modal").modal('hide');
+
+            if (data.ok) {
+                $(".migracao-form").hide();
+                $("#migracao-sucesso").fadeIn();
+            }
+            else {
+                $("#migracao-erro .modal-body").html(data.mensagem);
+                $("#migracao-erro").modal();
+            }
+
+        }
+
+    </script>
+
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="portlet box backWrite grey-gallery">
+
+    <div class="portlet-title">
+        <div class="tools">
+            <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
+        </div>
+        <div class="actions">
+            <a href=''class="btn btn-sm green-meadow" style="display:none"></a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+
+    <div class="portlet-body">
+
+        @if (ViewBag.PatrocinadorMigrou)
+        {
+            <div class="migracao-form">
+                <p><b>@traducaoHelper["MIGRACAO_REDE_USUARIO_PRONTO"]</b></p>
+                <center><input type="button" class="btn btn-success" value="@traducaoHelper["MIGRACAO_REDE_ACAO_MIGRAR"]" onclick="abrirMigrar()" /></center>
+            </div>
+        }
+        else
+        {
+            <div class="migracao-form">
+
+                <p>@Html.Raw(string.Format(traducaoHelper["MIGRACAO_REDE_PATROCINADOR_1"], ViewBag.PatrocinadorLogin))</p>
+                <p>@traducaoHelper["MIGRACAO_REDE_PATROCINADOR_2"]</p>
+
+                <span>@traducaoHelper["MIGRACAO_REDE_BUSCA_PATROCINADOR"]</span>
+                <br />
+                <select id="ProcuraLogin" name="ProcuraLogin" class="form-control js-data-example-ajax input-medium"></select>
+
+                <br /><br />
+                <span>@traducaoHelper["MIGRACAO_REDE_BUSCA_PATROCINADOR_AVISO"]</span>
+            </div>
+        }
+
+        <div id="migracao-sucesso" style="display:none">
+            <b>@traducaoHelper["MIGRACAO_REDE_MIGRACAO_CONCLUIDA"]</b>
+        </div>
+
+    </div>
+
+
+</div>
+
+<div id="migracao-patrocinador-modal" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">@traducaoHelper["CONFIRMACAO"]</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" value="" id="patrocinador-login" />
+                @Html.Raw(string.Format(traducaoHelper["MIGRACAO_REDE_CONFIRMACAO_COM_PATROCINADOR"], "<span id='txt-patrocinador-login'></span>"))
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" style="float:left" onclick="cancelarMigracaoPatrocinador()">@traducaoHelper["CANCELAR"]</button>
+                <button class="btn btn-primary " onclick="migrarComPatrocinador()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="migracao-modal" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">@traducaoHelper["CONFIRMACAO"]</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" value="@ViewBag.PatrocinadorID" id="patrocinador-id" />
+                @traducaoHelper["MIGRACAO_REDE_CONFIRMACAO_SEM_PATROCINADOR"]
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" style="float:left" onclick="cancelarMigracao()">@traducaoHelper["CANCELAR"]</button>
+                <button class="btn btn-primary " onclick="migrarComPatrocinador()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="migracao-erro" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">@traducaoHelper["ERRO"]</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+
+        </div>
+    </div>
+</div>

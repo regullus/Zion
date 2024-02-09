@@ -1,0 +1,324 @@
+top-bottom-margin {
+    margin-top: 15px;
+}
+
+.top-bottom-margin {
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.card-frame {
+    border-radius: 5px !important;
+    -webkit-box-shadow: 6px 6px 17px -3px rgba(0,0,0,0.75);
+    -moz-box-shadow: 6px 6px 17px -3px rgba(0,0,0,0.75);
+    box-shadow: 6px 6px 17px -3px rgba(0,0,0,0.75);
+    padding: 10px;
+}
+
+.card-home {
+    height: 70px;
+}
+
+.card-cor {
+    background: #00ff00a8;
+}
+
+.grey-card {
+    background: #848484;
+    background: -moz-linear-gradient(top, #848484 1%, #444444 100%);
+    background: -webkit-linear-gradient(top, #848484 1%,#444444 100%);
+    background: linear-gradient(to bottom, #848484 1%,#444444 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#848484', endColorstr='#444444',GradientType=0 );
+}
+
+.green-simple-card {
+    background: #00ff00a8;
+}
+
+.purple-simple-card {
+    background: #6e41b2;
+}
+
+.red-simple-card {
+    background: #a90329;
+}
+
+.green-card {
+    height: 70px;
+    background: #627d4d;
+    background: -moz-linear-gradient(top, #627d4d 0%, #1f3b08 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #627d4d), color-stop(100%, #1f3b08));
+    background: -webkit-linear-gradient(top, #627d4d 0%, #1f3b08 100%);
+    background: -o-linear-gradient(top, #627d4d 0%, #1f3b08 100%);
+    background: -ms-linear-gradient(top, #627d4d 0%, #1f3b08 100%);
+    background: linear-gradient(to bottom, #627d4d 0%, #1f3b08 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#627d4d', endColorstr='#1f3b08', GradientType=0 );
+}
+
+.red-card {
+    height: 70px;
+    background: #a90329;
+    background: -moz-linear-gradient(top, #a90329 0%, #6d0019 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #a90329), color-stop(100%, #6d0019));
+    background: -webkit-linear-gradient(top, #a90329 0%, #6d0019 100%);
+    background: -o-linear-gradient(top, #a90329 0%, #6d0019 100%);
+    background: -ms-linear-gradient(top, #a90329 0%, #6d0019 100%);
+    background: linear-gradient(to bottom, #a90329 0%, #6d0019 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019', GradientType=0 );
+}
+
+.pink-card {
+    height: 70px;
+    background: #8f0293;
+    background: -moz-linear-gradient(top, #8f0293 0%, #4d0054 100%);
+    background: -webkit-linear-gradient(top, #8f0293 0%,#4d0054 100%);
+    background: linear-gradient(to bottom, #8f0293 0%,#4d0054 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8f0293', endColorstr='#4d0054',GradientType=0 );
+}
+
+.turquoise-card {
+    background: #027573;
+    background: -moz-linear-gradient(top, #027573 1%, #005154 100%);
+    background: -webkit-linear-gradient(top, #027573 1%,#005154 100%);
+    background: linear-gradient(to bottom, #027573 1%,#005154 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#027573', endColorstr='#005154',GradientType=0 );
+}
+
+.gold-card {
+    height: 70px;
+    background: #cca300;
+    background: -moz-linear-gradient(top, #cca300 0%, #a85e03 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #cca300), color-stop(100%, #a85e03));
+    background: -webkit-linear-gradient(top, #cca300 0%, #a85e03 100%);
+    background: -o-linear-gradient(top, #cca300 0%, #a85e03 100%);
+    background: -ms-linear-gradient(top, #cca300 0%, #a85e03 100%);
+    background: linear-gradient(to bottom, #cca300 0%, #a85e03 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cca300', endColorstr='#a85e03', GradientType=0 );
+}
+
+.blue-card {
+    height: 70px;
+    background: #00529e;
+    background: -moz-linear-gradient(top, #00529e 0%, #001933 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #00529e), color-stop(100%, #001933));
+    background: -webkit-linear-gradient(top, #00529e 0%, #001933 100%);
+    background: -o-linear-gradient(top, #00529e 0%, #001933 100%);
+    background: -ms-linear-gradient(top, #00529e 0%, #001933 100%);
+    background: linear-gradient(to bottom, #00529e 0%, #001933 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00529e', endColorstr='#001933', GradientType=0 );
+}
+
+.orange-card {
+    height: 70px;
+    background: #fc8e08;
+    background: -moz-linear-gradient(top, #fc8e08 0%, #b86806 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #fc8e08), color-stop(100%, #b86806));
+    background: -webkit-linear-gradient(top, #fc8e08 0%, #b86806 100%);
+    background: -o-linear-gradient(top, #fc8e08 0%, #b86806 100%);
+    background: -ms-linear-gradient(top, #fc8e08 0%, #b86806 100%);
+    background: linear-gradient(to bottom, #fc8e08 0%, #b86806 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fc8e08', endColorstr='#b86806', GradientType=0 );
+}
+
+.grey-card {
+    background: #848484;
+    background: -moz-linear-gradient(top, #848484 1%, #444444 100%);
+    background: -webkit-linear-gradient(top, #848484 1%,#444444 100%);
+    background: linear-gradient(to bottom, #848484 1%,#444444 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#848484', endColorstr='#444444',GradientType=0 );
+}
+
+.springgreen-card {
+    height: 70px;
+    background: #07e810;
+    background: -moz-linear-gradient(top, #07e810 0%, #087413 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #07e810), color-stop(100%, #087413));
+    background: -webkit-linear-gradient(top, #07e810 0%, #087413 100%);
+    background: -o-linear-gradient(top, #07e810 0%, #087413 100%);
+    background: -ms-linear-gradient(top, #07e810 0%, #087413 100%);
+    background: linear-gradient(to bottom, #07e810 0%, #087413 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#07e810', endColorstr='#087413', GradientType=0 );
+}
+
+.magenta-card {
+    height: 70px;
+    background: #d21fb9;
+    background: -moz-linear-gradient(top, #d21fb9 0%, #ad1a99 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #d21fb9), color-stop(100%, #ad1a99));
+    background: -webkit-linear-gradient(top, #d21fb9 0%, #ad1a99 100%);
+    background: -o-linear-gradient(top, #d21fb9 0%, #ad1a99 100%);
+    background: -ms-linear-gradient(top, #d21fb9 0%, #ad1a99 100%);
+    background: linear-gradient(to bottom, #d21fb9 0%, #ad1a99 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d21fb9', endColorstr='#ad1a99', GradientType=0 );
+}
+
+.card-title-div {
+    font-weight: bold;
+    color: rgb(255,255,255);
+    font-size: 9px;
+    font-family: 'Open Sans', sans-serif;
+    text-align: end;
+    text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.75);
+    text-transform: uppercase;
+}
+
+.card-title-user-info-label {
+    font-weight: bold;
+    color: rgb(255,255,255);
+    font-size: 9px;
+    font-family: 'Open Sans', sans-serif;
+    text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.59);
+    text-transform: uppercase;
+}
+
+.card-content-txt {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
+}
+
+@media (max-width: 360px) {
+    .card-content-txt {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 16px;
+    }
+}
+
+.card-content2-txt {
+    font-size: 8px;
+    font-weight: normal;
+    text-transform: uppercase;
+    text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.59);
+}
+
+.icon-bg {
+    margin-top: 28px;
+    position: absolute;
+    font-size: 60px;
+    margin-left: 8px;
+    color: rgba(255,255,255,0.2);
+}
+
+.lime-card {
+    height: 70px;
+    background: #ade600;
+    background: -moz-linear-gradient(top, #ade600 0%, #5ec200 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #ade600), color-stop(100%, #5ec200));
+    background: -webkit-linear-gradient(top, #ade600 0%, #5ec200 100%);
+    background: -o-linear-gradient(top, #ade600 0%, #5ec200 100%);
+    background: -ms-linear-gradient(top, #ade600 0%, #5ec200 100%);
+    background: linear-gradient(to bottom, #ade600 0%, #5ec200 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ade600', endColorstr='#5ec200', GradientType=0 );
+}
+
+.scroll-card {
+    background: #22313f;
+    height: -moz-available;
+    height: -webkit-fill-available;
+}
+
+@media screen and (min-width: 2001px) {
+    .semi-donut {
+        --percentage: 0;
+        --fill: #fff;
+        width: 250px;
+        height: 125px;
+        position: relative;
+        color: white;
+        font-size: 22px;
+        font-weight: 600;
+        overflow: hidden;
+        color: var(--fill);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        box-sizing: border-box;
+        text-align: center;
+        margin-left: 106px;
+    }
+
+        .semi-donut:after {
+            content: '';
+            width: 250px;
+            height: 250px;
+            border: 50px solid;
+            border-color: rgba(0,0,0,0.15) rgba(0,0,0,0.15) var(--fill) var(--fill);
+            position: absolute;
+            border-radius: 50%;
+            left: 0;
+            top: 0;
+            box-sizing: border-box;
+            transform: rotate( calc( 1deg * ( -45 + var(--percentage) * 1.8 ) ) );
+            animation: fillAnimation 1s ease-in;
+        }
+}
+
+@media screen and (min-width: 1281px) and (max-width: 2000px) {
+    .semi-donut {
+        --percentage: 0;
+        --fill: #fff;
+        width: 250px;
+        height: 130px;
+        position: relative;
+        color: white;
+        font-size: 22px;
+        font-weight: 600;
+        overflow: hidden;
+        color: var(--fill);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        box-sizing: border-box;
+        text-align: center;
+        margin-left: 106px;
+    }
+
+        .semi-donut:after {
+            content: '';
+            width: 250px;
+            height: 250px;
+            border: 50px solid;
+            border-color: rgba(0,0,0,0.15) rgba(0,0,0,0.15) var(--fill) var(--fill);
+            position: absolute;
+            border-radius: 50%;
+            left: 0;
+            top: 0;
+            box-sizing: border-box;
+            transform: rotate( calc( 1deg * ( -45 + var(--percentage) * 1.8 ) ) );
+            animation: fillAnimation 1s ease-in;
+        }
+}
+
+@media screen and (max-width: 1280px) {
+    .semi-donut {
+        --percentage: 0;
+        --fill: #fff;
+        /*width: 250px;*/
+        height: 125px;
+        position: relative;
+        color: white;
+        font-size: 22px;
+        font-weight: 600;
+        overflow: hidden;
+        color: var(--fill);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        box-sizing: border-box;
+        text-align: center;
+        margin-left: 5px;
+    }
+
+        .semi-donut:after {
+            content: '';
+            width: 250px;
+            height: 250px;
+            border: 50px solid;
+            border-color: rgba(0,0,0,0.15) rgba(0,0,0,0.15) var(--fill) var(--fill);
+            position: absolute;
+            border-radius: 50%;
+            top: 0;
+            box-sizing: border-box;
+            transform: rotate( calc( 1deg * ( -45 + var(--percentage) * 1.8 ) ) );
+            animation: fillAnimation 1s ease-in;
+        }
+}

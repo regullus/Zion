@@ -1,0 +1,87 @@
+﻿@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["ALTERAR_SENHA"];
+
+    #endregion
+
+    #region Variaveis
+
+    #endregion
+}
+
+@section pageStyles {
+}
+
+@section head {
+}
+
+@section pageScripts {
+
+}
+
+@section PageLevelScripts {
+}
+
+@section jQueryRead {
+}
+
+
+
+<div class="portlet box grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-pencil" id="AlterarSenhaIndex"></i>@traducaoHelper["ALTERAR_SENHA"]
+        </div>
+    </div>
+
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        @using (Html.BeginForm("Alterar", "AlterarSenha"))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["SENHA_ATUAL"]</label>
+                        <div class="col-md-10" id="alterarSenhaIndexSenhaAtual">
+                            <input type="password" name="txtSenhaAtual" id="idSenhaAtual" maxlength="20" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["NOVA_SENHA"]</label>
+                        <div class="col-md-10" id="alterarSenhaIndexNovaSenha">
+                            <input type="password" name="txtSenhaNova" id="idSenhaNova" maxlength="20" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="atualizacao">@traducaoHelper["REPETIR_NOVA_SENHA"]</label>
+                        <div class="col-md-10" id="alterarSenhaIndexRepetirNovaSenha">
+                            <input type="password" name="txtSenhaConfima" id="idSenhaRepetir" maxlength="20" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10" id="alterarSenhaIndexAlterarSenha">
+                            <input type="submit" value="@traducaoHelper["ALTERAR_SENHA"]" class="btn green-haze" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+

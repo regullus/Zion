@@ -1,0 +1,1 @@
+sqlcmd -S sql.tronar.com -d Tronar -U usDesenv -P Saturno2@21 -i D:\Backup\Script\tronar.sql -o D:\Backup\Script\tronar.txt

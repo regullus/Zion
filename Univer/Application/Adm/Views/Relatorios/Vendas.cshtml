@@ -1,0 +1,344 @@
+﻿@model PagedList.IPagedList<Core.Models.Relatorios.RelatorioPedidosModel>
+@using PagedList.Mvc;
+@{
+    #region Layout
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    #endregion
+
+    #region ViewBags
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.Title = traducaoHelper["VENDAS"];
+    #endregion
+
+    #region Variaveis
+
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+
+    #endregion
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/dateRangePicker")
+    @Styles.Render("~/Content/sweetAlert")
+}
+
+@section head {
+}
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/dataPicker")
+}
+
+@section PageLevelScripts {
+    @Scripts.Render("~/scripts/dataTimePickerComponent")
+}
+
+@section jQueryRead {
+}
+
+<div class="portlet box grey-gallery">
+    <div class="portlet-title">
+        <div class="caption"><i class="fa fa-reorder"></i> @traducaoHelper["VENDAS"]</div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
+            <a href='@Url.Action("Reload", "relatorios", new {@acao = "vendas"})' class="atualizar" title="@traducaoHelper["RELER"]" />
+        </div>
+        <div class="actions">
+            <a href='@Url.Action("vendasExcel", "relatorios", new { CurrentProcuraDtIni = ViewBag.CurrentProcuraDtIni, CurrentProcuraDtFim = ViewBag.CurrentProcuraDtFim, CurrentProcuraTipo = ViewBag.CurrentProcuraTipo, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraStatus = ViewBag.CurrentProcuraStatus, CurrentProcuraCategoria = ViewBag.CurrentProcuraCategoria, CurrentProcuraProduto = ViewBag.CurrentProcuraProduto, CurrentProcuraProdutoTipo = ViewBag.CurrentProcuraProdutoTipo, CurrentProcuraMeioPagamento = ViewBag.CurrentProcuraMeioPagamento} )' class="btn btn-sm yellow-casablanca">
+                <i class="fa fa-file-excel-o"></i> Excel
+            </a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                @using (Html.BeginForm("vendas", "relatorios", FormMethod.Get))
+                {
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="input-group">
+                                @Html.DropDownList("NumeroPaginas", null, htmlAttributes: new { @class = "form-control input-small input-inline marginB05", @style = "width:70px !important;" })
+                                <input class="btn purple form-control input-small input-inline fontPlaceHolderIcon" id="Atualizar" name="Atualizar" value="&#xf021; @traducaoHelper["ATUALIZAR"]" type="submit" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="pull-right">
+                            <div class="input-group date-picker input-daterange " data-date="10/11/2012" data-date-format="dd/mm/yyyy">
+                                @Html.TextBox("ProcuraDtIni", ViewBag.CurrentProcuraDtIni as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @autocomplete = "off", @style = "width:120px !important;" })
+                                @Html.Label("LabelAte", traducaoHelper["ATE"], new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @style = "background-color:#ddd; width:55px !important; padding: 6px 12px; font-size:14px !important; text-align:center !important;" })
+                                @Html.TextBox("ProcuraDtFim", ViewBag.CurrentProcuraDtFim as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @autocomplete = "off", @style = "width:120px !important;" })
+                            </div>
+                            <div class="form-group input-group ">
+                                @Html.DropDownList("ProcuraTipo", null, htmlAttributes: new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["TIPO"], @title = traducaoHelper["TIPO"] })
+                                @Html.DropDownList("ProcuraStatus", null, htmlAttributes: new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["STATUS"], @title = traducaoHelper["STATUS"] })
+                                @Html.TextBox("ProcuraLogin", ViewBag.CurrentProcuraLogin as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["LOGIN"] })
+                                @Html.DropDownList("ProcuraCategoria", null, htmlAttributes: new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["CATEGORIA"], @title = traducaoHelper["CATEGORIA"] })
+                                @Html.DropDownList("ProcuraMeioPagamento", null, htmlAttributes: new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["MEIO_PAGAMENTO"], @title = traducaoHelper["MEIO_PAGAMENTO"] })
+                                @Html.DropDownList("ProcuraProdutoTipo", null, htmlAttributes: new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["TIPO_PRODUTO"], @title = traducaoHelper["TIPO_PRODUTO"] })
+                                @Html.TextBox("ProcuraProduto", ViewBag.CurrentProcuraProduto as string, new { @class = "form-control input-small input-inline fontPlaceHolderIcon marginB05", @placeholder = traducaoHelper["PRODUTO"] })
+                                <input class="btn blue-madison form-control input-small input-inline fontPlaceHolderIcon" id="Procura" name="Procura" value="&#xf002; @traducaoHelper["PROCURAR"]" type="submit" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model, page => Url.Action("vendas", new { page, SortOrder = ViewBag.CurrentSort, CurrentProcuraDtIni = ViewBag.CurrentProcuraDtIni, CurrentProcuraDtFim = ViewBag.CurrentProcuraDtFim,CurrentProcuraProdutoTipo = ViewBag.CurrentProcuraProdutoTipo, CurrentProcuraTipo = ViewBag.CurrentProcuraTipo, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraStatus = ViewBag.CurrentProcuraStatus, CurrentProcuraCategoria = ViewBag.CurrentProcuraCategoria, CurrentProcuraProduto = ViewBag.CurrentProcuraProduto, CurrentProcuraMeioPagamento = ViewBag.CurrentProcuraMeioPagamento, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize }))
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"] @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) @traducaoHelper["DE"] @Model.PageCount &nbsp;</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-scrollable">
+
+            <table class="table table-striped table-bordered table-hover">
+                @if (ViewBag.CurrentProcuraTipo == 1)
+                {
+
+                    <thead>
+                        <tr>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["USUARIO"]&nbsp;</th>
+                            @*<th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["NOME"]&nbsp;</th>*@
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["PEDIDO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["DATA"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["PRODUTO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["MEIO_PAGAMENTO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["STATUS"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["DATA_STATUS"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["QUANTIDADE"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["VALOR_UNITARIO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["TOTAL"]&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["USUARIO"]&nbsp;</th>
+                            @*<th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["NOME"]&nbsp;</th>*@
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["PEDIDO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["DATA"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["PRODUTO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["MEIO_PAGAMENTO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["STATUS"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["DATA_STATUS"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["QUANTIDADE"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["VALOR_UNITARIO"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["TOTAL"]&nbsp;</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            switch (item.tipoRg)
+                            {
+                                case 1:
+                                    {
+                                        <tr>
+                                            <td>@Html.DisplayFor(modelItem => item.login) </td>
+                                            @*<td>Nome </td>*@
+                                            <td>@Html.DisplayFor(modelItem => item.pedido) </td>
+                                            <td>@Html.DisplayFor(modelItem => item.dataPedido) </td>
+                                            <td>@Html.DisplayFor(modelItem => item.produto) </td>
+                                            <td>@Html.DisplayFor(modelItem => item.meioPagamento) </td>
+                                            <td>
+                                                @switch (item.pgtoStatusID)
+                                                {
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Indefinido:
+                                                        {
+                                                            @traducaoHelper["INDEFINIDO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento:
+                                                        {
+                                                            @traducaoHelper["AGUARDANDO_PAGAMENTO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoConfirmacao:
+                                                        {
+                                                            @traducaoHelper["AGUARDANDO_CONFIRMACAO"];
+                                                            break;
+                                                        }
+
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago:
+                                                        {
+                                                            @traducaoHelper["PAGO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Cancelado:
+                                                        {
+                                                            @traducaoHelper["CANCELADO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Expirado:
+                                                        {
+                                                            @traducaoHelper["ESPIRADO"];
+                                                            break;
+                                                        }
+                                                    default:
+                                                        {
+                                                            @traducaoHelper["INDEFINIDO"];
+                                                            break;
+                                                        }
+                                                }
+                                            </td>
+                                            <td>@Html.DisplayFor(modelItem => item.dataStatus) </td>
+                                            <td class="text-right">@item.quantidade</td>
+                                            <td class="text-right">@moedaPadrao.Simbolo @item.valor.ToString(moedaPadrao.MascaraOut)</td>
+                                            <td class="text-right">@moedaPadrao.Simbolo @item.total.ToString(moedaPadrao.MascaraOut)</td>
+                                        </tr>
+                                    }
+                                    break;
+                                case 2:
+                                    {
+                                        <tr>
+                                            <td bgcolor="Gainsboro"> </td>
+                                            @*<td bgcolor="Gainsboro">Nome </td>*@
+                                            <td bgcolor="Gainsboro"> </td>
+                                            <td bgcolor="Gainsboro"> </td>
+                                            <td bgcolor="Gainsboro"> </td>
+                                            <td bgcolor="Gainsboro"> </td>
+                                            <td bgcolor="Gainsboro"> </td>
+                                            <td bgcolor="Gainsboro" class="text-right">@traducaoHelper["TOTAL"] @item.login</td>
+                                            <td bgcolor="Gainsboro" class="text-right">@Html.DisplayFor(modelItem => item.quantidade) </td>
+                                            <td bgcolor="Gainsboro" class="text-right">@moedaPadrao.Simbolo @item.valor.ToString(moedaPadrao.MascaraOut)</td>
+                                            <td bgcolor="Gainsboro" class="text-right">@moedaPadrao.Simbolo @item.total.ToString(moedaPadrao.MascaraOut)</td>
+                                        </tr>
+                                    }
+                                    break;
+                                case 9:
+                                    {
+                                        <tr>
+                                            <td bgcolor="silver"> </td>
+                                            @*<td bgcolor="silver">Nome </td>*@
+                                            <td bgcolor="silver"> </td>
+                                            <td bgcolor="silver"> </td>
+                                            <td bgcolor="silver"> </td>
+                                            <td bgcolor="silver"> </td>
+                                            <td bgcolor="silver"> </td>
+                                            <td bgcolor="silver" class="text-right">@traducaoHelper["TOTAL_GERAL"] </td>
+                                            <td bgcolor="silver" class="text-right">@Html.DisplayFor(modelItem => item.quantidade) </td>
+                                            <td bgcolor="silver" class="text-right">@moedaPadrao.Simbolo @item.valor.ToString(moedaPadrao.MascaraOut)</td>
+                                            <td bgcolor="silver" class="text-right">@moedaPadrao.Simbolo @item.total.ToString(moedaPadrao.MascaraOut)</td>
+                                        </tr>
+                                    }
+                                    break;
+                            }
+                        }
+
+ 
+
+
+                    </tbody>
+                }
+                else
+                {
+                    <thead>
+                        <tr>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["CATEGORIA"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["QUANTIDADE"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["VALOR"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["STATUS"]&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["CATEGORIA"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["QUANTIDADE"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["VALOR"]&nbsp;</th>
+                            <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["STATUS"]&nbsp;</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            switch (item.tipoRg)
+                            {
+                                case 2:
+                                    {
+                                        <tr>
+                                            <td bgcolor="">@Html.DisplayFor(modelItem => item.categoria) </td>
+                                            <td bgcolor="" class="text-right">@Html.DisplayFor(modelItem => item.quantidade) </td>
+                                            <td bgcolor="" class="text-right">@moedaPadrao.Simbolo @item.total.ToString(moedaPadrao.MascaraOut)</td>
+                                            <td>
+                                                @switch (item.pgtoStatusID)
+                                                {
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Indefinido:
+                                                        {
+                                                            @traducaoHelper["INDEFINIDO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoPagamento:
+                                                        {
+                                                            @traducaoHelper["AGUARDANDO_PAGAMENTO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.AguardandoConfirmacao:
+                                                        {
+                                                            @traducaoHelper["AGUARDANDO_CONFIRMACAO"];
+                                                            break;
+                                                        }
+
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago:
+                                                        {
+                                                            @traducaoHelper["PAGO"];
+                                                            break;
+                                                        }
+                                                    case (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Cancelado:
+                                                        {
+                                                            @traducaoHelper["CANCELADO"];
+                                                            break;
+                                                        }
+                                                    default:
+                                                        {
+                                                            @traducaoHelper["INDEFINIDO"];
+                                                            break;
+                                                        }
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                    break;
+                                case 3:
+                                    {
+                                        <tr>
+                                            <td bgcolor="Gainsboro" class="text-right">@traducaoHelper["TOTAL_GERAL"] @item.categoria </td>
+                                            <td bgcolor="Gainsboro" class="text-right">@Html.DisplayFor(modelItem => item.quantidade) </td>
+                                            <td bgcolor="Gainsboro" class="text-right">@moedaPadrao.Simbolo @item.total.ToString(moedaPadrao.MascaraOut)</td>
+                                            <td bgcolor="Gainsboro" class="text-right"></td>
+                                        </tr>
+                                    }
+                                    break;
+                                case 9:
+                                    {
+                                        <tr>
+                                            <td bgcolor="silver" class="text-right">@traducaoHelper["TOTAL_GERAL"] </td>
+                                            <td bgcolor="silver" class="text-right">@Html.DisplayFor(modelItem => item.quantidade) </td>
+                                            <td bgcolor="silver" class="text-right">@moedaPadrao.Simbolo @item.total.ToString(moedaPadrao.MascaraOut)</td>
+                                            <td bgcolor="silver" class="text-right"> </td>
+                                        </tr>
+                                    }
+                                    break;
+                            }
+                        }
+                    </tbody>
+                }
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="border-gridFooter">
+                <div class="col-md-10">
+                    @Html.PagedListPager(Model, page => Url.Action("vendas", new { page, SortOrder = ViewBag.CurrentSort, CurrentProcuraDtIni = ViewBag.CurrentProcuraDtIni, CurrentProcuraDtFim = ViewBag.CurrentProcuraDtFim, CurrentProcuraProdutoTipo = ViewBag.CurrentProcuraProdutoTipo, CurrentProcuraTipo = ViewBag.CurrentProcuraTipo, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraStatus = ViewBag.CurrentProcuraStatus, CurrentProcuraCategoria = ViewBag.CurrentProcuraCategoria, CurrentProcuraProduto = ViewBag.CurrentProcuraProduto, CurrentProcuraMeioPagamento = ViewBag.CurrentProcuraMeioPagamento, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize }))
+
+                </div>
+                <div class="col-md-2">
+                    <label class="pull-right">@traducaoHelper["PAG"]  @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) @traducaoHelper["DE"]  @Model.PageCount &nbsp;</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
