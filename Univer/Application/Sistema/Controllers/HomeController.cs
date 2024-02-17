@@ -507,6 +507,9 @@
 
                 #region ViewBags
 
+                //Exibe ou não os dados do associado acima do menu
+                ViewBag.ExibeDadosAssociado = false;
+
                 strErro = "ViewBags";
 
                 strErro = "ViewBags - ExibeBanners";

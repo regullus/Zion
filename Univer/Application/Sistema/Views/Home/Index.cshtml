@@ -275,7 +275,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="row">
-                        @if (!Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_EXIBIR_ASSOCIADO"))
+                        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_EXIBIR_ASSOCIADO"))
                         {
                             <div class="row">
                                 <div class="col-md-3 padding-0">
@@ -374,6 +374,7 @@
                                         </ul>
                                         <br />
                                     </div>
+                                    
                                     <!-- END MENU -->
                                 </div>
                             </div>

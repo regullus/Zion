@@ -852,7 +852,7 @@ namespace cpUtilities
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 strRet = "";
                 //throw new Exception("[Gerais.Morpho]" + ex.Message, ex);

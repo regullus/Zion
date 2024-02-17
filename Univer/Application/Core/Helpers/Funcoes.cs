@@ -52,7 +52,7 @@ namespace Core.Helpers
             {
                 intRetorno = usuarioRepository.GetByExpression(x => x.FilialID == idFilial).Count();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 intRetorno = 0;
             }

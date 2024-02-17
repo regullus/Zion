@@ -1339,7 +1339,7 @@ namespace Sistema.Areas.Loja.Controllers
                 enderecoRepository.Save(endereco);
                 return RedirectToAction("entrega-e-faturamento");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
                 Session["Erro"] = traducaoHelper["PREENCHA_DADOS"];

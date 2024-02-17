@@ -28,7 +28,7 @@ namespace Core.Repositories.Usuario
                     new SqlParameter("@Ok", SqlDbType.Bit) { Value = ok }
                     ).FirstOrDefault();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
@@ -44,7 +44,7 @@ namespace Core.Repositories.Usuario
                 return count > 0;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

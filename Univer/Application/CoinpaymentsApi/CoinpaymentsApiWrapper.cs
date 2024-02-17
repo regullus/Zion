@@ -23,7 +23,7 @@ namespace Coinpayments.Api
                 var helper = new ExchangeRateHelper(exchangeRates.Result);
                 return helper;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

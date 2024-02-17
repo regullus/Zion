@@ -106,7 +106,7 @@ namespace Core.Repositories.Loja
                     var produtoValor = produto.ProdutoValor.FirstOrDefault();
                     valor = produtoValor.Valor;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //sem dados
                 }

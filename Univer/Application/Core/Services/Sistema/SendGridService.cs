@@ -47,7 +47,7 @@ namespace Core.Services.Sistema
             var client = new SendGridClient(strApiKey);
             response = await client.SendEmailAsync(sgMsg);
          }
-         catch (Exception ex)
+         catch (Exception)
          {
 
          }
@@ -85,7 +85,7 @@ namespace Core.Services.Sistema
             var client = new SendGridClient(strApiKey);
             client.SendEmailAsync(sgMsg);
          }
-         catch (Exception ex)
+         catch (Exception )
          {
 
          }

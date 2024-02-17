@@ -945,7 +945,7 @@ namespace Core.Services.Usuario
                 {
                     senhaDescripto = Helpers.CriptografiaHelper.Descriptografar(senhaAnterior);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     senhaDescripto = senhaAnterior;
                 }

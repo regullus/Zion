@@ -242,7 +242,7 @@ namespace Core.Builders
                 } while (pedidoRepository.GetByCodigo(codigo.ToString()) != null);
                 return codigo.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return "";
             }

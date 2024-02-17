@@ -58,7 +58,7 @@ namespace Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO gravar erro
             }

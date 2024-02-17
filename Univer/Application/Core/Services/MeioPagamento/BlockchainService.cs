@@ -85,7 +85,7 @@ namespace Core.Services.MeioPagamento
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -107,7 +107,7 @@ namespace Core.Services.MeioPagamento
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -129,7 +129,7 @@ namespace Core.Services.MeioPagamento
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -150,7 +150,7 @@ namespace Core.Services.MeioPagamento
                     return retorno.Equals("Transaction Not Found") ? false : true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

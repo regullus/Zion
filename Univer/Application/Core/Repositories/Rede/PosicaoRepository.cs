@@ -94,7 +94,7 @@ namespace Core.Repositories.Rede
                 else
                     pontos = (double)posicao.AcumuladoEsquerda;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //sem dados
             }

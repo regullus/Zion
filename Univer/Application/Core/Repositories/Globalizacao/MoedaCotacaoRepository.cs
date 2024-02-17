@@ -129,7 +129,7 @@ namespace Core.Repositories.Globalizacao
                 var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
                 return (double)cotacao.BtcUsd;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return bitcoinValue;
             }
@@ -144,7 +144,7 @@ namespace Core.Repositories.Globalizacao
                 var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
                 return (double)cotacao.LtcUsd;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return litecoinValue;
             }
@@ -157,7 +157,7 @@ namespace Core.Repositories.Globalizacao
                 var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
                 return (double)cotacao.UsdtUsd;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 1;
             }

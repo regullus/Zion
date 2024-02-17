@@ -62,7 +62,7 @@ namespace Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //throw new Exception("[Gerais.ConverteData]" + ex.Message, ex);
                 strRetorno = "";
