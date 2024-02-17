@@ -21,7 +21,7 @@
     #endregion
 
     #region Variaveis
-    var captchaKey = Core.Helpers.ConfiguracaoHelper.GetString("RECAPTCHA_SITE_KEY"); // "6LegpsUUAAAAACAAg-PdfR7OZE-N2cp1-XtA8JKd";
+    var captchaKey = Core.Helpers.ConfiguracaoHelper.GetString("RECAPTCHA_SITE_KEY"); @*"6LegpsUUAAAAACAAg-PdfR7OZE-N2cp1-XtA8JKd";*@
 
     #endregion
 
@@ -58,17 +58,15 @@
                     $('.divSexo').show();
                     $('.divDocPF').show();
                     $('.divDocPJ').hide();
-                    $("#lblDataNascimento").text("@traducaoHelper["DATA_NASCIMENTO"]");
+                    @*$("#lblDataNascimento").text("@traducaoHelper["DATA_NASCIMENTO"]");*@
                     $("#DocPJ").text("");
                 } else {
                     $('.divSexo').hide();
                     $('.divDocPF').hide();
                     $('.divDocPJ').show();
-                    $("#lblDataNascimento").text("@traducaoHelper["DATA_ABERTURA"]");
+                    @*$("#lblDataNascimento").text("@traducaoHelper["DATA_ABERTURA"]");*@
                     $("#DocPF").text("");
                 }
-
-                $('#DataNascimento').inputmask('99/99/9999');
 
                 if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA").Trim().Length' != 0) {
                     $('#DocPF').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA")');
@@ -160,6 +158,10 @@
         </script>
     }
 
+    @*<script type="text/javascript">
+        $('#DataNascimento').inputmask('99/99/9999');
+    </script>*@
+
     @if (ViewBag.Patrocinador != null)
     {
         Core.Entities.Usuario getPatrocinador = (Core.Entities.Usuario)ViewBag.Patrocinador;
@@ -169,13 +171,13 @@
 
         string foto = "";
 
-        if (usuarioBinder != null)
-        {
-            if (usuarioBinder.Foto != null)
-            {
-                foto = Url.Content(usuarioBinder.Foto);
-            }
-        }
+        //if (usuarioBinder != null)
+        //{
+        //    if (usuarioBinder.Foto != null)
+        //    {
+        //        foto = Url.Content(usuarioBinder.Foto);
+        //    }
+        //}
         if (String.IsNullOrEmpty(foto))
         {
             foto = Url.Content("~/Content/img/" + (getPatrocinador.Sexo == "M" ? Helpers.Local.Sistema + "/Homem" : Helpers.Local.Sistema + "/Mulher") + ".png");
@@ -699,7 +701,6 @@
     FormValidation.init();
 }
 
-
 <div class="row">
     <div class="col-md-12 ">
         <div class="portlet solid grey-cararra">
@@ -911,12 +912,12 @@
                                                     </div>
                                                 </div>*@
 
-                                            <div class="col-md-4">
+                                            @*<div class="col-md-4">
                                                 <div class="form-group form-md-line-input ">
                                                     <input type="text" min="1900-01-01" max="@dtMax" class="form-control" id="DataNascimento" name="DataNascimento" value="@ViewBag.DataNascimento">
                                                     <label id="lblDataNascimento" name="lblDataNascimento" for="DataNascimento">@traducaoHelper["DATA_NASCIMENTO"].ToLower()</label>
                                                 </div>
-                                            </div>
+                                            </div>*@
 
                                             <div class="col-md-4 divSexo">
                                                 <div class="form-group form-md-radios">

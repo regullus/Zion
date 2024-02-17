@@ -13,6 +13,7 @@ As
 Begin
    --Necessario para o entity reconhecer retorno de select com tabela temporaria
    Set FMTONLY OFF
+   Set NOCOUNT ON
    
    --Inclui usuario na rede conforme regras 
    --Expecifico para rede do tipo Univer
@@ -53,7 +54,7 @@ Begin
          @DonatorEsqInf2 int,
          @Debug bit
 
-   Set @Debug = 'true'
+   Set @Debug = 'false'
    Set @Incluido = 'false'
    Set @DireitaFinalizada = 'false'
    Set @EsquerdaFinalizada = 'false'
@@ -122,10 +123,22 @@ Begin
 	)
    Begin
       --Select 'MCR 1.0: Usuário (' + TRIM(STR(@UsuarioID)) + ') já existe no tabuleiro!', @Chamada as Chamada
-      Select * from Rede.TabuleiroUsuario Where BoardID = 1 --Teste mcr
-      Select * from Rede.Tabuleiro Where BoardID = 1 --Teste mcr
+      --Select * from Rede.TabuleiroUsuario Where BoardID = 1 --Teste mcr
+      --Select * from Rede.Tabuleiro Where BoardID = 1 --Teste mcr
       --Regra: Caso usuário já exista no tabuleiro, não se pode incluí-lo novamente
-      Set @Historico = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro Chamada: ' + @Chamada
+      Set @Historico = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (0). Chamada: ' + @Chamada
+      if(@Chamada = 'NovaInscricao')
+      Begin
+         --Já estando no tabuleiro seta para Ativo = false --(Já incluido)
+         Update
+            Rede.TabuleiroNivel
+         Set
+            Ativo = 'false'
+         Where
+            UsuarioID = @UsuarioID And
+            BoardID = @BoardID And
+            Ativo = 'true'
+      End
    End
    Else
 	Begin
@@ -387,19 +400,19 @@ Begin
                --Verifica se novo usuario já esta no tebuleiro do pai
                If(@DonatorEsqSup1 = @UsuarioID OR @DonatorEsqSup2 = @UsuarioID OR @DonatorEsqInf1 = @UsuarioID  OR @DonatorEsqInf2 = @UsuarioID)
                Begin
-                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro'
+                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (1)'
                End
                If(@DonatorDirSup1 = @UsuarioID OR @DonatorDirSup2 = @UsuarioID OR @DonatorDirInf1 = @UsuarioID  OR @DonatorDirInf2 = @UsuarioID)
 		         Begin
-                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro'
+                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (2)'
                End
 		         If(@IndicatorDirSup = @UsuarioID OR @IndicatorDirInf = @UsuarioID OR @IndicatorEsqSup = @UsuarioID  OR @IndicatorEsqInf = @UsuarioID)
                Begin
-                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro'
+                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (3)'
                End
 		         If(@CoodinatorDir = @UsuarioID OR @CoodinatorEsq = @UsuarioID)
                Begin
-                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro'
+                  Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (4)'
                End
             
                --Select 'MCR 6.5: DireitaFinalizada: ' + STR(@DireitaFinalizada) + ' @EsquerdaFinalizada: ' + STR(@EsquerdaFinalizada), @Chamada as Chamada
@@ -673,7 +686,9 @@ Begin
                      BoardID = @BoardID
 
                   if(@Ciclo is null)
-                     Set @Ciclo = 1
+                     Begin
+                        Set @Ciclo = 1
+                     End
 
                   if Not Exists (Select 'Existe' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and TabuleiroID = @ID and BoardID = @BoardID And Ciclo = @Ciclo)
                   Begin
@@ -737,7 +752,9 @@ Begin
                      BoardID = @BoardID
 
                   if(@Ciclo is null)
+                  Begin
                      Set @Ciclo = 1
+                  End
 
                   Update
                      Rede.TabuleiroUsuario
@@ -991,61 +1008,64 @@ Begin
                      StatusID = 1 and
                      BoardID = @BoardID
 
-                  if (@IncluiUsuAutBoard = 'true')
+                  --Select 'MCR 8.0: Promove Usuario Master para novo Board', @Chamada as Chamada
+                  --*********** Promove Usuario Master para novo Board ***********
+                  --Sobe para proximo Board
+                  Set @BoardID = @BoardID + 1
+                  --Verifica se ainda há board acima do master
+                  IF Not Exists (Select 'Existe' From Rede.Board Where ID = @BoardID)
                   Begin
-                     --Select 'MCR 8.0: Promove Usuario Master para novo Board', @Chamada as Chamada
-                     --*********** Promove Usuario Master para novo Board ***********
-                     --Sobe para proximo Board
-                     Set @BoardID = @BoardID + 1
-                     --Verifica se ainda há board acima do master
-                     IF Not Exists (Select 'Existe' From Rede.Board Where ID = @BoardID)
-                     Begin
-                        --Caso não haja mais board superiores volta ao inicio
-                        Set @BoardID = 1
-                     End
+                     --Caso não haja mais board superiores volta ao inicio
+                     Set @BoardID = 1
+                  End
+                  
+                  --Obtem Master do usuario passado como parametro e inclui o novo usuário nesse tabuleiro
+                  --Select @UsuarioPaiID as UsuarioPaiID, @UsuarioPaiID as UsuarioPaiID, @BoardID as BoardID --MCR
+                  Select Top(1)
+                     @UsuarioPaiID = MasterID 
+                  From 
+                     Rede.TabuleiroUsuario
+                  Where
+                      UsuarioID = @Master and 
+                      TabuleiroID = @ID and 
+                      BoardID = @BoardID and
+                      StatusID = 1
+                        
+                  --Select @UsuarioPaiID as UsuarioPaiID  --MCR
 
-                     --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior
-                     --Obtem um master ativo no novo board superior
-
-                     --Obtem Master do usuario passado como parametro e inclui o novo usuário nesse tabuleiro
+                  --Caso não encontre um Pai obtem o primeiro pai disponivel
+                  if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
+                  Begin
+                     --Select 'MCR 8.1: Sem um pai', @Chamada as Chamada
+                     --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
                      Select Top(1)
-                        @UsuarioPaiID = MasterID 
+                        @UsuarioPaiID = UsuarioID 
                      From 
                         Rede.TabuleiroUsuario
                      Where
                         StatusID = 1 and
-                        UsuarioID = @UsuarioPaiID and
                         BoardID = @BoardID
-               
-                     --Caso não encontre um Pai obtem o primeiro pai disponivel
+
                      if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
                      Begin
-                        --Select 'MCR 8.1: Sem um pai', @Chamada as Chamada
-                        --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
-                        Select Top(1)
-                           @UsuarioPaiID = UsuarioID 
-                        From 
-                           Rede.TabuleiroUsuario
-                        Where
-                           StatusID = 1 and
-                           BoardID = @BoardID
-
-                        if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
-                        Begin
-                           Set @Historico = 'Não foi possível encontrar um master para o usuario: ' + TRIM(STR(@UsuarioID)) + ' para o Board: ' + TRIM(STR(@BoardID)) + '. Chamada: ' + @Chamada
-                           Set @PosicaoFilho = '***'
-                        End
-                        Else
-                        Begin
-                           --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (1)
-                           Exec spG_Tabuleiro @UsuarioID = @UsuarioPaiID, @UsuarioPaiID = @UsuarioPaiID, @BoardID = @BoardID, @Chamada = 'Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (1)'
-                        End
+                        Set @Historico = 'Não foi possível encontrar um master para o usuario: ' + TRIM(STR(@UsuarioPaiID)) + ' para o Board: ' + TRIM(STR(@BoardID)) + '. Chamada: ' + @Chamada
+                        INSERT INTO Rede.TabuleiroNivel (UsuarioID, BoardID, Data, Ativo, Mensagem) VALUES (@UsuarioPaiID, @BoardID, @DataInicio, 'true', @Historico)
+                        Set @PosicaoFilho = '***'
                      End
                      Else
                      Begin
-                        --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (2)
-                        Exec spG_Tabuleiro @UsuarioID = @UsuarioPaiID, @UsuarioPaiID = @UsuarioPaiID, @BoardID = @BoardID, @Chamada = 'Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (2)'
+                        --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (1)
+                        INSERT INTO Rede.TabuleiroNivel (UsuarioID, BoardID, Data, Ativo, Mensagem) VALUES (@UsuarioPaiID, @BoardID, @DataInicio, 'true','Inclui master (' + TRIM(STR(@UsuarioPaiID)) + ') em novo com novo ciclo e em novo tabuleiro em board superior (1)')
+                        --Chamada da SP para incluir usuario em nivel superior, deve ser chamda no front ao clicar em um botão
+                        --Exec spG_Tabuleiro @UsuarioID = @UsuarioPaiID, @UsuarioPaiID = @UsuarioPaiID, @BoardID = @BoardID, @Chamada = 'Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (1)'
                      End
+                  End
+                  Else
+                  Begin
+                     --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (2)
+                     INSERT INTO Rede.TabuleiroNivel (UsuarioID, BoardID, Data, Ativo, Mensagem) VALUES (@UsuarioPaiID, @BoardID, @DataInicio, 'true','Inclui master (' + TRIM(STR(@UsuarioPaiID)) + ') em novo com novo ciclo e em novo tabuleiro em board superior (2)')
+                     --Chamada da SP para incluir usuario em nivel superior, deve ser chamda no front ao clicar em um botão
+                     --Exec spG_Tabuleiro @UsuarioID = @Master, @UsuarioPaiID = @Master, @BoardID = @BoardID, @Chamada = 'Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (2)'
                   End
                End
                Else
@@ -1061,7 +1081,9 @@ Begin
                      BoardID = @BoardID
 
                   if(@Ciclo is null)
+                  Begin
                      Set @Ciclo = 1
+                  End
 
                   if Not Exists (Select 'Existe' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and TabuleiroID = @ID and BoardID = @BoardID And Ciclo = @Ciclo)
                   Begin
@@ -1145,7 +1167,7 @@ Begin
                Begin
                   --Select 'MCR 11.3: Chama novamente essa sp, agora com um pai (' + TRIM(STR(@MasterTabuleiro)) + ') valido', @Chamada as Chamada
                   --Chama novamente essa sp, agora com um pai valido
-                  Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Chama novamente essa sp, agora com um pai valido'
+                  Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'ChamaNovamenteSP'
                End
             End
             Else
@@ -1230,50 +1252,6 @@ Begin
                   null
                )
             End
-            --Caso o Board seja 2 é porque o usuario subiu de board, assim
-            --Além de subir no board deve ser criado uma nova entrada no board 1 para esse usuario
-            --Ainda, só sobe de nível se o indicador de subida automatica @IncluiUsuAutBoard for true
-            if (@BoardID = 2 and @IncluiUsuAutBoard = 'true')
-            Begin
-               --Select 'MCR: 12.0: Inclui usuario automaticamente no board' , @Chamada as Chamada
-               --Obtem primeiro master de um tabuleiro disponivel para usuario entrar no board 1 
-               --Obtem Master do usuario passado como parametro e inclui o novo usuário nesse tabuleiro
-               Select Top(1)
-                  @UsuarioPaiID = MasterID 
-               From 
-                  Rede.TabuleiroUsuario
-               Where
-                  StatusID = 1 and
-                  UsuarioID = @UsuarioPaiID and
-                  BoardID = 1
-
-               if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
-               Begin
-                  --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
-                  Select Top(1)
-                     @UsuarioPaiID = UsuarioID 
-                  From 
-                     Rede.TabuleiroUsuario
-                  Where
-                     StatusID = 1 and
-                     BoardID = 1
-
-                  if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
-                  Begin
-                     Set @Historico = 'Não há um tabuleiro diponível para usuario ' + TRIM(STR(@UsuarioID)) + ' Entrar novamente no Board 1 estando no Board 2. Chamada: ' + @Chamada
-                  End
-                  Else
-                  Begin
-                     --Chama novamente essa sp, para inclui o master novamente no Board=1
-                     Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @UsuarioPaiID, @BoardID = 1, @Chamada = 'Chama novamente essa sp, para inclui o master novamente no Board=1 (1)' --*****
-                  End
-               End
-               Else
-               Begin
-                  --Chama novamente essa sp, para inclui o master novamente no Board=1
-                  Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @UsuarioPaiID, @BoardID = 1, @Chamada = 'Chama novamente essa sp, para inclui o master novamente no Board=1 (2)'
-               End
-            End
          End
       End
       Else
@@ -1305,8 +1283,37 @@ Begin
    if(@Debug = 'true')
    Begin
       Select @UsuarioID as UsuarioID, @UsuarioPaiID as UsuarioPaiID, @ID TabuleiroID, @PosicaoFilho as Posicao, @Historico as historico, @Chamada as Chamada
-      Set @Historico = ''
    End
+   Else
+   Begin
+      if(@Historico is null or @Historico = '')
+      Begin
+         if(@Chamada <> 'ChamaNovamenteSP')
+         Begin
+            Select 'OK' as Retorno, @UsuarioID as UsuarioID, @UsuarioPaiID as UsuarioPaiID, @ID TabuleiroID, @BoardID as BoardID, @PosicaoFilho as Posicao, '' as historico, @chamada as Chamada
+         End
+         if(@Chamada = 'NovaInscricao')
+         Begin
+            --Já estando no tabuleiro seta para Ativo = false --(Já incluido)
+            Update
+               Rede.TabuleiroNivel
+            Set
+               Ativo = 'false'
+            Where
+               UsuarioID = @UsuarioID And
+               BoardID = @BoardID And
+               Ativo = 'true'
+         End
+      End
+      Else
+      Begin
+         if(@Chamada <> 'ChamaNovamenteSP')
+         Begin
+            Select 'NOOK' as Retorno, @UsuarioID as UsuarioID, @UsuarioPaiID as UsuarioPaiID, @ID TabuleiroID, @BoardID as BoardID, @PosicaoFilho as Posicao, @Historico as historico, @chamada as Chamada
+         End
+      End
+   End
+   Set @Historico = ''
    
    Drop Table #temp
 

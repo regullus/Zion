@@ -56,6 +56,9 @@
                 case "MettaBull":
                     strPath = "~/Content/admin/css/themes/MettaBull.css";
                     break;
+                case "Universol":
+                    strPath = "~/Content/admin/css/themes/Universol.css";
+                    break;
                 case "AtivaBox":
                     strPath = "~/Content/admin/css/themes/AtivaBox.css";
                     break;

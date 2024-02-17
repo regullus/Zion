@@ -484,6 +484,11 @@ namespace Sistema.Controllers
             string strCelular = string.IsNullOrWhiteSpace(form["Celular"]) ? "0" : form["Celular"];
             //strCelular = Regex.Replace(strCelular, @"[^\d]", ""); // == so numeros
             string strDataNascimento = form["DataNascimento"];
+            if (String.IsNullOrEmpty(strDataNascimento))
+            {
+                strDataNascimento = "01/01/1910";
+            }
+
             //string strDocumento = form["Documento"];
 
             string strTpPessoa = form["TipoPessoa"];

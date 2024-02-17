@@ -1,10 +1,10 @@
 
 use Univer
 go
-delete rede.Tabuleiro where id > 7
 delete rede.TabuleiroUsuario where id > 49
-
+delete rede.Tabuleiro where id > 7
 delete rede.TabuleiroLog
+delete rede.TabuleiroNivel
 
 update Rede.Tabuleiro 
 Set
@@ -41,7 +41,8 @@ go
 
 Select * from rede.TabuleiroUsuario -- where StatusID = 1 order by UsuarioID
 Select * from rede.Tabuleiro --where StatusID = 1
---Select * from Rede.TabuleiroLog
+Select * from Rede.TabuleiroLog
+Select * from Rede.TabuleiroNivel
 
 
 

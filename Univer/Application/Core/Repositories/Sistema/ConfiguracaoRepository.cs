@@ -24,7 +24,14 @@ namespace Core.Repositories.Sistema
         {
             if (!String.IsNullOrEmpty(chave))
             {
-                return cachedRepository.FirstOrDefault(c => c.Chave == chave);
+                if (cachedRepository == null || cachedRepository.Count == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return cachedRepository.FirstOrDefault(c => c.Chave == chave);
+                }
             }
             return null;
         }
