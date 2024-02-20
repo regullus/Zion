@@ -1019,6 +1019,7 @@
                 #endregion
 
                 #region Info Usuario 
+
                 strErro = "Info Usuario -  ViewBag";
 
                 var pontosUsuarios = posicaoRepository.ObtemPontuacao(usuario.ID);

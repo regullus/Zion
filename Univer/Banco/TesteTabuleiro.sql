@@ -4,7 +4,7 @@ go
 delete rede.TabuleiroUsuario where id > 49
 delete rede.Tabuleiro where id > 7
 delete rede.TabuleiroLog
-delete rede.TabuleiroNivel
+delete rede.TabuleiroNivel where id> 49
 
 update Rede.Tabuleiro 
 Set
@@ -37,12 +37,14 @@ update Rede.TabuleiroUsuario Set StatusID = 1, DataFim = null, Posicao = 'Indica
 update Rede.TabuleiroUsuario Set StatusID = 1, DataFim = null, Posicao = 'IndicatorEsqInf', MasterID = 2580 Where id in (7,14,21,28,35,42,49)
 update Rede.TabuleiroUsuario Set TabuleiroID = BoardID, Ciclo = 1 Where id <= 49
 
+update rede.TabuleiroNivel set DataFim = null, StatusID = 2, Observacao = 'Usuário do Sistema'
 go
 
 Select * from rede.TabuleiroUsuario -- where StatusID = 1 order by UsuarioID
+Select * from Rede.TabuleiroNivel
 Select * from rede.Tabuleiro --where StatusID = 1
 Select * from Rede.TabuleiroLog
-Select * from Rede.TabuleiroNivel
+
 
 
 

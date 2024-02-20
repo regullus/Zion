@@ -124,6 +124,8 @@ namespace Sistema.Controllers
         private Core.Helpers.TraducaoHelper traducaoHelper;
         private CicloRepository cicloRepository;
 
+        private PosicaoRepository posicaoRepository;
+
         public CadastroController(DbContext context)
         {
             paisRepository = new PaisRepository(context);
@@ -143,6 +145,7 @@ namespace Sistema.Controllers
             pedidoService = new Core.Services.Loja.PedidoService(context);
             cartaoCreditoRepository = new CartaoCreditoRepository(context);
             cicloRepository = new CicloRepository(context);
+            posicaoRepository = new PosicaoRepository(context);
         }
 
         #endregion
@@ -1056,6 +1059,19 @@ namespace Sistema.Controllers
             }
 
             usuario = usuarioFactory.Criar(usuario, lstEnderecos);
+
+            try
+            {
+                //Caso o tipo de rede seja tabuleiro, inclui usuario no tabuleiro
+                if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
+                {
+                    var tabuleiro = posicaoRepository.IncluiNoTabuleiro(usuario.ID, patrocinador.ID, 1, "Principal");
+                }
+            }
+            catch (Exception ex)
+            {
+                //logar erro
+            }
 
             try
             {

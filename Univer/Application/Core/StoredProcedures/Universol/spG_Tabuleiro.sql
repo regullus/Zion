@@ -1360,6 +1360,7 @@ Begin
    Drop Table #temp
 
 End -- Sp
+
 go
 Grant Exec on spG_Tabuleiro To public
 go

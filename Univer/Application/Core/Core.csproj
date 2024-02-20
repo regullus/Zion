@@ -543,6 +543,7 @@
     <Compile Include="Models\Relatorio\RelatorioSaldoItem.cs" />
     <Compile Include="Models\Relatorio\RelatorioPontos.cs" />
     <Compile Include="Models\Relatorio\RelatorioSaldoResumo.cs" />
+    <Compile Include="Models\StoredProcedures\spG_Tabuleiro.cs" />
     <Compile Include="Models\StoredProcedures\spC_AtivoMensal.cs" />
     <Compile Include="Models\StoredProcedures\spC_ObtemDiretos.cs" />
     <Compile Include="Models\StoredProcedures\spOC_US_ObtemAvisoNaoLidos.cs" />

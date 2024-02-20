@@ -91,3 +91,7 @@ exec spG_Tabuleiro @UsuarioID = 2650, @UsuarioPaiID =2587, @BoardID = 1, @Chamad
 
 --2588 InCompleto
 exec spG_Tabuleiro @UsuarioID = 2651, @UsuarioPaiID =2588, @BoardID = 1, @Chamada = 'Principal'
+
+--Convite
+exec spG_Tabuleiro @UsuarioID = 2587, @UsuarioPaiID =2587, @BoardID = 1, @Chamada = 'Convite'
+exec spG_Tabuleiro @UsuarioID = 2587, @UsuarioPaiID =2587, @BoardID = 2, @Chamada = 'Convite'

@@ -176,5 +176,31 @@ namespace Core.Repositories.Rede
             var retorno = _context.Database.SqlQuery<double?>(sql).FirstOrDefault();
             return retorno != null ? retorno : 0;
         }
+
+        public double? ObtemTabuleiroNivel(int usuarioID, int statusID)
+        {
+            string sql = "spC_TabuleiroNivel @UsuarioID = " + usuarioID + ", @StatusID = " + statusID;
+            var retorno = _context.Database.SqlQuery<double?>(sql).FirstOrDefault();
+            return retorno != null ? retorno : 0;
+        }
+
+        public string IncluiNoTabuleiro(int usuarioID, int usuarioPaiID, int boardID, string chamada)
+        {
+            if (string.IsNullOrEmpty(chamada))
+            {
+                chamada = "Principal";
+            }
+            //chamada deve ser principal ou convite
+            if (!(chamada == "Principal" || chamada == "Convite"))
+            {
+                chamada = "Principal";
+            }
+
+            string sql = "spG_Tabuleiro @UsuarioID = " + usuarioID + ", @UsuarioPaiID = " + usuarioPaiID + ", @BoardID = " + boardID + ", @Chamada = '" + chamada + "'";
+            Models.StoredProcedures.spG_Tabuleiro retorno = _context.Database.SqlQuery<Models.StoredProcedures.spG_Tabuleiro>(sql).FirstOrDefault();
+
+            return retorno.Retorno;
+        }
+
     }
 }
