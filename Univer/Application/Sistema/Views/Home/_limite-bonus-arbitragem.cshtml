@@ -1,8 +1,9 @@
 ﻿@{ 
     var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.AtingiuLimiteGanhoBonusArbitragem = ViewBag.AtingiuLimiteGanhoBonusArbitragem ?? false;
 }
 
-@if (ViewBag.AtingiuLimiteGanhoBonusArbitragem)
+@if (!ViewBag.RedeTabuleiro && ViewBag.AtingiuLimiteGanhoBonusArbitragem)
 {
     <div id="limite-bonus-arbitragem-modal" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

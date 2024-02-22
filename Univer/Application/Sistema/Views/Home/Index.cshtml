@@ -1,8 +1,13 @@
 ﻿@{
-
     #region Layout
 
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region init
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
 
     #endregion
 
@@ -13,36 +18,44 @@
     ViewBag.Author = "";
     ViewBag.ReferrerMode = ReferrerMode.OriginWhenCrossOrigin;
     ViewBag.TwitterCard = new SummaryLargeImageTwitterCard("");
+    ViewBag.Title = traducaoHelper["DOCUMENTOS"].ToString().ToLower();
+    var usuarioContainer = (Sistema.Containers.UsuarioContainer)ViewBag.UsuarioContainer;
+    var usuario = usuarioContainer.Usuario;
+    Boolean blnExibeBanner = ViewBag.ExibeBanners ?? true;
+    IList<Core.Entities.Arquivo> banners = ViewBag.Banners;
+    IEnumerable<Core.Entities.Associacao> associacoes = null;
+    IEnumerable<Core.Entities.Classificacao> classificacoes = null;
+    IEnumerable<Core.Models.StoredProcedures.spC_AtivoMensal> ativoMensal = null;
 
-    ViewBag.OpenGraph = new OpenGraphWebsite(
-    ViewBag.Title,
-    new OpenGraphImage(Url.AbsoluteContent("~/content/icons/open-graph-1200x630.png")) { Height = 630, Type = ContentType.Png, Width = 1200 })
+    ViewBag.OpenGraph = new OpenGraphWebsite(ViewBag.Title, new OpenGraphImage(Url.AbsoluteContent("~/content/icons/open-graph-1200x630.png")) { Height = 630, Type = ContentType.Png, Width = 1200 })
     {
         Determiner = OpenGraphDeterminer.Blank,
         SiteName = Application.Name
     };
 
-    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
-    var binarioData = (IEnumerable<Core.Entities.Posicao>)ViewBag.BinarioData;
-    var valorZerado = 0;
     List<SelectListItem> listaDerramamento = null;
-    if (ViewBag.ExibeLadoDerramamento)
+
+    if (ViewBag.RedeTabuleiro)
     {
-        listaDerramamento = (List<SelectListItem>)ViewBag.ListaDerramamento;
+        #region Tabuleiro
+
+        #endregion
     }
+    else
+    {
+        #region Nao Tabuleiro
 
-    ViewBag.Title = traducaoHelper["DOCUMENTOS"].ToString().ToLower();
-    var usuarioContainer = (Sistema.Containers.UsuarioContainer)ViewBag.UsuarioContainer;
-    var usuario = usuarioContainer.Usuario;
+        if (ViewBag.ExibeLadoDerramamento)
+        {
+            listaDerramamento = (List<SelectListItem>)ViewBag.ListaDerramamento;
+        }
 
-    Boolean blnExibeBanner = ViewBag.ExibeBanners;
-    IList<Core.Entities.Arquivo> banners = ViewBag.Banners;
+        associacoes = (IEnumerable<Core.Entities.Associacao>)ViewBag.Associacoes;
+        classificacoes = (IEnumerable<Core.Entities.Classificacao>)ViewBag.Classificacoes;
+        ativoMensal = (IEnumerable<Core.Models.StoredProcedures.spC_AtivoMensal>)ViewBag.AtivoMensal;
 
-    var associacoes = (IEnumerable<Core.Entities.Associacao>)ViewBag.Associacoes;
-    var classificacoes = (IEnumerable<Core.Entities.Classificacao>)ViewBag.Classificacoes;
-
-    var ativoMensal = (IEnumerable<Core.Models.StoredProcedures.spC_AtivoMensal>)ViewBag.AtivoMensal;
-    DateTime data;
+        #endregion
+    }
 
     ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
     if (ViewBag.MascaraData == null)
@@ -53,6 +66,10 @@
     #endregion
 
     #region Variaveis
+
+    DateTime data;
+    var binarioData = (IEnumerable<Core.Entities.Posicao>)ViewBag.BinarioData;
+    var valorZerado = 0;
 
     var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
 
@@ -104,111 +121,117 @@
 }
 
 @section pageScripts {
+    @if (!ViewBag.RedeTabuleiro)
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                //$('.owl-carousel').owlCarousel({
+                //    items: 1,
+                //    loop: true,
+                //    margin: 10,
+                //    autoplay: true,
+                //    autoplayTimeout: 5000,
+                //    autoplayHoverPause: false,
+                //    dots: true,
+                //});
 
-    <script type="text/javascript">
-        $(document).ready(function () {
+                if ('@ViewBag.BolqueioRenovacao' == 'true') {
+                    blink("#bolqueioRenovacao");
+                }
 
-            //$('.owl-carousel').owlCarousel({
-            //    items: 1,
-            //    loop: true,
-            //    margin: 10,
-            //    autoplay: true,
-            //    autoplayTimeout: 5000,
-            //    autoplayHoverPause: false,
-            //    dots: true,
-            //});
+                @*if ('@usuario.DataMigracao.HasValue' == 'True'  && '@Core.Helpers.ConfiguracaoHelper.GetString("EXIGI_MIGRACAO")' == 'true' ) {*@
+                if ('@usuarioContainer.PendenteMigracao' == 'True') {
+                    blink("#migracao");
+                }
 
-            if ('@ViewBag.BolqueioRenovacao' == 'true') {
-                blink("#bolqueioRenovacao");
-            }
+                $(function () {
+                  $('[data-toggle="tooltip"]').tooltip({
+                    template: '<div class="tooltip md-tooltip" role="tooltip"><div class="tooltip-arrow md-arrow"></div><div class="tooltip-inner md-inner" style="font-size:medium; border-radius:5px!important;"></div></div>'
+                  })
+                })
 
-            @*if ('@usuario.DataMigracao.HasValue' == 'True'  && '@Core.Helpers.ConfiguracaoHelper.GetString("EXIGI_MIGRACAO")' == 'true' ) {*@
-            if ('@usuarioContainer.PendenteMigracao' == 'True') {
-                blink("#migracao");
-            }
+                var btnCopiarCadastro = $("#cadastroLinkCopiar");
+                var copiado = $("#copiado");
+                var copiadoTemp = 0;
+                copiado.hide();
 
-            $(function () {
-              $('[data-toggle="tooltip"]').tooltip({
-                template: '<div class="tooltip md-tooltip" role="tooltip"><div class="tooltip-arrow md-arrow"></div><div class="tooltip-inner md-inner" style="font-size:medium; border-radius:5px!important;"></div></div>'
-              })
-            })
+                var btnCopiarLojaExterna = $("#lojaExternaLinkCopiar");
+                var copiadoLojaExterna = $("#copiadoLojaExterna");
+                var copiadoTempLojaExterna = 0;
+                copiadoLojaExterna.hide();
 
-            var btnCopiarCadastro = $("#cadastroLinkCopiar");
-            var copiado = $("#copiado");
-            var copiadoTemp = 0;
-            copiado.hide();
+                btnCopiarCadastro.on('click', function () {
 
-            var btnCopiarLojaExterna = $("#lojaExternaLinkCopiar");
-            var copiadoLojaExterna = $("#copiadoLojaExterna");
-            var copiadoTempLojaExterna = 0;
-            copiadoLojaExterna.hide();
+                    var el = document.createElement('textarea');
 
-            btnCopiarCadastro.on('click', function () {
+                    el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)';
 
-                var el = document.createElement('textarea');
+                    el.setAttribute('readonly', '');
+                    el.style = { position: 'absolute', left: '-9999px' };
+                    document.body.appendChild(el);
 
-                el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)';
+                    el.select();
 
-                el.setAttribute('readonly', '');
-                el.style = { position: 'absolute', left: '-9999px' };
-                document.body.appendChild(el);
+                    document.execCommand('copy');
 
-                el.select();
+                    copiado.fadeIn();
+                    clearTimeout(copiadoTemp);
+                    copiadoTemp = setTimeout(function () { copiado.fadeOut(); }, 1000);
 
-                document.execCommand('copy');
-
-                copiado.fadeIn();
-                clearTimeout(copiadoTemp);
-                copiadoTemp = setTimeout(function () { copiado.fadeOut(); }, 1000);
-
-                document.body.removeChild(el);
-            });
-
-            btnCopiarLojaExterna.on('click', function () {
-
-                var el = document.createElement('textarea');
-
-                el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA") + Helpers.Local.nomeUsuario)';
-
-                el.setAttribute('readonly', '');
-                el.style = { position: 'absolute', left: '-9999px' };
-                document.body.appendChild(el);
-
-                el.select();
-
-                document.execCommand('copy');
-
-                copiadoLojaExterna.fadeIn();
-                clearTimeout(copiadoTempLojaExterna);
-                copiadoTempLojaExterna = setTimeout(function () { copiadoLojaExterna.fadeOut(); }, 1000);
-
-                document.body.removeChild(el);
-            });
-        });
-    </script>
-
-    <script type="text/javascript">
-        function blink(selector) {
-            setTimeout(function () {
-                $(selector).fadeOut("slow", function () {
-                    $(this).fadeIn("slow", function () {
-                        blink(this); // recursive function will call after fadeIn finish
-                    });
+                    document.body.removeChild(el);
                 });
 
-            }, 500);
-        }
-    </script>
+                btnCopiarLojaExterna.on('click', function () {
 
+                    var el = document.createElement('textarea');
+
+                    el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA") + Helpers.Local.nomeUsuario)';
+
+                    el.setAttribute('readonly', '');
+                    el.style = { position: 'absolute', left: '-9999px' };
+                    document.body.appendChild(el);
+
+                    el.select();
+
+                    document.execCommand('copy');
+
+                    copiadoLojaExterna.fadeIn();
+                    clearTimeout(copiadoTempLojaExterna);
+                    copiadoTempLojaExterna = setTimeout(function () { copiadoLojaExterna.fadeOut(); }, 1000);
+
+                    document.body.removeChild(el);
+                });
+
+            });
+        </script>
+
+        <script type="text/javascript">
+            function blink(selector) {
+                setTimeout(function () {
+                    $(selector).fadeOut("slow", function () {
+                        $(this).fadeIn("slow", function () {
+                            blink(this); // recursive function will call after fadeIn finish
+                        });
+                    });
+
+                }, 500);
+            }
+        </script>
+
+    }
 }
 
 @section PageLevelScripts{
-    <script type="text/javascript">
-      function Derramamento(id) {
-         $.post('@Url.Action("derramamento")', { id: id }, function () { });
-      }
-    </script>
+    @if (!ViewBag.RedeTabuleiro)
+    {
+        <script type="text/javascript">
+          function Derramamento(id) {
+             $.post('@Url.Action("derramamento")', { id: id }, function () { });
+          }
+        </script>
+    }
 }
+
 @section jQueryRead {
 }
 
@@ -217,6 +240,7 @@
 <!-- BEGIN PAGE CONTENT-->
 <div class="portlet light" style="padding-left:0;padding-right:10px">
     <div class="portlet-body">
+        <!--BANNER-->
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
@@ -243,34 +267,37 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="row padding-Left-20 padding-Right-20">
-                        <div class="col-md-8 padding-lateral-20 ">
-                            <div style="height: 40px;">
-                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@traducaoHelper["META_CLASSIFICACAO"]: @ViewBag.classificacaoValor</span></div>
-                            </div>
-                            <div class="progress progress-striped active" style="height: 40px; width: 96%; position: absolute;">
-                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @ViewBag.porcentagemClassificacao;">
+        @if (!ViewBag.RedeTabuleiro)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="row padding-Left-20 padding-Right-20">
+                            <div class="col-md-8 padding-lateral-20 ">
+                                <div style="height: 40px;">
+                                    <div class="col-md-12 card-title-div"><span class="card-content-txt">@traducaoHelper["META_CLASSIFICACAO"]: @ViewBag.classificacaoValor</span></div>
                                 </div>
-                            </div>
-                            <div style="height: 40px; width: 96%; position: absolute; background-color: transparent;">
-                                <div style="padding-top: 6px;">
-                                    <span style="font-size: 16px; font-weight: bold; color: black; float: left; padding-left: 5px;">@traducaoHelper["ACUMULADO_GERAL"]: @ViewBag.pontosAcumulados</span>
+                                <div class="progress progress-striped active" style="height: 40px; width: 96%; position: absolute;">
+                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @ViewBag.porcentagemClassificacao;">
+                                    </div>
                                 </div>
-                            </div>
-                            <div style="height: 40px; width: 96%; position: absolute; background-color: transparent;">
-                                <div style="padding-top: 6px;">
-                                    <span style="font-size: 16px; font-weight: bold; color: black; float: right; padding-right: 5px;">@ViewBag.classificacaoUsuario</span>
+                                <div style="height: 40px; width: 96%; position: absolute; background-color: transparent;">
+                                    <div style="padding-top: 6px;">
+                                        <span style="font-size: 16px; font-weight: bold; color: black; float: left; padding-left: 5px;">@traducaoHelper["ACUMULADO_GERAL"]: @ViewBag.pontosAcumulados</span>
+                                    </div>
+                                </div>
+                                <div style="height: 40px; width: 96%; position: absolute; background-color: transparent;">
+                                    <div style="padding-top: 6px;">
+                                        <span style="font-size: 16px; font-weight: bold; color: black; float: right; padding-right: 5px;">@ViewBag.classificacaoUsuario</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <br/>
+        }
+        <br />
         <div style="margin-top: 40px;">
             <div class="row">
                 <div class="col-md-12">
@@ -374,7 +401,7 @@
                                         </ul>
                                         <br />
                                     </div>
-                                    
+
                                     <!-- END MENU -->
                                 </div>
                             </div>
@@ -441,7 +468,7 @@
                 }
             }
 
-            @if (!usuarioContainer.PendenteMigracao)
+            @if (!usuarioContainer.PendenteMigracao && !ViewBag.RedeTabuleiro)
             {
                 <div class="row">
                     <div class="col-md-8 padding-lateral-10">
@@ -1296,7 +1323,3 @@ if (!totalAcumulado.error) {
 @Html.Partial("_avisos", (List<Core.Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos>)ViewBag.Avisos)
 @Html.Partial("_limite-bonus-arbitragem")
 @Html.Partial("_aviso-migracao")
-
-
-
-

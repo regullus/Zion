@@ -1,8 +1,9 @@
 ﻿@{
     var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+    ViewBag.MigrouNovaRede = ViewBag.MigrouNovaRede ?? false;
 }
 
-@if (!ViewBag.MigrouNovaRede)
+@if (!ViewBag.MigrouNovaRede && !ViewBag.RedeTabuleiro)
 {
     <div id="migracao-aviso-modal" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -22,7 +23,6 @@
         </div>
     </div>
 
-
     <script type="text/javascript">
 
         $(function () {
@@ -33,10 +33,9 @@
             location.href = @Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "/migracao/rede"
         }
 
-
-function migrarDepois() {
+        function migrarDepois() {
             $('#migracao-aviso-modal').modal('hide');
-}
+        }
 
     </script>
 

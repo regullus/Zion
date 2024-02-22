@@ -45,6 +45,8 @@ Select * from Rede.TabuleiroNivel
 Select * from rede.Tabuleiro --where StatusID = 1
 Select * from Rede.TabuleiroLog
 
+----update autenticacao set Email = replace(Email, 'universol.global', '@universol.global')
+
 
 
 

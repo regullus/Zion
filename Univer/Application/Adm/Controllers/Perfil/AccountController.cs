@@ -186,8 +186,6 @@ namespace Sistema.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
@@ -270,7 +268,6 @@ namespace Sistema.Controllers
             {
                 if (blnAtivo)
                 {
-
                     #region Usuario
 
                     //Checa se usuario existe
