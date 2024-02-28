@@ -47,9 +47,6 @@
 
             switch (strTema)
             {
-                case "19L":
-                    strPath = "~/Content/admin/css/themes/19L.css";
-                    break;
                 case "Afiliex":
                     strPath = "~/Content/admin/css/themes/Afiliex.css";
                     break;
@@ -309,7 +306,6 @@
                ;
             bundles.Add(scrThemeComum);
             #endregion
-
 
             #region Login
 

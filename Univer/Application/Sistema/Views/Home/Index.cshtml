@@ -266,7 +266,6 @@
                 </div>
             </div>
         </div>
-
         @if (!ViewBag.RedeTabuleiro)
         {
             <div class="row">
@@ -316,14 +315,13 @@
                                         <!-- END SIDEBAR USERPIC -->
                                         <!-- SIDEBAR USER TITLE -->
                                         @*<div class="profile-usertitle  margem-0 padding-lateral-10">
-                                            <p class="profile-usertitle-name">
-                                               <strong>@usuario.Nome</strong>
-                                            </p>*@
+                                    <p class="profile-usertitle-name">
+                                       <strong>@usuario.Nome</strong>
+                                    </p>*@
                                         @*<div class="profile-usertitle-job">
-                                               @usuario.Login
-                                            </div>*@
+                                       @usuario.Login
+                                    </div>*@
                                     </div>
-
                                     <!-- END SIDEBAR USER TITLE -->
                                     <!-- SIDEBAR MENU -->
                                     <div class="profile-usermenu margem-0 padding-lateral-10">
@@ -414,9 +412,10 @@
             {
                 if (usuario.NivelAssociacao > 0)
                 {
+
                     if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_CADASTRO"))
                     {
-                        <div class="row">
+                        @*<div class="row">
                             <div class="col-md-12 padding-lateral-10">
                                 <div class="col-md-2 padding-Right-0" style="width: 111px !important; padding-top: 9px;">
                                     <i class="fa fa-pencil-square-o"></i>
@@ -436,7 +435,7 @@
                                     <span id="copiado">@traducaoHelper["COPIANDO"]</span>
                                 </div>
                             </div>
-                        </div>
+                        </div>*@
                     }
 
                     if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA"))
@@ -734,32 +733,32 @@
                             @if (ViewBag.DashboardPontos)
                             {
                                 @*<div class="col-md-6 blog-tag-data hide">
-                                        <div class="dashboard-stat2 bg-blue-ebonyclay">
-                                            <div class="display">
-                                                <div class="number">
-                                                    <h3 class="font-green-sharp">@pontos.ToString(moedaPadrao.MascaraOut)</h3>
-                                                    <small>@traducaoHelper["PONTOS"] (@ViewBag.PontosLado)</small>
-                                                </div>
-                                                <div class="icon">
-                                                    <p class=""><img src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" style="width: 96px;" /></p>
-                                                </div>
-                                            </div>
-                                            <div class="progress-info">
-                                                <h4 class="font-green-sharp">@ViewBag.PlanoCarreiraNome</h4>
-                                                <div class="progress">
-                                                    <span style="width: @ViewBag.PlanoCarreiraPercentagem.ToString().Replace(',', '.');" class="progress-bar progress-bar-success green-sharp">
-                                                        <span class="sr-only">@ViewBag.PlanoCarreiraPercentagem</span>
-                                                    </span>
-                                                    <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
-
-                                                        </div>
-                                                    </div>
-                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
-                                                </div>
-                                            </div>
+                                <div class="dashboard-stat2 bg-blue-ebonyclay">
+                                    <div class="display">
+                                        <div class="number">
+                                            <h3 class="font-green-sharp">@pontos.ToString(moedaPadrao.MascaraOut)</h3>
+                                            <small>@traducaoHelper["PONTOS"] (@ViewBag.PontosLado)</small>
                                         </div>
-                                    </div>*@
+                                        <div class="icon">
+                                            <p class=""><img src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" style="width: 96px;" /></p>
+                                        </div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <h4 class="font-green-sharp">@ViewBag.PlanoCarreiraNome</h4>
+                                        <div class="progress">
+                                            <span style="width: @ViewBag.PlanoCarreiraPercentagem.ToString().Replace(',', '.');" class="progress-bar progress-bar-success green-sharp">
+                                                <span class="sr-only">@ViewBag.PlanoCarreiraPercentagem</span>
+                                            </span>
+                                            <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
+
+                                                </div>
+                                            </div>
+                                            <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
 
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
                                     <div>
@@ -769,13 +768,13 @@
                                             <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PLANO_CARREIRA"]</span></div>
                                             <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNome</span></div>
                                             @*<div class="col-md-12 card-title-div">
-                                                    <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 15px 4px -2px 4px;">
-                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
-                                                        </div>
-                                                    </div>
-                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
+                                            <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 15px 4px -2px 4px;">
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
                                                 </div>
-                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@classificacao.Nome</span></div>*@
+                                            </div>
+                                            <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
+                                        </div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content-txt">@classificacao.Nome</span></div>*@
                                         </div>
                                     </div>
                                 </div>
@@ -792,10 +791,10 @@
                                             <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNomeAnter</span></div>
                                             <div class="col-md-12 card-title-div">
                                                 @*<div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)%">
-                                                        </div>
-                                                    </div>
-                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagemAnter % </span>*@
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)%">
+                                                </div>
+                                            </div>
+                                            <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagemAnter % </span>*@
                                             </div>
                                         </div>
                                     </div>
