@@ -35,10 +35,16 @@
 
     List<SelectListItem> listaDerramamento = null;
 
+    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroConvites = null;
+    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroAtivos = null;
+    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroFinalizados = null;
+
     if (ViewBag.RedeTabuleiro)
     {
         #region Tabuleiro
-
+        tabuleiroConvites = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosConvite;
+        tabuleiroAtivos = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosAtivos;
+        tabuleiroFinalizados = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosFinalizados;
         #endregion
     }
     else
@@ -229,7 +235,7 @@
              $.post('@Url.Action("derramamento")', { id: id }, function () { });
           }
         </script>
-    }
+    } 
 }
 
 @section jQueryRead {
@@ -240,6 +246,7 @@
 <!-- BEGIN PAGE CONTENT-->
 <div class="portlet light" style="padding-left:0;padding-right:10px">
     <div class="portlet-body">
+
         <!--BANNER-->
         <div class="row">
             <div class="col-md-12">
@@ -266,578 +273,286 @@
                 </div>
             </div>
         </div>
-        @if (!ViewBag.RedeTabuleiro)
+
+        @if (ViewBag.RedeTabuleiro)
         {
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="row padding-Left-20 padding-Right-20">
-                            <div class="col-md-8 padding-lateral-20 ">
-                                <div style="height: 40px;">
-                                    <div class="col-md-12 card-title-div"><span class="card-content-txt">@traducaoHelper["META_CLASSIFICACAO"]: @ViewBag.classificacaoValor</span></div>
-                                </div>
-                                <div class="progress progress-striped active" style="height: 40px; width: 96%; position: absolute;">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @ViewBag.porcentagemClassificacao;">
+            <div class="row" style="max-width: 1600px">
+                <div class="col-md-12 padding-lateral-10">
+                    <div class="portlet-body expand" style="padding:0px 0px 10px 0px!important;">
+                        @if (tabuleiroConvites != null)
+                        {
+                            foreach (var item in tabuleiroConvites)
+                            {
+                                //VERDE - CONVITE
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
+                                    <div class="card-frame card-home card-cor convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
+                                        <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONVITE"]</span></div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
                                     </div>
                                 </div>
-                                <div style="height: 40px; width: 96%; position: absolute; background-color: transparent;">
-                                    <div style="padding-top: 6px;">
-                                        <span style="font-size: 16px; font-weight: bold; color: black; float: left; padding-left: 5px;">@traducaoHelper["ACUMULADO_GERAL"]: @ViewBag.pontosAcumulados</span>
+                            }
+                        }
+
+                        @if (tabuleiroAtivos != null)
+                        {
+                            foreach (var item in tabuleiroAtivos)
+                            {
+                                //ROXO ATIVOS
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
+                                    <div class="card-frame card-home purple-simple-card ativo" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
+                                        <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVO"]</span></div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
                                     </div>
                                 </div>
-                                <div style="height: 40px; width: 96%; position: absolute; background-color: transparent;">
-                                    <div style="padding-top: 6px;">
-                                        <span style="font-size: 16px; font-weight: bold; color: black; float: right; padding-right: 5px;">@ViewBag.classificacaoUsuario</span>
+                            }
+                        }
+
+                        @if (tabuleiroFinalizados != null)
+                        {
+                            foreach (var item in tabuleiroFinalizados)
+                            {
+                                //VERMELHO - ENCERRADOS
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
+                                    <div class="card-frame red-card finalizado"  data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
+                                        <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["FINALIZADOS"]</span></div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
+                                        <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            }
+                        }
+
                     </div>
                 </div>
+
+                <!-- END ACCORDION PORTLET-->
             </div>
         }
-        <br />
-        <div style="margin-top: 40px;">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_EXIBIR_ASSOCIADO"))
-                        {
-                            <div class="row">
-                                <div class="col-md-3 padding-0">
-                                    <!-- PORTLET MAIN -->
-                                    <div class="portlet light profile-sidebar-portlet margem-0" style="width:95%">
-                                        <!-- SIDEBAR USERPIC -->
-                                        <div class="profile-userpic padding-0 margem-0 mt-element-ribbon text-center">
-                                            <div class="ribbon ribbon-shadow ribbon-sub ribbon-color-warning uppercase"><strong>@usuario.Nome</strong></div>
-                                            <img src="@foto" class="img-responsive" alt="" style="width: 250px; max-height: 260px; display:inline; margin-top: -45px;">
+        else
+        {
+            <div style="margin-top: 40px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_EXIBIR_ASSOCIADO"))
+                            {
+                                <div class="row">
+                                    <div class="col-md-3 padding-0">
+                                        <!-- PORTLET MAIN -->
+                                        <div class="portlet light profile-sidebar-portlet margem-0" style="width:95%">
+                                            <!-- SIDEBAR USERPIC -->
+                                            <div class="profile-userpic padding-0 margem-0 mt-element-ribbon text-center">
+                                                <div class="ribbon ribbon-shadow ribbon-sub ribbon-color-warning uppercase"><strong>@usuario.Nome</strong></div>
+                                                <img src="@foto" class="img-responsive" alt="" style="width: 250px; max-height: 260px; display:inline; margin-top: -45px;">
+                                            </div>
+                                            <!-- END SIDEBAR USERPIC -->
+                                            <!-- SIDEBAR USER TITLE -->
+                                            @*<div class="profile-usertitle  margem-0 padding-lateral-10">
+                                            <p class="profile-usertitle-name">
+                                               <strong>@usuario.Nome</strong>
+                                            </p>*@
+                                            @*<div class="profile-usertitle-job">
+                                               @usuario.Login
+                                            </div>*@
                                         </div>
-                                        <!-- END SIDEBAR USERPIC -->
-                                        <!-- SIDEBAR USER TITLE -->
-                                        @*<div class="profile-usertitle  margem-0 padding-lateral-10">
-                                    <p class="profile-usertitle-name">
-                                       <strong>@usuario.Nome</strong>
-                                    </p>*@
-                                        @*<div class="profile-usertitle-job">
-                                       @usuario.Login
-                                    </div>*@
-                                    </div>
-                                    <!-- END SIDEBAR USER TITLE -->
-                                    <!-- SIDEBAR MENU -->
-                                    <div class="profile-usermenu margem-0 padding-lateral-10">
-                                        <ul class="nav margem-0 padding-0">
-                                            <li>
-                                                <span class="text-primary sizetxtuser hide">
-                                                    <i class="icon-star"></i>
-                                                    <strong>@traducaoHelper["STATUS"].ToLower(): </strong> @usuario.Status.ToString().ToLower()
-                                                </span>
-                                                <span class="text-primary sizetxtuser hide">
-                                                    <i class="icon-star"></i>
-                                                    <strong>@traducaoHelper["PLANO_CARREIRA"].ToLower(): </strong><br /> @(classificacao != null ? classificacao.Nome : "")
-                                                </span>
-                                                @if (!ViewBag.DashboardAssociacao)
-                                                {
-                                                    <span class="text-primary sizetxtuser">
+                                        <!-- END SIDEBAR USER TITLE -->
+                                        <!-- SIDEBAR MENU -->
+                                        <div class="profile-usermenu margem-0 padding-lateral-10">
+                                            <ul class="nav margem-0 padding-0">
+                                                <li>
+                                                    <span class="text-primary sizetxtuser hide">
                                                         <i class="icon-star"></i>
-                                                        @traducaoHelper["ASSOCIACAO"].ToLower(): <strong> @(usuarioAssociacao != null ? usuarioAssociacao.Nome : "")</strong>
+                                                        <strong>@traducaoHelper["STATUS"].ToLower(): </strong> @usuario.Status.ToString().ToLower()
                                                     </span>
+                                                    <span class="text-primary sizetxtuser hide">
+                                                        <i class="icon-star"></i>
+                                                        <strong>@traducaoHelper["PLANO_CARREIRA"].ToLower(): </strong><br /> @(classificacao != null ? classificacao.Nome : "")
+                                                    </span>
+                                                    @if (!ViewBag.DashboardAssociacao)
+                                                    {
+                                                        <span class="text-primary sizetxtuser">
+                                                            <i class="icon-star"></i>
+                                                            @traducaoHelper["ASSOCIACAO"].ToLower(): <strong> @(usuarioAssociacao != null ? usuarioAssociacao.Nome : "")</strong>
+                                                        </span>
+                                                    }
+                                                </li>
+                                                @if (usuario.PatrocinadorDiretoID.HasValue)
+                                                {
+                                                    <li>
+                                                        <span class="text-primary sizetxtuser">
+                                                            <i class="icon-user"></i>
+                                                            @traducaoHelper["PATROCINADOR"].ToLower(): <strong> @usuario.PatrocinadorDireto.Login.ToLower()</strong>
+                                                        </span>
+                                                    </li>
                                                 }
-                                            </li>
-                                            @if (usuario.PatrocinadorDiretoID.HasValue)
-                                            {
                                                 <li>
                                                     <span class="text-primary sizetxtuser">
-                                                        <i class="icon-user"></i>
-                                                        @traducaoHelper["PATROCINADOR"].ToLower(): <strong> @usuario.PatrocinadorDireto.Login.ToLower()</strong>
+                                                        <i class="icon-notebook"></i>
+                                                        @traducaoHelper["DATA_CADASTRO"].ToLower(): <strong> @usuario.DataCriacao.ToString(ViewBag.MascaraData)</strong>
                                                     </span>
                                                 </li>
-                                            }
-                                            <li>
-                                                <span class="text-primary sizetxtuser">
-                                                    <i class="icon-notebook"></i>
-                                                    @traducaoHelper["DATA_CADASTRO"].ToLower(): <strong> @usuario.DataCriacao.ToString(ViewBag.MascaraData)</strong>
-                                                </span>
-                                            </li>
-                                            @if (@ExibeDataAtivacao)
-                                            {
-                                                <li>
-                                                    <span class="text-primary sizetxtuser">
-                                                        <i class="icon-like"></i>
-                                                        @traducaoHelper["DATA_ATIVACAO"].ToLower():<strong> @usuario.DataAtivacao.Value.ToString(ViewBag.MascaraData)</strong>
-                                                    </span>
-                                                </li>
-                                            }
-                                            @if (ViewBag.IsLideranca)
-                                            {
-                                                <li>
-                                                    <span class="text-primary sizetxtuser">
-                                                        <i class="icon-diamond"></i>
-                                                        <strong>@traducaoHelper["LIDERANCA"]</strong>
-                                                    </span>
-                                                </li>
-                                            }
-                                            @if (@BolqueioRenovacao)
-                                            {
-                                                <li>
-                                                    <span class="text-primary sizetxtuser" id="bolqueioRenovacao">
-                                                        <i class="icon-dislike"></i>
-                                                        @traducaoHelper["BLOQUEADO"].ToLower():<strong style="color:red"> @traducaoHelper["AGUARDANDO_RENOVACAO"]</strong>
-                                                    </span>
-                                                </li>
-                                            }
-                                            @*@if (usuario.DataMigracao.HasValue && Core.Helpers.ConfiguracaoHelper.GetBoolean("EXIGI_MIGRACAO"))*@
-                                            @if (usuarioContainer.PendenteMigracao)
-                                            {
-                                                <li>
-                                                    <span class="text-primary sizetxtuser" id="migracao">
-                                                        <i class="icon-dislike"></i>
-                                                        @traducaoHelper["STATUS"].ToLower():<strong style="color:red"> @traducaoHelper["AGUARDANDO_MIGRACAO"]</strong>
-                                                    </span>
-                                                </li>
-                                            }
+                                                @if (@ExibeDataAtivacao)
+                                                {
+                                                    <li>
+                                                        <span class="text-primary sizetxtuser">
+                                                            <i class="icon-like"></i>
+                                                            @traducaoHelper["DATA_ATIVACAO"].ToLower():<strong> @usuario.DataAtivacao.Value.ToString(ViewBag.MascaraData)</strong>
+                                                        </span>
+                                                    </li>
+                                                }
+                                                @if (ViewBag.IsLideranca)
+                                                {
+                                                    <li>
+                                                        <span class="text-primary sizetxtuser">
+                                                            <i class="icon-diamond"></i>
+                                                            <strong>@traducaoHelper["LIDERANCA"]</strong>
+                                                        </span>
+                                                    </li>
+                                                }
+                                                @if (@BolqueioRenovacao)
+                                                {
+                                                    <li>
+                                                        <span class="text-primary sizetxtuser" id="bolqueioRenovacao">
+                                                            <i class="icon-dislike"></i>
+                                                            @traducaoHelper["BLOQUEADO"].ToLower():<strong style="color:red"> @traducaoHelper["AGUARDANDO_RENOVACAO"]</strong>
+                                                        </span>
+                                                    </li>
+                                                }
+                                                @*@if (usuario.DataMigracao.HasValue && Core.Helpers.ConfiguracaoHelper.GetBoolean("EXIGI_MIGRACAO"))*@
+                                                @if (usuarioContainer.PendenteMigracao)
+                                                {
+                                                    <li>
+                                                        <span class="text-primary sizetxtuser" id="migracao">
+                                                            <i class="icon-dislike"></i>
+                                                            @traducaoHelper["STATUS"].ToLower():<strong style="color:red"> @traducaoHelper["AGUARDANDO_MIGRACAO"]</strong>
+                                                        </span>
+                                                    </li>
+                                                }
 
-                                        </ul>
-                                        <br />
+                                            </ul>
+                                            <br />
+                                        </div>
+
+                                        <!-- END MENU -->
                                     </div>
-
-                                    <!-- END MENU -->
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            @if (!usuarioContainer.PendenteMigracao)
-            {
-                if (usuario.NivelAssociacao > 0)
+                @if (!usuarioContainer.PendenteMigracao)
                 {
-
-                    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_CADASTRO"))
+                    if (usuario.NivelAssociacao > 0)
                     {
-                        @*<div class="row">
-                            <div class="col-md-12 padding-lateral-10">
-                                <div class="col-md-2 padding-Right-0" style="width: 111px !important; padding-top: 9px;">
-                                    <i class="fa fa-pencil-square-o"></i>
-                                    <span class="title">
-                                        @traducaoHelper["LINK_CADASTRO"]:
-                                    </span>
-                                </div>
-                                <div class="col-md-7">
-                                    <div class="input-group">
-                                        <input type="text" id="cadastroLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)">
-                                        <span class="input-group-btn">
-                                            <input class="btn btn-danger" id="cadastroLinkCopiar" value=" @traducaoHelper["COPIAR"]">
+
+                        if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_CADASTRO"))
+                        {
+                            @*<div class="row">
+                                <div class="col-md-12 padding-lateral-10">
+                                    <div class="col-md-2 padding-Right-0" style="width: 111px !important; padding-top: 9px;">
+                                        <i class="fa fa-pencil-square-o"></i>
+                                        <span class="title">
+                                            @traducaoHelper["LINK_CADASTRO"]:
                                         </span>
                                     </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <span id="copiado">@traducaoHelper["COPIANDO"]</span>
-                                </div>
-                            </div>
-                        </div>*@
-                    }
-
-                    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA"))
-                    {
-                        <div class="row">
-                            <div class="col-md-12 padding-lateral-10 padding-top-10">
-                                <div class="col-md-2">
-                                    <i class="fa fa-external-link-square"></i>
-                                    <span class="title">
-                                        @traducaoHelper["LOJA_EXTERNA"]:
-                                    </span>
-                                </div>
-                                <div class="col-md-7">
-                                    <div class="input-group">
-                                        <input type="text" id="lojaExternaLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA") + Helpers.Local.nomeUsuario)">
-                                        <span class="input-group-btn">
-                                            <input class="btn btn-danger" id="lojaExternaLinkCopiar" value=" @traducaoHelper["COPIAR"]">
-
-                                        </span>
-
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <span id="copiadoLojaExterna">@traducaoHelper["COPIANDO"]</span>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-            }
-
-            @if (!usuarioContainer.PendenteMigracao && !ViewBag.RedeTabuleiro)
-            {
-                <div class="row">
-                    <div class="col-md-8 padding-lateral-10">
-                        <div class="portlet-body expand" style="padding:0px 0px 10px 0px!important;">
-
-                            @*PLANO_ATUAL*@
-                            @if (ViewBag.DashboardAssociacao)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-star icon-bg"></i>
-                                        <div class="card-frame  card-home card-cor">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PLANO_ATUAL"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@(usuarioAssociacao != null ? usuarioAssociacao.Nome : "")</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content2-txt"></span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @*SALDO*@
-                            @if (ViewBag.DashboardSaldo)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-money icon-bg"></i>
-                                        <div class="card-frame card-home green-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["SALDO_TOTAL_DISPONIVEL"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.SaldoTotalDisponivel.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-money icon-bg"></i>
-                                        <div class="card-frame card-home green-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["SALDO_GANHOS_DIARIOS"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contasaldo" class="card-content-txt">@ViewBag.SaldoGanhosDiarios.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-money icon-bg"></i>
-                                        <div class="card-frame card-home green-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["SALDO_GANHOS_COMISSOES"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contasaldo" class="card-content-txt">@ViewBag.SaldoGanhosComissoes.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame card-home purple-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_GANHOS_DIARIOS"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoGanhosDiarios.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame card-home purple-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_GANHOS_UNILEVAL"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoGanhosUnilevel.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame card-home purple-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_GANHOS_GLOBAIS"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoGanhosGlobais.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame card-home purple-simple-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_TOTAL"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoTotal.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardDiretos)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-group icon-bg"></i>
-                                        <div class="card-frame card-home card-cor">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["MEMBROS"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.QtdeDiretos.ToString("##,###,##0")</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["QTDE_ATUAL"].ToUpper()</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardUsuarios)
-                            {
-                                if (ViewBag.RedeBinaria)
-                                {
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                        <div>
-                                            <i class="icon-users icon-bg"></i>
-                                            <div class="card-frame grey-card">
-                                                <div class="col-md-12 card-title-div">
-                                                    <span class="card-title-txt">
-                                                        @traducaoHelper["EQUIPE"]
-                                                    </span>
-                                                </div>
-                                                <div class="row number-stats margin-bottom-30">
-                                                    <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
-                                                        <div class="stat-left">
-                                                            <div class="stat-chart">
-                                                                <div id="sparkline_bar"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt">
-                                                                    @traducaoHelper["ESQUERDA"]
-                                                                </div>
-                                                                <div class="card-content-txt">
-                                                                    @ViewBag.RedeEsquerdo
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
-                                                        <div class="stat-right">
-                                                            <div class="stat-chart">
-                                                                <div id="sparkline_bar2"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt">
-                                                                    @traducaoHelper["DIREITA"]
-                                                                </div>
-                                                                <div class="card-content-txt">
-                                                                    @ViewBag.RedeDireito
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="table-scrollable table-scrollable-borderless">
-                                                    <table class="table table-hover table-light bg-grey-cararra hide">
-                                                        <thead>
-                                                            <tr class="uppercase">
-                                                                <th width="40%" style="text-align:center;">@traducaoHelper["PLANO"]</th>
-                                                                <th width="30%" style="text-align:center;">@traducaoHelper["ESQUERDA"]</th>
-                                                                <th width="30%" style="text-align:center;">@traducaoHelper["DIREITA"]</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach (var associacao in associacoes.OrderBy(a => a.Nivel))
-                                                            {
-                                                                var associados = usuario.PatrocinadosDireto.Where(u => u.StatusID == (int)Core.Entities.Usuario.TodosStatus.Associado && u.NivelAssociacao == associacao.Nivel);
-                                                                var esquerda = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "0"));
-                                                                var direita = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "1"));
-                                                                <tr>
-                                                                    <td><h4>@associacao.Nome</h4></td>
-                                                                    <td style="text-align:center;"><h4>@esquerda</h4></td>
-                                                                    <td style="text-align:center;"><h4>@direita</h4></td>
-                                                                </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                        <div>
-                                            <i class="icon-users icon-bg"></i>
-                                            <div class="card-frame card-home card-cor">
-                                                <div class="col-md-12 card-title-div">
-                                                    <span class="card-title-txt">@traducaoHelper["EQUIPE"] </span>
-                                                </div>
-                                                <div class="row number-stats margin-bottom-30">
-                                                    <div class="col-md-4 col-sm-4 col-xs-4 card-title-div">
-                                                        <div class="stat-left">
-                                                            <div class="stat-chart">
-                                                                <div id="sparkline_bar"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt">
-                                                                    @traducaoHelper["COLUNA0"]
-                                                                </div>
-                                                                <div class="card-content-txt">
-                                                                    @ViewBag.RedeColuna0
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 col-sm-4 col-xs-4 card-title-div">
-                                                        <div class="stat-right">
-                                                            <div class="stat-chart">
-                                                                <div id="sparkline_bar2"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt" style="text-align:center!important;">
-                                                                    @traducaoHelper["COLUNA1"]
-                                                                </div>
-                                                                <div class="card-content-txt" style="text-align:center!important;">
-                                                                    @ViewBag.RedeColuna1
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 col-sm-4 col-xs-4 card-title-div">
-                                                        <div class="stat-right">
-                                                            <div class="stat-chart">
-                                                                <div id="sparkline_bar2"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt">
-                                                                    @traducaoHelper["COLUNA2"]
-                                                                </div>
-                                                                <div class="card-content-txt">
-                                                                    @ViewBag.RedeColuna2
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="table-scrollable table-scrollable-borderless">
-                                                    <table class="table table-hover table-light bg-grey-cararra hide">
-                                                        <thead>
-                                                            <tr class="uppercase">
-                                                                <th width="40%" style="text-align:center;">@traducaoHelper["PLANO"]</th>
-                                                                <th width="30%" style="text-align:center;">@traducaoHelper["ESQUERDA"]</th>
-                                                                <th width="30%" style="text-align:center;">@traducaoHelper["DIREITA"]</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach (var associacao in associacoes.OrderBy(a => a.Nivel))
-                                                            {
-                                                                var associados = usuario.PatrocinadosDireto.Where(u => u.StatusID == (int)Core.Entities.Usuario.TodosStatus.Associado && u.NivelAssociacao == associacao.Nivel);
-                                                                var esquerda = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "0"));
-                                                                var direita = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "1"));
-                                                                <tr>
-                                                                    <td><h4>@associacao.Nome</h4></td>
-                                                                    <td style="text-align:center;"><h4>@esquerda</h4></td>
-                                                                    <td style="text-align:center;"><h4>@direita</h4></td>
-                                                                </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            }
-
-                            @if (ViewBag.DashboardPontos)
-                            {
-                                @*<div class="col-md-6 blog-tag-data hide">
-                                <div class="dashboard-stat2 bg-blue-ebonyclay">
-                                    <div class="display">
-                                        <div class="number">
-                                            <h3 class="font-green-sharp">@pontos.ToString(moedaPadrao.MascaraOut)</h3>
-                                            <small>@traducaoHelper["PONTOS"] (@ViewBag.PontosLado)</small>
-                                        </div>
-                                        <div class="icon">
-                                            <p class=""><img src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" style="width: 96px;" /></p>
-                                        </div>
-                                    </div>
-                                    <div class="progress-info">
-                                        <h4 class="font-green-sharp">@ViewBag.PlanoCarreiraNome</h4>
-                                        <div class="progress">
-                                            <span style="width: @ViewBag.PlanoCarreiraPercentagem.ToString().Replace(',', '.');" class="progress-bar progress-bar-success green-sharp">
-                                                <span class="sr-only">@ViewBag.PlanoCarreiraPercentagem</span>
+                                    <div class="col-md-7">
+                                        <div class="input-group">
+                                            <input type="text" id="cadastroLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)">
+                                            <span class="input-group-btn">
+                                                <input class="btn btn-danger" id="cadastroLinkCopiar" value=" @traducaoHelper["COPIAR"]">
                                             </span>
-                                            <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
-
-                                                </div>
-                                            </div>
-                                            <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
                                         </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span id="copiado">@traducaoHelper["COPIANDO"]</span>
                                     </div>
                                 </div>
                             </div>*@
+                        }
 
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        @*<i class="fa fa-sign-in icon-bg"></i>*@
-                                        <div class="card-frame pink-card">
-                                            <img class="img-bg" style="margin-top: -9px;" src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/associacao/" + classificacao.Nivel + ".png")" />
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PLANO_CARREIRA"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNome</span></div>
-                                            @*<div class="col-md-12 card-title-div">
-                                            <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 15px 4px -2px 4px;">
-                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
-                                                </div>
-                                            </div>
-                                            <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
-                                        </div>
-                                        <div class="col-md-12 card-title-div"><span class="card-content-txt">@classificacao.Nome</span></div>*@
+                        if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA"))
+                        {
+                            <div class="row">
+                                <div class="col-md-12 padding-lateral-10 padding-top-10">
+                                    <div class="col-md-2">
+                                        <i class="fa fa-external-link-square"></i>
+                                        <span class="title">
+                                            @traducaoHelper["LOJA_EXTERNA"]:
+                                        </span>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="input-group">
+                                            <input type="text" id="lojaExternaLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA") + Helpers.Local.nomeUsuario)">
+                                            <span class="input-group-btn">
+                                                <input class="btn btn-danger" id="lojaExternaLinkCopiar" value=" @traducaoHelper["COPIAR"]">
+
+                                            </span>
+
                                         </div>
                                     </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardPontosMaximos)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-expand icon-bg"></i>
-                                        @*<img class="img-bg" src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivelAnter + ".png")" />*@
-                                        <div class="card-frame blue-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ULTIMA_QUALIFICACAO"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNomeAnter</span></div>
-                                            <div class="col-md-12 card-title-div">
-                                                @*<div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)%">
-                                                </div>
-                                            </div>
-                                            <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagemAnter % </span>*@
-                                            </div>
-                                        </div>
+                                    <div class="col-md-2">
+                                        <span id="copiadoLojaExterna">@traducaoHelper["COPIANDO"]</span>
                                     </div>
                                 </div>
-                            }
+                            </div>
+                        }
+                    }
+                }
 
-                            @if (ViewBag.DashboardPontosCiclo)
-                            {
-                                <div class="col-md-6 blog-tag-data hide">
-                                    <div class="dashboard-stat2 bg-blue-ebonyclay">
-                                        <div class="display">
-                                            <div class="number">
-                                                <h3 class="font-green-sharp">@pontos.ToString(moedaPadrao.MascaraOut)</h3>
-                                                <small>@traducaoHelper["PONTOS"] </small>
-                                            </div>
-                                            <div class="icon">
-                                                <p class=""><img src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" style="width: 96px;" /></p>
-                                            </div>
-                                        </div>
-                                        <div class="progress-info">
-                                            <h4 class="font-green-sharp">@ViewBag.PlanoCarreiraNome</h4>
-                                            <div class="progress">
-                                                <span style="width: @ViewBag.PlanoCarreiraPercentagem.ToString().Replace(',', '.');" class="progress-bar progress-bar-success green-sharp">
-                                                    <span class="sr-only">@ViewBag.PlanoCarreiraPercentagem</span>
-                                                </span>
-                                                <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
+                @if (!usuarioContainer.PendenteMigracao && !ViewBag.RedeTabuleiro)
+                {
+                    <div class="row">
+                        <div class="col-md-8 padding-lateral-10">
+                            <div class="portlet-body expand" style="padding:0px 0px 10px 0px!important;">
 
-                                                    </div>
-                                                </div>
-                                                <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @*PLANO_ATUAL*@
+                                @if (ViewBag.DashboardAssociacao)
                                 {
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
                                         <div>
-                                            <i class="fa fa-bar-chart-o icon-bg"></i>
-                                            <div class="card-frame grey-card">
-                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TOTAL_PONTOS"] </span></div>
-                                                <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PontosTotal.ToString("##,###,##0")</span></div>
+                                            <i class="fa fa-star icon-bg"></i>
+                                            <div class="card-frame  card-home card-cor">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PLANO_ATUAL"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@(usuarioAssociacao != null ? usuarioAssociacao.Nome : "")</span></div>
                                                 <div class="col-md-12 card-title-div"><span class="card-content2-txt"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @*SALDO*@
+                                @if (ViewBag.DashboardSaldo)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-money icon-bg"></i>
+                                            <div class="card-frame card-home green-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["SALDO_TOTAL_DISPONIVEL"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.SaldoTotalDisponivel.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-money icon-bg"></i>
+                                            <div class="card-frame card-home green-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["SALDO_GANHOS_DIARIOS"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contasaldo" class="card-content-txt">@ViewBag.SaldoGanhosDiarios.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-money icon-bg"></i>
+                                            <div class="card-frame card-home green-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["SALDO_GANHOS_COMISSOES"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contasaldo" class="card-content-txt">@ViewBag.SaldoGanhosComissoes.ToString(moedaPadrao.MascaraOut)</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -845,13 +560,307 @@
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
                                         <div>
                                             <i class="fa fa-arrow-up icon-bg"></i>
-                                            @*<img class="img-bg" src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" />*@
-                                            <div class="card-frame pink-card">
-                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["QUALIFICACAO"]  ( @pontos.ToString("##,###,##0") @traducaoHelper["PONTOS"] )</span></div>
-                                                <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNome</span></div>
-                                                <div class="col-md-12 card-title-div">
+                                            <div class="card-frame card-home purple-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_GANHOS_DIARIOS"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoGanhosDiarios.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-arrow-up icon-bg"></i>
+                                            <div class="card-frame card-home purple-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_GANHOS_UNILEVAL"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoGanhosUnilevel.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-arrow-up icon-bg"></i>
+                                            <div class="card-frame card-home purple-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_GANHOS_GLOBAIS"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoGanhosGlobais.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-arrow-up icon-bg"></i>
+                                            <div class="card-frame card-home purple-simple-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ACUMULADO_TOTAL"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="totalAcumulado" class="card-content-txt">@ViewBag.AcumuladoTotal.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardDiretos)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-group icon-bg"></i>
+                                            <div class="card-frame card-home card-cor">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["MEMBROS"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.QtdeDiretos.ToString("##,###,##0")</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["QTDE_ATUAL"].ToUpper()</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardUsuarios)
+                                {
+                                    if (ViewBag.RedeBinaria)
+                                    {
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                            <div>
+                                                <i class="icon-users icon-bg"></i>
+                                                <div class="card-frame grey-card">
+                                                    <div class="col-md-12 card-title-div">
+                                                        <span class="card-title-txt">
+                                                            @traducaoHelper["EQUIPE"]
+                                                        </span>
+                                                    </div>
+                                                    <div class="row number-stats margin-bottom-30">
+                                                        <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
+                                                            <div class="stat-left">
+                                                                <div class="stat-chart">
+                                                                    <div id="sparkline_bar"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt">
+                                                                        @traducaoHelper["ESQUERDA"]
+                                                                    </div>
+                                                                    <div class="card-content-txt">
+                                                                        @ViewBag.RedeEsquerdo
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
+                                                            <div class="stat-right">
+                                                                <div class="stat-chart">
+                                                                    <div id="sparkline_bar2"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt">
+                                                                        @traducaoHelper["DIREITA"]
+                                                                    </div>
+                                                                    <div class="card-content-txt">
+                                                                        @ViewBag.RedeDireito
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-scrollable table-scrollable-borderless">
+                                                        <table class="table table-hover table-light bg-grey-cararra hide">
+                                                            <thead>
+                                                                <tr class="uppercase">
+                                                                    <th width="40%" style="text-align:center;">@traducaoHelper["PLANO"]</th>
+                                                                    <th width="30%" style="text-align:center;">@traducaoHelper["ESQUERDA"]</th>
+                                                                    <th width="30%" style="text-align:center;">@traducaoHelper["DIREITA"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var associacao in associacoes.OrderBy(a => a.Nivel))
+                                                                {
+                                                                    var associados = usuario.PatrocinadosDireto.Where(u => u.StatusID == (int)Core.Entities.Usuario.TodosStatus.Associado && u.NivelAssociacao == associacao.Nivel);
+                                                                    var esquerda = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "0"));
+                                                                    var direita = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "1"));
+                                                                    <tr>
+                                                                        <td><h4>@associacao.Nome</h4></td>
+                                                                        <td style="text-align:center;"><h4>@esquerda</h4></td>
+                                                                        <td style="text-align:center;"><h4>@direita</h4></td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                            <div>
+                                                <i class="icon-users icon-bg"></i>
+                                                <div class="card-frame card-home card-cor">
+                                                    <div class="col-md-12 card-title-div">
+                                                        <span class="card-title-txt">@traducaoHelper["EQUIPE"] </span>
+                                                    </div>
+                                                    <div class="row number-stats margin-bottom-30">
+                                                        <div class="col-md-4 col-sm-4 col-xs-4 card-title-div">
+                                                            <div class="stat-left">
+                                                                <div class="stat-chart">
+                                                                    <div id="sparkline_bar"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt">
+                                                                        @traducaoHelper["COLUNA0"]
+                                                                    </div>
+                                                                    <div class="card-content-txt">
+                                                                        @ViewBag.RedeColuna0
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-sm-4 col-xs-4 card-title-div">
+                                                            <div class="stat-right">
+                                                                <div class="stat-chart">
+                                                                    <div id="sparkline_bar2"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt" style="text-align:center!important;">
+                                                                        @traducaoHelper["COLUNA1"]
+                                                                    </div>
+                                                                    <div class="card-content-txt" style="text-align:center!important;">
+                                                                        @ViewBag.RedeColuna1
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-sm-4 col-xs-4 card-title-div">
+                                                            <div class="stat-right">
+                                                                <div class="stat-chart">
+                                                                    <div id="sparkline_bar2"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt">
+                                                                        @traducaoHelper["COLUNA2"]
+                                                                    </div>
+                                                                    <div class="card-content-txt">
+                                                                        @ViewBag.RedeColuna2
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-scrollable table-scrollable-borderless">
+                                                        <table class="table table-hover table-light bg-grey-cararra hide">
+                                                            <thead>
+                                                                <tr class="uppercase">
+                                                                    <th width="40%" style="text-align:center;">@traducaoHelper["PLANO"]</th>
+                                                                    <th width="30%" style="text-align:center;">@traducaoHelper["ESQUERDA"]</th>
+                                                                    <th width="30%" style="text-align:center;">@traducaoHelper["DIREITA"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var associacao in associacoes.OrderBy(a => a.Nivel))
+                                                                {
+                                                                    var associados = usuario.PatrocinadosDireto.Where(u => u.StatusID == (int)Core.Entities.Usuario.TodosStatus.Associado && u.NivelAssociacao == associacao.Nivel);
+                                                                    var esquerda = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "0"));
+                                                                    var direita = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "1"));
+                                                                    <tr>
+                                                                        <td><h4>@associacao.Nome</h4></td>
+                                                                        <td style="text-align:center;"><h4>@esquerda</h4></td>
+                                                                        <td style="text-align:center;"><h4>@direita</h4></td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                @if (ViewBag.DashboardPontos)
+                                {
+                                    @*<div class="col-md-6 blog-tag-data hide">
+                                        <div class="dashboard-stat2 bg-blue-ebonyclay">
+                                            <div class="display">
+                                                <div class="number">
+                                                    <h3 class="font-green-sharp">@pontos.ToString(moedaPadrao.MascaraOut)</h3>
+                                                    <small>@traducaoHelper["PONTOS"] (@ViewBag.PontosLado)</small>
+                                                </div>
+                                                <div class="icon">
+                                                    <p class=""><img src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" style="width: 96px;" /></p>
+                                                </div>
+                                            </div>
+                                            <div class="progress-info">
+                                                <h4 class="font-green-sharp">@ViewBag.PlanoCarreiraNome</h4>
+                                                <div class="progress">
+                                                    <span style="width: @ViewBag.PlanoCarreiraPercentagem.ToString().Replace(',', '.');" class="progress-bar progress-bar-success green-sharp">
+                                                        <span class="sr-only">@ViewBag.PlanoCarreiraPercentagem</span>
+                                                    </span>
                                                     <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.PlanoCarreiraPercentagem)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.PlanoCarreiraPercentagem)%">
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
+
+                                                        </div>
+                                                    </div>
+                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>*@
+
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            @*<i class="fa fa-sign-in icon-bg"></i>*@
+                                            <div class="card-frame pink-card">
+                                                <img class="img-bg" style="margin-top: -9px;" src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/associacao/" + classificacao.Nivel + ".png")" />
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PLANO_CARREIRA"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNome</span></div>
+                                                @*<div class="col-md-12 card-title-div">
+                                                    <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 15px 4px -2px 4px;">
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
+                                                        </div>
+                                                    </div>
+                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
+                                                </div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@classificacao.Nome</span></div>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardPontosMaximos)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-expand icon-bg"></i>
+                                            @*<img class="img-bg" src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivelAnter + ".png")" />*@
+                                            <div class="card-frame blue-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ULTIMA_QUALIFICACAO"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNomeAnter</span></div>
+                                                <div class="col-md-12 card-title-div">
+                                                    @*<div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.PlanoCarreiraPercentagemAnter)%">
+                                                        </div>
+                                                    </div>
+                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagemAnter % </span>*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardPontosCiclo)
+                                {
+                                    <div class="col-md-6 blog-tag-data hide">
+                                        <div class="dashboard-stat2 bg-blue-ebonyclay">
+                                            <div class="display">
+                                                <div class="number">
+                                                    <h3 class="font-green-sharp">@pontos.ToString(moedaPadrao.MascaraOut)</h3>
+                                                    <small>@traducaoHelper["PONTOS"] </small>
+                                                </div>
+                                                <div class="icon">
+                                                    <p class=""><img src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" style="width: 96px;" /></p>
+                                                </div>
+                                            </div>
+                                            <div class="progress-info">
+                                                <h4 class="font-green-sharp">@ViewBag.PlanoCarreiraNome</h4>
+                                                <div class="progress">
+                                                    <span style="width: @ViewBag.PlanoCarreiraPercentagem.ToString().Replace(',', '.');" class="progress-bar progress-bar-success green-sharp">
+                                                        <span class="sr-only">@ViewBag.PlanoCarreiraPercentagem</span>
+                                                    </span>
+                                                    <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@ViewBag.PlanoCarreiraPercentagem" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.PlanoCarreiraPercentagem%">
+
                                                         </div>
                                                     </div>
                                                     <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
@@ -859,390 +868,421 @@
                                             </div>
                                         </div>
                                     </div>
-                                }
-                            }
-
-                            @if (ViewBag.DashboardAtividadeMensal)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-bolt icon-bg"></i>
-                                        <div class="card-frame @(ViewBag.AtividadeMensalAtivo ? "green-card" : "red-card") ">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVIDADE_MENSAL"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt"></span><span id="contaatividademensal" class="card-content-txt">@(ViewBag.AtividadeMensalAtivo ? traducaoHelper["ATIVO"] : traducaoHelper["INATIVO"])</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(ViewBag.DataValidade == null ? "" : @traducaoHelper["VALIDO_ATE"] + ViewBag.DataValidade)</span><span id="contaatividaderestante" class="card-content2-txt"></span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardBonificacao)
-                            {
-                                <!-- Bonus 1 -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-hand-o-up icon-bg"></i>
-                                        <div class="card-frame red-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@ViewBag.Bonificacoes[0].Nome</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contabonusindicacao" class="card-content-txt">@ViewBag.Bonus_01</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["ACUMULADO"] </span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Bonus 2 -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-group icon-bg"></i>
-                                        <div class="card-frame blue-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@ViewBag.Bonificacoes[1].Nome</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contabonusatividade" class="card-content-txt">@ViewBag.Bonus_02</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["ACUMULADO"] </span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardPedidosPendentesPgto)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="icon-basket icon-bg"></i>
-                                        <div class="card-frame turquoise-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PEDIDOS_PENDENTES"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt"></span><span id="pedidoPendentes" class="card-content-txt">@ViewBag.QtdePedidosPendentesPgto</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardContatos)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="icon-call-end icon-bg"></i>
-                                        <div class="card-frame grey-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONTATOS_PENDENTES"] </span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt"></span><span id="contatosPendentes" class="card-content-txt">0</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardBinAcumulado)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <a href="@(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_PONTOS_BINARIO") ? Url.Action("PontosBinario", "Relatorios", new { ProcuraDtIni = Core.Helpers.App.DateTimeZion.Date.ToString(ViewBag.MascaraData), ProcuraDtFim = Core.Helpers.App.DateTimeZion.Date.ToString(ViewBag.MascaraData) }) : "javascript:;")">
-                                            <i class="fa fa-sort-amount-asc icon-bg"></i>
-
-                                            <div class="card-frame grey-card">
-                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["BINARIO_ACUMULADO"]</span></div>
-                                                <div class="row number-stats margin-bottom-30">
-                                                    <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
-                                                        <div class="stat-left">
-                                                            <div class="stat-chart">
-                                                                <div id="sparkline_bar"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt">
-                                                                    @traducaoHelper["ESQUERDA"]
-                                                                </div>
-                                                                <div class="card-content-txt">
-                                                                    @acumuladoEsquerda.ToString(moedaPadrao.MascaraOut)
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
-                                                        <div class="stat-right">
-                                                            <div class="stat-chart">
-                                                                <!-- do not line break "sparkline_bar" div. sparkline chart has an issue when the container div has line break -->
-                                                                <div id="sparkline_bar2"></div>
-                                                            </div>
-                                                            <div class="stat-number">
-                                                                <div class="card-title-txt">
-                                                                    @traducaoHelper["DIREITA"]
-                                                                </div>
-                                                                <div class="card-content-txt">
-                                                                    @acumuladoDireita.ToString(moedaPadrao.MascaraOut)
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="table-scrollable table-scrollable-borderless">
-                                                    <table class="table table-hover table-light bg-grey-cararra hide">
-                                                        <thead>
-                                                            <tr class="uppercase">
-                                                                <th width="40%" style="text-align:center;">@traducaoHelper["DATA"]</th>
-                                                                <th width="30%" style="text-align:center;">@traducaoHelper["ESQUERDA"]</th>
-                                                                <th width="30%" style="text-align:center;">@traducaoHelper["DIREITA"]</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach (var associacao in associacoes.OrderBy(a => a.Nivel))
-                                                            {
-                                                                var associados = usuario.PatrocinadosDireto.Where(u => u.StatusID == (int)Core.Entities.Usuario.TodosStatus.Associado && u.NivelAssociacao == associacao.Nivel);
-                                                                var esquerda = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "0"));
-                                                                var direita = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "1"));
-                                                                <tr>
-                                                                    <td><h4>@associacao.Nome</h4></td>
-                                                                    <td style="text-align:center;"><h4>@esquerda</h4></td>
-                                                                    <td style="text-align:center;"><h4>@direita</h4></td>
-                                                                </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardBinDiario)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <div class="card-frame scroll-card" style="min-height: 160px; max-height: 251px;">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["BINARIO_DIARIO"]</span></div>
-                                            <div class="col-md-12">
-                                                @*<div class="table-scrollable table-scrollable-borderless">*@
-                                                <div>
-                                                    <table class="table table-hover table-light">
-                                                        <thead>
-                                                            <tr class="uppercase">
-                                                                <th colspan="2">
-                                                                    @traducaoHelper["DATA"]
-                                                                </th>
-                                                                <th>
-                                                                    @traducaoHelper["ESQUERDA"]
-                                                                </th>
-                                                                <th>
-                                                                    @traducaoHelper["DIREITA"]
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        @if (binarioData != null)
-                                                        {
-                                                            foreach (var item in binarioData)
-                                                            {
-                                                                <tr>
-                                                                    <td class="fit">
-                                                                        @item.DataFim.ToString("dd/MM/yyyy")
-                                                                    </td>
-                                                                    <td>
-                                                                        &nbsp;
-                                                                    </td>
-                                                                    <td>
-                                                                        @(item.ValorDiaPernaEsquerda.HasValue ? item.ValorDiaPernaEsquerda.Value.ToString(moedaPadrao.MascaraOut) : valorZerado.ToString(moedaPadrao.MascaraOut))
-                                                                    </td>
-                                                                    <td>
-                                                                        @(item.ValorDiaPernaDireita.HasValue ? item.ValorDiaPernaDireita.Value.ToString(moedaPadrao.MascaraOut) : valorZerado.ToString(moedaPadrao.MascaraOut))
-                                                                    </td>
-                                                                </tr>
-                                                            }
-                                                        }
-                                                    </table>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardAtivos)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <div class="card-frame scroll-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVOS"]</span></div>
-                                            <div class="col-md-12">
-                                                <div class="table-scrollable table-scrollable-borderless">
-                                                    <table class="table table-hover table-light">
-                                                        <thead>
-                                                            <tr class="uppercase">
-                                                                <th>
-                                                                    @traducaoHelper["LOGIN"]
-                                                                </th>
-                                                                <th>
-                                                                    @traducaoHelper["DATA"]
-                                                                </th>
-                                                                <th>
-                                                                    @traducaoHelper["LADO"]
-                                                                </th>
-                                                                <th>
-                                                                    @traducaoHelper["STATUS"]
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        @if (ativoMensal != null)
-                                                        {
-                                                            foreach (var item in ativoMensal)
-                                                            {
-                                                                data = item.DataValidade ?? Core.Helpers.App.DateTimeZion;
-                                                                <tr>
-                                                                    <td>
-                                                                        <a href="javascript:;" class="primary-link">@item.Login</a>
-                                                                    </td>
-                                                                    <td>
-                                                                        @if (@item.DataValidade != null)
-                                                                        {
-                                                                            @data.ToString(ViewBag.MascaraData)
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        @switch (@item.Lado)
-                                                                        {
-                                                                            case "LD":
-                                                                                @traducaoHelper["DIREITO"];
-                                                                                break;
-                                                                            case "LE":
-                                                                                @traducaoHelper["ESQUERDO"];
-                                                                                break;
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        @if (item.Status == 0)
-                                                                        {
-                                                                            <i class="fa fa-thumbs-down" style="color:red"></i>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <i class="fa fa-thumbs-up" style="color:green"></i>
-                                                                        }
-                                                                    </td>
-
-                                                                </tr>
-                                                            }
-                                                        }
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardTetoGanhosTotais)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame gold-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TETO_GANHOS_TOTAIS"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo @ViewBag.TetoGanhosTotais.ToString(moedaPadrao.MascaraOut)</span></div>
-                                            <div class="col-md-12 card-title-div">
-                                                <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosTotais * 100)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosTotais * 100)%">
-                                                    </div>
-                                                </div>
-                                                <span class="card-content2-txt" style="display:inline-flex!important;"> @Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosTotais * 100, 2) % </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardTetoGanhosAlavancagem)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame springgreen-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TETO_GANHOS_ALAVANCAGEM"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo @ViewBag.TetoGanhosAlavancagem.ToString(moedaPadrao.MascaraOut)</span></div>
-                                            <div class="col-md-12 card-title-div">
-                                                <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
-                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosAlavancagem * 100)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosAlavancagem * 100)%">
-                                                    </div>
-                                                </div>
-                                                <span class="card-content2-txt" style="display:inline-flex!important;"> @Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosAlavancagem * 100, 2) % </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardTetoGanhosBonusEquipeBinario)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-arrow-up icon-bg"></i>
-                                        <div class="card-frame magenta-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TETO_GANHOS_BONUS_BINARIO"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo @ViewBag.TetoGanhosBonusEquipeBinario.ToString(moedaPadrao.MascaraOut)</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.DashboardGanhosTotaisBonificacao)
-                            {
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                    <div>
-                                        <i class="fa fa-hand-o-up icon-bg"></i>
-                                        <div class="card-frame red-card">
-                                            <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TOTAL_GANHOS_BONIFICACAO"]</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span class="card-content-txt">@ViewBag.GanhosTotaisBonificacao.ToString(moedaPadrao.MascaraOut)</span></div>
-                                            <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["ACUMULADO"] </span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            @if (ViewBag.ExibeLadoDerramamento)
-                            {
-                                if (ViewBag.RedeBinaria)
-                                {
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                        <i class="fa fa-cog icon-bg" style="margin-left: 12px;"></i>
-                                        <div class="card-frame red-card">
-                                            <div class="col-md-12 card-title-div" style="margin-bottom: 10px;">
-                                                @traducaoHelper["LADO_DERRAMAMENTO"].ToLower()
-                                            </div>
-                                            <div style="text-align:center;">
-                                                @foreach (var item in listaDerramamento)
-                                                {
-                                                    <input style="margin-left: 30px;" name="group1" type="radio" value="@item.Value" @(item.Selected ? "checked='checked'" : "") onclick="Derramamento(this.value)" /><label for="group1" style="margin-left: 5px;" class="card-title-div">@item.Text</label>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
-                                        <i class="icon-directions icon-bg" style="margin-left: 12px;"></i>
-                                        <div class="card-frame red-simple-card card-home">
-                                            <div class="col-md-12 card-title-div" style="margin-bottom: 10px;">
-                                                @traducaoHelper["LADO_DERRAMAMENTO"].ToLower()
-                                            </div>
+                                    {
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
                                             <div>
-                                                <div class="form-group form-md-line-input" style="margin-right: 10px;">
-                                                    <select class="form-control text-primary" id="ladoDerramamento" onchange="Derramamento(this.value)" style="max-width:200px; padding-right:5px!important; color:white;">
-                                                        <option class="text-primary" value="">@traducaoHelper["SELECIONAR"]</option>
-                                                        @foreach (var item in listaDerramamento)
-                                                        {
-                                                            <option class="text-primary" value="@item.Value" @(usuario.DerramamentoID.ToString() == item.Value ? "selected=selected" : "")>@item.Text</option>
-                                                        }
-                                                    </select>
+                                                <i class="fa fa-bar-chart-o icon-bg"></i>
+                                                <div class="card-frame grey-card">
+                                                    <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TOTAL_PONTOS"] </span></div>
+                                                    <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PontosTotal.ToString("##,###,##0")</span></div>
+                                                    <div class="col-md-12 card-title-div"><span class="card-content2-txt"></span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                            <div>
+                                                <i class="fa fa-arrow-up icon-bg"></i>
+                                                @*<img class="img-bg" src="@Url.Content("~/Content/img/" + Helpers.Local.Cliente + "/classificacao/" + ViewBag.PlanoCarreiraNivel + ".png")" />*@
+                                                <div class="card-frame pink-card">
+                                                    <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["QUALIFICACAO"]  ( @pontos.ToString("##,###,##0") @traducaoHelper["PONTOS"] )</span></div>
+                                                    <div class="col-md-12 card-title-div"><span id="contameusdiretos" class="card-content-txt">@ViewBag.PlanoCarreiraNome</span></div>
+                                                    <div class="col-md-12 card-title-div">
+                                                        <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
+                                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.PlanoCarreiraPercentagem)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.PlanoCarreiraPercentagem)%">
+                                                            </div>
+                                                        </div>
+                                                        <span class="card-content2-txt" style="display:inline-flex!important;"> @ViewBag.PlanoCarreiraPercentagem % </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                @if (ViewBag.DashboardAtividadeMensal)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-bolt icon-bg"></i>
+                                            <div class="card-frame @(ViewBag.AtividadeMensalAtivo ? "green-card" : "red-card") ">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVIDADE_MENSAL"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt"></span><span id="contaatividademensal" class="card-content-txt">@(ViewBag.AtividadeMensalAtivo ? traducaoHelper["ATIVO"] : traducaoHelper["INATIVO"])</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(ViewBag.DataValidade == null ? "" : @traducaoHelper["VALIDO_ATE"] + ViewBag.DataValidade)</span><span id="contaatividaderestante" class="card-content2-txt"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardBonificacao)
+                                {
+                                    <!-- Bonus 1 -->
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-hand-o-up icon-bg"></i>
+                                            <div class="card-frame red-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@ViewBag.Bonificacoes[0].Nome</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contabonusindicacao" class="card-content-txt">@ViewBag.Bonus_01</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["ACUMULADO"] </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bonus 2 -->
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-group icon-bg"></i>
+                                            <div class="card-frame blue-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@ViewBag.Bonificacoes[1].Nome</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span id="contabonusatividade" class="card-content-txt">@ViewBag.Bonus_02</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["ACUMULADO"] </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardPedidosPendentesPgto)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="icon-basket icon-bg"></i>
+                                            <div class="card-frame turquoise-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["PEDIDOS_PENDENTES"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt"></span><span id="pedidoPendentes" class="card-content-txt">@ViewBag.QtdePedidosPendentesPgto</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardContatos)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="icon-call-end icon-bg"></i>
+                                            <div class="card-frame grey-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONTATOS_PENDENTES"] </span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt"></span><span id="contatosPendentes" class="card-content-txt">0</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardBinAcumulado)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <a href="@(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_PONTOS_BINARIO") ? Url.Action("PontosBinario", "Relatorios", new { ProcuraDtIni = Core.Helpers.App.DateTimeZion.Date.ToString(ViewBag.MascaraData), ProcuraDtFim = Core.Helpers.App.DateTimeZion.Date.ToString(ViewBag.MascaraData) }) : "javascript:;")">
+                                                <i class="fa fa-sort-amount-asc icon-bg"></i>
+
+                                                <div class="card-frame grey-card">
+                                                    <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["BINARIO_ACUMULADO"]</span></div>
+                                                    <div class="row number-stats margin-bottom-30">
+                                                        <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
+                                                            <div class="stat-left">
+                                                                <div class="stat-chart">
+                                                                    <div id="sparkline_bar"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt">
+                                                                        @traducaoHelper["ESQUERDA"]
+                                                                    </div>
+                                                                    <div class="card-content-txt">
+                                                                        @acumuladoEsquerda.ToString(moedaPadrao.MascaraOut)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 col-sm-6 col-xs-6 card-title-div">
+                                                            <div class="stat-right">
+                                                                <div class="stat-chart">
+                                                                    <!-- do not line break "sparkline_bar" div. sparkline chart has an issue when the container div has line break -->
+                                                                    <div id="sparkline_bar2"></div>
+                                                                </div>
+                                                                <div class="stat-number">
+                                                                    <div class="card-title-txt">
+                                                                        @traducaoHelper["DIREITA"]
+                                                                    </div>
+                                                                    <div class="card-content-txt">
+                                                                        @acumuladoDireita.ToString(moedaPadrao.MascaraOut)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-scrollable table-scrollable-borderless">
+                                                        <table class="table table-hover table-light bg-grey-cararra hide">
+                                                            <thead>
+                                                                <tr class="uppercase">
+                                                                    <th width="40%" style="text-align:center;">@traducaoHelper["DATA"]</th>
+                                                                    <th width="30%" style="text-align:center;">@traducaoHelper["ESQUERDA"]</th>
+                                                                    <th width="30%" style="text-align:center;">@traducaoHelper["DIREITA"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var associacao in associacoes.OrderBy(a => a.Nivel))
+                                                                {
+                                                                    var associados = usuario.PatrocinadosDireto.Where(u => u.StatusID == (int)Core.Entities.Usuario.TodosStatus.Associado && u.NivelAssociacao == associacao.Nivel);
+                                                                    var esquerda = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "0"));
+                                                                    var direita = associados.Count(a => a.Assinatura.StartsWith(usuario.Assinatura + "1"));
+                                                                    <tr>
+                                                                        <td><h4>@associacao.Nome</h4></td>
+                                                                        <td style="text-align:center;"><h4>@esquerda</h4></td>
+                                                                        <td style="text-align:center;"><h4>@direita</h4></td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardBinDiario)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <div class="card-frame scroll-card" style="min-height: 160px; max-height: 251px;">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["BINARIO_DIARIO"]</span></div>
+                                                <div class="col-md-12">
+                                                    @*<div class="table-scrollable table-scrollable-borderless">*@
+                                                    <div>
+                                                        <table class="table table-hover table-light">
+                                                            <thead>
+                                                                <tr class="uppercase">
+                                                                    <th colspan="2">
+                                                                        @traducaoHelper["DATA"]
+                                                                    </th>
+                                                                    <th>
+                                                                        @traducaoHelper["ESQUERDA"]
+                                                                    </th>
+                                                                    <th>
+                                                                        @traducaoHelper["DIREITA"]
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            @if (binarioData != null)
+                                                            {
+                                                                foreach (var item in binarioData)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="fit">
+                                                                            @item.DataFim.ToString("dd/MM/yyyy")
+                                                                        </td>
+                                                                        <td>
+                                                                            &nbsp;
+                                                                        </td>
+                                                                        <td>
+                                                                            @(item.ValorDiaPernaEsquerda.HasValue ? item.ValorDiaPernaEsquerda.Value.ToString(moedaPadrao.MascaraOut) : valorZerado.ToString(moedaPadrao.MascaraOut))
+                                                                        </td>
+                                                                        <td>
+                                                                            @(item.ValorDiaPernaDireita.HasValue ? item.ValorDiaPernaDireita.Value.ToString(moedaPadrao.MascaraOut) : valorZerado.ToString(moedaPadrao.MascaraOut))
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardAtivos)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <div class="card-frame scroll-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVOS"]</span></div>
+                                                <div class="col-md-12">
+                                                    <div class="table-scrollable table-scrollable-borderless">
+                                                        <table class="table table-hover table-light">
+                                                            <thead>
+                                                                <tr class="uppercase">
+                                                                    <th>
+                                                                        @traducaoHelper["LOGIN"]
+                                                                    </th>
+                                                                    <th>
+                                                                        @traducaoHelper["DATA"]
+                                                                    </th>
+                                                                    <th>
+                                                                        @traducaoHelper["LADO"]
+                                                                    </th>
+                                                                    <th>
+                                                                        @traducaoHelper["STATUS"]
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            @if (ativoMensal != null)
+                                                            {
+                                                                foreach (var item in ativoMensal)
+                                                                {
+                                                                    data = item.DataValidade ?? Core.Helpers.App.DateTimeZion;
+                                                                    <tr>
+                                                                        <td>
+                                                                            <a href="javascript:;" class="primary-link">@item.Login</a>
+                                                                        </td>
+                                                                        <td>
+                                                                            @if (@item.DataValidade != null)
+                                                                            {
+                                                                                @data.ToString(ViewBag.MascaraData)
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            @switch (@item.Lado)
+                                                                            {
+                                                                                case "LD":
+                                                                                    @traducaoHelper["DIREITO"];
+                                                                                    break;
+                                                                                case "LE":
+                                                                                    @traducaoHelper["ESQUERDO"];
+                                                                                    break;
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            @if (item.Status == 0)
+                                                                            {
+                                                                                <i class="fa fa-thumbs-down" style="color:red"></i>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <i class="fa fa-thumbs-up" style="color:green"></i>
+                                                                            }
+                                                                        </td>
+
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 }
-                            }
-                        </div>
-                    </div>
 
-                    <!-- END ACCORDION PORTLET-->
-                </div>
-            }
-        </div>
+                                @if (ViewBag.DashboardTetoGanhosTotais)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-arrow-up icon-bg"></i>
+                                            <div class="card-frame gold-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TETO_GANHOS_TOTAIS"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo @ViewBag.TetoGanhosTotais.ToString(moedaPadrao.MascaraOut)</span></div>
+                                                <div class="col-md-12 card-title-div">
+                                                    <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosTotais * 100)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosTotais * 100)%">
+                                                        </div>
+                                                    </div>
+                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosTotais * 100, 2) % </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardTetoGanhosAlavancagem)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-arrow-up icon-bg"></i>
+                                            <div class="card-frame springgreen-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TETO_GANHOS_ALAVANCAGEM"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo @ViewBag.TetoGanhosAlavancagem.ToString(moedaPadrao.MascaraOut)</span></div>
+                                                <div class="col-md-12 card-title-div">
+                                                    <div class="progress progress-striped active" style="height:10px!important; width:100px; display:inline-block;margin: 0px 4px -2px 4px;">
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosAlavancagem * 100)" aria-valuemin="0" aria-valuemax="100" style="width:@Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosAlavancagem * 100)%">
+                                                        </div>
+                                                    </div>
+                                                    <span class="card-content2-txt" style="display:inline-flex!important;"> @Math.Round(ViewBag.GanhosTotaisBonificacao / ViewBag.TetoGanhosAlavancagem * 100, 2) % </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardTetoGanhosBonusEquipeBinario)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-arrow-up icon-bg"></i>
+                                            <div class="card-frame magenta-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TETO_GANHOS_BONUS_BINARIO"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo @ViewBag.TetoGanhosBonusEquipeBinario.ToString(moedaPadrao.MascaraOut)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.DashboardGanhosTotaisBonificacao)
+                                {
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                        <div>
+                                            <i class="fa fa-hand-o-up icon-bg"></i>
+                                            <div class="card-frame red-card">
+                                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["TOTAL_GANHOS_BONIFICACAO"]</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@moedaPadrao.Simbolo </span><span class="card-content-txt">@ViewBag.GanhosTotaisBonificacao.ToString(moedaPadrao.MascaraOut)</span></div>
+                                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@traducaoHelper["ACUMULADO"] </span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (ViewBag.ExibeLadoDerramamento)
+                                {
+                                    if (ViewBag.RedeBinaria)
+                                    {
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                            <i class="fa fa-cog icon-bg" style="margin-left: 12px;"></i>
+                                            <div class="card-frame red-card">
+                                                <div class="col-md-12 card-title-div" style="margin-bottom: 10px;">
+                                                    @traducaoHelper["LADO_DERRAMAMENTO"].ToLower()
+                                                </div>
+                                                <div style="text-align:center;">
+                                                    @foreach (var item in listaDerramamento)
+                                                    {
+                                                        <input style="margin-left: 30px;" name="group1" type="radio" value="@item.Value" @(item.Selected ? "checked='checked'" : "") onclick="Derramamento(this.value)" /><label for="group1" style="margin-left: 5px;" class="card-title-div">@item.Text</label>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin" id="cardGrid">
+                                            <i class="icon-directions icon-bg" style="margin-left: 12px;"></i>
+                                            <div class="card-frame red-simple-card card-home">
+                                                <div class="col-md-12 card-title-div" style="margin-bottom: 10px;">
+                                                    @traducaoHelper["LADO_DERRAMAMENTO"].ToLower()
+                                                </div>
+                                                <div>
+                                                    <div class="form-group form-md-line-input" style="margin-right: 10px;">
+                                                        <select class="form-control text-primary" id="ladoDerramamento" onchange="Derramamento(this.value)" style="max-width:200px; padding-right:5px!important; color:white;">
+                                                            <option class="text-primary" value="">@traducaoHelper["SELECIONAR"]</option>
+                                                            @foreach (var item in listaDerramamento)
+                                                            {
+                                                                <option class="text-primary" value="@item.Value" @(usuario.DerramamentoID.ToString() == item.Value ? "selected=selected" : "")>@item.Text</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <!-- END ACCORDION PORTLET-->
+                    </div>
+                }
+            </div>
+        }
+
     </div>
 </div>
 <!-- END PAGE CONTENT-->
@@ -1317,6 +1357,57 @@ if (!totalAcumulado.error) {
 } else {
   console.error(totalAcumulado.error);
 };*@
+</script>
+
+<script>
+    $('.convite')
+        .css('cursor', 'pointer')
+        .click(
+            function () {
+                var tabuleiroID = $(this).attr("data-id");
+                
+                
+            }
+        )
+        .hover(
+            function () {
+                $(this).css('background', '#32cd32');
+            },
+            function () {
+                $(this).css('background', '');
+            }
+    );
+    $('.ativo')
+        .css('cursor', 'pointer')
+        .click(
+            function () {
+                var tabuleiroID = $(this).attr("data-id");
+            }
+        )
+        .hover(
+            function () {
+                $(this).css('background', '#865fcf');
+            },
+            function () {
+                $(this).css('background', '');
+            }
+    );
+    $('.finalizado')
+        .css('cursor', 'pointer')
+        .click(
+            function () {
+                var tabuleiroID = $(this).attr("data-id");
+            }
+        )
+        .hover(
+            function () {
+                $(this).css('background', '#b92e0a');
+            },
+            function () {
+                $(this).css('background', '');
+            }
+    );
+
 </script>
 
 @Html.Partial("_avisos", (List<Core.Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos>)ViewBag.Avisos)

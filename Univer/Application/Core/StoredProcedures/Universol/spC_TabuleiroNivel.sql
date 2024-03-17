@@ -18,31 +18,47 @@ BEGIN
    --Necessario para o entity reconhecer retorno de select com tabela temporaria
    Set FMTONLY OFF
    Set nocount on
-
+   --StatusId = 1 Usuario convidado a entrar no tabuleiro pagamento não efetuado
+   --StatusId = 2 Usuario ativo no tabuleiro
+   --StatusId = 3 Usuario finalizou o tabuleiro
    SELECT
-      ID,
-      UsuarioID,
-      BoardID,
-      DataInicio,
-      DataFim,
-      StatusID,
-      Observacao
+      tn.ID,
+      tn.UsuarioID,
+      tn.BoardID,
+      boa.Nome as BoardNome,
+      tab.Posicao,
+      tn.DataInicio,
+      tn.DataFim,
+      tn.StatusID,
+      tn.Observacao
   FROM 
-      Rede.TabuleiroNivel
+      Rede.TabuleiroNivel tn,
+      Rede.Board boa,
+      Rede.TabuleiroUsuario tab
    WHERE
-      UsuarioID = @UsuarioID and
-      StatusID = @StatusID
+      tn.UsuarioID = @UsuarioID and
+      tn.StatusID = coalesce(@StatusID, @StatusID, tn.StatusID) and
+      tn.BoardID = boa.id and
+      tn.UsuarioID = tab.UsuarioID and
+      tn.BoardID = tab.boardID
+   Order By 
+      StatusID
  
 End -- Sp
 
 go
 Grant Exec on spC_TabuleiroNivel To public
 go
-
-Exec spC_TabuleiroNivel @UsuarioID = 2587, @StatusID = 1
-Exec spC_TabuleiroNivel @UsuarioID = 2587, @StatusID = 2
-Exec spC_TabuleiroNivel @UsuarioID = 2587, @StatusID = 3
-
 Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 1
 Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 2
 Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 3
+
+Exec spC_TabuleiroNivel @UsuarioID = 2585, @StatusID = 1
+Exec spC_TabuleiroNivel @UsuarioID = 2585, @StatusID = 2
+Exec spC_TabuleiroNivel @UsuarioID = 2585, @StatusID = 3
+
+Exec spC_TabuleiroNivel @UsuarioID = 2586, @StatusID = 1
+Exec spC_TabuleiroNivel @UsuarioID = 2586, @StatusID = 2
+Exec spC_TabuleiroNivel @UsuarioID = 2586, @StatusID = 3
+
+

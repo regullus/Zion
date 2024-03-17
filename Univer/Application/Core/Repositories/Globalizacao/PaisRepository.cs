@@ -25,19 +25,24 @@ namespace Core.Repositories.Globalizacao
             return cachedRepository.Where(p => p.BlocoID == blocoID);
         }
 
-        public Entities.Pais GetBySigla(string siglaComnpleta)
+        public Entities.Pais GetBySigla(string sigla)
         {
-            var split = siglaComnpleta.Split('-');
-            var sigla = "BR";
             Entities.Pais pais = null;
-
-            if (split.Any())
-            {
-                sigla = split[split.Length - 1];
-            }
+            
             try
             {
-                return cachedRepository.FirstOrDefault(p => p.Disponivel && p.Sigla == sigla);
+                if(sigla == "en-US")
+                {
+                    return cachedRepository.FirstOrDefault(p => p.ID == 476); //USA
+                }
+                else if(sigla =="es-ES") 
+                {
+                    return cachedRepository.FirstOrDefault(p => p.ID == 449); //Spain
+                }
+                else
+                {
+                    return cachedRepository.FirstOrDefault(p => p.ID == 1); //Brazil
+                }
             }
             catch (Exception)
             {
@@ -50,7 +55,7 @@ namespace Core.Repositories.Globalizacao
         {
             try
             {
-                return cachedRepository.FirstOrDefault(p => p.Disponivel && p.Padrao);
+                return cachedRepository.FirstOrDefault(p => p.ID == 476); //USA
             }
             catch (Exception)
             {

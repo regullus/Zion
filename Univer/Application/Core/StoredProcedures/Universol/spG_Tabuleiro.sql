@@ -46,14 +46,14 @@ Begin
          @NovoTabuleiroID int,
          @IncluiUsuAutBoard bit,
          @Continua bit,
-         @CoodinatorDir int,
+         @CoordinatorDir int,
          @IndicatorDirSup int,
          @IndicatorDirInf int,
          @DonatorDirSup1 int,
          @DonatorDirSup2 int,
          @DonatorDirInf1 int,
          @DonatorDirInf2 int,
-         @CoodinatorEsq int,
+         @CoordinatorEsq int,
          @IndicatorEsqSup int,
          @IndicatorEsqInf int,
          @DonatorEsqSup1 int,
@@ -82,14 +82,14 @@ Begin
       BoardID int not null,
       StatusID int not null,
       Master int not null,
-      CoodinatorDir int null,
+      CoordinatorDir int null,
       IndicatorDirSup int null,
       IndicatorDirInf int null,
       DonatorDirSup1 int null,
       DonatorDirSup2 int null,
       DonatorDirInf1 int null,
       DonatorDirInf2 int null,
-      CoodinatorEsq int null,
+      CoordinatorEsq int null,
       IndicatorEsqSup int null,
       IndicatorEsqInf int null,
       DonatorEsqSup1 int null,
@@ -110,14 +110,14 @@ Begin
       BoardID = @BoardID and
       (
          Master = @UsuarioID Or
-         CoodinatorDir = @UsuarioID Or
+         CoordinatorDir = @UsuarioID Or
          IndicatorDirSup = @UsuarioID Or
          IndicatorDirInf = @UsuarioID Or
          DonatorDirSup1 = @UsuarioID Or
          DonatorDirSup2 = @UsuarioID Or
          DonatorDirInf1 = @UsuarioID Or
          DonatorDirInf2 = @UsuarioID Or
-         CoodinatorEsq = @UsuarioID Or
+         CoordinatorEsq = @UsuarioID Or
          IndicatorEsqSup = @UsuarioID Or
          IndicatorEsqInf = @UsuarioID Or
          DonatorEsqSup1 = @UsuarioID Or
@@ -152,14 +152,14 @@ Begin
                tab.BoardID as BoardID,
                tab.StatusID as StatusID,
                tab.Master as Master,
-               tab.CoodinatorDir as CoodinatorDir,
+               tab.CoordinatorDir as CoordinatorDir,
                tab.IndicatorDirSup as IndicatorDirSup,
                tab.IndicatorDirInf as IndicatorDirInf,
                tab.DonatorDirSup1 as DonatorDirSup1,
                tab.DonatorDirSup2 as DonatorDirSup2,
                tab.DonatorDirInf1 as DonatorDirInf1,
                tab.DonatorDirInf2 as DonatorDirInf2,
-               tab.CoodinatorEsq as CoodinatorEsq,
+               tab.CoordinatorEsq as CoordinatorEsq,
                tab.IndicatorEsqSup as IndicatorEsqSup,
                tab.IndicatorEsqInf as IndicatorEsqInf,
                tab.DonatorEsqSup1 as DonatorEsqSup1,
@@ -182,14 +182,14 @@ Begin
                tab.BoardID as BoardID,
                tab.StatusID as StatusID,
                tab.Master as Master,
-               tab.CoodinatorDir as CoodinatorDir,
+               tab.CoordinatorDir as CoordinatorDir,
                tab.IndicatorDirSup as IndicatorDirSup,
                tab.IndicatorDirInf as IndicatorDirInf,
                tab.DonatorDirSup1 as DonatorDirSup1,
                tab.DonatorDirSup2 as DonatorDirSup2,
                tab.DonatorDirInf1 as DonatorDirInf1,
                tab.DonatorDirInf2 as DonatorDirInf2,
-               tab.CoodinatorEsq as CoodinatorEsq,
+               tab.CoordinatorEsq as CoordinatorEsq,
                tab.IndicatorEsqSup as IndicatorEsqSup,
                tab.IndicatorEsqInf as IndicatorEsqInf,
                tab.DonatorEsqSup1 as DonatorEsqSup1,
@@ -206,14 +206,14 @@ Begin
                tab.BoardID = @BoardID and
                (
                   tab.Master = @UsuarioPaiID Or
-                  tab.CoodinatorDir = @UsuarioPaiID Or
+                  tab.CoordinatorDir = @UsuarioPaiID Or
                   tab.IndicatorDirSup = @UsuarioPaiID Or
                   tab.IndicatorDirInf = @UsuarioPaiID Or
                   tab.DonatorDirSup1 = @UsuarioPaiID Or
                   tab.DonatorDirSup2 = @UsuarioPaiID Or
                   tab.DonatorDirInf1 = @UsuarioPaiID Or
                   tab.DonatorDirInf2 = @UsuarioPaiID Or
-                  tab.CoodinatorEsq = @UsuarioPaiID Or
+                  tab.CoordinatorEsq = @UsuarioPaiID Or
                   tab.IndicatorEsqSup = @UsuarioPaiID Or
                   tab.IndicatorEsqInf = @UsuarioPaiID Or
                   tab.DonatorEsqSup1 = @UsuarioPaiID Or
@@ -232,14 +232,14 @@ Begin
                @ID = ID,
                @Master = Master,
                @DataInicio = DataInicio,
-               @CoodinatorDir = CoodinatorDir,
+               @CoordinatorDir = CoordinatorDir,
                @IndicatorDirSup = IndicatorDirSup,
                @IndicatorDirInf = IndicatorDirInf,
                @DonatorDirSup1 = DonatorDirSup1,
                @DonatorDirSup2 = DonatorDirSup2,
                @DonatorDirInf1 = DonatorDirInf1,
                @DonatorDirInf2 = DonatorDirInf2,
-               @CoodinatorEsq = CoodinatorEsq,
+               @CoordinatorEsq = CoordinatorEsq,
                @IndicatorEsqSup = IndicatorEsqSup,
                @IndicatorEsqInf = IndicatorEsqInf,
                @DonatorEsqSup1 = DonatorEsqSup1,
@@ -250,7 +250,7 @@ Begin
                #temp
 
             --Verifica se lado direito esta completo
-            if(@CoodinatorDir is not Null and @IndicatorDirSup is not Null and @IndicatorDirInf is not Null and @DonatorDirSup1  is not Null and @DonatorDirSup2 is not Null and @DonatorDirInf1 is not Null and @DonatorDirInf2  is not Null)
+            if(@CoordinatorDir is not Null and @IndicatorDirSup is not Null and @IndicatorDirInf is not Null and @DonatorDirSup1  is not Null and @DonatorDirSup2 is not Null and @DonatorDirInf1 is not Null and @DonatorDirInf2  is not Null)
             Begin
                Set @DireitaFinalizada = 'True'
             End
@@ -266,7 +266,7 @@ Begin
             End
             
             --Verifica se lado esquerdo esta completo
-            if(@CoodinatorEsq is not Null and @IndicatorEsqSup is not Null and @IndicatorEsqInf is not Null and @DonatorEsqSup1  is not Null and @DonatorEsqSup2 is not Null and @DonatorEsqInf1 is not Null and @DonatorEsqInf2  is not Null)
+            if(@CoordinatorEsq is not Null and @IndicatorEsqSup is not Null and @IndicatorEsqInf is not Null and @DonatorEsqSup1  is not Null and @DonatorEsqSup2 is not Null and @DonatorEsqInf1 is not Null and @DonatorEsqInf2  is not Null)
             Begin
                Set @EsquerdaFinalizada = 'True'
             End
@@ -363,15 +363,15 @@ Begin
                Begin
                   Set @PosicaoPai = 'IndicatorEsqInf'
                End
-               --CoodinatorDir
-               if (@CoodinatorDir = @UsuarioPaiID )
+               --CoordinatorDir
+               if (@CoordinatorDir = @UsuarioPaiID )
                Begin
-                  Set @PosicaoPai = 'CoodinatorDir'
+                  Set @PosicaoPai = 'CoordinatorDir'
                End
-               --CoodinatorEsq
-               if (@CoodinatorEsq = @UsuarioPaiID )
+               --CoordinatorEsq
+               if (@CoordinatorEsq = @UsuarioPaiID )
                Begin
-                  Set @PosicaoPai = 'CoodinatorEsq'
+                  Set @PosicaoPai = 'CoordinatorEsq'
                End
                --Master
                if (@Master = @UsuarioPaiID )
@@ -392,7 +392,7 @@ Begin
                Begin
                   Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (3)'
                End
-		         If(@CoodinatorDir = @UsuarioID OR @CoodinatorEsq = @UsuarioID)
+		         If(@CoordinatorDir = @UsuarioID OR @CoordinatorEsq = @UsuarioID)
                Begin
                   Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (4)'
                End
@@ -401,38 +401,38 @@ Begin
                if(@PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true')
                Begin
                   --*********** COORDINATOR **************
-                  --Verifica se há cordinator, caso não inclui usuario como coordinator na direita
-                  if (@CoodinatorDir is null and @Incluido = 'false')
+                  --Verifica se há coordinator, caso não inclui usuario como coordinator na direita
+                  if (@CoordinatorDir is null and @Incluido = 'false')
                      Begin
                         Update
 	                        Rede.Tabuleiro
                         Set
-                           CoodinatorDir = @UsuarioID
+                           CoordinatorDir = @UsuarioID
                         Where
                            ID = @ID
                
-                        Set @CoodinatorDir = @UsuarioID
+                        Set @CoordinatorDir = @UsuarioID
                         Set @Incluido = 'true'
-                        Set @PosicaoFilho = 'CoodinatorDir'
+                        Set @PosicaoFilho = 'CoordinatorDir'
                      End
-                  --Verifica se há cordinator, caso não inclui usuario como coordinator na esquerda
-                  if (@CoodinatorEsq is null and @Incluido = 'false')
+                  --Verifica se há coordinator, caso não inclui usuario como coordinator na esquerda
+                  if (@CoordinatorEsq is null and @Incluido = 'false')
                      Begin
                         Update
 	                        Rede.Tabuleiro
                         Set
-                           CoodinatorEsq = @UsuarioID
+                           CoordinatorEsq = @UsuarioID
                         Where
                            ID = @ID
                
-                        Set @CoodinatorEsq = @UsuarioID
+                        Set @CoordinatorEsq = @UsuarioID
                         Set @Incluido = 'true'
-                        Set @PosicaoFilho = 'CoodinatorEsq'
+                        Set @PosicaoFilho = 'CoordinatorEsq'
                      End
                End --Master
             
                --*********** COORDINATOR DIREITA **************
-               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoodinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
+               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
                Begin
                   --Verifica se há Indicator, caso não inclui usuario como indicator superior direita
                   if (@IndicatorDirSup is null and @Incluido = 'false')
@@ -465,7 +465,7 @@ Begin
                End
             
                --*********** COORDINATOR ESQUERDA **************
-               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoodinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
+               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
                Begin
                   --Verifica se há Indicator, caso não inclui usuario como indicator superior esquerda
                   if (@IndicatorEsqSup is null and @Incluido = 'false')
@@ -498,7 +498,7 @@ Begin
                End
             
                --*********** INDICATOR DIREITA Superior ************** 
-               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoodinatorEsq' Or @PosicaoPai = 'CoodinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
+               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
                Begin
                   if (@DonatorDirSup1 is null and @Incluido = 'false')
                      Begin
@@ -529,7 +529,7 @@ Begin
                End
             
                --*********** INDICATOR DIREITA Inferior ************** 
-               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoodinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
+               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
                Begin
                   if (@DonatorDirInf1 is null and @Incluido = 'false')
                      Begin
@@ -560,7 +560,7 @@ Begin
                End
             
                --*********** INDICATOR ESQUERDA Superior **************
-               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoodinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
+               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
                Begin
                   if (@DonatorEsqSup1 is null and @Incluido = 'false')
                      Begin
@@ -591,7 +591,7 @@ Begin
                End
             
                --*********** INDICATOR ESQUERDA Inferior **************
-               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoodinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
+               if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
                Begin
                   if (@DonatorEsqInf1 is null and @Incluido = 'false')
                      Begin
@@ -624,7 +624,7 @@ Begin
                --Verifica se o tabuleiro esta completo
                if(
                   @Master is not null And 
-                  @CoodinatorDir is not null And 
+                  @CoordinatorDir is not null And 
                   @IndicatorDirSup is not null And 
                   @IndicatorDirInf is not null And 
                   @IndicatorEsqSup is not null And 
@@ -633,7 +633,7 @@ Begin
                   @DonatorDirSup2 is not null And 
                   @DonatorDirInf1 is not null And 
                   @DonatorDirInf2 is not null And 
-                  @CoodinatorEsq is not null And 
+                  @CoordinatorEsq is not null And 
                   @DonatorEsqSup1 is not null And 
                   @DonatorEsqSup2 is not null And 
                   @DonatorEsqInf1 is not null And 
@@ -792,8 +792,8 @@ Begin
                      BoardID,
                      StatusID,
                      Master,
-                     CoodinatorDir,
-                     CoodinatorEsq,
+                     CoordinatorDir,
+                     CoordinatorEsq,
                      IndicatorDirSup,
                      IndicatorDirInf,
                      DonatorDirSup1,
@@ -813,9 +813,9 @@ Begin
                   (
                      @BoardID,
                      1, --StatusId = 1 é ativo
-                     @CoodinatorDir, --Master
-                     @IndicatorDirSup, --CoodinatorDir
-                     @IndicatorDirInf, --CoodinatorEsq
+                     @CoordinatorDir, --Master
+                     @IndicatorDirSup, --CoordinatorDir
+                     @IndicatorDirInf, --CoordinatorEsq
                      @DonatorDirSup1, --IndicatorDirSup
                      @DonatorDirSup2, --IndicatorDirInf
                      null, --DonatorDirSup1
@@ -840,17 +840,17 @@ Begin
                   Set
                      Posicao = 'Master',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
-                     UsuarioID = @CoodinatorDir And
+                     UsuarioID = @CoordinatorDir And
                      StatusID = 1 and
                      BoardID = @BoardID
                   Update
                      Rede.TabuleiroUsuario
                   Set
-                     Posicao = 'CoodinatorDir',
+                     Posicao = 'CoordinatorDir',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
                      UsuarioID = @IndicatorDirSup And
                      StatusID = 1 and
@@ -858,9 +858,9 @@ Begin
                   Update
                      Rede.TabuleiroUsuario
                   Set
-                     Posicao = 'CoodinatorEsq',
+                     Posicao = 'CoordinatorEsq',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
                      UsuarioID = @IndicatorDirInf And
                      StatusID = 1 and
@@ -870,7 +870,7 @@ Begin
                   Set
                      Posicao = 'IndicatorDirSup',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
                      UsuarioID = @DonatorDirSup1 And
                      StatusID = 1 and
@@ -880,7 +880,7 @@ Begin
                   Set
                      Posicao = 'IndicatorDirInf',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
                      UsuarioID = @DonatorDirSup2 And
                      StatusID = 1 and
@@ -890,7 +890,7 @@ Begin
                   Set
                      Posicao = 'IndicatorEsqSup',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
                      UsuarioID = @DonatorDirInf1 And
                      StatusID = 1 and
@@ -900,7 +900,7 @@ Begin
                   Set
                      Posicao = 'IndicatorEsqInf',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorDir
+                     MasterID = @CoordinatorDir
                   Where
                      UsuarioID = @DonatorDirInf2 And
                      StatusID = 1 and
@@ -912,8 +912,8 @@ Begin
                      BoardID,
                      StatusID,
                      Master,
-                     CoodinatorDir,
-                     CoodinatorEsq,
+                     CoordinatorDir,
+                     CoordinatorEsq,
                      IndicatorDirSup,
                      IndicatorDirInf,
                      DonatorDirSup1,
@@ -933,9 +933,9 @@ Begin
                   (
                      @BoardID,
                      1, --StatusId = 1 é ativo
-                     @CoodinatorEsq, --Master
-                     @IndicatorEsqSup, --CoodinatorDir
-                     @IndicatorEsqInf, --CoodinatorEsq
+                     @CoordinatorEsq, --Master
+                     @IndicatorEsqSup, --CoordinatorDir
+                     @IndicatorEsqInf, --CoordinatorEsq
                      @DonatorEsqSup1, --IndicatorDirSup
                      @DonatorEsqSup2, --IndicatorDirInf
                      null, --DonatorDirSup1
@@ -960,17 +960,17 @@ Begin
                   Set
                      Posicao = 'Master',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
-                     UsuarioID = @CoodinatorEsq And
+                     UsuarioID = @CoordinatorEsq And
                      StatusID = 1 and
                      BoardID = @BoardID
                   Update
                      Rede.TabuleiroUsuario
                   Set
-                     Posicao = 'CoodinatorDir',
+                     Posicao = 'CoordinatorDir',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
                      UsuarioID = @IndicatorEsqSup And
                      StatusID = 1 and
@@ -978,9 +978,9 @@ Begin
                   Update
                      Rede.TabuleiroUsuario
                   Set
-                     Posicao = 'CoodinatorEsq',
+                     Posicao = 'CoordinatorEsq',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
                      UsuarioID = @IndicatorEsqInf And
                      StatusID = 1 and
@@ -990,7 +990,7 @@ Begin
                   Set
                      Posicao = 'IndicatorDirSup',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
                      UsuarioID = @DonatorEsqSup1 And
                      StatusID = 1 and
@@ -1000,7 +1000,7 @@ Begin
                   Set
                      Posicao = 'IndicatorDirInf',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
                      UsuarioID = @DonatorEsqSup2 And
                      StatusID = 1 and
@@ -1010,7 +1010,7 @@ Begin
                   Set
                      Posicao = 'IndicatorEsqSup',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
                      UsuarioID = @DonatorEsqInf1 And
                      StatusID = 1 and
@@ -1020,7 +1020,7 @@ Begin
                   Set
                      Posicao = 'IndicatorEsqInf',
                      TabuleiroID = @Identity,
-                     MasterID = @CoodinatorEsq
+                     MasterID = @CoordinatorEsq
                   Where
                      UsuarioID = @DonatorEsqInf2 And
                      StatusID = 1 and
@@ -1203,8 +1203,8 @@ Begin
                   BoardID,
                   StatusID,
                   Master,
-                  CoodinatorDir,
-                  CoodinatorEsq,
+                  CoordinatorDir,
+                  CoordinatorEsq,
                   IndicatorDirSup,
                   IndicatorDirInf,
                   DonatorDirSup1,
@@ -1225,8 +1225,8 @@ Begin
                   @BoardID,
                   1, --StatusId = 1 é ativo
                   @UsuarioID, --Master
-                  Null, --CoodinatorDir
-                  Null, --CoodinatorEsq
+                  Null, --CoordinatorDir
+                  Null, --CoordinatorEsq
                   Null, --IndicatorDirSup
                   Null, --IndicatorDirInf
                   null, --DonatorDirSup1
@@ -1365,4 +1365,4 @@ go
 Grant Exec on spG_Tabuleiro To public
 go
 
---exec spG_Tabuleiro @UsuarioID = 2591, @UsuarioPaiID =2590, @BoardID = 1, @Chamada = 'Principal'
+exec spG_Tabuleiro @UsuarioID = 2580, @UsuarioPaiID =2590, @BoardID = 1, @Chamada = 'Principal'

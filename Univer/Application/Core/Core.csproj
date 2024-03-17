@@ -41,6 +41,9 @@
     <Reference Include="Canducci.Zip">
       <HintPath>..\packages\CanducciCep.3.0.1\lib\net45\Canducci.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.0.90\lib\net461\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="DomainExtension, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\DomainExtension.dll</HintPath>
@@ -535,6 +538,7 @@
     <Compile Include="Models\Loja\CarrinhoItemModel.cs" />
     <Compile Include="Models\Loja\CarrinhoModel.cs" />
     <Compile Include="Models\Loja\CarrinhoPagamentoModel.cs" />
+    <Compile Include="Models\Rede\Tabuleiro\TabuleiroNivelModel.cs" />
     <Compile Include="Models\Relatorio\RelatorioPagamentoModel.cs" />
     <Compile Include="Models\Relatorio\RelatorioBonusPagos.cs" />
     <Compile Include="Models\Relatorio\RelatorioPedidos.cs" />
@@ -607,6 +611,7 @@
     <Compile Include="Repositories\Loja\DepartamentoRepository.cs" />
     <Compile Include="Repositories\Loja\CupomRepository.cs" />
     <Compile Include="Repositories\Rede\AssociacaoLimiteGanhoRepository.cs" />
+    <Compile Include="Repositories\Rede\TabuleiroRepository.cs" />
     <Compile Include="Repositories\Rede\RedeMigracaoRepository.cs" />
     <Compile Include="Repositories\Rede\AssociacaoRepository.cs" />
     <Compile Include="Repositories\Rede\PontosBinariosRepository.cs" />
@@ -756,6 +761,17 @@
     <Content Include="StoredProcedures\11Novas\sp_ValidacaoCadastro_Insert.sql" />
     <Content Include="StoredProcedures\11Novas\sp_OC_SUP_Resposta.sql" />
     <Content Include="StoredProcedures\11Novas\sp_OC_SUP_NovoChamado.sql" />
+    <Content Include="StoredProcedures\Outras\spC_ObtemDiretosBusca.sql" />
+    <Content Include="StoredProcedures\Outras\spC_ObtemDiretos_V2.sql" />
+    <Content Include="StoredProcedures\Outras\sp_VerificaUsuarioLogAPI.sql" />
+    <Content Include="StoredProcedures\Racco\spDG_RE_GeraBonusEquipe.sql" />
+    <Content Include="StoredProcedures\Racco\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\Racco\spDG_US_Qualificacao.sql" />
+    <Content Include="StoredProcedures\Racco\spOC_US_CalculaRede.sql" />
+    <Content Include="StoredProcedures\Universol\spC_TabuleiroNivel.sql" />
+    <Content Include="StoredProcedures\Universol\spG_Tabuleiro.20240209.sql" />
+    <Content Include="StoredProcedures\Universol\spG_Tabuleiro.sql" />
+    <Content Include="StoredProcedures\Universol\spG_Tabuleiro_old.sql" />
     <Content Include="StoredProcedures\XSinergia\spOC_LO_ListaPedidosVendaComposicao.sql" />
     <Content Include="StoredProcedures\Zion\Function\StringToListInt.sql" />
     <Content Include="StoredProcedures\Zion\StoredProcedure\Bonus\spDG_RE_GeraBonusBinario.sql" />
@@ -826,13 +842,13 @@
     <Content Include="StoredProcedures\Original\spG_AtivoMensalPagamento.sql" />
     <Content Include="StoredProcedures\Original\spG_AtivoMensalValidade.sql" />
     <Content Include="StoredProcedures\Original\spPontuacaoPosicao.sql" />
-    <Content Include="StoredProcedures\spDG_RE_GeraBonusAtivoMensal.sql" />
-    <Content Include="StoredProcedures\spDG_RE_GeraBonusBinario.sql" />
-    <Content Include="StoredProcedures\spDG_RE_GeraBonusIndicacao.sql" />
-    <Content Include="StoredProcedures\spG_AtivoMensalValidade.sql" />
-    <Content Include="StoredProcedures\spG_AtivoMensalPagamento.sql" />
-    <Content Include="StoredProcedures\spPontuacaoPosicao.sql" />
-    <Content Include="StoredProcedures\spC_AtivoMensal.sql" />
+    <Content Include="StoredProcedures\Outras\spDG_RE_GeraBonusAtivoMensal.sql" />
+    <Content Include="StoredProcedures\Outras\spDG_RE_GeraBonusBinario.sql" />
+    <Content Include="StoredProcedures\Outras\spDG_RE_GeraBonusIndicacao.sql" />
+    <Content Include="StoredProcedures\Outras\spG_AtivoMensalValidade.sql" />
+    <Content Include="StoredProcedures\Outras\spG_AtivoMensalPagamento.sql" />
+    <Content Include="StoredProcedures\Outras\spPontuacaoPosicao.sql" />
+    <Content Include="StoredProcedures\Outras\spC_AtivoMensal.sql" />
     <Content Include="StoredProcedures\Zion\Function\GetDateZion.sql" />
     <Content Include="StoredProcedures\Zion\Function\TruncZion.sql" />
     <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_FI_BuscarSolicitacoesSaque.sql" />
@@ -852,6 +868,7 @@
       <Name>cpUtilities</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

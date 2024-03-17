@@ -20,6 +20,7 @@ namespace Core.Repositories.Globalizacao
 
         public Entities.Traducao GetByIdiomaChave(int idiomaID, string chave)
         {
+            chave = chave.ToUpper();
             return cachedRepository.FirstOrDefault(t => t.IdiomaID == idiomaID && t.Chave == chave);
         }
 

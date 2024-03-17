@@ -1296,7 +1296,7 @@ namespace Sistema.Controllers
                     if (pais == null)
                     {
                         //Default
-                        pais = paisRepository.GetBySigla("pt-BR");
+                        pais = paisRepository.GetBySigla("en-US");
                     }
                 }
             }
@@ -1308,7 +1308,7 @@ namespace Sistema.Controllers
                 var culture = new System.Globalization.CultureInfo(pais.Idioma.Sigla);
                 Thread.CurrentThread.CurrentCulture = culture;
                 Thread.CurrentThread.CurrentUICulture = culture;
-            }
+            } 
         }
 
         private void Fundos()

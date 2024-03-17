@@ -26,310 +26,322 @@
 </li>
 
 
-@if (usuarioContainer.PendenteMigracao)
+@if (!Core.Helpers.ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
 {
-    if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_FINANCEIRO").ToLower() == "true")
+    if (usuarioContainer.PendenteMigracao)
+    {
+        if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_FINANCEIRO").ToLower() == "true")
+        {
+            <li>
+                <a href="javascript:;">
+                    <i class="fa fa-money"></i>
+                    <span class="title">
+                        @traducaoHelper["FINANCEIRO"]
+                    </span>
+                    <span class="arrow " />
+                </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a href="@Url.Action("index", "meu-extrato", new { area = "" })">
+                            <i class="fa fa-reorder"></i>
+                            <span class="title">
+                                @traducaoHelper["MEU_EXTRATO"]
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
+
+        <li>
+            <a href="@Url.Action("index", "documento", new { area = "" })">
+                <i class="fa fa-files-o"></i>
+                <span class="title">
+                    @traducaoHelper["DOCUMENTOS"]
+                </span>
+            </a>
+        </li>
+
+    }
+    else
     {
         <li>
             <a href="javascript:;">
-                <i class="fa fa-money"></i>
+                <i class="fa fa-shopping-cart"></i>
                 <span class="title">
-                    @traducaoHelper["FINANCEIRO"]
+                    @traducaoHelper["LOJA"]
                 </span>
                 <span class="arrow " />
             </a>
             <ul class="sub-menu">
                 <li>
-                    <a href="@Url.Action("index", "meu-extrato", new { area = "" })">
-                        <i class="fa fa-reorder"></i>
+                    <a href="@Url.Action("index", "home", new { area = "loja" })">
+                        <i class="fa fa-rocket"></i>
                         <span class="title">
-                            @traducaoHelper["MEU_EXTRATO"]
+                            @traducaoHelper["LOJA_PACK"]
+                        </span>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_FINANCEIRO").ToLower() == "true")
+        {
+            <li>
+                <a href="javascript:;">
+                    <i class="fa fa-money"></i>
+                    <span class="title">
+                        @traducaoHelper["FINANCEIRO"]
+                    </span>
+                    <span class="arrow " />
+                </a>
+                <ul class="sub-menu">
+
+                    <li>
+                        <a href="@Url.Action("index", "meu-extrato", new { area = "" })">
+                            <i class="fa fa-reorder"></i>
+                            <span class="title">
+                                @traducaoHelper["MEU_EXTRATO"]
+                            </span>
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="@Url.Action("index", "saque", new { area = "" })">
+                            <i class="fa fa-bank"></i>
+                            <span class="title">
+                                @traducaoHelper["SAQUES"]
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
+
+        <li>
+            <a href="javascript:;">
+                <i class="fa fa-file-text-o"></i>
+                <span class="title">
+                    @traducaoHelper["PEDIDOS"]
+                </span>
+                <span class="arrow " />
+            </a>
+            <ul class="sub-menu">
+                <li>
+                    <a href="@Url.Action("index", "meus-pedidos", new { area = "" })">
+                        <i class="fa fa-gift"></i>
+                        <span class="title">
+                            @traducaoHelper["MEUS_PEDIDOS"]
                         </span>
                     </a>
                 </li>
             </ul>
         </li>
+
+        <li>
+            <a href="@Url.Action("index", "documento", new { area = "" })">
+                <i class="fa fa-files-o"></i>
+                <span class="title">
+                    @traducaoHelper["DOCUMENTOS"]
+                </span>
+            </a>
+        </li>
+
+        if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_REDE").ToLower() == "true")
+        {
+            <li>
+                <a href="javascript:;">
+                    <i class="fa fa-sitemap"></i>
+                    <span class="title">
+                        @traducaoHelper["MINHA_REDE"]
+                    </span>
+                    <span class="arrow " />
+                </a>
+                <ul class="sub-menu">
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MIGRAR_REDE") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("migrarrede", "minha-rede", new { area = "" })">
+                            <i class="fa fa-clock-o"></i>
+                            <span class="title">
+                                @traducaoHelper["MIGRAR_REDE"]
+                            </span>
+                        </a>
+                    </li>
+
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_CADASTROS_PENDENTES") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("cadastros-pendentes", "minha-rede", new { area = "" })">
+                            <i class="fa fa-clock-o"></i>
+                            <span class="title">
+                                @traducaoHelper["CADASTROS_PENDENTES"]
+                            </span>
+                        </a>
+                    </li>
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MINHA_ARVORE") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("minha-arvore", "minha-rede", new { area = "" })">
+                            <i class="fa fa-tree"></i>
+                            <span class="title">
+                                @traducaoHelper["MINHA_ARVORE"]
+                            </span>
+                        </a>
+                    </li>
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MINHA_REDE") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("rede", "minha-rede", new { area = "" })">
+                            <i class="fa fa-tree"></i>
+                            <span class="title">
+                                @traducaoHelper["MINHA_REDE"]
+                            </span>
+                        </a>
+                    </li>
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MEUS_DIRETOS") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("meus-diretos", "minha-rede", new { area = "" })">
+                            <i class="fa fa-group"></i>
+                            <span class="title">
+                                @traducaoHelper["MEUS_DIRETOS"]
+                            </span>
+                        </a>
+                    </li>
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_UNILEVEL") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("unilevel", "minha-rede", new { area = "" })">
+                            <i class="fa fa-group"></i>
+                            <span class="title">
+                                @traducaoHelper["UNILEVEL"]
+                            </span>
+                        </a>
+                    </li>
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MEUS_INATIVOS") == "true" ? "" : "hidden")>
+                        <a href="@Url.Action("meus-INATIVOS", "minha-rede", new { area = "" })">
+                            <i class="fa fa-thumbs-down"></i>
+                            <span class="title">
+                                @traducaoHelper["MEUS_INATIVOS"]
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
+
+
+        if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_RELATORIO").ToLower() == "true")
+        {
+            <li>
+                <a href="javascript:;">
+                    <i class="fa fa-bar-chart-o"></i>
+                    <span class="title">
+                        @traducaoHelper["RELATORIOS"]
+                    </span>
+                    <span class="arrow " />
+                </a>
+                <ul class="sub-menu">
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_VENDAS") ? "" : "hidden")>
+                        <a href="@Url.Action("vendas", "relatorios", new { area = "" })">
+                            <i class="fa fa-tachometer"></i>
+                            <span class="title">
+                                @traducaoHelper["VENDAS_REDE"]
+                            </span>
+                        </a>
+                    </li>
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_GANHOS") ? "" : "hidden")>
+                        <a href="@Url.Action("ganhos", "relatorios", new { area = "" })">
+                            <i class="fa fa-trophy"></i>
+                            <span class="title">
+                                @traducaoHelper["GANHOS"]
+                            </span>
+                        </a>
+                    </li>
+
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_PONTOS") ? "" : "hidden")>
+                        <a href="@Url.Action("pontos", "relatorios", new { area = "" })">
+                            <i class="fa fa-asterisk"></i>
+                            <span class="title">
+                                @traducaoHelper["PONTOS"]
+                            </span>
+                        </a>
+                    </li>
+
+                    <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_PONTOS_BINARIO") ? "" : "hidden")>
+                        <a href="@Url.Action("pontosBinario", "relatorios", new { area = "" })">
+                            <i class="fa fa-asterisk"></i>
+                            <span class="title">
+                                @traducaoHelper["PONTOS_BINARIO"]
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
+
+        <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
+            <a href="~/p/@Helpers.Local.nomeUsuario">
+                <i class="fa fa-pencil-square-o"></i>
+                <span class="title">
+                    Link @traducaoHelper["CADASTRO"]
+                </span>
+            </a>
+        </li>
+
+        @*<li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
+                   <a href="#">
+                       <i class="fa fa-shopping-cart"></i>
+                       <span class="title">
+                           E-Commerce
+                       </span>
+                   </a>
+            </li>*@
+
+        @*<li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
+                  <a href="#">
+                      <i class="fa fa-video-camera"></i>
+                      <span class="title">
+                          @traducaoHelper["ACADEMY"]
+                      </span>
+                  </a>
+            </li>*@
+
+        if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA"))
+        {
+            <li class="last ">
+                <a href="@Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA")@Helpers.Local.nomeUsuario" target="_blank">
+                    <i class="fa fa-external-link-square"></i>
+                    <span class="title">
+                        Link @traducaoHelper["LOJA_EXTERNA"]
+                    </span>
+                </a>
+            </li>
+        }
     }
 
-    <li>
-        <a href="@Url.Action("index", "documento", new { area = "" })">
-            <i class="fa fa-files-o"></i>
-            <span class="title">
-                @traducaoHelper["DOCUMENTOS"]
-            </span>
-        </a>
-    </li>
+    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_SEGURANCA"))
+    {
+        <li>
+            <a href="@Url.Action("googleauthenticator", "seguranca", new { area = "" })">
+                <i class="fa fa-lock"></i>
+                <span class="title">
+                    @traducaoHelper["SEGURANCA"]
+                </span>
+            </a>
+        </li>
+    }
 
+    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_AVISO"))
+    {
+        <li>
+            <a href="@Url.Action("index", "avisos", new { area = "" })">
+                <i class="fa fa-envelope"></i>
+                <span class="title">
+                    @traducaoHelper["AVISO"]
+                </span>
+            </a>
+        </li>
+    }
 }
 else
 {
-    <li>
-        <a href="javascript:;">
-            <i class="fa fa-shopping-cart"></i>
-            <span class="title">
-                @traducaoHelper["LOJA"]
-            </span>
-            <span class="arrow " />
-        </a>
-        <ul class="sub-menu">
-            <li>
-                <a href="@Url.Action("index", "home", new { area = "loja" })">
-                    <i class="fa fa-rocket"></i>
-                    <span class="title">
-                        @traducaoHelper["LOJA_PACK"]
-                    </span>
-                </a>
-            </li>
-
-        </ul>
-    </li>
-
-    if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_FINANCEIRO").ToLower() == "true")
-    {
-        <li>
-            <a href="javascript:;">
-                <i class="fa fa-money"></i>
-                <span class="title">
-                    @traducaoHelper["FINANCEIRO"]
-                </span>
-                <span class="arrow " />
-            </a>
-            <ul class="sub-menu">
-
-                <li>
-                    <a href="@Url.Action("index", "meu-extrato", new { area = "" })">
-                        <i class="fa fa-reorder"></i>
-                        <span class="title">
-                            @traducaoHelper["MEU_EXTRATO"]
-                        </span>
-                    </a>
-                </li>
-
-
-                <li>
-                    <a href="@Url.Action("index", "saque", new { area = "" })">
-                        <i class="fa fa-bank"></i>
-                        <span class="title">
-                            @traducaoHelper["SAQUES"]
-                        </span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-    }
-
-    <li>
-        <a href="javascript:;">
-            <i class="fa fa-file-text-o"></i>
-            <span class="title">
-                @traducaoHelper["PEDIDOS"]
-            </span>
-            <span class="arrow " />
-        </a>
-        <ul class="sub-menu">
-            <li>
-                <a href="@Url.Action("index", "meus-pedidos", new { area = "" })">
-                    <i class="fa fa-gift"></i>
-                    <span class="title">
-                        @traducaoHelper["MEUS_PEDIDOS"]
-                    </span>
-                </a>
-            </li>
-        </ul>
-    </li>
-
-    <li>
-        <a href="@Url.Action("index", "documento", new { area = "" })">
-            <i class="fa fa-files-o"></i>
-            <span class="title">
-                @traducaoHelper["DOCUMENTOS"]
-            </span>
-        </a>
-    </li>
-
-    if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_REDE").ToLower() == "true")
-    {
-        <li>
-            <a href="javascript:;">
-                <i class="fa fa-sitemap"></i>
-                <span class="title">
-                    @traducaoHelper["MINHA_REDE"]
-                </span>
-                <span class="arrow " />
-            </a>
-            <ul class="sub-menu">
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MIGRAR_REDE") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("migrarrede", "minha-rede", new { area = "" })">
-                        <i class="fa fa-clock-o"></i>
-                        <span class="title">
-                            @traducaoHelper["MIGRAR_REDE"]
-                        </span>
-                    </a>
-                </li>
-
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_CADASTROS_PENDENTES") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("cadastros-pendentes", "minha-rede", new { area = "" })">
-                        <i class="fa fa-clock-o"></i>
-                        <span class="title">
-                            @traducaoHelper["CADASTROS_PENDENTES"]
-                        </span>
-                    </a>
-                </li>
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MINHA_ARVORE") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("minha-arvore", "minha-rede", new { area = "" })">
-                        <i class="fa fa-tree"></i>
-                        <span class="title">
-                            @traducaoHelper["MINHA_ARVORE"]
-                        </span>
-                    </a>
-                </li>
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MINHA_REDE") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("rede", "minha-rede", new { area = "" })">
-                        <i class="fa fa-tree"></i>
-                        <span class="title">
-                            @traducaoHelper["MINHA_REDE"]
-                        </span>
-                    </a>
-                </li>
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MEUS_DIRETOS") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("meus-diretos", "minha-rede", new { area = "" })">
-                        <i class="fa fa-group"></i>
-                        <span class="title">
-                            @traducaoHelper["MEUS_DIRETOS"]
-                        </span>
-                    </a>
-                </li>
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_UNILEVEL") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("unilevel", "minha-rede", new { area = "" })">
-                        <i class="fa fa-group"></i>
-                        <span class="title">
-                            @traducaoHelper["UNILEVEL"]
-                        </span>
-                    </a>
-                </li>
-                <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MEUS_INATIVOS") == "true" ? "" : "hidden")>
-                    <a href="@Url.Action("meus-INATIVOS", "minha-rede", new { area = "" })">
-                        <i class="fa fa-thumbs-down"></i>
-                        <span class="title">
-                            @traducaoHelper["MEUS_INATIVOS"]
-                        </span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-    }
-
-
-    if (Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_RELATORIO").ToLower() == "true")
-    {
-        <li>
-            <a href="javascript:;">
-                <i class="fa fa-bar-chart-o"></i>
-                <span class="title">
-                    @traducaoHelper["RELATORIOS"]
-                </span>
-                <span class="arrow " />
-            </a>
-            <ul class="sub-menu">
-                <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_VENDAS") ? "" : "hidden")>
-                    <a href="@Url.Action("vendas", "relatorios", new { area = "" })">
-                        <i class="fa fa-tachometer"></i>
-                        <span class="title">
-                            @traducaoHelper["VENDAS_REDE"]
-                        </span>
-                    </a>
-                </li>
-                <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_GANHOS") ? "" : "hidden")>
-                    <a href="@Url.Action("ganhos", "relatorios", new { area = "" })">
-                        <i class="fa fa-trophy"></i>
-                        <span class="title">
-                            @traducaoHelper["GANHOS"]
-                        </span>
-                    </a>
-                </li>
-
-                <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_PONTOS") ? "" : "hidden")>
-                    <a href="@Url.Action("pontos", "relatorios", new { area = "" })">
-                        <i class="fa fa-asterisk"></i>
-                        <span class="title">
-                            @traducaoHelper["PONTOS"]
-                        </span>
-                    </a>
-                </li>
-
-                <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_RELATORIO_PONTOS_BINARIO") ? "" : "hidden")>
-                    <a href="@Url.Action("pontosBinario", "relatorios", new { area = "" })">
-                        <i class="fa fa-asterisk"></i>
-                        <span class="title">
-                            @traducaoHelper["PONTOS_BINARIO"]
-                        </span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-    }
-
     <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
         <a href="~/p/@Helpers.Local.nomeUsuario">
             <i class="fa fa-pencil-square-o"></i>
             <span class="title">
                 Link @traducaoHelper["CADASTRO"]
-            </span>
-        </a>
-    </li>
-      
-    @*<li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
-            <a href="#">
-                <i class="fa fa-shopping-cart"></i>
-                <span class="title">
-                    E-Commerce
-                </span>
-            </a>
-        </li>*@
-
-  
-
-    @*<li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
-            <a href="#">
-                <i class="fa fa-video-camera"></i>
-                <span class="title">
-                    @traducaoHelper["ACADEMY"]
-                </span>
-            </a>
-        </li>*@
-
-    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA"))
-    {
-        <li class="last ">
-            <a href="@Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA")@Helpers.Local.nomeUsuario" target="_blank">
-                <i class="fa fa-external-link-square"></i>
-                <span class="title">
-                    Link @traducaoHelper["LOJA_EXTERNA"]
-                </span>
-            </a>
-        </li>
-    }
-}
-
-@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_SEGURANCA"))
-{
-    <li>
-        <a href="@Url.Action("googleauthenticator", "seguranca", new { area = "" })">
-            <i class="fa fa-lock"></i>
-            <span class="title">
-                @traducaoHelper["SEGURANCA"]
-            </span>
-        </a>
-    </li>
-}
-
-@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_AVISO"))
-{
-    <li>
-        <a href="@Url.Action("index", "avisos", new { area = "" })">
-            <i class="fa fa-envelope"></i>
-            <span class="title">
-                @traducaoHelper["AVISO"]
             </span>
         </a>
     </li>

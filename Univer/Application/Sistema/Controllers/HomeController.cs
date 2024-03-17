@@ -76,6 +76,8 @@
         private UsuarioDerramamentoLogRepository usuarioDerramamentoLogRepository;
         private UsuarioGanhoRepository usuarioGanhoRepository;
 
+        private TabuleiroRepository tabuleiroRepository;
+
         public HomeController(DbContext context)
                  : base(context)
         {
@@ -100,6 +102,8 @@
             bonificacaoRepository = new BonificacaoRepository(context);
             usuarioDerramamentoLogRepository = new UsuarioDerramamentoLogRepository(context);
             usuarioGanhoRepository = new UsuarioGanhoRepository(context);
+
+            tabuleiroRepository = new TabuleiroRepository(context);
         }
 
         #endregion
@@ -254,6 +258,9 @@
                 if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
                 {
                     ViewBag.RedeTabuleiro = true;
+                    ViewBag.TabuleirosConvite = tabuleiroRepository.ObtemTabuleiro(usuario.ID, 1); //1 - Convite
+                    ViewBag.TabuleirosAtivos = tabuleiroRepository.ObtemTabuleiro(usuario.ID, 2); //2 - em andamento
+                    ViewBag.TabuleirosFinalizados = tabuleiroRepository.ObtemTabuleiro(usuario.ID, 3); //3 - Finalizado
                 }
                 else
                 {
@@ -930,18 +937,7 @@
                         ViewBag.RedeDireito5 = qtdeDireito5;
                         ViewBag.RedeTotal5 = qtdeEsquerdo5 + qtdeDireito5;
                     }
-                    //else
-                    //{
-                    //    if (false) /// Erro - Analisar melhor
-                    //    {
-                    //        ViewBag.Pontos = posicaoRepository.ObtemPontuacaoCiclo(usuario.ID, "VQ", "ATUAL");
-                    //        //ViewBag.PontosAnter = posicaoRepository.ObtemPontuacaoCiclo(usuario.ID, "VQ", "ANTERIOR");
-                    //        ViewBag.PontosMax = posicaoRepository.ObtemPontuacaoMaxima(usuario.ID, "VQ");
-                    //        //ViewBag.PontosTotal = posicaoRepository.ObtemPontuacaoCiclo(usuario.ID, "VT", "ATUAL");
-                    //        ViewBag.PontosTotal = posicaoRepository.ObtemPontuacaTotal(usuario.ID);
-                    //    }
-                    //}
-
+            
                     #endregion
 
                     #region Pedidos Pendente de Pagamento
