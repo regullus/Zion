@@ -8,7 +8,6 @@ namespace Core.Models
 {
     public class TabuleiroNivelModel
     {
-
         public int ID { get; set; }
         public int UsuarioID { get; set; }
         public int BoardID {  get; set; }

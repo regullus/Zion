@@ -24,8 +24,7 @@ namespace Core.Repositories.Rede
             _context = context;
         }
 
-
-        public IEnumerable<TabuleiroNivelModel> ObtemTabuleiro(int idUsuario, int? statusID)
+        public IEnumerable<TabuleiroNivelModel> ObtemNivelTabuleiro(int idUsuario, int? statusID)
         {
             string sql = "";
 
@@ -43,6 +42,27 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public IEnumerable<TabuleiroModel> ObtemTabuleiro(int id)
+        {
+            string sql = "Exec spC_Tabuleiro @id=" + id ;
+
+            var retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).ToList();
+
+            return retorno;
+        }
+
+        public IEnumerable<TabuleiroInclusao> IncluiTabuleiro(int idUsuario, int idPai, int idBoard)
+        {
+            //idUsuario usuarioa ser incluido no tabuleiro
+            //idPai patrocinador do usuario acima
+            //idBoard board a ser inserido o usuario
+            //chamada deve ser principal para incluir novo usuario
+            string sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='Principal'";
+
+            var retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).ToList();
+
+            return retorno;
+        }
 
     }
 }

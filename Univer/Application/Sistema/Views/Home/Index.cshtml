@@ -35,16 +35,16 @@
 
     List<SelectListItem> listaDerramamento = null;
 
-    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroConvites = null;
-    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroAtivos = null;
-    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroFinalizados = null;
+    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroNivelConvites = null;
+    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroNivelAtivos = null;
+
+    string planetaCor = "";
 
     if (ViewBag.RedeTabuleiro)
     {
         #region Tabuleiro
-        tabuleiroConvites = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosConvite;
-        tabuleiroAtivos = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosAtivos;
-        tabuleiroFinalizados = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosFinalizados;
+        tabuleiroNivelConvites = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosNivelConvite;
+        tabuleiroNivelAtivos = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosNivelAtivos;
         #endregion
     }
     else
@@ -235,7 +235,7 @@
              $.post('@Url.Action("derramamento")', { id: id }, function () { });
           }
         </script>
-    } 
+    }
 }
 
 @section jQueryRead {
@@ -244,34 +244,12 @@
 <!-- END PAGE BREADCRUMB -->
 <!-- END PAGE HEADER-->
 <!-- BEGIN PAGE CONTENT-->
-<div class="portlet light" style="padding-left:0;padding-right:10px">
-    <div class="portlet-body">
+<div class="portlet light" style="padding-left: 0; padding-right: 10px; background-color: black; max-width: 1600px;background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg")) no-repeat center center">
+    <div class="portlet-body" >
 
         <!--BANNER-->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    @if (blnExibeBanner)
-                    {
-                        <div class=" @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_EXIBIR_ASSOCIADO") == true ? "col-md-12" : "col-md-12")  padding-lateral-10">
-                            <div class="owl-carousel" style="margin-bottom:20px; margin-left: 20px;">
-                                @if (banners != null && banners.Count > 0)
-                                {
-                                    foreach (var banner in banners)
-                                    {
-                                        @*<img src="@Url.Content(banner.CaminhoVirtual)" class="img-responsive" alt="@banner.Nome">*@
-                                        <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/" + @banner.Nome)" alt="@banner.Nome" class="img-responsive" style="max-width: 60%;">
-                                    }
-                                }
-                                else
-                                {
-                                    <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.jpg")" class="img-responsive">
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
+        <div class="row" style="max-width: 1600px; height: 800px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center">
+            
         </div>
 
         @if (ViewBag.RedeTabuleiro)
@@ -279,14 +257,14 @@
             <div class="row" style="max-width: 1600px">
                 <div class="col-md-12 padding-lateral-10">
                     <div class="portlet-body expand" style="padding:0px 0px 10px 0px!important;">
-                        @if (tabuleiroConvites != null)
+                        @if (tabuleiroNivelConvites != null)
                         {
-                            foreach (var item in tabuleiroConvites)
+                            foreach (var item in tabuleiroNivelConvites)
                             {
                                 //VERDE - CONVITE
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
                                     <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
-                                    <div class="card-frame card-home card-cor convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
+                                    <div class="card-frame card-home springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
                                         <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONVITE"]</span></div>
                                         <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
                                         <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
@@ -295,31 +273,46 @@
                             }
                         }
 
-                        @if (tabuleiroAtivos != null)
+                        @if (tabuleiroNivelAtivos != null)
                         {
-                            foreach (var item in tabuleiroAtivos)
+                            foreach (var item in tabuleiroNivelAtivos)
                             {
+                                switch (item.BoardNome.Substring(0, 3).ToLower())
+                                {
+                                    case "mer":
+                                        planetaCor = "grey-card";
+                                        break;
+                                    case "sat":
+                                        planetaCor = "green-card";
+                                        break;
+                                    case "mar":
+                                        planetaCor = "red-card";
+                                        break;
+                                    case "jup":
+                                        planetaCor = "pink-card";
+                                        break;
+                                    case "ven":
+                                        planetaCor = "orange-card";
+                                        break;
+                                    case "ura":
+                                        planetaCor = "blue-card";
+                                        break;
+                                    case "ter":
+                                        planetaCor = "turquoise-card";
+                                        break;
+                                    case "sol":
+                                        planetaCor = "gold-card";
+                                        break;
+                                    default:
+                                        planetaCor = "orange-card";
+                                        break;
+                                }
+
                                 //ROXO ATIVOS
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
                                     <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
-                                    <div class="card-frame card-home purple-simple-card ativo" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
+                                    <div class="card-frame card-home @(planetaCor) ativo" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
                                         <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVO"]</span></div>
-                                        <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
-                                        <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
-                                    </div>
-                                </div>
-                            }
-                        }
-
-                        @if (tabuleiroFinalizados != null)
-                        {
-                            foreach (var item in tabuleiroFinalizados)
-                            {
-                                //VERMELHO - ENCERRADOS
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
-                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
-                                    <div class="card-frame red-card finalizado"  data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
-                                        <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["FINALIZADOS"]</span></div>
                                         <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
                                         <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
                                     </div>
@@ -335,6 +328,26 @@
         }
         else
         {
+            <!--BANNER-->
+            <div class="row" style="max-width: 1600px;">
+                @if (blnExibeBanner)
+                {
+                    <div class="owl-carousel" style="margin-bottom:20px; margin-left: 60px;">
+                        @if (banners != null && banners.Count > 0)
+                        {
+                            foreach (var banner in banners)
+                            {
+                                @*<img src="@Url.Content(banner.CaminhoVirtual)" class="img-responsive" alt="@banner.Nome">*@
+                                <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/" + @banner.Nome)" alt="@banner.Nome" class="img-responsive" style="max-width: 60%;">
+                            }
+                        }
+                        else
+                        {
+                            <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")" class="img-responsive center-align" style="height: 800px; height: 800px;">
+                        }
+                    </div>
+                }
+            </div>
             <div style="margin-top: 40px;">
                 <div class="row">
                     <div class="col-md-12">
@@ -354,10 +367,10 @@
                                             <!-- SIDEBAR USER TITLE -->
                                             @*<div class="profile-usertitle  margem-0 padding-lateral-10">
                                             <p class="profile-usertitle-name">
-                                               <strong>@usuario.Nome</strong>
+                                                <strong>@usuario.Nome</strong>
                                             </p>*@
                                             @*<div class="profile-usertitle-job">
-                                               @usuario.Login
+                                                @usuario.Login
                                             </div>*@
                                         </div>
                                         <!-- END SIDEBAR USER TITLE -->
@@ -1365,8 +1378,8 @@ if (!totalAcumulado.error) {
         .click(
             function () {
                 var tabuleiroID = $(this).attr("data-id");
-                
-                
+
+
             }
         )
         .hover(
@@ -1376,7 +1389,7 @@ if (!totalAcumulado.error) {
             function () {
                 $(this).css('background', '');
             }
-    );
+        );
     $('.ativo')
         .css('cursor', 'pointer')
         .click(
@@ -1391,7 +1404,7 @@ if (!totalAcumulado.error) {
             function () {
                 $(this).css('background', '');
             }
-    );
+        );
     $('.finalizado')
         .css('cursor', 'pointer')
         .click(
@@ -1406,7 +1419,7 @@ if (!totalAcumulado.error) {
             function () {
                 $(this).css('background', '');
             }
-    );
+        );
 
 </script>
 

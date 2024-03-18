@@ -1351,7 +1351,15 @@ Begin
    Begin
       if(@Chamada <> 'PaiValido')
       Begin
-         Select 'NOOK' as Retorno, @UsuarioID as UsuarioID, @UsuarioPaiID as UsuarioPaiID, @ID TabuleiroID, @BoardID as BoardID, @PosicaoFilho as Posicao, @Historico as historico, @chamada as Chamada
+         Select 
+            'NOOK' as Retorno, 
+            @UsuarioID as UsuarioID, 
+            @UsuarioPaiID as UsuarioPaiID, 
+            @ID TabuleiroID, 
+            @BoardID as BoardID, 
+            @PosicaoFilho as Posicao, 
+            @Historico as Historico, 
+            @chamada as Chamada
       End
    End
    

@@ -105,26 +105,22 @@ namespace Sistema.Controllers
         private EstadoRepository estadoRepository;
         private CidadeRepository cidadeRepository;
         private GeolocalizacaoService geolocalizacaoService;
-
         private UsuarioRepository usuarioRepository;
         private UsuarioStatusRepository usuarioStatusRepository;
         private UsuarioAssociacaoRepository usuarioAssociacaoRepository;
         private PosicaoRepository posicaoRedeRepository;
         private UsuarioFactory usuarioFactory;
         private UsuarioService usuarioService;
-
         private ProdutoRepository produtoRepository;
         private ContaDepositoRepository contaDepositoRepository;
         private PedidoPagamentoRepository pedidoPagamentoRepository;
-
         private PedidoFactory pedidoFactory;
         private Core.Services.Loja.PedidoService pedidoService;
         private CartaoCreditoRepository cartaoCreditoRepository;
-
         private Core.Helpers.TraducaoHelper traducaoHelper;
         private CicloRepository cicloRepository;
-
         private PosicaoRepository posicaoRepository;
+        private TabuleiroRepository tabuleiroRepository;
 
         public CadastroController(DbContext context)
         {
@@ -146,6 +142,7 @@ namespace Sistema.Controllers
             cartaoCreditoRepository = new CartaoCreditoRepository(context);
             cicloRepository = new CicloRepository(context);
             posicaoRepository = new PosicaoRepository(context);
+            tabuleiroRepository = new TabuleiroRepository(context);
         }
 
         #endregion
@@ -406,6 +403,8 @@ namespace Sistema.Controllers
 
         public async Task<ActionResult> Pais_Changed(FormCollection form)
         {
+            await Task.FromResult(false); //Fake task
+
             var sigla = form["sigla"];
 
             Localizacao(sigla);
@@ -415,6 +414,8 @@ namespace Sistema.Controllers
 
         public async Task<ActionResult> Pais_MeusDados_Changed(FormCollection form)
         {
+            await Task.FromResult(false); //Fake task
+
             var paisID = int.Parse(form["pais"]);
 
             Localizacao(paisID);
@@ -1124,6 +1125,29 @@ namespace Sistema.Controllers
             }
 
             #endregion
+
+            if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
+            {
+                //Inclui usuario no tabuleiro
+                IEnumerable<Core.Models.TabuleiroInclusao> tabuleiroInclusao = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinador.ID, 1); //1 - Convite
+                String Retorno = "";
+                if(tabuleiroInclusao != null)
+                {
+                    Core.Models.TabuleiroInclusao tabuleiroIncluido = tabuleiroInclusao.FirstOrDefault();
+                    if (tabuleiroIncluido != null)
+                    {
+                        String retorno = tabuleiroIncluido.Retorno;
+                        if (retorno == "NOOK")
+                        {
+                            
+                        }
+                    }
+                        
+                }
+
+
+
+            }
 
             return RedirectToAction("sucesso", new { login = usuario.Login });
         }

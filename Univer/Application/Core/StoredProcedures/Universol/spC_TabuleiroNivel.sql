@@ -26,6 +26,7 @@ BEGIN
       tn.UsuarioID,
       tn.BoardID,
       boa.Nome as BoardNome,
+      tab.TabuleiroID as TabuleiroID,
       tab.Posicao,
       tn.DataInicio,
       tn.DataFim,
@@ -57,8 +58,9 @@ Exec spC_TabuleiroNivel @UsuarioID = 2585, @StatusID = 1
 Exec spC_TabuleiroNivel @UsuarioID = 2585, @StatusID = 2
 Exec spC_TabuleiroNivel @UsuarioID = 2585, @StatusID = 3
 
-Exec spC_TabuleiroNivel @UsuarioID = 2586, @StatusID = 1
-Exec spC_TabuleiroNivel @UsuarioID = 2586, @StatusID = 2
-Exec spC_TabuleiroNivel @UsuarioID = 2586, @StatusID = 3
+Exec spC_TabuleiroNivel @UsuarioID = 2607, @StatusID = 1
+Exec spC_TabuleiroNivel @UsuarioID = 2607, @StatusID = 2
+Exec spC_TabuleiroNivel @UsuarioID = 2607, @StatusID = 3
 
+Select * from rede.TabuleiroUsuario
 
