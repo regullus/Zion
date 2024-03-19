@@ -37,12 +37,10 @@ namespace Sistema.Controllers
         private UsuarioRepository usuarioRepository;
         private AssociacaoRepository associacaoRepository;
         private ClassificacaoRepository classificacaoRepository;
-
         private List<Usuario> filhosPosicao;
-
         private List<NoRedeBinder> _listaRetorno;
         private List<Associacao> _listaAssociacoes;
-
+        private TabuleiroRepository tabuleiroRepository;
 
         private int idNo = 1;
 
@@ -60,6 +58,7 @@ namespace Sistema.Controllers
             usuarioRepository = new UsuarioRepository(context);
             associacaoRepository = new AssociacaoRepository(context);
             classificacaoRepository = new ClassificacaoRepository(context);
+            tabuleiroRepository = new TabuleiroRepository(context);
 
             moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
             diasPerdaPosicao = Core.Helpers.ConfiguracaoHelper.GetInt("DIAS_PERDA_POSICAO_INATIVIDADE");
@@ -411,6 +410,58 @@ namespace Sistema.Controllers
         #endregion
 
         #region Actions
+
+        public ActionResult Tabuleiro()
+        {
+            obtemMensagem();
+
+            ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
+
+            try
+            {
+                ViewBag.RedeTabuleiro = true;
+                int tabuleiroConviteID = 0;
+                int tabuleiroAtivosID = 0;
+
+                IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
+                IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
+                IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelFinalizados = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 3); //3 - Finalizado
+                ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
+                ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
+
+                IEnumerable<Core.Models.TabuleiroModel> tabuleirosConvite = null;
+                IEnumerable<Core.Models.TabuleiroModel> tabuleirosAtivos = null;
+
+                if (tabuleirosNivelConvite.Count() > 0)
+                {
+                    Core.Models.TabuleiroNivelModel tabuleiroConviteList = tabuleirosNivelConvite.FirstOrDefault();
+                    tabuleiroConviteID = tabuleiroConviteList.TabuleiroID;
+                    ViewBag.tabuleiroConviteID = tabuleiroConviteID;
+                    if (tabuleiroConviteID > 0)
+                    {
+                        tabuleirosConvite = tabuleiroRepository.ObtemTabuleiro(tabuleiroConviteID);
+                        ViewBag.tabuleirosConvite = tabuleirosConvite;
+                    }
+                }
+                if (tabuleirosNivelAtivos.Count() > 0)
+                {
+                    Core.Models.TabuleiroNivelModel tabuleiroAtivosList = tabuleirosNivelAtivos.FirstOrDefault();
+                    tabuleiroAtivosID = tabuleiroAtivosList.TabuleiroID;
+                    ViewBag.tabuleiroAtivosID = tabuleiroAtivosID;
+                    if (tabuleiroAtivosID > 0)
+                    {
+                        tabuleirosAtivos = tabuleiroRepository.ObtemTabuleiro(tabuleiroAtivosID);
+                        ViewBag.tabuleirosAtivos = tabuleirosAtivos;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("login", "Account", new { strPopupTitle = "Erro", strPopupMessage = ex.Message, Sair = "true" });
+            }
+
+            return View();
+        }
 
         public ActionResult MinhaArvore()
         {
@@ -926,7 +977,6 @@ namespace Sistema.Controllers
                 ViewBag.UltimoEsquerda = usuarios.LastOrDefault(x => x.Assinatura.EndsWith("0")) != null ? usuarios.LastOrDefault(x => x.Assinatura.EndsWith("0")).ID != topo ? usuarios.LastOrDefault(x => x.Assinatura.EndsWith("0")).ID : 0 : 0;
                 ViewBag.UltimoDireita = usuarios.LastOrDefault(x => x.Assinatura.EndsWith("1")) != null ? usuarios.LastOrDefault(x => x.Assinatura.EndsWith("1")).ID != topo ? usuarios.LastOrDefault(x => x.Assinatura.EndsWith("1")).ID : 0 : 0;
             }
-
 
             ViewBag.Topo = topo;
 

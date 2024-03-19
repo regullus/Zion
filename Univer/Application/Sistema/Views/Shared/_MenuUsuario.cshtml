@@ -337,6 +337,39 @@
 }
 else
 {
+    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_AVISO"))
+    {
+        <li>
+            <a href="@Url.Action("index", "avisos", new { area = "" })">
+                <i class="fa fa-envelope"></i>
+                <span class="title">
+                    @traducaoHelper["AVISO"]
+                </span>
+            </a>
+        </li>
+    }
+
+    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_SEGURANCA"))
+    {
+        <li>
+            <a href="@Url.Action("googleauthenticator", "seguranca", new { area = "" })">
+                <i class="fa fa-lock"></i>
+                <span class="title">
+                    @traducaoHelper["SEGURANCA"]
+                </span>
+            </a>
+        </li>
+    }
+
+    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_UNILEVEL") == "true" ? "" : "hidden")>
+        <a href="@Url.Action("tabuleiro", "minha-rede", new { area = "" })">
+            <i class="fa fa-sitemap"></i>
+            <span class="title">
+                @traducaoHelper["MINHA_REDE"]
+            </span>
+        </a>
+    </li>
+
     <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
         <a href="~/p/@Helpers.Local.nomeUsuario">
             <i class="fa fa-pencil-square-o"></i>
@@ -347,14 +380,17 @@ else
     </li>
 }
 
-<li>
-    <a href="~/Suporte">
-        <i class="fa fa-life-ring"></i>
-        <span class="title">
-            @traducaoHelper["SUPORTE"]
-        </span>
-    </a>
-</li>
+@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_SUPORTE"))
+{ 
+    <li>
+        <a href="~/Suporte">
+            <i class="fa fa-life-ring"></i>
+            <span class="title">
+                @traducaoHelper["SUPORTE"]
+            </span>
+        </a>
+    </li>
+}
 
 <li class="last ">
     <a href="~/Account/Login/?Sair=true">

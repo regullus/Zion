@@ -207,7 +207,8 @@
         {
             //bool blnEcommerce = false;
             string strErro = "";
-            ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
+            ViewBag.Background = null;
+
             try
             {
                 #region Logado

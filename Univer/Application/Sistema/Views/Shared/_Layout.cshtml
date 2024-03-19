@@ -149,7 +149,7 @@
         <!-- BEGIN HEADER INNER -->
         <div class="page-header-inner">
             <!-- BEGIN LOGO -->
-            <div class="page-logo" style="padding-left: 0px !important;">
+            <div class="page-logo" style="padding: 0px; margin: 0px;">
                 <a href=".">
                     <img src="@Url.Content("~/Content/admin/img/" + Helpers.Local.Sistema + "/logo-sistema.png")?vre=@Helpers.Local.Versao" alt="logo" class="logo-default" />
                 </a>
@@ -235,7 +235,7 @@
                             <!-- END USER LOGIN DROPDOWN -->
                             <!-- BEGIN USER LOGIN DROPDOWN -->
                             <li class="dropdown dropdown-extended dropdown-notification dropdown-dark">
-                                <a href="~/Account/Login/?Sair=true" class="dropdown-toggle" data-hover="dropdown"><i class="fa fa-sign-out"></i> Sair</a>
+                                <a href="~/Account/Login/?Sair=true" class="dropdown-toggle" data-hover="dropdown"><i class="fa fa-sign-out"></i> @traducaoHelper["SAIR"] </a>
                             </li>
                             <!-- END USER LOGIN DROPDOWN -->
                         </ul>

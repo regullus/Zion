@@ -8141,6 +8141,7 @@
     <Content Include="Views\Migracao\Rede.cshtml" />
     <Content Include="Views\MinhaRede\MigrarRede.cshtml" />
     <Content Include="Views\Shared\_LayoutLimpo.cshtml" />
+    <Content Include="Views\MinhaRede\Tabuleiro.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
