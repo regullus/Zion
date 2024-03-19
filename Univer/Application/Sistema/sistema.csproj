@@ -430,9 +430,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Arquivos\banners\Afiliex\banner1.jpg" />
-    <Content Include="Arquivos\banners\Universol\banner1.jpg" />
     <Content Include="Arquivos\banners\MettaBull\banner1.jpg" />
     <Content Include="Arquivos\banners\SolSolar\banner1.jpg" />
+    <Content Include="Arquivos\banners\Universol\banner1.jpg" />
+    <Content Include="Arquivos\banners\Universol\banner1.png" />
+    <Content Include="Arquivos\banners\Universol\fundo.jpg" />
     <Content Include="Arquivos\banners\Xsinergia\banner1.jpg" />
     <Content Include="Arquivos\banners\Xsinergia\banner1.png" />
     <Content Include="Arquivos\banners\Xsinergia\banner2.jpg" />
@@ -491,6 +493,7 @@
     <Content Include="Content\admin\css\themes\Afiliex.css" />
     <Content Include="Content\admin\css\themes\Falkol.css" />
     <Content Include="Content\admin\css\themes\MettaBull.css" />
+    <Content Include="Content\admin\css\themes\Universolbkp.css" />
     <Content Include="Content\admin\css\themes\Universol.css" />
     <Content Include="Content\admin\css\themes\XSinergia.css" />
     <Content Include="Content\admin\css\themes\ZionJB.css" />

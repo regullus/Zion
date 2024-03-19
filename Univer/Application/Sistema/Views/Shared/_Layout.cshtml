@@ -15,7 +15,7 @@
     var usuarioBinder = new Sistema.ModelBinders.UsuarioBinder();
     usuarioBinder.Usuario = usuario;
     ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
-    if(ViewBag.MascaraData == null)
+    if (ViewBag.MascaraData == null)
     {
         ViewBag.MascaraData = "dd/MM/yyyy";
     }
@@ -41,7 +41,11 @@
             foto = Url.Content(foto);
         }
     }
-
+    string background = "";
+    if(ViewBag.Background != null )
+    {
+        background = ViewBag.Background;
+    }
 }
 
 <!DOCTYPE html>
@@ -134,11 +138,12 @@
           return i;
         }
 
-        $(document).ready(function () { $("input").attr("autocomplete", "off"); }); 
+        $(document).ready(function () { $("input").attr("autocomplete", "off"); });
     </script>
 </head>
 
-<body class="page-header-fixed bodyColorBackground" onload="startTime()">
+<body class="page-header-fixed bodyColorBackground" onload="startTime()" style="@(background.IsEmpty() ? "" : background)" >
+    @*<body class="page-header-fixed " onload="startTime()" style="background-color: black; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg")) no-repeat center center">*@
     <!-- BEGIN HEADER -->
     <div class="page-header navbar navbar-fixed-top">
         <!-- BEGIN HEADER INNER -->
@@ -514,73 +519,72 @@
         </script>
     }
     <!-- Fim POPUP -->
-
     @*@if (Helpers.Local.Ambiente != "dev")
-    {
-        <script type="text/javascript">
+        {
+            <script type="text/javascript">
 
-        var timeoutDesconetarEtapa1 = 0;
-        var timeoutDesconetarEtapa2 = 0;
+            var timeoutDesconetarEtapa1 = 0;
+            var timeoutDesconetarEtapa2 = 0;
 
-        var limiteContadorDeslogarSegundos = 10;
-        var contadorDeslogarSegundos = 0
-        const umsegundo = 60000
+            var limiteContadorDeslogarSegundos = 10;
+            var contadorDeslogarSegundos = 0
+            const umsegundo = 60000
 
-        var tempoParaExpirarSessao = umsegundo * @Core.Helpers.ConfiguracaoHelper.GetInt("MINUTOS_DESCONECTAR");
+            var tempoParaExpirarSessao = umsegundo * @Core.Helpers.ConfiguracaoHelper.GetInt("MINUTOS_DESCONECTAR");
 
-        $("#btn-continuar-logado").on("click", () => {
-            console.log("sdfsdfsf")
-            contadorParaDeslogarEtapa1();
-        })
+            $("#btn-continuar-logado").on("click", () => {
+                console.log("sdfsdfsf")
+                contadorParaDeslogarEtapa1();
+            })
 
-        function contadorParaDeslogarEtapa1() {
+            function contadorParaDeslogarEtapa1() {
 
-            contadorDeslogarSegundos = limiteContadorDeslogarSegundos;
+                contadorDeslogarSegundos = limiteContadorDeslogarSegundos;
 
-            clearTimeout(timeoutDesconetarEtapa1);
-            clearTimeout(timeoutDesconetarEtapa2);
-
-            $("#modalDesconectar").modal("hide")
-
-            timeoutDesconetarEtapa1 = setTimeout(() => {
-
-                $("#modalDesconectar").modal("show")
-
-                contadorParaDeslogarEtapa2();
-
-            }, tempoParaExpirarSessao);
-        }
-
-        contadorParaDeslogarEtapa1();
-
-        function contadorParaDeslogarEtapa2() {
-
-            $("#desconectar-segundos").html(contadorDeslogarSegundos)
-
-            timeoutDesconetarEtapa2 = setTimeout(() => {
-
+                clearTimeout(timeoutDesconetarEtapa1);
                 clearTimeout(timeoutDesconetarEtapa2);
 
-                if (contadorDeslogarSegundos == 0) {
-                    contadorDeslogarSegundos = limiteContadorDeslogarSegundos;
+                $("#modalDesconectar").modal("hide")
 
-                    $(".desconectando-esconder").hide();
-                    $("#desconectando").removeClass('hide');
+                timeoutDesconetarEtapa1 = setTimeout(() => {
 
-                    location.href = '/Account/Login/?Sair=true';
+                    $("#modalDesconectar").modal("show")
 
-                }
-                else {
-                    contadorDeslogarSegundos--;
-                    contadorParaDeslogarEtapa2()
-                }
+                    contadorParaDeslogarEtapa2();
 
-            }, 1000);
+                }, tempoParaExpirarSessao);
+            }
 
-        }
+            contadorParaDeslogarEtapa1();
 
-        </script>
-    }*@
+            function contadorParaDeslogarEtapa2() {
+
+                $("#desconectar-segundos").html(contadorDeslogarSegundos)
+
+                timeoutDesconetarEtapa2 = setTimeout(() => {
+
+                    clearTimeout(timeoutDesconetarEtapa2);
+
+                    if (contadorDeslogarSegundos == 0) {
+                        contadorDeslogarSegundos = limiteContadorDeslogarSegundos;
+
+                        $(".desconectando-esconder").hide();
+                        $("#desconectando").removeClass('hide');
+
+                        location.href = '/Account/Login/?Sair=true';
+
+                    }
+                    else {
+                        contadorDeslogarSegundos--;
+                        contadorParaDeslogarEtapa2()
+                    }
+
+                }, 1000);
+
+            }
+
+            </script>
+        }*@
 
 </body>
 

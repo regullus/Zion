@@ -234,3 +234,4 @@ Exec spC_Tabuleiro @id = 1
 Exec spC_Tabuleiro @id = 20
 
 
+sELECT * FROM Rede.Tabuleiro

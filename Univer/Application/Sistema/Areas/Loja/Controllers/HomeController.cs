@@ -96,7 +96,7 @@ namespace Sistema.Areas.Loja.Controllers
                     //Valor minimo de inverstimento para quem não esta ativo
                     ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
                 }
-           
+
                 if (usuario.Pedido.Any())
                 {
                     foreach (var pedido in usuario.Pedido.OrderByDescending(p => p.DataCriacao))

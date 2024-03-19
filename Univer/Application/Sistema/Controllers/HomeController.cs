@@ -207,7 +207,7 @@
         {
             //bool blnEcommerce = false;
             string strErro = "";
-
+            ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
             try
             {
                 #region Logado
@@ -257,7 +257,6 @@
                     ViewBag.RedeTabuleiro = true;
                     int tabuleiroConviteID = 0;
                     int tabuleiroAtivosID = 0;
-                    int tabuleiroFinalizadosID = 0;
 
                     IEnumerable <Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                     IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
