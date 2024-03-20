@@ -416,42 +416,31 @@ namespace Sistema.Controllers
             obtemMensagem();
 
             ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
-
+            ViewBag.idUsuario = usuario.ID;
             try
             {
                 ViewBag.RedeTabuleiro = true;
-                int tabuleiroConviteID = 0;
-                int tabuleiroAtivosID = 0;
-
+                
+                int idTabuleiro = 0;
+                
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
-                IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelFinalizados = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 3); //3 - Finalizado
+                
                 ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
                 ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
 
-                IEnumerable<Core.Models.TabuleiroModel> tabuleirosConvite = null;
-                IEnumerable<Core.Models.TabuleiroModel> tabuleirosAtivos = null;
+                Core.Models.TabuleiroModel tabuleiro = null;
 
-                if (tabuleirosNivelConvite.Count() > 0)
-                {
-                    Core.Models.TabuleiroNivelModel tabuleiroConviteList = tabuleirosNivelConvite.FirstOrDefault();
-                    tabuleiroConviteID = tabuleiroConviteList.TabuleiroID;
-                    ViewBag.tabuleiroConviteID = tabuleiroConviteID;
-                    if (tabuleiroConviteID > 0)
-                    {
-                        tabuleirosConvite = tabuleiroRepository.ObtemTabuleiro(tabuleiroConviteID);
-                        ViewBag.tabuleirosConvite = tabuleirosConvite;
-                    }
-                }
                 if (tabuleirosNivelAtivos.Count() > 0)
                 {
-                    Core.Models.TabuleiroNivelModel tabuleiroAtivosList = tabuleirosNivelAtivos.FirstOrDefault();
-                    tabuleiroAtivosID = tabuleiroAtivosList.TabuleiroID;
-                    ViewBag.tabuleiroAtivosID = tabuleiroAtivosID;
-                    if (tabuleiroAtivosID > 0)
+                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
+                    //Obtem o tabuleiro que será exibido quando a pag for carregada
+                    idTabuleiro = tabuleiroAtivo.TabuleiroID;
+                    ViewBag.idTabuleiro = idTabuleiro;
+                    if (idTabuleiro > 0)
                     {
-                        tabuleirosAtivos = tabuleiroRepository.ObtemTabuleiro(tabuleiroAtivosID);
-                        ViewBag.tabuleirosAtivos = tabuleirosAtivos;
+                        tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro);
+                        ViewBag.tabuleiro = tabuleiro;
                     }
                 }
             }
@@ -1013,6 +1002,8 @@ namespace Sistema.Controllers
 
         #endregion
 
+        #region Json
+
         public JsonResult GetUsuarios(string search)
         {
             IQueryable<Usuario> usuarios = usuarioRepository.GetByExpression(x => x.Login.Contains(search) && x.Assinatura.StartsWith(usuario.Assinatura));
@@ -1064,7 +1055,8 @@ namespace Sistema.Controllers
                 return Json(ex.Message);
             }
         }
-
+        
+        #endregion
     }
 
 }

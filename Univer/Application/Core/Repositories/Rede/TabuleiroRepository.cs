@@ -42,11 +42,11 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public IEnumerable<TabuleiroModel> ObtemTabuleiro(int id)
+        public TabuleiroModel ObtemTabuleiro(int id)
         {
             string sql = "Exec spC_Tabuleiro @id=" + id ;
 
-            var retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).ToList();
+            var retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).FirstOrDefault();;
 
             return retorno;
         }

@@ -256,38 +256,29 @@
                 if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
                 {
                     ViewBag.RedeTabuleiro = true;
-                    int tabuleiroConviteID = 0;
-                    int tabuleiroAtivosID = 0;
-
+                    
                     IEnumerable <Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                     IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
-                    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelFinalizados = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 3); //3 - Finalizado
+                    
                     ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
                     ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
 
-                    IEnumerable<Core.Models.TabuleiroModel> tabuleirosConvite = null; 
-                    IEnumerable<Core.Models.TabuleiroModel> tabuleirosAtivos = null; 
+                    Core.Models.TabuleiroModel tabuleiro = null; 
                     
                     if (tabuleirosNivelConvite.Count() > 0)
                     {
                         Core.Models.TabuleiroNivelModel tabuleiroConviteList = tabuleirosNivelConvite.FirstOrDefault();
-                        tabuleiroConviteID = tabuleiroConviteList.TabuleiroID;
-                        ViewBag.tabuleiroConviteID = tabuleiroConviteID;
-                        if (tabuleiroConviteID > 0)
-                        {
-                            tabuleirosConvite = tabuleiroRepository.ObtemTabuleiro(tabuleiroConviteID);
-                            ViewBag.tabuleirosConvite = tabuleirosConvite;
-                        }
                     }
                     if (tabuleirosNivelAtivos.Count() > 0)
                     {
                         Core.Models.TabuleiroNivelModel tabuleiroAtivosList = tabuleirosNivelAtivos.FirstOrDefault();
-                        tabuleiroAtivosID = tabuleiroAtivosList.TabuleiroID;
-                        ViewBag.tabuleiroAtivosID = tabuleiroAtivosID;
+                        //Obtem o primeiro tabuleiro que sera mostrado na pagina
+                        int tabuleiroAtivosID = tabuleiroAtivosList.TabuleiroID;
                         if (tabuleiroAtivosID > 0)
                         {
-                            tabuleirosAtivos = tabuleiroRepository.ObtemTabuleiro(tabuleiroAtivosID);
-                            ViewBag.tabuleirosAtivos=tabuleirosAtivos;
+                            tabuleiro = tabuleiroRepository.ObtemTabuleiro(tabuleiroAtivosID);
+                            ViewBag.tabuleiroID = tabuleiroAtivosID;
+                            ViewBag.tabuleiro=tabuleiro;
                         }
                     }
                 }

@@ -13,6 +13,8 @@
 
     #region ViewBags
 
+    int idUsuario = ViewBag.idUsuario;
+
     var usuarioAtual = (Core.Entities.Usuario)ViewBag.Nivel1;
 
     ViewBag.Title = "Minha Rede".ToLower();
@@ -27,6 +29,9 @@
     IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroNivelAtivos = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosNivelAtivos;
 
     string planetaCor = "";
+
+    int idTabuleiro = ViewBag.idTabuleiro;
+    Core.Models.TabuleiroModel tabuleiro = (Core.Models.TabuleiroModel)ViewBag.tabuleiro;
 
     #endregion
 
@@ -48,6 +53,49 @@
     <script type="text/javascript" src="~/Content/scripts/jquery.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/countUp.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function widthResizer() {
+            var width = window.innerWidth
+            console.log(width)
+        }
+
+        // Getting the width of the browser on load
+        widthResizer()
+
+        // Getting the width of the browser whenever the screen resolution changes.
+        window.addEventListener('resize', widthResizer)
+
+        @*$(document).ready(function () {
+            var height = $(window).height();
+            var width = $(window).width();
+            Swal.fire({
+                title: "Sucesso!",
+                html: height + '|' + width,
+                icon: "success",
+                showCancelButton: true,
+                cancelButtonText: "Ok",
+                confirmButtonText: "<i class='flaticon2-back'></i>voltar",
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                },
+                customClass: {
+                    confirmButton: "btn btn-primary font-weight-bolder",
+                    cancelButton: "btn btn-light-dark font-weight-bolder"
+                }
+            }).then(function (result) {
+            if (result.value) {
+                window.location.href = "@ViewBag.MensagemVoltarLink"
+                };
+            });
+        });*@
+    </script>
+
 }
 
 @section PageLevelScripts{
@@ -82,28 +130,57 @@
     <div class="portlet-body">
 
         <!--BANNER-->
-        <div class="row" style="max-width: 1600px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center">
+        <div class="row" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqSup1" style="height: 60px; width: 60px; position: absolute; top: 160px; left: 480px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorEsqSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 118px; left: 450px;">@(tabuleiro.NomeDonatorEsqSup1)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqSup2" style="height: 60px; width: 60px; position: absolute; top: 280px; left: 300px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorEsqSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 338px; left: 270px;">@(tabuleiro.NomeDonatorEsqSup2)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqInf1" style="height: 60px; width: 60px; position: absolute; top: 500px; left: 400px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorEsqInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 558px; left: 370px;">@(tabuleiro.NomeDonatorEsqInf1)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqInf2" style="height: 60px; width: 60px; position: absolute; top: 720px; left: 520px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorEsqInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 778px; left: 490px;">@(tabuleiro.NomeDonatorEsqInf2)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirSup1" style="height: 60px; width: 60px; position: absolute; top: 180px; left: 900px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorDirSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 238px; left: 870px;">@(tabuleiro.NomeDonatorDirSup1)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirSup2" style="height: 60px; width: 60px; position: absolute; top: 400px; left: 1000px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorDirSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 458px; left: 970px;">@(tabuleiro.NomeDonatorDirSup2)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirInf1" style="height: 60px; width: 60px; position: absolute; top: 560px; left: 1140px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorDirInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 618px; left: 1110px;">@(tabuleiro.NomeDonatorDirInf1)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirInf2" style="height: 60px; width: 60px; position: absolute; top: 690px; left: 960px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.DonatorDirInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 748px; left: 930px;">@(tabuleiro.NomeDonatorDirInf2)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + ".png")' ?v=@Helpers.Local.Versao class="IndicatorEsqSup" style="height: 60px; width: 60px; position: absolute; top: 340px; left: 520px;">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.IndicatorEsqSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 398px; left: 490px;">@(tabuleiro.NomeIndicatorEsqSup)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + ".png")' ?v=@Helpers.Local.Versao class="IndicatorEsqInf" style="height: 60px; width: 60px; position: absolute; top: 570px; left: 600px; ">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.IndicatorEsqInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 628px; left: 570px;">@(tabuleiro.NomeIndicatorEsqInf)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + ".png")' ?v=@Helpers.Local.Versao class="IndicatorDirSup" style="height: 60px; width: 60px; position: absolute; top: 290px; left: 800px; ">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.IndicatorDirSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 348px; left: 770px;">@(tabuleiro.NomeIndicatorDirSup)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + ".png")' ?v=@Helpers.Local.Versao class="IndcatorDirInf" style="height: 60px; width: 60px; position: absolute; top: 560px; left: 930px; ">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.IndicatorDirInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 618px; left: 900px;">@(tabuleiro.NomeIndicatorDirInf)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + ".png")' ?v=@Helpers.Local.Versao class="CoordinatorEsq" style="height: 60px; width: 60px; position: absolute; top: 440px; left: 580px; ">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.CoordinatorEsq == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 498px; left: 550px;">@(tabuleiro.NomeCoordinatorEsq)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + ".png")' ?v=@Helpers.Local.Versao class="CoordinatorDir" style="height: 60px; width: 60px; position: absolute; top: 450px; left: 870px; ">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.CoordinatorDir == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; position: absolute; top: 508px; left: 840px;">@(tabuleiro.NomeCoordinatorDir)</button>
+
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + ".png")' ?v=@Helpers.Local.Versao class="Master" style="height: 60px; width: 60px; position: absolute; top: 450px; left: 720px; ">
+            <button id="" name="" class="btn btn-circle @(tabuleiro.Master == idUsuario ? "btn-warning" : "btn-success") btn-sm @(tabuleiro.pinMaster == 0 ? "hidden" : "")" style="max-width: 120px; width: 120px; max-width: 120px; width: 120px; position: absolute; top: 508px; left: 690px;">@(tabuleiro.NomeMaster)</button>
 
         </div>
-        <div class="row" style="max-width: 1600px">
+
+        <div class="row" style="max-width: 980px">
             <div class="col-md-12 padding-lateral-10">
                 <div class="portlet-body expand" style="padding:0px 0px 10px 0px!important;">
-                    @if (tabuleiroNivelConvites != null)
-                    {
-                        foreach (var item in tabuleiroNivelConvites)
-                        {
-                            //VERDE - CONVITE
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
-                                <div class="card-frame card-home springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
-                                    <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONVITE"]</span></div>
-                                    <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
-                                    <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
-                                </div>
-                            </div>
-                        }
-                    }
-
                     @if (tabuleiroNivelAtivos != null)
                     {
                         foreach (var item in tabuleiroNivelAtivos)
@@ -141,7 +218,7 @@
 
                             //ROXO ATIVOS
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png")' style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
+                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Niveis/" + item.BoardID + ".png")' ?v=@Helpers.Local.Versao style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
                                 <div class="card-frame card-home @(planetaCor) ativo" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
                                     <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVO"]</span></div>
                                     <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
@@ -150,7 +227,21 @@
                             </div>
                         }
                     }
-
+                    @if (tabuleiroNivelConvites != null)
+                    {
+                        foreach (var item in tabuleiroNivelConvites)
+                        {
+                            //VERDE - CONVITE
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-bottom-margin">
+                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Niveis/" + item.BoardID + ".png")' ?v=@Helpers.Local.Versao style="vertical-align: top; height: 64px; padding: 0; margin: 0; padding-top: 5px; padding-left: 5px;" class="icon-bg">
+                                <div class="card-frame card-home springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)">
+                                    <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONVITE"]</span></div>
+                                    <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
+                                    <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
 

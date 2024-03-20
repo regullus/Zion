@@ -22,10 +22,10 @@ namespace Core.Models
         public int? pinIndicatorDirSup { get; set; }
         public int? IndicatorDirInf { get; set; }
         public string NomeIndicatorDirInf { get; set; }
-        public int? pinIndcatorDitInf { get; set; }
+        public int? pinIndicatorDirInf { get; set; }
         public int? DonatorDirSup1 { get; set; }
         public string NomeDonatorDirSup1 { get; set; }
-        public int? pinDonaDirSup1 { get; set; }
+        public int? pinDonatorDirSup1 { get; set; }
         public int? DonatorDirSup2 { get; set; }
         public string NomeDonatorDirSup2 { get; set; }
         public int? pinDonatorDirSup2 { get; set; }

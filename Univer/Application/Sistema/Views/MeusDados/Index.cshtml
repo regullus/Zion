@@ -75,7 +75,7 @@
         };
     }
 
-    var dataString ="";
+    var dataString = "";
     switch (Model.Pais.IdiomaID)
     {
         case 2: //Espanhol
@@ -695,7 +695,7 @@
             <div class="portlet-body form">
                 @using (Html.BeginForm("Salvar", "MeusDados", FormMethod.Post, new { enctype = "multipart/form-data", role = "form", id = "formInformacoesPessoais" }))
                 {
-                    <div class="col-md-12 padding-20 ">
+                    <div class="col-md-12 padding-20 widget-bg-color-white">
 
                         <input id="Tab" name="Tab" type="hidden" value="@Sistema.Controllers.MeusDadosController.Tabs.InformacoesPessoais" />
                         <input type="hidden" id="formInformacoesPessoaisToken" name="formInformacoesPessoaisToken" class="form-control" value="" />
@@ -769,11 +769,11 @@
 
 
                             @*<div class="col-md-4">
-                                    <div class="form-group form-md-line-input form-md-floating-label">
-                                        <input type="text" class="form-control" required id="Documento" name="Documento" value="@Model.Documento">
-                                        <label for="form_control_1">@traducaoHelper["DOCUMENTO_IDENTIFICACAO"]</label>
-                                    </div>
-                                </div>*@
+                                <div class="form-group form-md-line-input form-md-floating-label">
+                                    <input type="text" class="form-control" required id="Documento" name="Documento" value="@Model.Documento">
+                                    <label for="form_control_1">@traducaoHelper["DOCUMENTO_IDENTIFICACAO"]</label>
+                                </div>
+                            </div>*@
 
                             <div class="col-md-4">
                                 <div class="form-group form-md-line-input form-md-floating-label">
@@ -809,6 +809,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group form-md-line-input form-md-floating-label">
@@ -863,76 +864,76 @@
 
                 }
 
-                @using (Html.BeginForm("Gravar", "MeusDados", FormMethod.Post, new { enctype = "multipart/form-data", role = "form", id = "formImagensPessoais" }))
+                @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MEUS_DADOS_IMAGEM"))
                 {
-
-                    <div class="form-body" id="foto">
-
-                        <div class="form-horizontal">
-                            <div class="form-group image-cropper">
-                                <div class="col-md-12"><h3>@traducaoHelper["IMAGEM"]</h3></div>
-
-                                <div class="col-md-6">
-                                    <h4>@traducaoHelper["TRABALHE_IMAGEM"]</h4>
-                                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                                        <div class="fileinput-new thumbnail" style="padding:0;">
-                                            @if (String.IsNullOrEmpty(ViewBag.Foto))
-                                            {
-                                                <img src="@Url.Content("~/Arquivos/perfil/000000.jpg")" alt="" class="image" id="fotoMeusDados" style="background-color:#ddd; height: 400px; " />
-                                            }
-                                            else
-                                            {
-                                                <img src="@Url.Content(ViewBag.Foto)" alt="" class="image" id="fotoMeusDados" style="background-color:#ddd; height: 400px; " />
-                                            }
+                    using (Html.BeginForm("Gravar", "MeusDados", FormMethod.Post, new { enctype = "multipart/form-data", role = "form", id = "formImagensPessoais" }))
+                    {
+                        <div class="form-body" id="foto">
+                            <div class="form-horizontal">
+                                <div class="form-group image-cropper">
+                                    <div class="col-md-12"><h3>@traducaoHelper["IMAGEM"]</h3></div>
+                                    <div class="col-md-6">
+                                        <h4>@traducaoHelper["TRABALHE_IMAGEM"]</h4>
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="padding:0;">
+                                                @if (String.IsNullOrEmpty(ViewBag.Foto))
+                                                {
+                                                    <img src="@Url.Content("~/Arquivos/perfil/000000.jpg")" alt="" class="image" id="fotoMeusDados" style="background-color:#ddd; height: 400px; " />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@Url.Content(ViewBag.Foto)" alt="" class="image" id="fotoMeusDados" style="background-color:#ddd; height: 400px; " />
+                                                }
+                                            </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="height: 400px;"></div>
+                                            <div>
+                                                <span class="btn default btn-file">
+                                                    <span class="fileinput-new">
+                                                        @traducaoHelper["ESCOLHA_IMAGEM"]
+                                                    </span>
+                                                    <span class="fileinput-exists">
+                                                        @traducaoHelper["MUDAR_IMAGEM"]
+                                                    </span>
+                                                    <input type="file" id="imgFoto" name="imgFoto">
+                                                </span>
+                                                <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput">
+                                                    @traducaoHelper["REMOVER_IMAGEM"]
+                                                </a>
+                                                <input type="hidden" id="formImagensPessoaisToken" name="formImagensPessoaisToken" class="form-control" value="" />
+                                                @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("AUTENTICACAO_DOIS_FATORES"))
+                                                {
+                                                    <input type="button" onclick="AbrirConfirmacao2FA('#formImagensPessoais');" value="Obter" class="btn btn-info pull-right fileinput-exists" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="submit" value="Obter" class="btn btn-info pull-right fileinput-exists" />
+                                                }
+                                                <a class="btn btn-info pull-right fileinput-new result" href="">@traducaoHelper["SALVAR_IMAGEM"]</a>
+                                            </div>
                                         </div>
-                                        <div class="fileinput-preview fileinput-exists thumbnail" style="height: 400px;"></div>
-                                        <div>
-                                            <span class="btn default btn-file">
-                                                <span class="fileinput-new">
-                                                    @traducaoHelper["ESCOLHA_IMAGEM"]
-                                                </span>
-                                                <span class="fileinput-exists">
-                                                    @traducaoHelper["MUDAR_IMAGEM"]
-                                                </span>
-                                                <input type="file" id="imgFoto" name="imgFoto">
+                                        <p>&nbsp;</p>
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h4>Preview</h4>
+                                        <div class="preview" style="width: 233px; height: 200px; border: 1px solid #eee;"></div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="help-block">
+                                            <span class="label label-danger">
+                                                @traducaoHelper["ALERTA"] <i class="fa fa-exclamation"></i>
                                             </span>
-                                            <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput">
-                                                @traducaoHelper["REMOVER_IMAGEM"]
-                                            </a>
-                                            <input type="hidden" id="formImagensPessoaisToken" name="formImagensPessoaisToken" class="form-control" value="" />
-                                            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("AUTENTICACAO_DOIS_FATORES"))
-                                            {
-                                                <input type="button" onclick="AbrirConfirmacao2FA('#formImagensPessoais');" value="Obter" class="btn btn-info pull-right fileinput-exists" />
-                                            }
-                                            else
-                                            {
-                                                <input type="submit" value="Obter" class="btn btn-info pull-right fileinput-exists" />
-                                            }
-                                            <a class="btn btn-info pull-right fileinput-new result" href="">@traducaoHelper["SALVAR_IMAGEM"]</a>
+                                            <p style="padding-top: 5px;">@traducaoHelper["MENSAGEM1_IMAGEM"]</p>
+                                            <p>@traducaoHelper["MENSAGEM2_IMAGEM"]</p>
                                         </div>
                                     </div>
-                                    <p>&nbsp;</p>
+                                </div>
 
-                                </div>
-                                <div class="col-md-6">
-                                    <h4>Preview</h4>
-                                    <div class="preview" style="width: 233px; height: 200px; border: 1px solid #eee;"></div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="help-block">
-                                        <span class="label label-danger">
-                                            @traducaoHelper["ALERTA"] <i class="fa fa-exclamation"></i>
-                                        </span>
-                                        <p style="padding-top: 5px;">@traducaoHelper["MENSAGEM1_IMAGEM"]</p>
-                                        <p>@traducaoHelper["MENSAGEM2_IMAGEM"]</p>
-                                    </div>
-                                </div>
                             </div>
-
                         </div>
-                    </div>
+                    }
                 }
-            </div>
+                </div>
         </div>
     </div>
 
@@ -1377,128 +1378,127 @@
             </div>
         </div>
     </div>
+    
+    @*<div id="EnvioDocumentos" class="tab-pane @(tab == Sistema.Controllers.MeusDadosController.Tabs.EnvioDeDocumentos ? "active" : "")">
+        <div class="portlet box backWrite grey-gallery">
 
-    @*
-        <div id="EnvioDocumentos" class="tab-pane @(tab == Sistema.Controllers.MeusDadosController.Tabs.EnvioDeDocumentos ? "active" : "")">
-            <div class="portlet box backWrite grey-gallery">
-
-                <div class="portlet-title">
-                    <div class="caption"></div>
-                    <div class="tools">
-                        <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
-                    </div>
-                    <div class="actions">
-                        <a href='#'>&nbsp;</a>
-                        <label>&nbsp;</label>
-                    </div>
+            <div class="portlet-title">
+                <div class="caption"></div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
                 </div>
+                <div class="actions">
+                    <a href='#'>&nbsp;</a>
+                    <label>&nbsp;</label>
+                </div>
+            </div>
 
-                <div class="portlet-body">
-                    @using (Html.BeginForm("Salvar", "MeusDados", FormMethod.Post, new { role = "form", enctype = "multipart/form-data", id = "fileupload" }))
-                    {
-                        <div class="row">
-                            <div class="col-md-12 padding-20">
+            <div class="portlet-body">
+                @using (Html.BeginForm("Salvar", "MeusDados", FormMethod.Post, new { role = "form", enctype = "multipart/form-data", id = "fileupload" }))
+                {
+                    <div class="row">
+                        <div class="col-md-12 padding-20">
 
-                                <input id="Tab" name="Tab" type="hidden" value="@Sistema.Controllers.MeusDadosController.Tabs.EnvioDeDocumentos" />
-                                <input type="hidden" id="fileuploadToken" name="fileuploadToken" class="form-control" value="" />
+                            <input id="Tab" name="Tab" type="hidden" value="@Sistema.Controllers.MeusDadosController.Tabs.EnvioDeDocumentos" />
+                            <input type="hidden" id="fileuploadToken" name="fileuploadToken" class="form-control" value="" />
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group form-md-line-input form-md-floating-label has-info">
-                                            <select class="form-control" id="TipoID" name="TipoID" required>
-                                                <option value="1">@traducaoHelper["DOCUMENTO_DE_IDENTIFICACAO"]</option>
-                                                <option value="2">@traducaoHelper["PASSAPORTE"]</option>
-                                                <option value="3">@traducaoHelper["COMPROVANTE_RESIDENCIA"]</option>
-                                                <option value="4">@traducaoHelper["COMPROVANTE_PAGAMENTO"]</option>
-                                            </select>
-                                            <label for="TipoID">@traducaoHelper["TIPO_DOCUMENTO"]</label>
-                                        </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group form-md-line-input form-md-floating-label has-info">
+                                        <select class="form-control" id="TipoID" name="TipoID" required>
+                                            <option value="1">@traducaoHelper["DOCUMENTO_DE_IDENTIFICACAO"]</option>
+                                            <option value="2">@traducaoHelper["PASSAPORTE"]</option>
+                                            <option value="3">@traducaoHelper["COMPROVANTE_RESIDENCIA"]</option>
+                                            <option value="4">@traducaoHelper["COMPROVANTE_PAGAMENTO"]</option>
+                                        </select>
+                                        <label for="TipoID">@traducaoHelper["TIPO_DOCUMENTO"]</label>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group form-md-line-input form-md-floating-label has-info">
-                                            <div class="input-group">
-                                                <span class="input-group-btn btn-left">
-                                                    <label id="uploadArquivo" class="custom-file-upload btn blue-oleo">
-                                                        <input type="file" id="Arquivo" name="Arquivo" style="display: none;" onchange="$('#Caminho').val(this.value)" />
-                                                        Upload
-                                                    </label>
-                                                </span>
-                                                <div class="input-group-control">
-                                                    <input type="text" class="form-control" id="Caminho" disabled placeholder="@traducaoHelper["TIPO_ARQUIVO_UPLOAD"]">
-                                                </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group form-md-line-input form-md-floating-label has-info">
+                                        <div class="input-group">
+                                            <span class="input-group-btn btn-left">
+                                                <label id="uploadArquivo" class="custom-file-upload btn blue-oleo">
+                                                    <input type="file" id="Arquivo" name="Arquivo" style="display: none;" onchange="$('#Caminho').val(this.value)" />
+                                                    Upload
+                                                </label>
+                                            </span>
+                                            <div class="input-group-control">
+                                                <input type="text" class="form-control" id="Caminho" disabled placeholder="@traducaoHelper["TIPO_ARQUIVO_UPLOAD"]">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <div class="form-actions">
-                                    <div class="row">
-                                        <div class="col-md-offset-2 col-md-10">
-                                            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("AUTENTICACAO_DOIS_FATORES"))
-                                            {
-                                                <input type="button" onclick="AbrirConfirmacao2FA('#fileupload');" value="@traducaoHelper["ENVIAR"]" class="btn btn-intern pull-right" />
-                                            }
-                                            else
-                                            {
-                                                <input type="submit" value="@traducaoHelper["SALVAR"]" class="btn btn-intern pull-right" />
-                                            }
-                                        </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-2 col-md-10">
+                                        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("AUTENTICACAO_DOIS_FATORES"))
+                                        {
+                                            <input type="button" onclick="AbrirConfirmacao2FA('#fileupload');" value="@traducaoHelper["ENVIAR"]" class="btn btn-intern pull-right" />
+                                        }
+                                        else
+                                        {
+                                            <input type="submit" value="@traducaoHelper["SALVAR"]" class="btn btn-intern pull-right" />
+                                        }
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    }
-                    <br />
-                    <br />
-                    <div class="row">
-                        <div class="col-md-12">
-                            @if (Model.Documentos.Any())
-                            {
-                                <table class="table table-condensed table-bordered margin-0px">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:center;">@traducaoHelper["TIPO"]</th>
-                                            <th style="text-align:center;">@traducaoHelper["VALIDADO"]</th>
-                                            <th style="text-align:center;">@traducaoHelper["DATA_ENVIO"]</th>
-                                            <th style="text-align: center; width: 30px;"></th>
+                    </div>
+                }
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        @if (Model.Documentos.Any())
+                        {
+                            <table class="table table-condensed table-bordered margin-0px">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center;">@traducaoHelper["TIPO"]</th>
+                                        <th style="text-align:center;">@traducaoHelper["VALIDADO"]</th>
+                                        <th style="text-align:center;">@traducaoHelper["DATA_ENVIO"]</th>
+                                        <th style="text-align: center; width: 30px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var documento in Model.Documentos.OrderByDescending(d => d.DataEnvio))
+                                    {
+                                        <tr @(active ? "class=active" : "")>
+                                            <td style="text-align:center; padding: 12px;">@Core.Helpers.EnumHelper.GetDescription(documento.Tipo)</td>
+                                            <td style="text-align:center; padding: 12px;">
+                                                @if (documento.Validado)
+                                                {
+                                                    <label class="label label-success">@traducaoHelper["SIM"]</label>
+                                                }
+                                                else
+                                                {
+                                                    <label class="label label-danger">@traducaoHelper["NÃO"]</label>
+                                                }
+                                            </td>
+                                            <td style="text-align:center; padding: 12px;">@documento.DataEnvio.ToString(ViewBag.MascaraData)</td>
+                                            <td style="text-align:center;">
+                                                <a href="@documento.CaminhoVirtual" target="_blank" class="btn btn-sm btn-success tooltiped" data-toggle="tooltip" data-original-title="download"><i class="fa fa-download"></i></a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var documento in Model.Documentos.OrderByDescending(d => d.DataEnvio))
-                                        {
-                                            <tr @(active ? "class=active" : "")>
-                                                <td style="text-align:center; padding: 12px;">@Core.Helpers.EnumHelper.GetDescription(documento.Tipo)</td>
-                                                <td style="text-align:center; padding: 12px;">
-                                                    @if (documento.Validado)
-                                                    {
-                                                        <label class="label label-success">@traducaoHelper["SIM"]</label>
-                                                    }
-                                                    else
-                                                    {
-                                                        <label class="label label-danger">@traducaoHelper["NÃO"]</label>
-                                                    }
-                                                </td>
-                                                <td style="text-align:center; padding: 12px;">@documento.DataEnvio.ToString(ViewBag.MascaraData)</td>
-                                                <td style="text-align:center;">
-                                                    <a href="@documento.CaminhoVirtual" target="_blank" class="btn btn-sm btn-success tooltiped" data-toggle="tooltip" data-original-title="download"><i class="fa fa-download"></i></a>
-                                                </td>
-                                            </tr>
-                                            active = !active;
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                            else
-                            {
-                                <p class="lead">@traducaoHelper["SEM_ENVIO_ARQUIVO"]</p>
-                            }
-                        </div>
+                                        active = !active;
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p class="lead">@traducaoHelper["SEM_ENVIO_ARQUIVO"]</p>
+                        }
                     </div>
                 </div>
             </div>
         </div>
-    *@
+    </div>*@
+    
 </div>
 
 <div id="Confirmacao2FA" class="modal" data-easein="tada" data-easeout="rollOut" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

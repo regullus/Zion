@@ -269,6 +269,10 @@ namespace Sistema.Controllers
 
         public bool Valida2FA(string token)
         {
+            if (!Core.Helpers.ConfiguracaoHelper.GetBoolean("AUTENTICACAO_DOIS_FATORES")) { 
+                return true; 
+            }
+
             var user = UserManager.FindById(usuario.IdAutenticacao);
             byte[] secretKey = Base32Encoder.Decode(user.GoogleAuthenticatorSecretKey);
 
@@ -318,7 +322,7 @@ namespace Sistema.Controllers
 
             bool validado = usuario.Status == Core.Entities.Usuario.TodosStatus.Associado || usuario.Status == Core.Entities.Usuario.TodosStatus.NaoAssociado;
 
-            if (validado && twoFactorEnabled)
+            if (validado)
             {
                 return LoadView(Tabs.InformacoesPessoais);
             }
