@@ -420,7 +420,10 @@ namespace Sistema.Controllers
             try
             {
                 ViewBag.RedeTabuleiro = true;
-                
+                ViewBag.height = "80px";
+                ViewBag.width = "80px";
+                ViewBag.txtMaxWidth = "120px";
+
                 int idTabuleiro = 0;
                 
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite

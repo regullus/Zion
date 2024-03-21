@@ -1281,56 +1281,6 @@ if (!totalAcumulado.error) {
 };*@
 </script>
 
-<script>
-    $('.convite')
-        .css('cursor', 'pointer')
-        .click(
-            function () {
-                var tabuleiroID = $(this).attr("data-id");
-
-
-            }
-        )
-        .hover(
-            function () {
-                $(this).css('background', '#32cd32');
-            },
-            function () {
-                $(this).css('background', '');
-            }
-        );
-    $('.ativo')
-        .css('cursor', 'pointer')
-        .click(
-            function () {
-                var tabuleiroID = $(this).attr("data-id");
-            }
-        )
-        .hover(
-            function () {
-                $(this).css('background', '#865fcf');
-            },
-            function () {
-                $(this).css('background', '');
-            }
-        );
-    $('.finalizado')
-        .css('cursor', 'pointer')
-        .click(
-            function () {
-                var tabuleiroID = $(this).attr("data-id");
-            }
-        )
-        .hover(
-            function () {
-                $(this).css('background', '#b92e0a');
-            },
-            function () {
-                $(this).css('background', '');
-            }
-        );
-
-</script>
 
 @Html.Partial("_avisos", (List<Core.Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos>)ViewBag.Avisos)
 @Html.Partial("_limite-bonus-arbitragem")

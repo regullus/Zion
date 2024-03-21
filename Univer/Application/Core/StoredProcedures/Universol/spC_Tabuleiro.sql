@@ -1,4 +1,4 @@
-use [Univer]
+use [UniverDEv]
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_Tabuleiro'))
    Drop Procedure spC_Tabuleiro
@@ -168,25 +168,21 @@ CREATE TABLE #temp
    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf1 from #temp) Update #temp Set pinDonatorEsqInf1= @Pin 
    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf2 from #temp) Update #temp Set pinDonatorEsqInf2= @Pin 
    
-   select pinDonatorEsqSup1 from #temp
-
-   Update #temp Set pinMaster=0 Where pinMaster=null
-   Update #temp Set pinCoordinatorDir=0 Where pinCoordinatorDir=null
-   Update #temp Set pinIndicatorDirSup=0 Where pinIndicatorDirSup=null
-   Update #temp Set pinIndicatorDirInf=0 Where pinIndicatorDirInf=null
-   Update #temp Set pinDonatorDirSup1=0 Where pinDonatorDirSup1=null
-   Update #temp Set pinDonatorDirSup2=0 Where pinDonatorDirSup2=null
-   Update #temp Set pinDonatorDirInf1=0 Where pinDonatorDirInf1=null
-   Update #temp Set pinDonatorDirInf2=0 Where pinDonatorDirInf2=null
-   Update #temp Set pinCoordinatorEsq=0 Where pinCoordinatorEsq=null
-   Update #temp Set pinIndicatorEsqSup=0 Where pinIndicatorEsqSup=null
-   Update #temp Set pinIndicatorEsqInf=0 Where pinIndicatorEsqInf=null
-   Update #temp Set pinDonatorEsqSup1=0 Where pinDonatorEsqSup1=null
-   Update #temp Set pinDonatorEsqSup2=0 Where pinDonatorEsqSup2=null
-   Update #temp Set pinDonatorEsqInf1=0 Where pinDonatorEsqInf1=null
-   Update #temp Set pinDonatorEsqInf2=0 Where pinDonatorEsqInf2=null
-
-   select pinDonatorEsqSup1 from #temp
+   Update #temp Set pinMaster=0 Where pinMaster is null
+   Update #temp Set pinCoordinatorDir=0 Where pinCoordinatorDir is null
+   Update #temp Set pinIndicatorDirSup=0 Where pinIndicatorDirSup is null
+   Update #temp Set pinIndicatorDirInf=0 Where pinIndicatorDirInf is null
+   Update #temp Set pinDonatorDirSup1=0 Where pinDonatorDirSup1 is null
+   Update #temp Set pinDonatorDirSup2=0 Where pinDonatorDirSup2 is null
+   Update #temp Set pinDonatorDirInf1=0 Where pinDonatorDirInf1 is null
+   Update #temp Set pinDonatorDirInf2=0 Where pinDonatorDirInf2 is null
+   Update #temp Set pinCoordinatorEsq=0 Where pinCoordinatorEsq is null
+   Update #temp Set pinIndicatorEsqSup=0 Where pinIndicatorEsqSup is null
+   Update #temp Set pinIndicatorEsqInf=0 Where pinIndicatorEsqInf is null
+   Update #temp Set pinDonatorEsqSup1=0 Where pinDonatorEsqSup1 is null
+   Update #temp Set pinDonatorEsqSup2=0 Where pinDonatorEsqSup2 is null
+   Update #temp Set pinDonatorEsqInf1=0 Where pinDonatorEsqInf1 is null
+   Update #temp Set pinDonatorEsqInf2=0 Where pinDonatorEsqInf2 is null
 
    Select 
       ID,
