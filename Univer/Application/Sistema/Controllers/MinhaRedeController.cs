@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Text;
 using System.Net;
+using Fluentx;
 
 
 #endregion
@@ -418,6 +419,11 @@ namespace Sistema.Controllers
 
             ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
             ViewBag.idUsuario = usuario.ID;
+
+            string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+            tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+            ViewBag.Token = tokenLocal;
+
             try
             {
                 ViewBag.RedeTabuleiro = true;
@@ -426,10 +432,10 @@ namespace Sistema.Controllers
                 ViewBag.txtMaxWidth = "120px";
 
                 int idTabuleiro = 0;
-                
+
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
-                
+
                 ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
                 ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
 
@@ -454,6 +460,57 @@ namespace Sistema.Controllers
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult GetDados(string usuarioID, string masterID, string tabuleiroID, string Nivel, string token)
+        {
+            if (usuarioID.IsNullOrEmpty() || masterID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idMaster = int.Parse(masterID);
+                int idTabuleiro = int.Parse(tabuleiroID);
+
+                if (usuarioID.IsNullOrEmpty() || masterID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                if (token != tokenLocal)
+                {
+                    //Devolove que tokem é invalido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                }
+                var data = new
+                {
+                    Nome = "Ariobaldo",
+                    Celular = "11955556644",
+                    Cripto = "123456789"
+                };
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = data,
+                    RecursionLimit = 1000 //_listaRetorno.Count
+                };
+
+                return jsonResult;
+
+            }
+            catch (Exception ex)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GM_01");
+            }
         }
 
         public ActionResult MinhaArvore()
@@ -1007,27 +1064,7 @@ namespace Sistema.Controllers
         #endregion
 
         #region Json
-
-        [HttpPost]
-        public ActionResult GetMaster(string id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            try
-            {
-                int idMaster = int.Parse(id);
-                return Json("OK");
-                
-            }
-            catch (Exception ex)
-            {
-                return Json(ex.Message);
-            }
-        }
-
+               
         public JsonResult GetUsuarios(string search)
         {
             IQueryable<Usuario> usuarios = usuarioRepository.GetByExpression(x => x.Login.Contains(search) && x.Assinatura.StartsWith(usuario.Assinatura));
@@ -1079,7 +1116,7 @@ namespace Sistema.Controllers
                 return Json(ex.Message);
             }
         }
-        
+
         #endregion
     }
 

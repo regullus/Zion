@@ -60,7 +60,7 @@
         var width = 0;
         var posWidth = 10;
 
-        $(document).ready(function () {
+        $(function () {
             width = window.innerWidth
             console.log('********** ' + width + ' ********** ')
 
@@ -200,99 +200,188 @@
         // Getting the width of the browser whenever the screen resolution changes.
         window.addEventListener('resize', widthResizer)
 
-        @*$(document).ready(function () {
-            var height = $(window).height();
-            var width = $(window).width();
-            Swal.fire({
-                title: "Sucesso!",
-                html: height + '|' + width,
-                icon: "success",
-                showCancelButton: true,
-                cancelButtonText: "Ok",
-                confirmButtonText: "<i class='flaticon2-back'></i>voltar",
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                },
-                customClass: {
-                    confirmButton: "btn btn-primary font-weight-bolder",
-                    cancelButton: "btn btn-light-dark font-weight-bolder"
-                }
-            }).then(function (result) {
-            if (result.value) {
-                window.location.href = "@ViewBag.MensagemVoltarLink"
-                };
-            });
-        });*@
-
-        $("#master").click(function () {
-
+        $('.master').on('click', function () {
+            var idMaster = $(this).attr("data-id");
+            //get
+            var idTabuleiro = $('#tabuleiro').val();
+            //Set
+            //$('#tabuleiro').val('xuxa');
             $.ajax({
-                url: "@Url.Action("GetMaster")",
+                url: "@Url.Action("GetDados")",
                 type: "POST",
                 data: {
-                    'id': '1'
+                    'usuarioID': '@(idUsuario)',
+                    'masterID': idMaster,
+                    'tabuleiroID': idTabuleiro,
+                    'Nivel': 'Master',
+                    'token': '@(ViewBag.Token)'
                 },
                 success: function (data) {
-                    Swal.fire({
-                        title: 'Sucesso!',
-                        text: 'Lote(s) cancelado(s) com sucesso!',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
+                    if (data != null) {
+                        var nome = data.Nome;
+                        var celular = data.Celular;
+                        var cripto = data.Cripto;
+                        $("#infoNome").html(data.Nome);
+                        $("#infoCelular").html(data.Celular);
+                        $("#infoCripto").html(data.Cripto);
+                        $("#infoTitulo").html('@(traducaoHelper["ALVO"])');
+                        $('#modDados').modal('show');
+                    } else {
+                        Swal.fire({
+                            title: 'Erro: ' + xhr.status + '!',
+                            text: '@(traducaoHelper["SEM_DADOS"])',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     Swal.fire({
                         title: 'Erro: ' + xhr.status + '!',
-                        text: 'Erro',
+                        text: 'Erro:' + thrownError.toString(),
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
                 },
             });
+        });
 
-            @*$.ajax({
-               url: '@Url.Action("GetMaster")',
-               type: 'POST',
-               data: { 'id': cod },
-               success: function (data) {
-                  if (data == 'OK') {
-                     swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])', 'success');
-                  }
-                  else {
-                     swal('@Html.Raw(traducaoHelper["ERRO"] + " 1")', data, 'error');
-                  }
-               },
-               error: function (data) {
-                  swal('@Html.Raw(traducaoHelper["ERRO"] + " 2")', data, 'error');
-               }
-            });*@
+        $('.coordinator').on('click', function () {
+            var idCoordinator = $(this).attr("data-id");
+            var idTabuleiro = $('#tabuleiro').val();
+            var idMaster = $('.master').attr("data-id");
+            if (idMaster == '@idUsuario') {
+                $.ajax({
+                    url: "@Url.Action("GetDados")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'masterID': idMaster,
+                        'tabuleiroID': idTabuleiro,
+                        'Nivel': 'Coordinator',
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            var nome = data.Nome;
+                            var celular = data.Celular;
+                            var cripto = data.Cripto;
+                            $("#infoNome").html(data.Nome);
+                            $("#infoCelular").html(data.Celular);
+                            $("#infoCripto").html(data.Cripto);
+                            $("#infoTitulo").html('@(traducaoHelper["SUPERVISOR"])');
+                            $('#modDados').modal('show');
+                        } else {
+                            Swal.fire({
+                                title: 'Erro: ' + xhr.status + '!',
+                                text: '@(traducaoHelper["SEM_DADOS"])',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        Swal.fire({
+                            title: 'Erro: ' + xhr.status + '!',
+                            text: 'Erro:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                });
+            }
+        });
 
-            Swal.fire({
-                title: "Sucesso!",
-                html: 'MAster',
-                icon: "success",
-                showCancelButton: true,
-                cancelButtonText: "Ok",
-                confirmButtonText: "<i class='flaticon2-back'></i>voltar",
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                },
-                customClass: {
-                    confirmButton: "btn btn-primary font-weight-bolder",
-                    cancelButton: "btn btn-light-dark font-weight-bolder"
-                }
-            }).then(function (result) {
-            if (result.value) {
-                window.location.href = "@ViewBag.MensagemVoltarLink"
-                };
-            });
+        $('.indicator').on('click', function () {
+            var idIndicator = $(this).attr("data-id");
+            var idTabuleiro = $('#tabuleiro').val();
+            var idMaster = $('.master').attr("data-id");
+            if (idMaster == '@idUsuario') {
+                $.ajax({
+                    url: "@Url.Action("GetDados")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'masterID': idMaster,
+                        'tabuleiroID': idTabuleiro,
+                        'Nivel': 'Indicator',
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            var nome = data.Nome;
+                            var celular = data.Celular;
+                            var cripto = data.Cripto;
+                            $("#infoNome").html(data.Nome);
+                            $("#infoCelular").html(data.Celular);
+                            $("#infoCripto").html(data.Cripto);
+                            $("#infoTitulo").html('@(traducaoHelper["ANFITRIAO"])');
+                            $('#modDados').modal('show');
+                        } else {
+                            Swal.fire({
+                                title: 'Erro: ' + xhr.status + '!',
+                                text: '@(traducaoHelper["SEM_DADOS"])',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        Swal.fire({
+                            title: 'Erro: ' + xhr.status + '!',
+                            text: 'Erro:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                });
+            }
+        });
 
+        $('.donator').on('click', function () {
+            var idDonator = $(this).attr("data-id");
+            var idTabuleiro = $('#tabuleiro').val();
+            var idMaster = $('.master').attr("data-id");
+            if (idMaster == '@idUsuario') {
+                $.ajax({
+                    url: "@Url.Action("GetDados")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'masterID': idMaster,
+                        'tabuleiroID': idTabuleiro,
+                        'Nivel': 'Donator',
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            var nome = data.Nome;
+                            var celular = data.Celular;
+                            var cripto = data.Cripto;
+                            $("#infoNome").html(data.Nome);
+                            $("#infoCelular").html(data.Celular);
+                            $("#infoCripto").html(data.Cripto);
+                            $("#infoTitulo").html('@(traducaoHelper["CONVIDADO"])');
+                            $('#modDados').modal('show');
+                        } else {
+                            Swal.fire({
+                                title: 'Erro: ' + xhr.status + '!',
+                                text: '@(traducaoHelper["SEM_DADOS"])',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        Swal.fire({
+                            title: 'Erro: ' + xhr.status + '!',
+                            text: 'Erro:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                });
+            }
         });
 
     </script>
@@ -332,50 +421,52 @@
         <!--BANNER-->
         <div class="row" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
 
+            <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
+
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqSup1">
-            <button id="DonatorEsqSup1" name="DonatorEsqSup1" class="btn btn-circle txtDonatorEsqSup1 @(tabuleiro.DonatorEsqSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqSup1" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-circle donator txtDonatorEsqSup1 @(tabuleiro.DonatorEsqSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqSup2">
-            <button id="DonatorEsqSup2" name="DonatorEsqSup2" class="btn btn-circle txtDonatorEsqSup2 @(tabuleiro.DonatorEsqSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqSup2" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-circle donator txtDonatorEsqSup2 @(tabuleiro.DonatorEsqSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqInf1">
-            <button id="DonatorEsqInf1" name="DonatorEsqInf1" class="btn btn-circle txtDonatorEsqInf1 @(tabuleiro.DonatorEsqInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqInf1" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-circle donator txtDonatorEsqInf1 @(tabuleiro.DonatorEsqInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorEsqInf2">
-            <button id="DonatorEsqInf2" name="DonatorEsqInf2" class="btn btn-circle txtDonatorEsqInf2 @(tabuleiro.DonatorEsqInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqInf2" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-circle donator txtDonatorEsqInf2 @(tabuleiro.DonatorEsqInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirSup1">
-            <button id="DonatorDirSup1" name="DonatorDirSup1" class="btn btn-circle txtDonatorDirSup1 @(tabuleiro.DonatorDirSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirSup1" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-circle donator txtDonatorDirSup1 @(tabuleiro.DonatorDirSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirSup2">
-            <button id="DonatorDirSup2" name="DonatorDirSup2" class="btn btn-circle txtDonatorDirSup2 @(tabuleiro.DonatorDirSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirSup2" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-circle donator txtDonatorDirSup2 @(tabuleiro.DonatorDirSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirInf1">
-            <button id="DonatorDirInf1" name="DonatorDirInf1" class="btn btn-circle txtDonatorDirInf1 @(tabuleiro.DonatorDirInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirInf1" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-circle donator txtDonatorDirInf1 @(tabuleiro.DonatorDirInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + ".png")' ?v=@Helpers.Local.Versao class="DonatorDirInf2">
-            <button id="DonatorDirInf2" name="DonatorDirInf2" class="btn btn-circle txtDonatorDirInf2 @(tabuleiro.DonatorDirInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirInf2" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-circle donator txtDonatorDirInf2 @(tabuleiro.DonatorDirInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + ".png")' ?v=@Helpers.Local.Versao class="IndicatorEsqSup">
-            <button id="IndicatorEsqSup" name="IndicatorEsqSup" class="btn btn-circle txtIndicatorEsqSup @(tabuleiro.IndicatorEsqSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorEsqSup" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-circle indicator txtIndicatorEsqSup @(tabuleiro.IndicatorEsqSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + ".png")' ?v=@Helpers.Local.Versao class="IndicatorEsqInf">
-            <button id="IndicatorEsqInf" name="IndicatorEsqInf" class="btn btn-circle txtIndicatorEsqInf @(tabuleiro.IndicatorEsqInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorEsqInf" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-circle indicator txtIndicatorEsqInf @(tabuleiro.IndicatorEsqInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + ".png")' ?v=@Helpers.Local.Versao class="IndicatorDirSup">
-            <button id="IndicatorDirSup" name="IndicatorDirSup" class="btn btn-circle txtIndicatorDirSup @(tabuleiro.IndicatorDirSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorDirSup" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-circle indicator txtIndicatorDirSup @(tabuleiro.IndicatorDirSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + ".png")' ?v=@Helpers.Local.Versao class="IndicatorDirInf">
-            <button id="IndicatorDirInf" name="IndicatorDirInf" class="btn btn-circle txtIndicatorDirInf @(tabuleiro.IndicatorDirInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorDirInf" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-circle indicator txtIndicatorDirInf @(tabuleiro.IndicatorDirInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + ".png")' ?v=@Helpers.Local.Versao class="CoordinatorEsq">
-            <button id="CoordinatorEsq" name="CoordinatorEsq" class="btn btn-circle txtCoordinatorEsq @(tabuleiro.CoordinatorEsq == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")">@(traducaoHelper["SUPERVISOR"])</button>
+            <button id="CoordinatorEsq" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-circle coordinator txtCoordinatorEsq @(tabuleiro.CoordinatorEsq == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")">@(traducaoHelper["SUPERVISOR"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + ".png")' ?v=@Helpers.Local.Versao class="CoordinatorDir">
-            <button id="CoordinatorDir" name="CoordinatorDir" class="btn btn-circle txtCoordinatorDir @(tabuleiro.CoordinatorDir == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")">@(traducaoHelper["SUPERVISOR"])</button>
+            <button id="CoordinatorDir" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-circle coordinator txtCoordinatorDir @(tabuleiro.CoordinatorDir == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")">@(traducaoHelper["SUPERVISOR"])</button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + ".png")' ?v=@Helpers.Local.Versao class="Master">
-            <button id="master" name="master" class="btn btn-circle txtMaster @(tabuleiro.Master == idUsuario ? "btn-warning" : "btn-success") btn-sm @(tabuleiro.pinMaster == 0 ? "hidden" : "")">@traducaoHelper["ALVO"]</button>
+            <button id="master" data-id="@(tabuleiro.Master)" class="btn btn-circle master txtMaster @(tabuleiro.Master == idUsuario ? "btn-warning" : "btn-success") btn-sm @(tabuleiro.pinMaster == 0 ? "hidden" : "")">@traducaoHelper["ALVO"]</button>
 
         </div>
 
@@ -450,3 +541,33 @@
         </div>
     </div>
 </div>
+
+<!-- BEGIN Dados -->
+<div id="modDados" class="modal fade modalPosition" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" >
+            <div class="modal-header"  style="background-color: #eee;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="infoTitulo"></h4>
+            </div>
+            <div class="modal-body" style="background-color: #fff;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>@(traducaoHelper["NOME"])</h3>
+                        <h3>@(traducaoHelper["CELULAR"])</h3>
+                        <h3>@(traducaoHelper["CARTEIRA_BTC"])</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 id="infoNome">xuxa</h3>
+                        <h3 id="infoCelular">11995556688</h3>
+                        <h3 id="infoCripto">123456789</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"  style="background-color: #eee;">
+                <button data-dismiss="modal" class="btn btn-success">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fim Dados -->
