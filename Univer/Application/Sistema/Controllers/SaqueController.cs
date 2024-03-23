@@ -821,86 +821,86 @@ namespace Sistema.Controllers
                     return Json(String.Format(traducaoHelper["LIMITE_POR_PLANO"]));
                 }
             }
-            switch (conta.MoedaIDCripto)
-            {
-                case (int)Moeda.Moedas.LTC:
-                    double cotacaoLTC = await moedaCotacaoRepository.GetLTCDolar1Async();
+            //switch (conta.MoedaIDCripto)
+            //{
+            //    case (int)Moeda.Moedas.LTC:
+            //        double cotacaoLTC = await moedaCotacaoRepository.GetLTCDolar1Async();
 
-                    if ((conta == null) || string.IsNullOrEmpty(conta.Litecoin))
-                    {
-                        return Json(traducaoHelper["CARTEIRA_LTC_INVALIDA"]);
-                    }
-                    string contaLTC = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Litecoin);
-                    contaLTC = cpUtilities.Gerais.Morpho(contaLTC, TipoCriptografia.Descriptografa);
-                    if (!BlockchainService.ValidarCarteiraLitecoin(contaLTC))
-                    {
-                        return Json(traducaoHelper["CARTEIRA_LTC_INVALIDA"]);
-                    }
-                    if (saqueFinal < valorMinimoUSD)
-                    {
-                        var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
-                        var valorMinimo = (valorMinimoUSD / cotacaoLTC).ToString(moedaPadrao.MascaraOut);
-                        return Json(string.Format(traducaoHelper["SOLICITACAO_SAQUE_LIMITE_MINIMO"], moedaPadrao.Simbolo.ToUpper(), valorMinimo));
-                    }
-                    saque.MoedaID = (int)Moeda.Moedas.LTC;
-                    saque.MoedaIDCripto = (int)Moeda.Moedas.LTC;
-                    saque.Carteira = conta.Litecoin;
-                    saque.TotalCripto = saqueFinal / cotacaoLTC;
-                    saque.Fee = feeSaque;
-                    break;
-                case (int)Moeda.Moedas.BTC:
-                    double CotacaoCripto = await moedaCotacaoRepository.GetBTCDolar1Async();
+            //        if ((conta == null) || string.IsNullOrEmpty(conta.Litecoin))
+            //        {
+            //            return Json(traducaoHelper["CARTEIRA_LTC_INVALIDA"]);
+            //        }
+            //        string contaLTC = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Litecoin);
+            //        contaLTC = cpUtilities.Gerais.Morpho(contaLTC, TipoCriptografia.Descriptografa);
+            //        if (!BlockchainService.ValidarCarteiraLitecoin(contaLTC))
+            //        {
+            //            return Json(traducaoHelper["CARTEIRA_LTC_INVALIDA"]);
+            //        }
+            //        if (saqueFinal < valorMinimoUSD)
+            //        {
+            //            var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+            //            var valorMinimo = (valorMinimoUSD / cotacaoLTC).ToString(moedaPadrao.MascaraOut);
+            //            return Json(string.Format(traducaoHelper["SOLICITACAO_SAQUE_LIMITE_MINIMO"], moedaPadrao.Simbolo.ToUpper(), valorMinimo));
+            //        }
+            //        saque.MoedaID = (int)Moeda.Moedas.LTC;
+            //        saque.MoedaIDCripto = (int)Moeda.Moedas.LTC;
+            //        saque.Carteira = conta.Litecoin;
+            //        saque.TotalCripto = saqueFinal / cotacaoLTC;
+            //        saque.Fee = feeSaque;
+            //        break;
+            //    case (int)Moeda.Moedas.BTC:
+            //        double CotacaoCripto = await moedaCotacaoRepository.GetBTCDolar1Async();
 
-                    if ((conta == null) || string.IsNullOrEmpty(conta.Bitcoin))
-                    {
-                        return Json(traducaoHelper["CARTEIRA_BTC_INVALIDA"]);
-                    }
+            //        if ((conta == null) || string.IsNullOrEmpty(conta.Bitcoin))
+            //        {
+            //            return Json(traducaoHelper["CARTEIRA_BTC_INVALIDA"]);
+            //        }
 
-                    string contaBTC = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Bitcoin);
-                    contaBTC = cpUtilities.Gerais.Morpho(contaBTC, TipoCriptografia.Descriptografa);
-                    if (!BlockchainService.ValidarCarteiraBitcoin(contaBTC))
-                    {
-                        return Json(traducaoHelper["CARTEIRA_BTC_INVALIDA"]);
-                    }
-                    if (saqueFinal < valorMinimoUSD)
-                    {
-                        var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
-                        var valorMinimo = (valorMinimoUSD / CotacaoCripto).ToString(moedaPadrao.MascaraOut);
-                        return Json(string.Format(traducaoHelper["SOLICITACAO_SAQUE_LIMITE_MINIMO"], moedaPadrao.Simbolo.ToUpper(), valorMinimo));
-                    }
-                    saque.MoedaID = (int)Moeda.Moedas.BTC;
-                    saque.MoedaIDCripto = (int)Moeda.Moedas.BTC;
-                    saque.Carteira = conta.Bitcoin;
-                    saque.TotalCripto = saqueFinal / CotacaoCripto;
-                    saque.Fee = feeSaque;
-                    break;
-                default: //USDT
-                    double cotacaoTether = await moedaCotacaoRepository.GetTetherDolar1Async();
+            //        string contaBTC = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Bitcoin);
+            //        contaBTC = cpUtilities.Gerais.Morpho(contaBTC, TipoCriptografia.Descriptografa);
+            //        if (!BlockchainService.ValidarCarteiraBitcoin(contaBTC))
+            //        {
+            //            return Json(traducaoHelper["CARTEIRA_BTC_INVALIDA"]);
+            //        }
+            //        if (saqueFinal < valorMinimoUSD)
+            //        {
+            //            var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+            //            var valorMinimo = (valorMinimoUSD / CotacaoCripto).ToString(moedaPadrao.MascaraOut);
+            //            return Json(string.Format(traducaoHelper["SOLICITACAO_SAQUE_LIMITE_MINIMO"], moedaPadrao.Simbolo.ToUpper(), valorMinimo));
+            //        }
+            //        saque.MoedaID = (int)Moeda.Moedas.BTC;
+            //        saque.MoedaIDCripto = (int)Moeda.Moedas.BTC;
+            //        saque.Carteira = conta.Bitcoin;
+            //        saque.TotalCripto = saqueFinal / CotacaoCripto;
+            //        saque.Fee = feeSaque;
+            //        break;
+            //    default: //USDT
+            //        double cotacaoTether = await moedaCotacaoRepository.GetTetherDolar1Async();
 
-                    if ((conta == null) || string.IsNullOrEmpty(conta.Tether))
-                    {
-                        return Json(traducaoHelper["CARTEIRA_TETHER_INVALIDA"]);
-                    }
-                    string contaTether = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Tether);
-                    contaTether = cpUtilities.Gerais.Morpho(contaTether, TipoCriptografia.Descriptografa);
+            //        if ((conta == null) || string.IsNullOrEmpty(conta.Tether))
+            //        {
+            //            return Json(traducaoHelper["CARTEIRA_TETHER_INVALIDA"]);
+            //        }
+            //        string contaTether = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Tether);
+            //        contaTether = cpUtilities.Gerais.Morpho(contaTether, TipoCriptografia.Descriptografa);
 
-                    if (!BlockchainService.ValidarCarteiraTether(contaTether))
-                    {
-                        return Json(traducaoHelper["CARTEIRA_TETHER_INVALIDA"]);
-                    }
-                    if (saqueFinal < valorMinimoUSD)
-                    {
-                        var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
-                        var valorMinimo = (valorMinimoUSD / cotacaoTether).ToString(moedaPadrao.MascaraOut);
-                        return Json(string.Format(traducaoHelper["SOLICITACAO_SAQUE_LIMITE_MINIMO"], moedaPadrao.Simbolo.ToUpper(), valorMinimo));
-                    }
-                    saque.MoedaID = (int)Moeda.Moedas.USDT;
-                    saque.MoedaIDCripto = (int)Moeda.Moedas.USDT;
-                    saque.Carteira = conta.Tether;
-                    saque.TotalCripto = saqueFinal / cotacaoTether;
-                    saque.Fee = feeSaque;
-                    break;
-            }
+            //        if (!BlockchainService.ValidarCarteiraTether(contaTether))
+            //        {
+            //            return Json(traducaoHelper["CARTEIRA_TETHER_INVALIDA"]);
+            //        }
+            //        if (saqueFinal < valorMinimoUSD)
+            //        {
+            //            var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+            //            var valorMinimo = (valorMinimoUSD / cotacaoTether).ToString(moedaPadrao.MascaraOut);
+            //            return Json(string.Format(traducaoHelper["SOLICITACAO_SAQUE_LIMITE_MINIMO"], moedaPadrao.Simbolo.ToUpper(), valorMinimo));
+            //        }
+            //        saque.MoedaID = (int)Moeda.Moedas.USDT;
+            //        saque.MoedaIDCripto = (int)Moeda.Moedas.USDT;
+            //        saque.Carteira = conta.Tether;
+            //        saque.TotalCripto = saqueFinal / cotacaoTether;
+            //        saque.Fee = feeSaque;
+            //        break;
+            //}
 
             saque.MoedaID = moeda.ID;
             saque.UsuarioID = usuario.ID;

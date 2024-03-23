@@ -321,7 +321,6 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Loja\Controllers\CarrinhoController.cs" />
     <Compile Include="Areas\Loja\Controllers\HomeController.cs" />
-    <Compile Include="Areas\Loja\Controllers\PagSeguroController.cs" />
     <Compile Include="Areas\Loja\Controllers\PedidoController.cs" />
     <Compile Include="Areas\Loja\LojaAreaRegistration.cs" />
     <Compile Include="Constants\Application.cs" />
@@ -373,16 +372,6 @@
     <Compile Include="Helpers\Imagens.cs" />
     <Compile Include="Helpers\Local.cs" />
     <Compile Include="Helpers\Tools.cs" />
-    <Compile Include="Integracao\Cielo\Cielo.cs" />
-    <Compile Include="Integracao\Cielo\CieloException.cs" />
-    <Compile Include="Integracao\Cielo\Enums.cs" />
-    <Compile Include="Integracao\Cielo\Models.cs" />
-    <Compile Include="Integracao\PagSeguro\PagSeguro.cs" />
-    <Compile Include="Integracao\ViviPay\Models.cs" />
-    <Compile Include="Integracao\ViviPay\ViviPay.cs" />
-    <Compile Include="Handler\Coinpayments\IpnHandler.ashx.cs">
-      <DependentUpon>IpnHandler.ashx</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201710311723598_adicao-google-auth.cs" />
     <Compile Include="Migrations\201710311723598_adicao-google-auth.Designer.cs">
       <DependentUpon>201710311723598_adicao-google-auth.cs</DependentUpon>
@@ -7211,7 +7200,6 @@
     <Content Include="Content\ptjs\demo\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="libman.json" />
     <Content Include="Content\icons\Sistema\MettaBull\Modelo.psd" />
-    <Content Include="Handler\Coinpayments\IpnHandler.ashx" />
     <None Include="ReadMe.html" />
     <Content Include="Content\img\propaganda\branco.jpg" />
     <Content Include="Content\img\Site\Cabecalho1.jpg" />
@@ -8146,7 +8134,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\Loja\Views\BitCoin\" />
     <Folder Include="Arquivos\banners\ZionJB\" />
     <Folder Include="Arquivos\documentos\en\" />
     <Folder Include="Arquivos\documentos\es\" />
@@ -8157,6 +8144,8 @@
     <Folder Include="Content\img\XSinergia\produtos\" />
     <Folder Include="Content\pages\img\background\" />
     <Folder Include="Content\pages\media\" />
+    <Folder Include="Handler\" />
+    <Folder Include="Integracao\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\Base\" />
   </ItemGroup>
@@ -8166,10 +8155,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CoinpaymentsApi\CoinpaymentsApi.csproj">
-      <Project>{aeff78b5-f458-4929-9dd2-1447f16d13f6}</Project>
-      <Name>CoinpaymentsApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{465f69eb-40a1-4add-b7a1-b77b150854e8}</Project>
       <Name>Core</Name>
@@ -8177,10 +8162,6 @@
     <ProjectReference Include="..\cpUtilities\cpUtilities.csproj">
       <Project>{bbeae12f-8b0d-4703-b137-b6569e1a4312}</Project>
       <Name>cpUtilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PagSeguro\PagSeguro.csproj">
-      <Project>{babc5658-6afd-4f8e-81f1-434553663d99}</Project>
-      <Name>PagSeguro</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

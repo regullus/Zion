@@ -16,6 +16,7 @@ using Sistema.Models;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Text;
+using System.Net;
 
 
 #endregion
@@ -1006,6 +1007,26 @@ namespace Sistema.Controllers
         #endregion
 
         #region Json
+
+        [HttpPost]
+        public ActionResult GetMaster(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idMaster = int.Parse(id);
+                return Json("OK");
+                
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
 
         public JsonResult GetUsuarios(string search)
         {

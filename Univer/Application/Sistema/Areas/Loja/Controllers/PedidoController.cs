@@ -1,5 +1,5 @@
 ﻿using Base32;
-using Coinpayments.Api;
+//using Coinpayments.Api;
 using Core.Entities;
 using Core.Entities.Loja;
 using Core.Factories;
@@ -14,8 +14,6 @@ using Core.Services.Usuario;
 using Newtonsoft.Json;
 using OtpSharp;
 using Sistema.Controllers;
-using Sistema.Integracao;
-using Sistema.Integracao.Models.ViviPay;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -26,7 +24,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Transactions;
 using System.Web.Mvc;
-using Uol.PagSeguro.Domain;
+//using Uol.PagSeguro.Domain;
 
 namespace Sistema.Areas.Loja.Controllers
 {
@@ -207,271 +205,271 @@ namespace Sistema.Areas.Loja.Controllers
             return View(carrinho);
         }
 
-        public ActionResult Pagamento(CarrinhoModel carrinho)
-        {
-            if (carrinho.Vazio)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                if (usuario.StatusID == 2) //Ativo
-                {
-                    //Valor minimo de inverstimento para quem esta ativo
-                    ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO_USUARIO_ATIVO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
-                }
-                else
-                {
-                    //Valor minimo de inverstimento para quem não esta ativo
-                    ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
-                }
-                if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
-                {
-                    if (carrinho.EnderecoEntrega == null || carrinho.EnderecoEntrega.ID == 0)
-                    //|| carrinho.EnderecoFaturamento == null   || carrinho.EnderecoFaturamento.ID == 0)
-                    {
-                        Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
-                        Session["Erro"] = traducaoHelper["COMPRA_MENSAGEM_ENDERECO_FATURAMENTO"];
-                        return RedirectToAction("entrega-e-faturamento", "pedido");
-                    }
-                }
-            }
+        //public ActionResult Pagamento(CarrinhoModel carrinho)
+        //{
+        //    if (carrinho.Vazio)
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    else
+        //    {
+        //        if (usuario.StatusID == 2) //Ativo
+        //        {
+        //            //Valor minimo de inverstimento para quem esta ativo
+        //            ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO_USUARIO_ATIVO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
+        //        }
+        //        else
+        //        {
+        //            //Valor minimo de inverstimento para quem não esta ativo
+        //            ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
+        //        }
+        //        if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+        //        {
+        //            if (carrinho.EnderecoEntrega == null || carrinho.EnderecoEntrega.ID == 0)
+        //            //|| carrinho.EnderecoFaturamento == null   || carrinho.EnderecoFaturamento.ID == 0)
+        //            {
+        //                Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
+        //                Session["Erro"] = traducaoHelper["COMPRA_MENSAGEM_ENDERECO_FATURAMENTO"];
+        //                return RedirectToAction("entrega-e-faturamento", "pedido");
+        //            }
+        //        }
+        //    }
 
-            //Verifica se frete está habilitado e valor do frete para o tipo Correio
-            if (ConfiguracaoHelper.TemChave("FRETE_HABILITADO") && ConfiguracaoHelper.GetBoolean("FRETE_HABILITADO"))
-            {
-                if (carrinho.Total > 0 && carrinho.Frete == null && ConfiguracaoHelper.TemChave("TIPO_FRETE") && ConfiguracaoHelper.GetString("TIPO_FRETE").ToUpper() == "CORREIO")
-                {
-                    carrinho.SetarFrete(CarrinhoTipoFrete.Correio);
-                }
-            }
+        //    //Verifica se frete está habilitado e valor do frete para o tipo Correio
+        //    if (ConfiguracaoHelper.TemChave("FRETE_HABILITADO") && ConfiguracaoHelper.GetBoolean("FRETE_HABILITADO"))
+        //    {
+        //        if (carrinho.Total > 0 && carrinho.Frete == null && ConfiguracaoHelper.TemChave("TIPO_FRETE") && ConfiguracaoHelper.GetString("TIPO_FRETE").ToUpper() == "CORREIO")
+        //        {
+        //            carrinho.SetarFrete(CarrinhoTipoFrete.Correio);
+        //        }
+        //    }
 
-            //Verifica se existem mensagens a serem exibidas.
-            obtemMensagem();
+        //    //Verifica se existem mensagens a serem exibidas.
+        //    obtemMensagem();
 
-            ViewBag.UsuarioContainer = this.usuarioContainer;
+        //    ViewBag.UsuarioContainer = this.usuarioContainer;
 
-            #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
-            if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
-            {
-                var produto = carrinho.Itens.FirstOrDefault();
+        //    #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
+        //    if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
+        //    {
+        //        var produto = carrinho.Itens.FirstOrDefault();
 
-                if (produto != null)
-                {
-                    Produto pacoteAtualUsuario;
+        //        if (produto != null)
+        //        {
+        //            Produto pacoteAtualUsuario;
 
-                    if (usuario.NivelAssociacao == 1)
-                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
-                    else
-                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+        //            if (usuario.NivelAssociacao == 1)
+        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+        //            else
+        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
 
-                    ViewBag.DiferencaValorUpgrade = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
-                }
-            }
-            #endregion
+        //            ViewBag.DiferencaValorUpgrade = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
+        //        }
+        //    }
+        //    #endregion
 
-            if (Session["Erro"] != null)
-            {
-                ViewBag.AlertErroTitulo = Session["ErroTitulo"];
-                ViewBag.AlertErro = Session["Erro"];
-                Session["Erro"] = null;
-                Session["ErroTitulo"] = null;
-            }
+        //    if (Session["Erro"] != null)
+        //    {
+        //        ViewBag.AlertErroTitulo = Session["ErroTitulo"];
+        //        ViewBag.AlertErro = Session["Erro"];
+        //        Session["Erro"] = null;
+        //        Session["ErroTitulo"] = null;
+        //    }
 
-            if (Session["Sucesso"] != null)
-            {
-                ViewBag.AlertSucessoTitulo = Session["SucessoTitulo"];
-                ViewBag.AlertSucesso = Session["Sucesso"];
-                Session["Sucesso"] = null;
-                Session["SucessoTitulo"] = null;
-                Session["CartaoNome"] = null;
-                Session["CartaoBandeira"] = null;
-                Session["CartaoNumero"] = null;
-                Session["CartaoCodSeguranca"] = null;
-                Session["CartaoMes"] = null;
-                Session["CartaoAno"] = null;
-                Session["CodePagSeguro"] = null;
-                Session["CartaoTelefone"] = null;
-                Session["CartaoCPF"] = null;
-                Session["CartaoEmail"] = null;
-                Session["Parcelamento"] = null;
-            }
+        //    if (Session["Sucesso"] != null)
+        //    {
+        //        ViewBag.AlertSucessoTitulo = Session["SucessoTitulo"];
+        //        ViewBag.AlertSucesso = Session["Sucesso"];
+        //        Session["Sucesso"] = null;
+        //        Session["SucessoTitulo"] = null;
+        //        Session["CartaoNome"] = null;
+        //        Session["CartaoBandeira"] = null;
+        //        Session["CartaoNumero"] = null;
+        //        Session["CartaoCodSeguranca"] = null;
+        //        Session["CartaoMes"] = null;
+        //        Session["CartaoAno"] = null;
+        //        Session["CodePagSeguro"] = null;
+        //        Session["CartaoTelefone"] = null;
+        //        Session["CartaoCPF"] = null;
+        //        Session["CartaoEmail"] = null;
+        //        Session["Parcelamento"] = null;
+        //    }
 
-            if (Session["Info"] != null)
-            {
-                ViewBag.AlertInfoTitulo = Session["InfoTitulo"];
-                ViewBag.AlertInfo = Session["Info"];
-                Session["Info"] = null;
-                Session["InfoTitulo"] = null;
-            }
+        //    if (Session["Info"] != null)
+        //    {
+        //        ViewBag.AlertInfoTitulo = Session["InfoTitulo"];
+        //        ViewBag.AlertInfo = Session["Info"];
+        //        Session["Info"] = null;
+        //        Session["InfoTitulo"] = null;
+        //    }
 
-            if (Session["ShowCartao"] != null)
-            {
-                ViewBag.ShowCartao = Session["ShowCartao"];
-                Session["ShowCartao"] = null;
-            }
+        //    if (Session["ShowCartao"] != null)
+        //    {
+        //        ViewBag.ShowCartao = Session["ShowCartao"];
+        //        Session["ShowCartao"] = null;
+        //    }
 
-            ViewBag.CodePagSeguro = Session["CodePagSeguro"];
+        //    ViewBag.CodePagSeguro = Session["CodePagSeguro"];
 
-            ViewBag.CartaoNome = Session["CartaoNome"];
-            ViewBag.CartaoBandeira = Session["CartaoBandeira"];
-            ViewBag.CartaoNumero = Session["CartaoNumero"];
-            ViewBag.CartaoCodSeguranca = Session["CartaoCodSeguranca"];
-            ViewBag.CartaoMes = Session["CartaoMes"];
-            ViewBag.CartaoAno = Session["CartaoAno"];
-            ViewBag.CartaoTelefone = Session["CartaoTelefone"];
-            ViewBag.CartaoCPF = Session["CartaoCPF"];
-            ViewBag.CartaoEmail = Session["CartaoEmail"];
-            ViewBag.TipoPagtoCartao = Session["TipoPagtoCartao"];
-            ViewBag.Parcelamento = Session["Parcelamento"];
-            ViewBag.ShowBitCripto = null;
+        //    ViewBag.CartaoNome = Session["CartaoNome"];
+        //    ViewBag.CartaoBandeira = Session["CartaoBandeira"];
+        //    ViewBag.CartaoNumero = Session["CartaoNumero"];
+        //    ViewBag.CartaoCodSeguranca = Session["CartaoCodSeguranca"];
+        //    ViewBag.CartaoMes = Session["CartaoMes"];
+        //    ViewBag.CartaoAno = Session["CartaoAno"];
+        //    ViewBag.CartaoTelefone = Session["CartaoTelefone"];
+        //    ViewBag.CartaoCPF = Session["CartaoCPF"];
+        //    ViewBag.CartaoEmail = Session["CartaoEmail"];
+        //    ViewBag.TipoPagtoCartao = Session["TipoPagtoCartao"];
+        //    ViewBag.Parcelamento = Session["Parcelamento"];
+        //    ViewBag.ShowBitCripto = null;
 
-            #region Parcelamento
-            if (ViewBag.Parcelamento != null && ViewBag.CartaoBandeira != null && carrinho.Total > 0)
-            {
-                ViviPay serviceViviPay = new ViviPay();
-                var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(ViewBag.CartaoBandeira, carrinho.Total.ToString("N2"));
-                List<Object> parcela = new List<object>();
+        //    #region Parcelamento
+        //    if (ViewBag.Parcelamento != null && ViewBag.CartaoBandeira != null && carrinho.Total > 0)
+        //    {
+        //        ViviPay serviceViviPay = new ViviPay();
+        //        var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(ViewBag.CartaoBandeira, carrinho.Total.ToString("N2"));
+        //        List<Object> parcela = new List<object>();
 
-                foreach (var item in retornoViviPay)
-                {
-                    parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
-                }
+        //        foreach (var item in retornoViviPay)
+        //        {
+        //            parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
+        //        }
 
-                ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto", ViewBag.Parcelamento);
-            }
-            else
-            {
-                List<Object> parcela = new List<object>();
-                ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto");
-            }
-            #endregion
+        //        ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto", ViewBag.Parcelamento);
+        //    }
+        //    else
+        //    {
+        //        List<Object> parcela = new List<object>();
+        //        ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto");
+        //    }
+        //    #endregion
 
-            #region Bandeira
+        //    #region Bandeira
 
-            List<Object> bandeira = new List<object>();
-            bandeira.Add(new { nome = "Visa", id = "visa" });
-            bandeira.Add(new { nome = "Mastercard", id = "mastercard" });
-            bandeira.Add(new { nome = "American Express", id = "amex" });
-            bandeira.Add(new { nome = "Elo", id = "elo" });
-            bandeira.Add(new { nome = "Diners Club", id = "diners" });
+        //    List<Object> bandeira = new List<object>();
+        //    bandeira.Add(new { nome = "Visa", id = "visa" });
+        //    bandeira.Add(new { nome = "Mastercard", id = "mastercard" });
+        //    bandeira.Add(new { nome = "American Express", id = "amex" });
+        //    bandeira.Add(new { nome = "Elo", id = "elo" });
+        //    bandeira.Add(new { nome = "Diners Club", id = "diners" });
 
-            if (ViewBag.CartaoBandeira != null)
-            {
-                ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome", ViewBag.CartaoBandeira);
-            }
-            else
-            {
-                ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome");
-            }
+        //    if (ViewBag.CartaoBandeira != null)
+        //    {
+        //        ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome", ViewBag.CartaoBandeira);
+        //    }
+        //    else
+        //    {
+        //        ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome");
+        //    }
 
-            #endregion
+        //    #endregion
 
-            #region Mes
+        //    #region Mes
 
-            List<Object> mes = new List<object>();
-            mes.Add(new { nome = traducaoHelper["JANEIRO"], id = "01" });
-            mes.Add(new { nome = traducaoHelper["FEVEREIRO"], id = "02" });
-            mes.Add(new { nome = traducaoHelper["MARCO"], id = "03" });
-            mes.Add(new { nome = traducaoHelper["ABRIL"], id = "04" });
-            mes.Add(new { nome = traducaoHelper["MAIO"], id = "05" });
-            mes.Add(new { nome = traducaoHelper["JUNHO"], id = "06" });
-            mes.Add(new { nome = traducaoHelper["JULHO"], id = "07" });
-            mes.Add(new { nome = traducaoHelper["AGOSTO"], id = "08" });
-            mes.Add(new { nome = traducaoHelper["SETEMBRO"], id = "09" });
-            mes.Add(new { nome = traducaoHelper["OUTUBRO"], id = "10" });
-            mes.Add(new { nome = traducaoHelper["NOVEMBRO"], id = "11" });
-            mes.Add(new { nome = traducaoHelper["DEZEMBRO"], id = "12" });
+        //    List<Object> mes = new List<object>();
+        //    mes.Add(new { nome = traducaoHelper["JANEIRO"], id = "01" });
+        //    mes.Add(new { nome = traducaoHelper["FEVEREIRO"], id = "02" });
+        //    mes.Add(new { nome = traducaoHelper["MARCO"], id = "03" });
+        //    mes.Add(new { nome = traducaoHelper["ABRIL"], id = "04" });
+        //    mes.Add(new { nome = traducaoHelper["MAIO"], id = "05" });
+        //    mes.Add(new { nome = traducaoHelper["JUNHO"], id = "06" });
+        //    mes.Add(new { nome = traducaoHelper["JULHO"], id = "07" });
+        //    mes.Add(new { nome = traducaoHelper["AGOSTO"], id = "08" });
+        //    mes.Add(new { nome = traducaoHelper["SETEMBRO"], id = "09" });
+        //    mes.Add(new { nome = traducaoHelper["OUTUBRO"], id = "10" });
+        //    mes.Add(new { nome = traducaoHelper["NOVEMBRO"], id = "11" });
+        //    mes.Add(new { nome = traducaoHelper["DEZEMBRO"], id = "12" });
 
-            if (ViewBag.CartaoMes != null)
-            {
-                ViewBag.ccMes = new SelectList(mes, "id", "nome", ViewBag.CartaoMes);
-            }
-            else
-            {
-                ViewBag.ccMes = new SelectList(mes, "id", "nome");
-            }
+        //    if (ViewBag.CartaoMes != null)
+        //    {
+        //        ViewBag.ccMes = new SelectList(mes, "id", "nome", ViewBag.CartaoMes);
+        //    }
+        //    else
+        //    {
+        //        ViewBag.ccMes = new SelectList(mes, "id", "nome");
+        //    }
 
-            #endregion
+        //    #endregion
 
-            #region Ano
+        //    #region Ano
 
-            List<Object> ano = new List<object>();
-            ano.Add(new { nome = App.DateTimeZion.Year.ToString(), id = App.DateTimeZion.Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(1).Year.ToString(), id = App.DateTimeZion.AddYears(1).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(2).Year.ToString(), id = App.DateTimeZion.AddYears(2).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(3).Year.ToString(), id = App.DateTimeZion.AddYears(3).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(4).Year.ToString(), id = App.DateTimeZion.AddYears(4).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(5).Year.ToString(), id = App.DateTimeZion.AddYears(5).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(6).Year.ToString(), id = App.DateTimeZion.AddYears(6).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(7).Year.ToString(), id = App.DateTimeZion.AddYears(7).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(8).Year.ToString(), id = App.DateTimeZion.AddYears(8).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(9).Year.ToString(), id = App.DateTimeZion.AddYears(9).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(10).Year.ToString(), id = App.DateTimeZion.AddYears(10).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(11).Year.ToString(), id = App.DateTimeZion.AddYears(11).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(12).Year.ToString(), id = App.DateTimeZion.AddYears(12).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(13).Year.ToString(), id = App.DateTimeZion.AddYears(13).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(14).Year.ToString(), id = App.DateTimeZion.AddYears(14).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(15).Year.ToString(), id = App.DateTimeZion.AddYears(15).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(16).Year.ToString(), id = App.DateTimeZion.AddYears(16).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(17).Year.ToString(), id = App.DateTimeZion.AddYears(17).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(18).Year.ToString(), id = App.DateTimeZion.AddYears(18).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(19).Year.ToString(), id = App.DateTimeZion.AddYears(19).Year.ToString() });
-            ano.Add(new { nome = App.DateTimeZion.AddYears(20).Year.ToString(), id = App.DateTimeZion.AddYears(20).Year.ToString() });
+        //    List<Object> ano = new List<object>();
+        //    ano.Add(new { nome = App.DateTimeZion.Year.ToString(), id = App.DateTimeZion.Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(1).Year.ToString(), id = App.DateTimeZion.AddYears(1).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(2).Year.ToString(), id = App.DateTimeZion.AddYears(2).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(3).Year.ToString(), id = App.DateTimeZion.AddYears(3).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(4).Year.ToString(), id = App.DateTimeZion.AddYears(4).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(5).Year.ToString(), id = App.DateTimeZion.AddYears(5).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(6).Year.ToString(), id = App.DateTimeZion.AddYears(6).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(7).Year.ToString(), id = App.DateTimeZion.AddYears(7).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(8).Year.ToString(), id = App.DateTimeZion.AddYears(8).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(9).Year.ToString(), id = App.DateTimeZion.AddYears(9).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(10).Year.ToString(), id = App.DateTimeZion.AddYears(10).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(11).Year.ToString(), id = App.DateTimeZion.AddYears(11).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(12).Year.ToString(), id = App.DateTimeZion.AddYears(12).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(13).Year.ToString(), id = App.DateTimeZion.AddYears(13).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(14).Year.ToString(), id = App.DateTimeZion.AddYears(14).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(15).Year.ToString(), id = App.DateTimeZion.AddYears(15).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(16).Year.ToString(), id = App.DateTimeZion.AddYears(16).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(17).Year.ToString(), id = App.DateTimeZion.AddYears(17).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(18).Year.ToString(), id = App.DateTimeZion.AddYears(18).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(19).Year.ToString(), id = App.DateTimeZion.AddYears(19).Year.ToString() });
+        //    ano.Add(new { nome = App.DateTimeZion.AddYears(20).Year.ToString(), id = App.DateTimeZion.AddYears(20).Year.ToString() });
 
-            if (ViewBag.CartaoAno != null)
-            {
-                ViewBag.ccAno = new SelectList(ano, "id", "nome", ViewBag.CartaoAno);
-            }
-            else
-            {
-                ViewBag.ccAno = new SelectList(ano, "id", "nome");
-            }
+        //    if (ViewBag.CartaoAno != null)
+        //    {
+        //        ViewBag.ccAno = new SelectList(ano, "id", "nome", ViewBag.CartaoAno);
+        //    }
+        //    else
+        //    {
+        //        ViewBag.ccAno = new SelectList(ano, "id", "nome");
+        //    }
 
-            #endregion
+        //    #endregion
 
-            #region Sessions
+        //    #region Sessions
 
-            Session["CartaoNome"] = null;
-            Session["CartaoBandeira"] = null;
-            Session["CartaoNumero"] = null;
-            Session["CartaoCodSeguranca"] = null;
-            Session["CartaoMes"] = null;
-            Session["CartaoAno"] = null;
-            Session["CodePagSeguro"] = null;
-            Session["CartaoTelefone"] = null;
-            Session["CartaoCPF"] = null;
-            Session["CartaoEmail"] = null;
-            Session["TipoPagtoCartao"] = null;
-            Session["Parcelamento"] = null;
+        //    Session["CartaoNome"] = null;
+        //    Session["CartaoBandeira"] = null;
+        //    Session["CartaoNumero"] = null;
+        //    Session["CartaoCodSeguranca"] = null;
+        //    Session["CartaoMes"] = null;
+        //    Session["CartaoAno"] = null;
+        //    Session["CodePagSeguro"] = null;
+        //    Session["CartaoTelefone"] = null;
+        //    Session["CartaoCPF"] = null;
+        //    Session["CartaoEmail"] = null;
+        //    Session["TipoPagtoCartao"] = null;
+        //    Session["Parcelamento"] = null;
 
-            #endregion
+        //    #endregion
 
-            //#region SaldoAtivo
+        //    //#region SaldoAtivo
 
-            //ViewBag.PagarSaldo = true;
+        //    //ViewBag.PagarSaldo = true;
 
-            //if (usuario.ExibeSaque == 0 || Core.Helpers.ConfiguracaoHelper.GetString("MEIO_PGTO_SALDO_ATIVO") != "true")
-            //{
-            //    ViewBag.PagarSaldo = false;
-            //}
+        //    //if (usuario.ExibeSaque == 0 || Core.Helpers.ConfiguracaoHelper.GetString("MEIO_PGTO_SALDO_ATIVO") != "true")
+        //    //{
+        //    //    ViewBag.PagarSaldo = false;
+        //    //}
 
-            //#endregion
+        //    //#endregion
 
-            if (ConfiguracaoHelper.GetBoolean("TAXAS_PAGAMENTO_PRODUTO_ATIVO"))
-            {
-                carrinho.Taxas = new List<CarrinhoTaxaModel>();
+        //    if (ConfiguracaoHelper.GetBoolean("TAXAS_PAGAMENTO_PRODUTO_ATIVO"))
+        //    {
+        //        carrinho.Taxas = new List<CarrinhoTaxaModel>();
 
-                var taxas = taxaRepository.GetByExpression(e => e.CategoriaID == 22).ToList();
+        //        var taxas = taxaRepository.GetByExpression(e => e.CategoriaID == 22).ToList();
 
-                foreach (var taxa in taxas.Where(w => w.Valor.HasValue))
-                {
-                    carrinho.Taxas.Add(new CarrinhoTaxaModel { Taxa = taxa, Valor = taxa.Valor.Value });
-                }
-            }
+        //        foreach (var taxa in taxas.Where(w => w.Valor.HasValue))
+        //        {
+        //            carrinho.Taxas.Add(new CarrinhoTaxaModel { Taxa = taxa, Valor = taxa.Valor.Value });
+        //        }
+        //    }
 
-            return View(carrinho);
-        }
+        //    return View(carrinho);
+        //}
 
         public ActionResult Pagar(CarrinhoModel carrinho, PedidoPagamento.MeiosPagamento meioPagamento, string token2FA = null, string rendimento = null, string bonus = null, string transferencia = null, string chamada = null, string pedidoID = null)
         {
@@ -1349,426 +1347,426 @@ namespace Sistema.Areas.Loja.Controllers
         }
 
         [HttpPost]
-        public ActionResult PagamentoCartao(CarrinhoModel carrinho, FormCollection form)
-        {
-            if (!carrinho.Vazio && carrinho.EnderecoEntrega != null && carrinho.EnderecoFaturamento != null)
-            {
-                try
-                {
-                    #region Variáveis
-                    string strTelefone = string.Empty;
-                    string strEmail = string.Empty;
-                    string strCPF = string.Empty;
-                    string strParcela = string.Empty;
-                    #endregion
+        //public ActionResult PagamentoCartao(CarrinhoModel carrinho, FormCollection form)
+        //{
+        //    if (!carrinho.Vazio && carrinho.EnderecoEntrega != null && carrinho.EnderecoFaturamento != null)
+        //    {
+        //        try
+        //        {
+        //            #region Variáveis
+        //            string strTelefone = string.Empty;
+        //            string strEmail = string.Empty;
+        //            string strCPF = string.Empty;
+        //            string strParcela = string.Empty;
+        //            #endregion
 
-                    #region Dados via form
-                    string tipoPagtoCartao = form["tipoPagtoCartao"];
-                    string strNome = form["ccNome"];
-                    string strBandeira = form["ccBandeira"];
-                    string strNumero = form["ccNumero"];
-                    string strCodSeguranca = form["ccCodSeguranca"];
-                    string strMes = form["ccMes"];
-                    string strAno = form["ccAno"];
-                    int totalPedido = Convert.ToInt32((carrinho.Total * 100));
+        //            #region Dados via form
+        //            string tipoPagtoCartao = form["tipoPagtoCartao"];
+        //            string strNome = form["ccNome"];
+        //            string strBandeira = form["ccBandeira"];
+        //            string strNumero = form["ccNumero"];
+        //            string strCodSeguranca = form["ccCodSeguranca"];
+        //            string strMes = form["ccMes"];
+        //            string strAno = form["ccAno"];
+        //            int totalPedido = Convert.ToInt32((carrinho.Total * 100));
 
-                    Session["ShowCartao"] = "true";
-                    Session["ValorFrete"] = carrinho.ValorFrete;
-                    Session["TipoPagtoCartao"] = tipoPagtoCartao;
-                    Session["CartaoNome"] = strNome;
-                    Session["CartaoBandeira"] = strBandeira;
-                    Session["CartaoNumero"] = strNumero;
-                    Session["CartaoCodSeguranca"] = strCodSeguranca;
-                    Session["CartaoMes"] = strMes;
-                    Session["CartaoAno"] = strAno;
+        //            Session["ShowCartao"] = "true";
+        //            Session["ValorFrete"] = carrinho.ValorFrete;
+        //            Session["TipoPagtoCartao"] = tipoPagtoCartao;
+        //            Session["CartaoNome"] = strNome;
+        //            Session["CartaoBandeira"] = strBandeira;
+        //            Session["CartaoNumero"] = strNumero;
+        //            Session["CartaoCodSeguranca"] = strCodSeguranca;
+        //            Session["CartaoMes"] = strMes;
+        //            Session["CartaoAno"] = strAno;
 
-                    if (carrinho.Frete != null)
-                        Session["DiasFrete"] = carrinho.Frete.PrazoDias;
+        //            if (carrinho.Frete != null)
+        //                Session["DiasFrete"] = carrinho.Frete.PrazoDias;
 
-                    if (tipoPagtoCartao == "ViviPay")
-                    {
-                        strTelefone = form["ccTelefone"];
-                        strEmail = form["ccEmail"];
-                        strCPF = form["ccCPF"];
-                        strParcela = form["ccParcelamento"];
+        //            if (tipoPagtoCartao == "ViviPay")
+        //            {
+        //                strTelefone = form["ccTelefone"];
+        //                strEmail = form["ccEmail"];
+        //                strCPF = form["ccCPF"];
+        //                strParcela = form["ccParcelamento"];
 
-                        Session["CartaoTelefone"] = strTelefone;
-                        Session["CartaoEmail"] = strEmail;
-                        Session["CartaoCPF"] = strCPF;
-                        Session["Parcelamento"] = strParcela;
-                    }
+        //                Session["CartaoTelefone"] = strTelefone;
+        //                Session["CartaoEmail"] = strEmail;
+        //                Session["CartaoCPF"] = strCPF;
+        //                Session["Parcelamento"] = strParcela;
+        //            }
 
-                    #endregion
+        //            #endregion
 
-                    #region  Consistencias
+        //            #region  Consistencias
 
-                    bool blnContinua = true;
-                    string strMensagem = "";
+        //            bool blnContinua = true;
+        //            string strMensagem = "";
 
-                    if (string.IsNullOrEmpty(strNome))
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NOME"] + " ";
-                    }
+        //            if (string.IsNullOrEmpty(strNome))
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NOME"] + " ";
+        //            }
 
-                    if (string.IsNullOrEmpty(strBandeira))
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_BANDEIRA"] + " ";
-                    }
+        //            if (string.IsNullOrEmpty(strBandeira))
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_BANDEIRA"] + " ";
+        //            }
 
-                    if (string.IsNullOrEmpty(strNumero))
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NUMERO"] + " ";
-                    }
-                    else
-                    {
-                        //Remove espaçõs em branco na digitação
-                        strNumero = strNumero.Replace(" ", "");
+        //            if (string.IsNullOrEmpty(strNumero))
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NUMERO"] + " ";
+        //            }
+        //            else
+        //            {
+        //                //Remove espaçõs em branco na digitação
+        //                strNumero = strNumero.Replace(" ", "");
 
-                        //Cartão deve possuir 16 digitos
-                        if (strNumero.Length < 12)
-                        {
-                            blnContinua = false;
-                            strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NUMERO"] + " ";
-                        }
-                    }
-                    if (string.IsNullOrEmpty(strCodSeguranca))
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_CODSEGURANCA"] + " ";
-                    }
+        //                //Cartão deve possuir 16 digitos
+        //                if (strNumero.Length < 12)
+        //                {
+        //                    blnContinua = false;
+        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NUMERO"] + " ";
+        //                }
+        //            }
+        //            if (string.IsNullOrEmpty(strCodSeguranca))
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_CODSEGURANCA"] + " ";
+        //            }
 
-                    if (string.IsNullOrEmpty(strMes))
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_MES"] + " ";
-                    }
+        //            if (string.IsNullOrEmpty(strMes))
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_MES"] + " ";
+        //            }
 
-                    if (string.IsNullOrEmpty(strAno))
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_ANO"] + " ";
-                    }
+        //            if (string.IsNullOrEmpty(strAno))
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_ANO"] + " ";
+        //            }
 
-                    if (totalPedido <= 0)
-                    {
-                        blnContinua = false;
-                        strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_VALOR"] + " ";
-                    }
+        //            if (totalPedido <= 0)
+        //            {
+        //                blnContinua = false;
+        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_VALOR"] + " ";
+        //            }
 
-                    if (tipoPagtoCartao == "ViviPay")
-                    {
-                        if (string.IsNullOrEmpty(strCPF))
-                        {
-                            blnContinua = false;
-                            strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_CPF"] + " ";
-                        }
+        //            if (tipoPagtoCartao == "ViviPay")
+        //            {
+        //                if (string.IsNullOrEmpty(strCPF))
+        //                {
+        //                    blnContinua = false;
+        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_CPF"] + " ";
+        //                }
 
-                        if (string.IsNullOrEmpty(strTelefone))
-                        {
-                            blnContinua = false;
-                            strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_TELEFONE"] + " ";
-                        }
+        //                if (string.IsNullOrEmpty(strTelefone))
+        //                {
+        //                    blnContinua = false;
+        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_TELEFONE"] + " ";
+        //                }
 
-                        if (string.IsNullOrEmpty(strEmail))
-                        {
-                            blnContinua = false;
-                            strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_EMAIL"] + " ";
-                        }
-                    }
+        //                if (string.IsNullOrEmpty(strEmail))
+        //                {
+        //                    blnContinua = false;
+        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_EMAIL"] + " ";
+        //                }
+        //            }
 
-                    #endregion
+        //            #endregion
 
-                    if (blnContinua)
-                    {
-                        if (tipoPagtoCartao == "Cartao")
-                        {
-                            #region Cielo
-                            try
-                            {
-                                //Gera o código do Pedido para atrelar a solicitação de pagamento
-                                carrinho.CodigoPedido = CriarCodigoPedido();
+        //            if (blnContinua)
+        //            {
+        //                if (tipoPagtoCartao == "Cartao")
+        //                {
+        //                    #region Cielo
+        //                    try
+        //                    {
+        //                        //Gera o código do Pedido para atrelar a solicitação de pagamento
+        //                        carrinho.CodigoPedido = CriarCodigoPedido();
 
-                                //Chama serviço de pagamento por cartão de credito
-                                var retornoCielo = Cielo.PagamentoCredito(strBandeira, strNome, strNumero, strCodSeguranca, strMes, strAno, carrinho.CodigoPedido, totalPedido);
+        //                        //Chama serviço de pagamento por cartão de credito
+        //                        var retornoCielo = Cielo.PagamentoCredito(strBandeira, strNome, strNumero, strCodSeguranca, strMes, strAno, carrinho.CodigoPedido, totalPedido);
 
-                                //Retorno da Cielo, deu certo
-                                if (retornoCielo.Payment.ReturnCode == "00")
-                                {
-                                    #region Sucesso
+        //                        //Retorno da Cielo, deu certo
+        //                        if (retornoCielo.Payment.ReturnCode == "00")
+        //                        {
+        //                            #region Sucesso
 
-                                    #region Cria Pedido Cielo
-                                    carrinho.Adicionar(PedidoPagamento.MeiosPagamento.Cartao, Core.Entities.PedidoPagamento.FormasPagamento.Padrao);
-                                    var pedidoCielo = pedidoFactory.Criar(carrinho);
-                                    var pagamentoCielo = pedidoCielo.PedidoPagamento.FirstOrDefault();
-                                    #endregion
+        //                            #region Cria Pedido Cielo
+        //                            carrinho.Adicionar(PedidoPagamento.MeiosPagamento.Cartao, Core.Entities.PedidoPagamento.FormasPagamento.Padrao);
+        //                            var pedidoCielo = pedidoFactory.Criar(carrinho);
+        //                            var pagamentoCielo = pedidoCielo.PedidoPagamento.FirstOrDefault();
+        //                            #endregion
 
-                                    Session["SucessoTitulo"] = traducaoHelper["PAGAMENTO"];
-                                    Session["Sucesso"] = traducaoHelper["OPERACAO_SUCESSO"];
-                                    //Armazenar em banco
-                                    pedidoService.ProcessarPagamento(pagamentoCielo.ID, Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago);
+        //                            Session["SucessoTitulo"] = traducaoHelper["PAGAMENTO"];
+        //                            Session["Sucesso"] = traducaoHelper["OPERACAO_SUCESSO"];
+        //                            //Armazenar em banco
+        //                            pedidoService.ProcessarPagamento(pagamentoCielo.ID, Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago);
 
-                                    //Salvar transação com cartao
-                                    CartaoCredito cartaoCredito = new CartaoCredito()
-                                    {
-                                        UsuarioID = usuario.ID,
-                                        PedidoPagamentoID = pagamentoCielo.ID,
-                                        PedidoID = pedidoCielo.ID,
-                                        Bandeira = strBandeira,
-                                        FinalCartao = strNumero.Substring(strNumero.Length - 4),
-                                        Token = "",
-                                        Valor = (totalPedido / 100),
-                                        Descricao = "Código Pedido: " + carrinho.CodigoPedido,
-                                        DataCriacao = App.DateTimeZion,
-                                        DataPagamento = App.DateTimeZion,
-                                        CodigoAutorizacao = retornoCielo.Payment.AuthorizationCode,
-                                        ComprovantePagamento = retornoCielo.Payment.ProofOfSale,
-                                        PagamentoID = retornoCielo.Payment.PaymentId.Value,
-                                        TransacaoID = retornoCielo.Payment.Tid,
-                                        CodigoRetorno = retornoCielo.Payment.ReturnCode,
-                                        MensagemRetorno = retornoCielo.Payment.ReturnMessage
-                                    };
-                                    cartaoCreditoRepository.Save(cartaoCredito);
+        //                            //Salvar transação com cartao
+        //                            CartaoCredito cartaoCredito = new CartaoCredito()
+        //                            {
+        //                                UsuarioID = usuario.ID,
+        //                                PedidoPagamentoID = pagamentoCielo.ID,
+        //                                PedidoID = pedidoCielo.ID,
+        //                                Bandeira = strBandeira,
+        //                                FinalCartao = strNumero.Substring(strNumero.Length - 4),
+        //                                Token = "",
+        //                                Valor = (totalPedido / 100),
+        //                                Descricao = "Código Pedido: " + carrinho.CodigoPedido,
+        //                                DataCriacao = App.DateTimeZion,
+        //                                DataPagamento = App.DateTimeZion,
+        //                                CodigoAutorizacao = retornoCielo.Payment.AuthorizationCode,
+        //                                ComprovantePagamento = retornoCielo.Payment.ProofOfSale,
+        //                                PagamentoID = retornoCielo.Payment.PaymentId.Value,
+        //                                TransacaoID = retornoCielo.Payment.Tid,
+        //                                CodigoRetorno = retornoCielo.Payment.ReturnCode,
+        //                                MensagemRetorno = retornoCielo.Payment.ReturnMessage
+        //                            };
+        //                            cartaoCreditoRepository.Save(cartaoCredito);
 
-                                    //Ir para proximo passo
-                                    carrinho.Limpar();
-                                    return RedirectToAction("finalizado", new { pedidoID = pedidoCielo.ID });
+        //                            //Ir para proximo passo
+        //                            carrinho.Limpar();
+        //                            return RedirectToAction("finalizado", new { pedidoID = pedidoCielo.ID });
 
-                                    #endregion
-                                }
-                                //Retorno da Cielo, deu erro
-                                else
-                                {
-                                    #region Erro
+        //                            #endregion
+        //                        }
+        //                        //Retorno da Cielo, deu erro
+        //                        else
+        //                        {
+        //                            #region Erro
 
-                                    carrinho.CodigoPedido = string.Empty;
+        //                            carrinho.CodigoPedido = string.Empty;
 
-                                    //Salvar transação com erro para log
-                                    CartaoCredito cartaoCredito = new CartaoCredito()
-                                    {
-                                        UsuarioID = usuario.ID,
-                                        PedidoPagamentoID = null,
-                                        PedidoID = null,
-                                        Bandeira = strBandeira,
-                                        FinalCartao = strNumero.Substring(strNumero.Length - 4),
-                                        Token = "",
-                                        Valor = (totalPedido / 100),
-                                        Descricao = "Falha na solicitação de pagamento - Cielo",
-                                        DataCriacao = App.DateTimeZion,
-                                        DataPagamento = null,
-                                        CodigoAutorizacao = string.Empty,
-                                        ComprovantePagamento = string.Empty,
-                                        PagamentoID = retornoCielo.Payment.PaymentId.Value,
-                                        TransacaoID = retornoCielo.Payment.Tid,
-                                        CodigoRetorno = retornoCielo.Payment.ReturnCode,
-                                        MensagemRetorno = retornoCielo.Payment.ReturnMessage
-                                    };
-                                    cartaoCreditoRepository.Save(cartaoCredito);
-                                    Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-                                    Session["Erro"] = traducaoHelper["CARTAO_RETORNO_ERRO"];
+        //                            //Salvar transação com erro para log
+        //                            CartaoCredito cartaoCredito = new CartaoCredito()
+        //                            {
+        //                                UsuarioID = usuario.ID,
+        //                                PedidoPagamentoID = null,
+        //                                PedidoID = null,
+        //                                Bandeira = strBandeira,
+        //                                FinalCartao = strNumero.Substring(strNumero.Length - 4),
+        //                                Token = "",
+        //                                Valor = (totalPedido / 100),
+        //                                Descricao = "Falha na solicitação de pagamento - Cielo",
+        //                                DataCriacao = App.DateTimeZion,
+        //                                DataPagamento = null,
+        //                                CodigoAutorizacao = string.Empty,
+        //                                ComprovantePagamento = string.Empty,
+        //                                PagamentoID = retornoCielo.Payment.PaymentId.Value,
+        //                                TransacaoID = retornoCielo.Payment.Tid,
+        //                                CodigoRetorno = retornoCielo.Payment.ReturnCode,
+        //                                MensagemRetorno = retornoCielo.Payment.ReturnMessage
+        //                            };
+        //                            cartaoCreditoRepository.Save(cartaoCredito);
+        //                            Session["ErroTitulo"] = traducaoHelper["CARTAO"];
+        //                            Session["Erro"] = traducaoHelper["CARTAO_RETORNO_ERRO"];
 
-                                    #endregion
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                #region Exception
+        //                            #endregion
+        //                        }
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                        #region Exception
 
-                                //Erro devolvido pela Cielo para a requisição solicitada
-                                string[] erro = ex.Message.Split(',');
+        //                        //Erro devolvido pela Cielo para a requisição solicitada
+        //                        string[] erro = ex.Message.Split(',');
 
-                                carrinho.CodigoPedido = string.Empty;
+        //                        carrinho.CodigoPedido = string.Empty;
 
-                                //Salvar transação com erro para log
-                                CartaoCredito cartaoCredito = new CartaoCredito()
-                                {
-                                    UsuarioID = usuario.ID,
-                                    PedidoPagamentoID = null,
-                                    PedidoID = null,
-                                    Bandeira = strBandeira,
-                                    FinalCartao = strNumero.Substring(strNumero.Length - 4),
-                                    Token = "",
-                                    Valor = (totalPedido / 100),
-                                    Descricao = "Ocorreu uma exceção na solicitação de pagamento - Cielo",
-                                    DataCriacao = App.DateTimeZion,
-                                    DataPagamento = null,
-                                    CodigoAutorizacao = string.Empty,
-                                    ComprovantePagamento = string.Empty,
-                                    PagamentoID = null,
-                                    TransacaoID = string.Empty,
-                                    CodigoRetorno = erro[0],
-                                    MensagemRetorno = erro[1]
-                                };
-                                cartaoCreditoRepository.Save(cartaoCredito);
-                                Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-                                Session["Erro"] = traducaoHelper["CARTAO_RETORNO_ERRO"];
+        //                        //Salvar transação com erro para log
+        //                        CartaoCredito cartaoCredito = new CartaoCredito()
+        //                        {
+        //                            UsuarioID = usuario.ID,
+        //                            PedidoPagamentoID = null,
+        //                            PedidoID = null,
+        //                            Bandeira = strBandeira,
+        //                            FinalCartao = strNumero.Substring(strNumero.Length - 4),
+        //                            Token = "",
+        //                            Valor = (totalPedido / 100),
+        //                            Descricao = "Ocorreu uma exceção na solicitação de pagamento - Cielo",
+        //                            DataCriacao = App.DateTimeZion,
+        //                            DataPagamento = null,
+        //                            CodigoAutorizacao = string.Empty,
+        //                            ComprovantePagamento = string.Empty,
+        //                            PagamentoID = null,
+        //                            TransacaoID = string.Empty,
+        //                            CodigoRetorno = erro[0],
+        //                            MensagemRetorno = erro[1]
+        //                        };
+        //                        cartaoCreditoRepository.Save(cartaoCredito);
+        //                        Session["ErroTitulo"] = traducaoHelper["CARTAO"];
+        //                        Session["Erro"] = traducaoHelper["CARTAO_RETORNO_ERRO"];
 
-                                #endregion
+        //                        #endregion
 
-                                return RedirectToAction("pagamento", "pedido");
-                            }
-                            #endregion
-                        }
+        //                        return RedirectToAction("pagamento", "pedido");
+        //                    }
+        //                    #endregion
+        //                }
 
-                        if (tipoPagtoCartao == "ViviPay")
-                        {
-                            #region ViviPay
+        //                if (tipoPagtoCartao == "ViviPay")
+        //                {
+        //                    #region ViviPay
 
-                            #region Parcelamento
-                            var juros = 0;
-                            var parcela = 0;
+        //                    #region Parcelamento
+        //                    var juros = 0;
+        //                    var parcela = 0;
 
-                            //Verifica se compra é parcelada e atribui valor com juros para a transação
-                            if (int.TryParse(strParcela, out parcela))
-                            {
-                                if (Session["ParcelamentosDisponiveisViviPay"] != null && parcela > 1)
-                                {
-                                    var listaParcelamentos = (List<brandCard>)Session["ParcelamentosDisponiveisViviPay"];
-                                    var totalComJuros = Convert.ToInt32(listaParcelamentos.FirstOrDefault(l => l.quantity == parcela).totalAmount * 100);
+        //                    //Verifica se compra é parcelada e atribui valor com juros para a transação
+        //                    if (int.TryParse(strParcela, out parcela))
+        //                    {
+        //                        if (Session["ParcelamentosDisponiveisViviPay"] != null && parcela > 1)
+        //                        {
+        //                            var listaParcelamentos = (List<brandCard>)Session["ParcelamentosDisponiveisViviPay"];
+        //                            var totalComJuros = Convert.ToInt32(listaParcelamentos.FirstOrDefault(l => l.quantity == parcela).totalAmount * 100);
 
-                                    //Calcula o juros do parcelamento
-                                    juros = totalComJuros - totalPedido;
+        //                            //Calcula o juros do parcelamento
+        //                            juros = totalComJuros - totalPedido;
 
-                                    //Atribui o valor do Pedido com o valor do parcelamento total
-                                    if (totalComJuros >= totalPedido)
-                                        totalPedido = totalComJuros;
-                                }
-                            }
-                            #endregion
+        //                            //Atribui o valor do Pedido com o valor do parcelamento total
+        //                            if (totalComJuros >= totalPedido)
+        //                                totalPedido = totalComJuros;
+        //                        }
+        //                    }
+        //                    #endregion
 
-                            try
-                            {
-                                #region Tratamento Dados
-                                var parseTelefone = ParseTelefone(strTelefone);
+        //                    try
+        //                    {
+        //                        #region Tratamento Dados
+        //                        var parseTelefone = ParseTelefone(strTelefone);
 
-                                Regex regex = new Regex(@"\d+");
-                                string cpf = string.Empty;
-                                foreach (Match m in regex.Matches(strCPF))
-                                    cpf += m.Value;
-                                #endregion
+        //                        Regex regex = new Regex(@"\d+");
+        //                        string cpf = string.Empty;
+        //                        foreach (Match m in regex.Matches(strCPF))
+        //                            cpf += m.Value;
+        //                        #endregion
 
-                                //Gera o código do Pedido para atrelar a solicitação de pagamento
-                                carrinho.CodigoPedido = CriarCodigoPedido();
+        //                        //Gera o código do Pedido para atrelar a solicitação de pagamento
+        //                        carrinho.CodigoPedido = CriarCodigoPedido();
 
-                                //Chama o serviço da ViviPay
-                                ViviPay serviceViviPay = new ViviPay();
-                                var retornoViviPay = serviceViviPay.PagamentoCredito(strBandeira, strNome, strNumero, strCodSeguranca, strMes, strAno, carrinho.CodigoPedido, totalPedido, cpf, parseTelefone.Item1, parseTelefone.Item2, strEmail, strParcela);
+        //                        //Chama o serviço da ViviPay
+        //                        ViviPay serviceViviPay = new ViviPay();
+        //                        var retornoViviPay = serviceViviPay.PagamentoCredito(strBandeira, strNome, strNumero, strCodSeguranca, strMes, strAno, carrinho.CodigoPedido, totalPedido, cpf, parseTelefone.Item1, parseTelefone.Item2, strEmail, strParcela);
 
-                                #region Sucesso
+        //                        #region Sucesso
 
-                                #region Cria Pedido ViviPay
-                                carrinho.Adicionar(PedidoPagamento.MeiosPagamento.ViviPay, PedidoPagamento.FormasPagamento.Padrao);
+        //                        #region Cria Pedido ViviPay
+        //                        carrinho.Adicionar(PedidoPagamento.MeiosPagamento.ViviPay, PedidoPagamento.FormasPagamento.Padrao);
 
-                                if (parcela > 0 && juros > 0)
-                                    carrinho.SetarDadosParcelamento(parcela, juros);
+        //                        if (parcela > 0 && juros > 0)
+        //                            carrinho.SetarDadosParcelamento(parcela, juros);
 
-                                var pedidoViviPay = pedidoFactory.Criar(carrinho);
-                                var pagamentoViviPay = pedidoViviPay.PedidoPagamento.FirstOrDefault();
-                                #endregion
+        //                        var pedidoViviPay = pedidoFactory.Criar(carrinho);
+        //                        var pagamentoViviPay = pedidoViviPay.PedidoPagamento.FirstOrDefault();
+        //                        #endregion
 
-                                Session["SucessoTitulo"] = traducaoHelper["PAGAMENTO"];
-                                Session["Sucesso"] = traducaoHelper["OPERACAO_SUCESSO"];
-                                //Armazenar em banco
-                                pedidoService.ProcessarPagamento(pagamentoViviPay.ID, PedidoPagamentoStatus.TodosStatus.Pago);
+        //                        Session["SucessoTitulo"] = traducaoHelper["PAGAMENTO"];
+        //                        Session["Sucesso"] = traducaoHelper["OPERACAO_SUCESSO"];
+        //                        //Armazenar em banco
+        //                        pedidoService.ProcessarPagamento(pagamentoViviPay.ID, PedidoPagamentoStatus.TodosStatus.Pago);
 
-                                //Salvar transação com cartao
-                                CartaoCredito cartaoCredito = new CartaoCredito()
-                                {
-                                    UsuarioID = usuario.ID,
-                                    PedidoPagamentoID = pagamentoViviPay.ID,
-                                    PedidoID = pedidoViviPay.ID,
-                                    Bandeira = strBandeira,
-                                    FinalCartao = strNumero.Substring(strNumero.Length - 4),
-                                    Token = "",
-                                    Valor = (totalPedido / 100),
-                                    Descricao = "Código Pedido: " + carrinho.CodigoPedido,
-                                    DataCriacao = App.DateTimeZion,
-                                    DataPagamento = App.DateTimeZion,
-                                    CodigoAutorizacao = string.Empty,
-                                    ComprovantePagamento = string.Empty,
-                                    PagamentoID = Guid.TryParse(retornoViviPay, out Guid newGuid) ? newGuid : Guid.NewGuid(),
-                                    TransacaoID = retornoViviPay,
-                                    CodigoRetorno = string.Empty,
-                                    MensagemRetorno = "ViviPay - Pagamento OK"
-                                };
-                                cartaoCreditoRepository.Save(cartaoCredito);
+        //                        //Salvar transação com cartao
+        //                        CartaoCredito cartaoCredito = new CartaoCredito()
+        //                        {
+        //                            UsuarioID = usuario.ID,
+        //                            PedidoPagamentoID = pagamentoViviPay.ID,
+        //                            PedidoID = pedidoViviPay.ID,
+        //                            Bandeira = strBandeira,
+        //                            FinalCartao = strNumero.Substring(strNumero.Length - 4),
+        //                            Token = "",
+        //                            Valor = (totalPedido / 100),
+        //                            Descricao = "Código Pedido: " + carrinho.CodigoPedido,
+        //                            DataCriacao = App.DateTimeZion,
+        //                            DataPagamento = App.DateTimeZion,
+        //                            CodigoAutorizacao = string.Empty,
+        //                            ComprovantePagamento = string.Empty,
+        //                            PagamentoID = Guid.TryParse(retornoViviPay, out Guid newGuid) ? newGuid : Guid.NewGuid(),
+        //                            TransacaoID = retornoViviPay,
+        //                            CodigoRetorno = string.Empty,
+        //                            MensagemRetorno = "ViviPay - Pagamento OK"
+        //                        };
+        //                        cartaoCreditoRepository.Save(cartaoCredito);
 
-                                //Ir para proximo passo
-                                carrinho.Limpar();
-                                return RedirectToAction("finalizado", new { pedidoID = pedidoViviPay.ID });
+        //                        //Ir para proximo passo
+        //                        carrinho.Limpar();
+        //                        return RedirectToAction("finalizado", new { pedidoID = pedidoViviPay.ID });
 
-                                #endregion
-                            }
-                            catch (Exception ex)
-                            {
-                                #region Exception
+        //                        #endregion
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                        #region Exception
 
-                                carrinho.CodigoPedido = string.Empty;
+        //                        carrinho.CodigoPedido = string.Empty;
 
-                                //Salvar transação com erro para log
-                                CartaoCredito cartaoCredito = new CartaoCredito()
-                                {
-                                    UsuarioID = usuario.ID,
-                                    PedidoPagamentoID = null,
-                                    PedidoID = null,
-                                    Bandeira = strBandeira,
-                                    FinalCartao = strNumero.Substring(strNumero.Length - 4),
-                                    Token = "",
-                                    Valor = (totalPedido / 100),
-                                    Descricao = "Falha na solicitação de pagamento - ViviPay",
-                                    DataCriacao = App.DateTimeZion,
-                                    DataPagamento = null,
-                                    CodigoAutorizacao = string.Empty,
-                                    ComprovantePagamento = string.Empty,
-                                    PagamentoID = null,
-                                    TransacaoID = string.Empty,
-                                    CodigoRetorno = string.Empty,
-                                    MensagemRetorno = ex.Message
-                                };
-                                cartaoCreditoRepository.Save(cartaoCredito);
-                                Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-                                Session["Erro"] = ex.Message;
+        //                        //Salvar transação com erro para log
+        //                        CartaoCredito cartaoCredito = new CartaoCredito()
+        //                        {
+        //                            UsuarioID = usuario.ID,
+        //                            PedidoPagamentoID = null,
+        //                            PedidoID = null,
+        //                            Bandeira = strBandeira,
+        //                            FinalCartao = strNumero.Substring(strNumero.Length - 4),
+        //                            Token = "",
+        //                            Valor = (totalPedido / 100),
+        //                            Descricao = "Falha na solicitação de pagamento - ViviPay",
+        //                            DataCriacao = App.DateTimeZion,
+        //                            DataPagamento = null,
+        //                            CodigoAutorizacao = string.Empty,
+        //                            ComprovantePagamento = string.Empty,
+        //                            PagamentoID = null,
+        //                            TransacaoID = string.Empty,
+        //                            CodigoRetorno = string.Empty,
+        //                            MensagemRetorno = ex.Message
+        //                        };
+        //                        cartaoCreditoRepository.Save(cartaoCredito);
+        //                        Session["ErroTitulo"] = traducaoHelper["CARTAO"];
+        //                        Session["Erro"] = ex.Message;
 
-                                #endregion
+        //                        #endregion
 
-                                return RedirectToAction("pagamento", "pedido");
-                            }
-                            #endregion
-                        }
-                    }
-                    else
-                    {
-                        //Inconsitencia
-                        Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-                        Session["Erro"] = strMensagem;
-                        //Vota para a tela de pagamento por cartão
-                        return RedirectToAction("pagamento", "pedido");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    #region erro
-                    Session["ErroTitulo"] = traducaoHelper["ERRO"];
-                    Session["Erro"] = ex.Message;
-                    return RedirectToAction("pagamento", "pedido");
-                    #endregion
-                }
-            }
-            else
-            {
-                #region Carrinho Vazio
-                Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
-                Session["Erro"] = traducaoHelper["PREENCHA_DADOS"];
-                return RedirectToAction("pagamento", "pedido");
-                #endregion
-            }
+        //                        return RedirectToAction("pagamento", "pedido");
+        //                    }
+        //                    #endregion
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //Inconsitencia
+        //                Session["ErroTitulo"] = traducaoHelper["CARTAO"];
+        //                Session["Erro"] = strMensagem;
+        //                //Vota para a tela de pagamento por cartão
+        //                return RedirectToAction("pagamento", "pedido");
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            #region erro
+        //            Session["ErroTitulo"] = traducaoHelper["ERRO"];
+        //            Session["Erro"] = ex.Message;
+        //            return RedirectToAction("pagamento", "pedido");
+        //            #endregion
+        //        }
+        //    }
+        //    else
+        //    {
+        //        #region Carrinho Vazio
+        //        Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
+        //        Session["Erro"] = traducaoHelper["PREENCHA_DADOS"];
+        //        return RedirectToAction("pagamento", "pedido");
+        //        #endregion
+        //    }
 
-            //Retorna a tela de pagamento com cartão
-            return RedirectToAction("pagamento", "pedido");
+        //    //Retorna a tela de pagamento com cartão
+        //    return RedirectToAction("pagamento", "pedido");
 
-        }
+        //}
 
         public ActionResult Endereco(CarrinhoModel carrinho, int novo = 0)
         {
@@ -1831,204 +1829,205 @@ namespace Sistema.Areas.Loja.Controllers
         }
 
         #region PagSeguro
-        public ActionResult PagSeguro(CarrinhoModel carrinho)
-        {
-            Session["ValorFrete"] = carrinho.ValorFrete;
+        //public ActionResult PagSeguro(CarrinhoModel carrinho)
+        //{
+        //    Session["ValorFrete"] = carrinho.ValorFrete;
 
-            if (carrinho.Frete != null)
-                Session["DiasFrete"] = carrinho.Frete.PrazoDias;
+        //    if (carrinho.Frete != null)
+        //        Session["DiasFrete"] = carrinho.Frete.PrazoDias;
 
-            //Cria a requisição de pagamento para a PagSeguro que retorna a URL para realizar o pagamento
-            var retorno = Integracao.PagSeguro.CreatePayment(carrinho, "redirect");
+        //    //Cria a requisição de pagamento para a PagSeguro que retorna a URL para realizar o pagamento
+        //    var retorno = Integracao.PagSeguro.CreatePayment(carrinho, "redirect");
 
-            #region Cria Pedido
+        //    #region Cria Pedido
 
-            if (carrinho.Vazio)
-                return RedirectToAction("Index", "Home");
+        //    if (carrinho.Vazio)
+        //        return RedirectToAction("Index", "Home");
 
-            if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
-            {
-                if (carrinho.EnderecoEntrega == null && carrinho.EnderecoEntrega.ID == 0)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    if (carrinho.EnderecoFaturamento == null || carrinho.EnderecoFaturamento.ID == 0)
-                    {
-                        carrinho.EnderecoFaturamento = carrinho.EnderecoEntrega;
-                    }
-                }
-            }
-            else
-            {
-                carrinho.EnderecoEntrega = usuario.EnderecoPrincipal;
-                carrinho.EnderecoFaturamento = usuario.EnderecoPrincipal;
-            }
+        //    if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+        //    {
+        //        if (carrinho.EnderecoEntrega == null && carrinho.EnderecoEntrega.ID == 0)
+        //        {
+        //            return RedirectToAction("Index", "Home");
+        //        }
+        //        else
+        //        {
+        //            if (carrinho.EnderecoFaturamento == null || carrinho.EnderecoFaturamento.ID == 0)
+        //            {
+        //                carrinho.EnderecoFaturamento = carrinho.EnderecoEntrega;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        carrinho.EnderecoEntrega = usuario.EnderecoPrincipal;
+        //        carrinho.EnderecoFaturamento = usuario.EnderecoPrincipal;
+        //    }
 
-            carrinho.Adicionar(PedidoPagamento.MeiosPagamento.PagSeguro, PedidoPagamento.FormasPagamento.Padrao);
-            var pedido = pedidoFactory.Criar(carrinho);
+        //    carrinho.Adicionar(PedidoPagamento.MeiosPagamento.PagSeguro, PedidoPagamento.FormasPagamento.Padrao);
+        //    var pedido = pedidoFactory.Criar(carrinho);
 
-            //Cria o pedido com o status de Aguardando Pagamento
-            var pagamento = pedido.PedidoPagamento.FirstOrDefault();
-            pedidoService.ProcessarPagamento(pagamento.ID, PedidoPagamentoStatus.TodosStatus.AguardandoPagamento);
+        //    //Cria o pedido com o status de Aguardando Pagamento
+        //    var pagamento = pedido.PedidoPagamento.FirstOrDefault();
+        //    pedidoService.ProcessarPagamento(pagamento.ID, PedidoPagamentoStatus.TodosStatus.AguardandoPagamento);
 
-            //Armazena o Pedido Pagamento em session para uso posterior
-            Session["PedidoID"] = pedido.ID;
+        //    //Armazena o Pedido Pagamento em session para uso posterior
+        //    Session["PedidoID"] = pedido.ID;
 
-            #region Posiciona Rede Sem Pagamento
-            if (ConfiguracaoHelper.GetBoolean("REDE_POSICIONA_SEM_PAGAMENTO") && usuario.StatusID == (int)Usuario.TodosStatus.NaoAssociado)
-            {
-                Boolean blnArvoreBinaria = false;
-                if (ConfiguracaoHelper.TemChave("REDE_BINARIA"))
-                    blnArvoreBinaria = ConfiguracaoHelper.GetBoolean("REDE_BINARIA");
+        //    #region Posiciona Rede Sem Pagamento
+        //    if (ConfiguracaoHelper.GetBoolean("REDE_POSICIONA_SEM_PAGAMENTO") && usuario.StatusID == (int)Usuario.TodosStatus.NaoAssociado)
+        //    {
+        //        Boolean blnArvoreBinaria = false;
+        //        if (ConfiguracaoHelper.TemChave("REDE_BINARIA"))
+        //            blnArvoreBinaria = ConfiguracaoHelper.GetBoolean("REDE_BINARIA");
 
-                if (blnArvoreBinaria)
-                {
-                    usuarioService.Associar(usuario.ID, 0);
-                }
-                else
-                {
-                    if (ConfiguracaoHelper.GetBoolean("REDE_PREENCHIMENTO_SEQUENCIAL"))
-                        usuarioService.AssociarRedeSequencia(usuario.ID, 0);
-                    else
-                        usuarioService.AssociarRedeHierarquia(usuario.ID, 0);
-                }
+        //        if (blnArvoreBinaria)
+        //        {
+        //            usuarioService.Associar(usuario.ID, 0);
+        //        }
+        //        else
+        //        {
+        //            if (ConfiguracaoHelper.GetBoolean("REDE_PREENCHIMENTO_SEQUENCIAL"))
+        //                usuarioService.AssociarRedeSequencia(usuario.ID, 0);
+        //            else
+        //                usuarioService.AssociarRedeHierarquia(usuario.ID, 0);
+        //        }
 
-                usuarioService.GeraUsuarioAssociacao(usuario, usuario.NivelAssociacao, false);
-            }
-            #endregion
+        //        usuarioService.GeraUsuarioAssociacao(usuario, usuario.NivelAssociacao, false);
+        //    }
+        //    #endregion
 
-            carrinho.Limpar();
+        //    carrinho.Limpar();
 
-            #endregion
+        //    #endregion
 
-            #region Usar para opção lighbox
-            //var retorno = Integracao.PagSeguro.CreatePayment(carrinho, "redirect").Split('=');
-            //Session["CodePagSeguro"] = retorno[1];
-            //return RedirectToAction("pagamento", "pedido");
-            #endregion
+        //    #region Usar para opção lighbox
+        //    //var retorno = Integracao.PagSeguro.CreatePayment(carrinho, "redirect").Split('=');
+        //    //Session["CodePagSeguro"] = retorno[1];
+        //    //return RedirectToAction("pagamento", "pedido");
+        //    #endregion
 
-            return Redirect(retorno);
-        }
+        //    return Redirect(retorno);
+        //}
 
-        public ActionResult RetornoPagSeguro(string transaction_id)
-        {
-            var retorno = Integracao.PagSeguro.VerifyPTransactionStatus(transaction_id);
-            var pedidoID = Session["PedidoID"] != null ? Convert.ToInt32(Session["PedidoID"]) : 0;
-            var pedido = new Pedido();
+        //public ActionResult RetornoPagSeguro(string transaction_id)
+        //{
+        //    var retorno = Integracao.PagSeguro.VerifyPTransactionStatus(transaction_id);
+        //    var pedidoID = Session["PedidoID"] != null ? Convert.ToInt32(Session["PedidoID"]) : 0;
+        //    var pedido = new Pedido();
 
-            if (retorno != null && pedidoID > 0)
-            {
-                pedido = pedidoService.ObterPedidoPorId(pedidoID);
+        //    if (retorno != null && pedidoID > 0)
+        //    {
+        //        pedido = pedidoService.ObterPedidoPorId(pedidoID);
 
-                if (pedido != null)
-                    CriarRegistroCartaoPagSeguro(retorno, pedido);
-            }
-            else
-            {
-                string[] strMensagem = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_8"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
-                Mensagem("PagSeguro", strMensagem, "err");
-                return RedirectToAction("Pagamento", "Pedido");
-            }
+        //        if (pedido != null)
+        //            CriarRegistroCartaoPagSeguro(retorno, pedido);
+        //    }
+        //    else
+        //    {
+        //        string[] strMensagem = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_8"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
+        //        Mensagem("PagSeguro", strMensagem, "err");
+        //        return RedirectToAction("Pagamento", "Pedido");
+        //    }
 
-            switch (retorno.TransactionStatus)
-            {
-                //Aguardando Pagamento
-                case 1:
-                    string[] strMensagem1 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_1"], " ", traducaoHelper["PAG_SEGURO_MSG_VERIFICAR"] };
-                    Mensagem("PagSeguro", strMensagem1, "ale");
-                    return RedirectToAction("Pagamento", "Pedido");
-                //Em análise
-                case 2:
-                    string[] strMensagem2 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_2"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
-                    Mensagem("PagSeguro", strMensagem2, "ale");
-                    return RedirectToAction("Pagamento", "Pedido");
-                //Paga
-                case 3:
-                    //Altera status de pagamento do pedido
-                    pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Pago);
-                    Session["PedidoID"] = null;
-                    return RedirectToAction("finalizado", new { pedidoID });
-                //Disponível
-                case 4:
-                    //Altera status de pagamento do pedido
-                    pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Pago);
-                    Session["PedidoID"] = null;
-                    return RedirectToAction("finalizado", new { pedidoID });
-                //Em disputa
-                case 5:
-                    string[] strMensagem5 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_5"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
-                    Mensagem("PagSeguro", strMensagem5, "ale");
-                    return RedirectToAction("Pagamento", "Pedido");
-                //Devolvida
-                case 6:
-                    string[] strMensagem6 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_6"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
-                    Mensagem("PagSeguro", strMensagem6, "msg");
-                    return RedirectToAction("Pagamento", "Pedido");
-                //Cancelada
-                case 7:
-                    string[] strMensagem7 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_7"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
-                    Mensagem("PagSeguro", strMensagem7, "ale");
-                    return RedirectToAction("Pagamento", "Pedido");
-                //Debitado e Retenção temporária
-                default:
-                    string[] strMensagem8 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_8"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
-                    Mensagem("PagSeguro", strMensagem8, "err");
-                    return RedirectToAction("Pagamento", "Pedido");
-            }
-        }
+        //    switch (retorno.TransactionStatus)
+        //    {
+        //        //Aguardando Pagamento
+        //        case 1:
+        //            string[] strMensagem1 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_1"], " ", traducaoHelper["PAG_SEGURO_MSG_VERIFICAR"] };
+        //            Mensagem("PagSeguro", strMensagem1, "ale");
+        //            return RedirectToAction("Pagamento", "Pedido");
+        //        //Em análise
+        //        case 2:
+        //            string[] strMensagem2 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_2"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
+        //            Mensagem("PagSeguro", strMensagem2, "ale");
+        //            return RedirectToAction("Pagamento", "Pedido");
+        //        //Paga
+        //        case 3:
+        //            //Altera status de pagamento do pedido
+        //            pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Pago);
+        //            Session["PedidoID"] = null;
+        //            return RedirectToAction("finalizado", new { pedidoID });
+        //        //Disponível
+        //        case 4:
+        //            //Altera status de pagamento do pedido
+        //            pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Pago);
+        //            Session["PedidoID"] = null;
+        //            return RedirectToAction("finalizado", new { pedidoID });
+        //        //Em disputa
+        //        case 5:
+        //            string[] strMensagem5 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_5"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
+        //            Mensagem("PagSeguro", strMensagem5, "ale");
+        //            return RedirectToAction("Pagamento", "Pedido");
+        //        //Devolvida
+        //        case 6:
+        //            string[] strMensagem6 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_6"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
+        //            Mensagem("PagSeguro", strMensagem6, "msg");
+        //            return RedirectToAction("Pagamento", "Pedido");
+        //        //Cancelada
+        //        case 7:
+        //            string[] strMensagem7 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_7"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
+        //            Mensagem("PagSeguro", strMensagem7, "ale");
+        //            return RedirectToAction("Pagamento", "Pedido");
+        //        //Debitado e Retenção temporária
+        //        default:
+        //            string[] strMensagem8 = new string[] { traducaoHelper["PAG_SEGURO_MSG_CODE_8"], " ", traducaoHelper["PAG_SEGURO_MSG"] };
+        //            Mensagem("PagSeguro", strMensagem8, "err");
+        //            return RedirectToAction("Pagamento", "Pedido");
+        //    }
+        //}
 
-        public void CriarRegistroCartaoPagSeguro(Uol.PagSeguro.Domain.Transaction transaction, Pedido pedido)
-        {
-            CartaoCredito cartaoCredito = new CartaoCredito()
-            {
-                UsuarioID = usuario.ID,
-                PedidoPagamentoID = pedido.PedidoPagamento.FirstOrDefault().ID,
-                PedidoID = pedido.ID,
-                Bandeira = string.Empty,
-                FinalCartao = string.Empty,
-                Token = "",
-                Valor = pedido.Total,
-                Descricao = "Código Pedido: " + pedido.Codigo,
-                DataCriacao = App.DateTimeZion,
-                DataPagamento = App.DateTimeZion,
-                CodigoAutorizacao = string.Empty,
-                ComprovantePagamento = string.Empty,
-                PagamentoID = null,
-                TransacaoID = transaction.Code,
-                CodigoRetorno = transaction.TransactionStatus.ToString()
-            };
+        //public void CriarRegistroCartaoPagSeguro(Uol.PagSeguro.Domain.Transaction transaction, Pedido pedido)
+        //{
+        //    CartaoCredito cartaoCredito = new CartaoCredito()
+        //    {
+        //        UsuarioID = usuario.ID,
+        //        PedidoPagamentoID = pedido.PedidoPagamento.FirstOrDefault().ID,
+        //        PedidoID = pedido.ID,
+        //        Bandeira = string.Empty,
+        //        FinalCartao = string.Empty,
+        //        Token = "",
+        //        Valor = pedido.Total,
+        //        Descricao = "Código Pedido: " + pedido.Codigo,
+        //        DataCriacao = App.DateTimeZion,
+        //        DataPagamento = App.DateTimeZion,
+        //        CodigoAutorizacao = string.Empty,
+        //        ComprovantePagamento = string.Empty,
+        //        PagamentoID = null,
+        //        TransacaoID = transaction.Code,
+        //        CodigoRetorno = transaction.TransactionStatus.ToString()
+        //    };
 
-            switch (transaction.TransactionStatus)
-            {
-                case 1:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Aguardando Pagamento";
-                    break;
-                case 2:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Em análise";
-                    break;
-                case 3:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Pagamento OK";
-                    break;
-                case 4:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Disponível";
-                    break;
-                case 5:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Em disputa";
-                    break;
-                case 6:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Devolvida";
-                    break;
-                case 7:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Cancelada";
-                    break;
-                default:
-                    cartaoCredito.MensagemRetorno = "PagSeguro - Debitado ou Retenção temporária";
-                    break;
-            }
-            cartaoCreditoRepository.Save(cartaoCredito);
-        }
+        //    switch (transaction.TransactionStatus)
+        //    {
+        //        case 1:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Aguardando Pagamento";
+        //            break;
+        //        case 2:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Em análise";
+        //            break;
+        //        case 3:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Pagamento OK";
+        //            break;
+        //        case 4:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Disponível";
+        //            break;
+        //        case 5:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Em disputa";
+        //            break;
+        //        case 6:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Devolvida";
+        //            break;
+        //        case 7:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Cancelada";
+        //            break;
+        //        default:
+        //            cartaoCredito.MensagemRetorno = "PagSeguro - Debitado ou Retenção temporária";
+        //            break;
+        //    }
+        //    cartaoCreditoRepository.Save(cartaoCredito);
+        //}
+     
         #endregion
 
         #endregion
@@ -2088,184 +2087,184 @@ namespace Sistema.Areas.Loja.Controllers
             return Json(retorno);
         }
 
-        public JsonResult ParcelamentosDisponiveisViviPay(string bandeira, double valor)
-        {
-            try
-            {   //Busca dados de parcelamento na API da ViviPay
-                ViviPay serviceViviPay = new ViviPay();
-                var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(bandeira, valor.ToString("N2"));
+        //public JsonResult ParcelamentosDisponiveisViviPay(string bandeira, double valor)
+        //{
+        //    try
+        //    {   //Busca dados de parcelamento na API da ViviPay
+        //        ViviPay serviceViviPay = new ViviPay();
+        //        var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(bandeira, valor.ToString("N2"));
 
-                //Armazena objeto em Session para uso no momento da criação do Pedido
-                Session["ParcelamentosDisponiveisViviPay"] = retornoViviPay;
+        //        //Armazena objeto em Session para uso no momento da criação do Pedido
+        //        Session["ParcelamentosDisponiveisViviPay"] = retornoViviPay;
 
 
-                //Cria objeto json para retornar para o DropDownList
-                List<Object> parcela = new List<object>();
+        //        //Cria objeto json para retornar para o DropDownList
+        //        List<Object> parcela = new List<object>();
 
-                foreach (var item in retornoViviPay)
-                {
-                    parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
-                }
+        //        foreach (var item in retornoViviPay)
+        //        {
+        //            parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
+        //        }
 
-                return Json(new { data = new SelectList(parcela, "parcelas", "texto") }, JsonRequestBehavior.AllowGet);
-            }
+        //        return Json(new { data = new SelectList(parcela, "parcelas", "texto") }, JsonRequestBehavior.AllowGet);
+        //    }
 
-            catch (Exception ex)
-            {
-                return Json(new { erro = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { erro = ex.Message }, JsonRequestBehavior.AllowGet);
+        //    }
 
-        }
+        //}
 
-        public async System.Threading.Tasks.Task<JsonResult> CriaPedidoCriptoAsync(CarrinhoModel carrinho, string cripto)
-        {
-            var moedaCripto = Moeda.Moedas.LTC;
-            if (!(cripto == "BTC" || cripto == "LTC" || cripto == "USDT.TRC20"))
-            {
-                LogErro("CriaPedidoCriptoAsync - Acesso indevido, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-                return Json(new { erro = traducaoHelper["cripto_INVALIDA"] + " " + traducaoHelper["ACESSO_INDEVIDO_REPORTADO"] }, JsonRequestBehavior.AllowGet);
-            }
-            if (cripto == "LTC")
-            {
-                moedaCripto = Moeda.Moedas.LTC;
-                if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_LITECOIN_ATIVO") == "true"))
-                {
-                    LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-                    return Json(new { erro = traducaoHelper["LTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            if (cripto == "BTC")
-            {
-                moedaCripto = Moeda.Moedas.BTC;
-                if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_BITCOIN_ATIVO") == "true"))
-                {
-                    LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-                    return Json(new { erro = traducaoHelper["BTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            if (cripto == "USDT.TRC20")
-            {
-                moedaCripto = Moeda.Moedas.USDT;
-                if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_TETHER_ATIVO") == "true"))
-                {
-                    LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-                    return Json(new { erro = traducaoHelper["USDT_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
-                }
-            }
+        //public async System.Threading.Tasks.Task<JsonResult> CriaPedidoCriptoAsync(CarrinhoModel carrinho, string cripto)
+        //{
+        //    var moedaCripto = Moeda.Moedas.LTC;
+        //    if (!(cripto == "BTC" || cripto == "LTC" || cripto == "USDT.TRC20"))
+        //    {
+        //        LogErro("CriaPedidoCriptoAsync - Acesso indevido, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+        //        return Json(new { erro = traducaoHelper["cripto_INVALIDA"] + " " + traducaoHelper["ACESSO_INDEVIDO_REPORTADO"] }, JsonRequestBehavior.AllowGet);
+        //    }
+        //    if (cripto == "LTC")
+        //    {
+        //        moedaCripto = Moeda.Moedas.LTC;
+        //        if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_LITECOIN_ATIVO") == "true"))
+        //        {
+        //            LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+        //            return Json(new { erro = traducaoHelper["LTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
+        //    if (cripto == "BTC")
+        //    {
+        //        moedaCripto = Moeda.Moedas.BTC;
+        //        if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_BITCOIN_ATIVO") == "true"))
+        //        {
+        //            LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+        //            return Json(new { erro = traducaoHelper["BTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
+        //    if (cripto == "USDT.TRC20")
+        //    {
+        //        moedaCripto = Moeda.Moedas.USDT;
+        //        if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_TETHER_ATIVO") == "true"))
+        //        {
+        //            LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+        //            return Json(new { erro = traducaoHelper["USDT_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
 
-            //Verifica se já existe um pedido pendente
-            var ultimoPedido = pedidoRepository.GetPedidoUltimoStatus(usuario.ID, carrinho.Itens.FirstOrDefault().Produto.ID);
+        //    //Verifica se já existe um pedido pendente
+        //    var ultimoPedido = pedidoRepository.GetPedidoUltimoStatus(usuario.ID, carrinho.Itens.FirstOrDefault().Produto.ID);
 
-            if (!(ultimoPedido == null || ultimoPedido.StatusId != (int)PedidoPagamentoStatus.TodosStatus.AguardandoPagamento))
-            {
-                return Json(new { erro = traducaoHelper["PEDIDO_JA_EXISTENTE_MENSAGEM"] }, JsonRequestBehavior.AllowGet);
-            }
+        //    if (!(ultimoPedido == null || ultimoPedido.StatusId != (int)PedidoPagamentoStatus.TodosStatus.AguardandoPagamento))
+        //    {
+        //        return Json(new { erro = traducaoHelper["PEDIDO_JA_EXISTENTE_MENSAGEM"] }, JsonRequestBehavior.AllowGet);
+        //    }
 
-            #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
-            if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
-            {
-                var produto = carrinho.Itens.FirstOrDefault();
+        //    #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
+        //    if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
+        //    {
+        //        var produto = carrinho.Itens.FirstOrDefault();
 
-                if (produto != null)
-                {
-                    Produto pacoteAtualUsuario;
+        //        if (produto != null)
+        //        {
+        //            Produto pacoteAtualUsuario;
 
-                    if (usuario.NivelAssociacao == 1)
-                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
-                    else
-                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+        //            if (usuario.NivelAssociacao == 1)
+        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+        //            else
+        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
 
-                    carrinho.Itens.First().Valor.Valor = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
-                }
-            }
-            #endregion
+        //            carrinho.Itens.First().Valor.Valor = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
+        //        }
+        //    }
+        //    #endregion
 
-            //Cria Pedido no Sistema
-            if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
-            {
-                if (carrinho.EnderecoEntrega == null && carrinho.EnderecoEntrega.ID == 0)
-                {
-                    return Json(new { erro = "Falha ao no endereço de entrega" }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    if (carrinho.EnderecoFaturamento == null || carrinho.EnderecoFaturamento.ID == 0)
-                    {
-                        carrinho.EnderecoFaturamento = carrinho.EnderecoEntrega;
-                    }
-                }
-            }
-            else
-            {
-                carrinho.EnderecoEntrega = usuario.EnderecoPrincipal;
-                carrinho.EnderecoFaturamento = usuario.EnderecoPrincipal;
-            }
+        //    //Cria Pedido no Sistema
+        //    if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+        //    {
+        //        if (carrinho.EnderecoEntrega == null && carrinho.EnderecoEntrega.ID == 0)
+        //        {
+        //            return Json(new { erro = "Falha ao no endereço de entrega" }, JsonRequestBehavior.AllowGet);
+        //        }
+        //        else
+        //        {
+        //            if (carrinho.EnderecoFaturamento == null || carrinho.EnderecoFaturamento.ID == 0)
+        //            {
+        //                carrinho.EnderecoFaturamento = carrinho.EnderecoEntrega;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        carrinho.EnderecoEntrega = usuario.EnderecoPrincipal;
+        //        carrinho.EnderecoFaturamento = usuario.EnderecoPrincipal;
+        //    }
 
-            carrinho.Adicionar(PedidoPagamento.MeiosPagamento.CryptoPayments, PedidoPagamento.FormasPagamento.Padrao);
-            var pedido = pedidoFactory.Criar(carrinho);
+        //    carrinho.Adicionar(PedidoPagamento.MeiosPagamento.CryptoPayments, PedidoPagamento.FormasPagamento.Padrao);
+        //    var pedido = pedidoFactory.Criar(carrinho);
 
-            try
-            {
-                ViewBag.ShowCripto = "true";
+        //    try
+        //    {
+        //        ViewBag.ShowCripto = "true";
 
-                decimal cotacaoCripto = await BuscarCotacaoAsync(cripto);
+        //        decimal cotacaoCripto = await BuscarCotacaoAsync(cripto);
 
-                if (cotacaoCripto > 0)
-                {
-                    var taxaPlataforma = ConfiguracaoHelper.GetDouble("TAXA_PLATAFORMA");
-                    if (taxaPlataforma <= 0)
-                    {
-                        taxaPlataforma = 5.0;
-                    }
+        //        if (cotacaoCripto > 0)
+        //        {
+        //            var taxaPlataforma = ConfiguracaoHelper.GetDouble("TAXA_PLATAFORMA");
+        //            if (taxaPlataforma <= 0)
+        //            {
+        //                taxaPlataforma = 5.0;
+        //            }
 
-                    if (taxaPlataforma > 0)
-                    {
-                        var valorUsdComTaxa = (decimal)pedido.Total.Value;
-                        if (cripto == "USDT.TRC20" && ConfiguracaoHelper.GetBoolean("HA_TAXA_PAGAMENTO_USDT"))
-                        {
-                            valorUsdComTaxa = (decimal)pedido.Total.Value * ((decimal)(taxaPlataforma / 100) + 1);
-                        }
+        //            if (taxaPlataforma > 0)
+        //            {
+        //                var valorUsdComTaxa = (decimal)pedido.Total.Value;
+        //                if (cripto == "USDT.TRC20" && ConfiguracaoHelper.GetBoolean("HA_TAXA_PAGAMENTO_USDT"))
+        //                {
+        //                    valorUsdComTaxa = (decimal)pedido.Total.Value * ((decimal)(taxaPlataforma / 100) + 1);
+        //                }
 
-                        var valorCriptoComTaxa = Math.Round(valorUsdComTaxa / cotacaoCripto, 4);
-                        string chave = pedido.ID.ToString() + "_" + App.DateTimeZion.Ticks.ToString().Substring(10, 5);
+        //                var valorCriptoComTaxa = Math.Round(valorUsdComTaxa / cotacaoCripto, 4);
+        //                string chave = pedido.ID.ToString() + "_" + App.DateTimeZion.Ticks.ToString().Substring(10, 5);
 
-                        //cripto = "LTCT";    //testar com LTC
-                        var purchase = await CoinpaymentsApi.GetCallbackAddress(cripto);
-                        //troca por causa do pagamento parcial. O metodo abaixo chama o cmd create_transation da api da coinpayments. E recomendado para pagamento com valor fixo                     
-                        //var purchase = await CoinpaymentsApi.CreateTransaction(valorUsdComTaxa, "USD", cripto, usuario.Email, custom: chave, itemNumber: pedido.Codigo);
+        //                //cripto = "LTCT";    //testar com LTC
+        //                //var purchase = await CoinpaymentsApi.GetCallbackAddress(cripto);
+        //                //troca por causa do pagamento parcial. O metodo abaixo chama o cmd create_transation da api da coinpayments. E recomendado para pagamento com valor fixo                     
+        //                //var purchase = await CoinpaymentsApi.CreateTransaction(valorUsdComTaxa, "USD", cripto, usuario.Email, custom: chave, itemNumber: pedido.Codigo);
 
-                        if (purchase != null && purchase.HttpResponse != null && purchase.HttpResponse.ContentBody != null)
-                        {
-                            dynamic purchaseJson = JsonConvert.DeserializeObject(purchase.HttpResponse.ContentBody);
-                            string numero = purchaseJson.result.address;
+        //                if (purchase != null && purchase.HttpResponse != null && purchase.HttpResponse.ContentBody != null)
+        //                {
+        //                    dynamic purchaseJson = JsonConvert.DeserializeObject(purchase.HttpResponse.ContentBody);
+        //                    string numero = purchaseJson.result.address;
 
-                            int referenciaID = 0;
-                            string valor = valorCriptoComTaxa.ToString();
-                            string mensagem = traducaoHelper["MENSAGEM_CONFIRMACAO_HASH_BTC"];
-                            pedidoFactory.SalvarDadosPagamentoCripto(numero, referenciaID, Convert.ToDecimal(valor), cotacaoCripto, (decimal)pedido.Total.Value, (int)moedaCripto);
-                            return Json(new { numero, valor, mensagem }, JsonRequestBehavior.AllowGet);
-                        }
-                        else
-                        {
-                            pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
-                            LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
-                            return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
-                        }
-                    }
-                }
+        //                    int referenciaID = 0;
+        //                    string valor = valorCriptoComTaxa.ToString();
+        //                    string mensagem = traducaoHelper["MENSAGEM_CONFIRMACAO_HASH_BTC"];
+        //                    pedidoFactory.SalvarDadosPagamentoCripto(numero, referenciaID, Convert.ToDecimal(valor), cotacaoCripto, (decimal)pedido.Total.Value, (int)moedaCripto);
+        //                    return Json(new { numero, valor, mensagem }, JsonRequestBehavior.AllowGet);
+        //                }
+        //                else
+        //                {
+        //                    pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
+        //                    LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
+        //                    return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
+        //                }
+        //            }
+        //        }
 
-                pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
-                LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
-                return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
-                //throw new Exception();
-            }
-            catch (Exception ex)
-            {
-                pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
-                LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now + " - Exceção: " + ex.InnerException);
-                return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
-            }
-        }
+        //        pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
+        //        LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
+        //        return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
+        //        //throw new Exception();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
+        //        LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now + " - Exceção: " + ex.InnerException);
+        //        return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
 
         #endregion
 
@@ -2322,27 +2321,27 @@ namespace Sistema.Areas.Loja.Controllers
             }
         }
 
-        private async System.Threading.Tasks.Task<decimal> BuscarCotacaoAsync(string siglaMoeda)
-        {
-            try
-            {
-                var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
-                switch (siglaMoeda.ToUpper())
-                {
-                    case "BTC":
-                        return cotacao.BtcUsd;
-                    case "LTC":
-                        return cotacao.LtcUsd;
-                    case "USDT.TRC20":
-                        return cotacao.UsdtUsd;
-                }
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-            return 0;
-        }
+        //private async System.Threading.Tasks.Task<decimal> BuscarCotacaoAsync(string siglaMoeda)
+        //{
+        //    try
+        //    {
+        //        var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
+        //        switch (siglaMoeda.ToUpper())
+        //        {
+        //            case "BTC":
+        //                return cotacao.BtcUsd;
+        //            case "LTC":
+        //                return cotacao.LtcUsd;
+        //            case "USDT.TRC20":
+        //                return cotacao.UsdtUsd;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return 0;
+        //    }
+        //    return 0;
+        //}
 
         private bool ConsistenteVariacaoBTC(decimal cotacao)
         {

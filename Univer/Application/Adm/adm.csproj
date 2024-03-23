@@ -8341,10 +8341,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cielo\Cielo.csproj">
-      <Project>{69cc7192-a7e2-4990-9c99-430b4e822da0}</Project>
-      <Name>Cielo</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{465f69eb-40a1-4add-b7a1-b77b150854e8}</Project>
       <Name>Core</Name>
