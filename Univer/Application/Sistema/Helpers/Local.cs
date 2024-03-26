@@ -242,7 +242,6 @@ namespace Helpers
                     }
                     else
                     {
-                        //pais = new PaisRepository(new YLEVELEntities()).GetBySigla("es-ES");
                         pais = new PaisRepository(new YLEVELEntities()).GetPadrao();
                     }
 
@@ -252,8 +251,7 @@ namespace Helpers
                     if (pais != null)
                         idioma = pais.Idioma;
                     else
-                        idioma = new IdiomaRepository(new YLEVELEntities()).GetBySigla("pt-BR");
-
+                        idioma = new IdiomaRepository(new YLEVELEntities()).GetBySigla("en-US");
                 }
 
                 return new Core.Helpers.TraducaoHelper(idioma);

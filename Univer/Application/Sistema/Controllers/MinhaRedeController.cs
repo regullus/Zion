@@ -463,9 +463,9 @@ namespace Sistema.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetDados(string usuarioID, string masterID, string tabuleiroID, string Nivel, string token)
+        public ActionResult GetDados(string usuarioID, string targetID, string tabuleiroID, string nivel, string token)
         {
-            if (usuarioID.IsNullOrEmpty() || masterID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            if (usuarioID.IsNullOrEmpty() || targetID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || nivel.IsNullOrEmpty())
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -473,10 +473,10 @@ namespace Sistema.Controllers
             try
             {
                 int idUsuario = int.Parse(usuarioID);
-                int idMaster = int.Parse(masterID);
+                int idTarget = int.Parse(targetID);
                 int idTabuleiro = int.Parse(tabuleiroID);
 
-                if (usuarioID.IsNullOrEmpty() || masterID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+                if (idUsuario <=0 || idTarget <= 0 || idTabuleiro <= 0 )
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
@@ -491,16 +491,25 @@ namespace Sistema.Controllers
                     //Devolove que tokem é invalido
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
                 }
-                var data = new
+
+                //Obem usuario target
+                Core.Models.TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idTabuleiro);
+
+                if (obtemInfoUsuario != null)
                 {
-                    Nome = "Ariobaldo",
-                    Celular = "11955556644",
-                    Cripto = "123456789"
-                };
+                    obtemInfoUsuario.Carteira = CriptografiaHelper.Morpho(obtemInfoUsuario.Carteira, CriptografiaHelper.TipoCriptografia.Descriptografa);
+
+                } else
+                {
+                    //Não há dados para ser exibido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GM_02");
+                }
+
+                //Verifica se usuarioID é master
 
                 JsonResult jsonResult = new JsonResult
                 {
-                    Data = data,
+                    Data = obtemInfoUsuario,
                     RecursionLimit = 1000 //_listaRetorno.Count
                 };
 

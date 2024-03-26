@@ -31,11 +31,26 @@ namespace Core.Repositories.Globalizacao
             
             try
             {
-                if(sigla == "en-US")
+                return cachedRepository.FirstOrDefault(p => p.Sigla == sigla); 
+            }
+            catch (Exception)
+            {
+                pais = GetPadrao();
+                return pais;
+            }
+        }
+
+        public Entities.Pais GetByCod(string sigla)
+        {
+            Entities.Pais pais = null;
+
+            try
+            {
+                if (sigla == "en-US")
                 {
                     return cachedRepository.FirstOrDefault(p => p.ID == 476); //USA
                 }
-                else if(sigla =="es-ES") 
+                else if (sigla == "es-ES")
                 {
                     return cachedRepository.FirstOrDefault(p => p.ID == 449); //Spain
                 }

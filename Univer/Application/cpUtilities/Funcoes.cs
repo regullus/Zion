@@ -1159,6 +1159,72 @@ namespace cpUtilities
             return strRetorno;
         }
 
+        /// <summary>
+        /// Converte Data 
+        /// </summary>
+        /// <param name="Data"></param>
+        /// <returns>Data no formato dd/mm/yyyy ou yyyy-mm-dd</returns>
+        /// <remarks></remarks>
+        public static string ConverterDataBanco(string strData, string idioma)
+        {
+            string strRetorno = "";
+            try
+            {
+                if (!string.IsNullOrEmpty(strData))
+                {
+                    if (strData.Trim().Length > 0)
+                    {
+                        if (strData.IndexOf("/") > 0)
+                        {
+                            if (idioma == "en-US")
+                            {
+                                //04/17/2022 => 2022-04-17
+                                strRetorno = strData.Substring(6, 4) + "-" + strData.Substring(0, 2) + "-" + strData.Substring(3, 2);
+                            }
+                            else
+                            {
+                                //17/04/2022 => 2022-04-17
+                                strRetorno = strData.Substring(6, 4) + "-" + strData.Substring(3, 2) + "-" + strData.Substring(0, 2);
+                            }
+                        }
+                        else if (strData.IndexOf("-") > 0)
+                        {
+                            if (idioma == "en-US")
+                            {
+                                //2022-04-17 => 04/17/2022
+                                strRetorno = strData.Substring(5, 2) + "/" + strData.Substring(8, 2) + "/" + strData.Substring(0, 4);
+                            }
+                            else
+                            {
+                                //2022-04-17 => 17/04/2022
+                                strRetorno = strData.Substring(8, 2) + "/" + strData.Substring(5, 2) + "/" + strData.Substring(0, 4);
+                            }
+                        }
+                        else
+                        {
+                            if (idioma == "en-US")
+                            {
+                                //20220417 => 04/17/2022
+                                strRetorno = strData.Substring(4, 2) + "/" + strData.Substring(6, 2) + "/" + strData.Substring(0, 4);
+                            }
+                            else
+                            {
+                                //20220417 => 17/04/2022
+                                strRetorno = strData.Substring(6, 2) + "/" + strData.Substring(4, 2) + "/" + strData.Substring(0, 4);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //throw new Exception("[Gerais.ConverteData]" + ex.Message, ex);
+                strRetorno = "";
+            }
+
+            return strRetorno;
+        }
+
 
         /// <summary>
         /// Converte Data 
@@ -2718,7 +2784,7 @@ namespace cpUtilities
                 string erro = ex.Message;
                 erro = "";
             }
-            
+
         }
 
         public static string GetFileContent(string fileName)

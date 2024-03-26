@@ -32,19 +32,19 @@ namespace Core.Services.Globalizacao
                 var ip = GetIP();
                 if (!string.IsNullOrEmpty(ip) && ip.Length >= 7)
                 {
-                    string sigla = GetSigla(ip);
-                    if (String.IsNullOrEmpty(sigla))
+                    string cod = GetSigla(ip);
+                    if (String.IsNullOrEmpty(cod))
                     {
                         if (ConfiguracaoHelper.GetString("IDIOMA_PADRAO") != null)
                         {
-                            sigla = ConfiguracaoHelper.GetString("IDIOMA_PADRAO");
+                            cod = ConfiguracaoHelper.GetString("IDIOMA_PADRAO");
                         }
                         else
                         {
-                            sigla = "BR";
+                            cod = "en-US";
                         }
                     }
-                    pais = paisRepository.GetBySigla(sigla);
+                    pais = paisRepository.GetByCod(cod);
                 }
             }
 

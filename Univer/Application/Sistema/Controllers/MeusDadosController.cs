@@ -35,6 +35,7 @@ using Base32;
 using OtpSharp;
 using Core.Services.Sistema;
 using System.Globalization;
+using System.Web.UI;
 
 #endregion
 
@@ -214,8 +215,8 @@ namespace Sistema.Controllers
                 ViewBag.Cidades = cidadeRepository.GetByEstado(4); //São paulo         
             }
 
-            //ViewBag.Instituicoes = instituicaoRepository.GetByExpression(i => i.IDPais == usuario.PaisID && i.IDAtivo == 1);
-            ViewBag.Instituicoes = instituicaoRepository.GetByExpression(i => (i.IDPais == 2 || i.IDPais == usuario.PaisID) && i.IDAtivo == 1); //Fixo idPais = 2 para pegar criptos
+            //Fixo idPais = 1 para pegar criptos
+            ViewBag.Instituicoes = instituicaoRepository.GetByExpression(i => (i.IDPais == 1 || i.IDPais == usuario.PaisID) && i.IDAtivo == 1); 
 
             ContaDeposito conta = usuario.ContaDeposito.FirstOrDefault(c => c.IDTipoConta == 2);
             if (conta != null)
@@ -405,6 +406,7 @@ namespace Sistema.Controllers
             var tab = (Tabs)Enum.Parse(typeof(Tabs), form["Tab"]);
 
             #region Valida Token Google Authenticator
+
             if (ConfiguracaoHelper.GetBoolean("AUTENTICACAO_DOIS_FATORES"))
             {
                 string token2FA = form["form" + tab + "Token"] != null ? form["form" + tab + "Token"] : form["fileuploadToken"];
@@ -432,47 +434,44 @@ namespace Sistema.Controllers
 
                         #region Validacoes
 
-                        string strDocPF = form["DocPF"];
-                        string strDocPJ = form["DocPJ"];
+                        //string strDocPF = form["DocPF"];
+                        //string strDocPJ = form["DocPJ"];
                         string strTpPessoa = form["TipoPessoa"];
                         string strPais = form["pais"];
 
-                        string idioma = "pt-BR";
-                        bool retorno = true;
+                        //bool retorno = true;
 
-                        Pais pais = (Pais)Session["pais"];
-                        if (pais != null)
-                        {
-                            idioma = pais.Idioma.Sigla;
-                        }
+                        //Pais pais = (Pais)Session["pais"];
+                        //string idioma = usuario.Pais.Idioma.Sigla;
 
                         string strDocumento = string.Empty;
-                        if (strTpPessoa == "F")
-                            strDocumento = strDocPF;
-                        else
-                            strDocumento = strDocPJ;
+                        //if (strTpPessoa == "F")
+                        //    strDocumento = strDocPF;
+                        //else
+                        //    strDocumento = strDocPJ;
 
-                        if (idioma == "pt-BR")
-                        {
-                            //se brasil valida CPF/ CNPJ
-                            if (strTpPessoa == "F") 
-                                retorno = cpUtilities.Validacoes.ValidaCPF(strDocumento);
-                            else
-                                retorno = cpUtilities.Validacoes.ValidaCNPJ(strDocumento);
+                        //if (idioma == "pt-BR")
+                        //{
+                        //    //se brasil valida CPF/ CNPJ
+                        //    if (strTpPessoa == "F") 
+                        //        retorno = cpUtilities.Validacoes.ValidaCPF(strDocumento);
+                        //    else
+                        //        retorno = cpUtilities.Validacoes.ValidaCNPJ(strDocumento);
 
-                            //se brasil valida cpf          
-                            if (!retorno)
-                            {
-                                strMensagem = new string[] { traducaoHelper["DOCUMENTO_IDENTIFICACAO"] + ": " + "inválido" };
-                                Mensagem(traducaoHelper["INCONSISTENCIA"], strMensagem, "msg");
-                                return RedirectToAction("informacoes-pessoais", new { tipoPessoa = strTpPessoa });
-                            }
-                        }
+                        //    //se brasil valida cpf          
+                        //    if (!retorno)
+                        //    {
+                        //        strMensagem = new string[] { traducaoHelper["DOCUMENTO_IDENTIFICACAO"] + ": " + "inválido" };
+                        //        Mensagem(traducaoHelper["INCONSISTENCIA"], strMensagem, "msg");
+                        //        return RedirectToAction("informacoes-pessoais", new { tipoPessoa = strTpPessoa });
+                        //    }
+                        //}
 
                         #endregion
 
                         string strDataNascimento = form["DataNascimento"];
-                        strDataNascimento = cpUtilities.Gerais.ConverterDataBanco(strDataNascimento);
+
+                        strDataNascimento = cpUtilities.Gerais.ConverterDataBanco(strDataNascimento, usuario.Pais.Idioma.Sigla);
                         DateTime dataAniversario = DateTime.Parse(strDataNascimento);
 
                         usuario.NomeFantasia = form["NomeFantasia"];
@@ -742,7 +741,9 @@ namespace Sistema.Controllers
 
                         conta.IDInstituicao = int.Parse(form["InstituicaoID"]);
                         conta.IDMeioPagamento = (int)PedidoPagamento.MeiosPagamento.Indefinido;
-                        conta.MoedaIDCripto = (int)Moeda.Moedas.NEN;
+                        
+                        //panda Está fixo isso aqui!!!!
+                        conta.MoedaIDCripto = (int)Moeda.Moedas.BTC;
 
                         if (Core.Helpers.ConfiguracaoHelper.GetString("MEUS_DADOS_CONTA_CRIPTOMOEDA") == "true")
                         {
@@ -751,7 +752,7 @@ namespace Sistema.Controllers
                                 case 107: //Litecoin
                                     if (!BlockchainService.ValidarCarteiraLitecoin(form["Bitcoin"]))
                                     {
-                                        strMensagem = new string[] { traducaoHelper["CONTA_INVALIDA"] };
+                                        strMensagem = new string[] { traducaoHelper["CARTEIRA_LTC_INVALIDA"] };
                                         Mensagem(traducaoHelper["ERRO"], strMensagem, "err");
 
                                         return RedirectToAction("dados-bancarios");
@@ -765,7 +766,7 @@ namespace Sistema.Controllers
                                 case 108: //Bitcoin
                                     if (!BlockchainService.ValidarCarteiraBitcoin(form["Bitcoin"]))
                                     {
-                                        strMensagem = new string[] { traducaoHelper["CONTA_INVALIDA"] };
+                                        strMensagem = new string[] { traducaoHelper["CARTEIRA_BTC_INVALIDA"] };
                                         Mensagem(traducaoHelper["ERRO"], strMensagem, "err");
 
                                         return RedirectToAction("dados-bancarios");
@@ -813,6 +814,7 @@ namespace Sistema.Controllers
 
                         contaDepositoRepository.Save(conta);
                         await SendEmailEdicaoCadastro("DADOS_BANCARIOS");
+                        
                         strMensagem = new string[] { traducaoHelper["DADOS_SALVOS_SUCESSO"] };
                         Mensagem(traducaoHelper["MENSAGEM"], strMensagem, "msg");
 

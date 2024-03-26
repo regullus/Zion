@@ -129,7 +129,7 @@
                .Include("~/Content/global/css/components.min.css")
                .Include("~/Content/global/css/plugins.min.css")
                .Include("~/Content/layouts/layout4/css/layout.min.css")
-               .Include("~/Content/layouts/layout4/css/themes/default.min.css")
+               //.Include("~/Content/layouts/layout4/css/themes/default.min.css")
                .Include("~/Content/layouts/layout4/css/custom.min.css")
                );
             //END THEME STYLES

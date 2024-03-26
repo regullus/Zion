@@ -1284,7 +1284,7 @@ namespace Sistema.Controllers
 
             if (Request.UserLanguages.Any())
             {
-                pais = paisRepository.GetBySigla(Request.UserLanguages[0]);
+                pais = paisRepository.GetByCod(Request.UserLanguages[0]);
             }
 
             if (pais == null)
@@ -1296,7 +1296,7 @@ namespace Sistema.Controllers
                     if (pais == null)
                     {
                         //Default
-                        pais = paisRepository.GetBySigla("en-US");
+                        pais = paisRepository.GetByCod("en-US");
                     }
                 }
             }
