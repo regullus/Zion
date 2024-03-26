@@ -488,7 +488,7 @@ namespace Sistema.Controllers
 
                 if (token != tokenLocal)
                 {
-                    //Devolove que tokem é invalido
+                    //Devolve que tokem é invalido
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
                 }
 
@@ -502,25 +502,82 @@ namespace Sistema.Controllers
                 } else
                 {
                     //Não há dados para ser exibido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GM_02");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_02");
                 }
 
                 //Verifica se usuarioID é master
+                string celular = obtemInfoUsuario.Celular;
+                celular = celular.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");
+                obtemInfoUsuario.Celular = celular;
 
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = obtemInfoUsuario,
-                    RecursionLimit = 1000 //_listaRetorno.Count
+                    RecursionLimit = 1000 
                 };
 
                 return jsonResult;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GM_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
             }
         }
+
+        [HttpPost]
+        public ActionResult GetTabuleiro(string usuarioID, string tabuleiroID, string token)
+        {
+            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idTabuleiro = int.Parse(tabuleiroID);
+
+                if (idUsuario <= 0 || idTabuleiro <= 0)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                if (token != tokenLocal)
+                {
+                    //Devolve que tokem é invalido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                }
+
+                //Obem usuario target
+                Core.Models.TabuleiroModel tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro);
+
+                if (tabuleiro == null)
+                {
+                    //Não há dados para ser exibido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_02");
+                }
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = tabuleiro,
+                    RecursionLimit = 1000 
+                };
+
+                return jsonResult;
+
+            }
+            catch (Exception)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
+            }
+        }
+
 
         public ActionResult MinhaArvore()
         {
@@ -746,7 +803,7 @@ namespace Sistema.Controllers
             JsonResult jsonResult = new JsonResult
             {
                 Data = data,
-                RecursionLimit = 1000 //_listaRetorno.Count
+                RecursionLimit = 1000 
             };
 
             return jsonResult;

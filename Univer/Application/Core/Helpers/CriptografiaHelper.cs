@@ -144,6 +144,11 @@ namespace Core.Helpers
             string strRet = "";
             short intStep;
 
+            if (String.IsNullOrEmpty(strEnt))
+            {
+                strEnt = "";
+            }
+
             try
             {
                 if (tipo == TipoCriptografia.Criptografa)
