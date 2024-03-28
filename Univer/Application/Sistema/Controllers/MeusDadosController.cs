@@ -483,6 +483,10 @@ namespace Sistema.Controllers
                         usuario.DataNascimento = dataAniversario;
                         usuario.PaisID = Convert.ToInt32(strPais);
 
+                        //Truncar em 15 caracteres
+                        string truncate = usuario.Apelido;
+                        usuario.Apelido = truncate.Length <= 15 ? truncate : truncate.Substring(0, 15);
+
                         repository.Save(usuario);
 
                         await SendEmailEdicaoCadastro("INFORMACOES_PESSOAIS");

@@ -709,8 +709,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group form-md-line-input form-md-floating-label">
-                                    <input type="text" class="form-control" required id="Apelido" name="Apelido" value="@Model.Apelido">
-                                    <label for="form_control_1">@traducaoHelper["APELIDO"]</label>
+                                    <input type="text" maxlength="15" class="form-control" required id="Apelido" name="Apelido" value="@Model.Apelido">
+                                    <label for="form_control_1">@traducaoHelper["APELIDO"] @traducaoHelper["MAXIMO_15_CARACTERES"]</label>
                                 </div>
                             </div>
                         </div>

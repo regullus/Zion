@@ -656,3 +656,11 @@ Page Header
 .page-header.navbar .page-logo .logo-default {
     margin: 10px 10px 10px 60px;
 }
+
+@media (min-width: 0px) and (max-width: 767px){
+    /* 767px */
+    .page-top {
+        display: none !important;
+        background-color: red !important;
+    }
+}

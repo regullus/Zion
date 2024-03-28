@@ -60,88 +60,170 @@
         var posWidth = 10;
 
         $(function () {
-            width = window.innerWidth
+            position();
+        });
+
+        function position() {
+
+            var position = $('.posTabuleiro').offset();
+
+            if (width > 0) {
+                $('.txtTitle').html('width:' + width.toString() + ' x=' + position.top + ' y=' + position.left + " w=" + $('.posTabuleiro').width());
+            }
+
 
             var alinhaTxtTop = 26;
-            var alinhaTxtLeft = -20;
-            var ajustTop = -22;
-            var ajustLeft = 0;
+            var alinhaTxtLeft = -10;
+            var ajustTop = -20;
+            var ajustLeft = -10;
 
-            var posDonatorEsqSup1Top = ajustTop + 160;
-            var posDonatorEsqSup1Left = 480;
+            var xDonatorEsqSup1Top = 160;
+            var yDonatorEsqSup1Left = 480;
+            var xDonatorEsqSup2Top = 280;
+            var yDonatorEsqSup2Left = 300;
+            var xDonatorEsqInf1Top = 500;
+            var yDonatorEsqInf1Left = 400;
+            var xDonatorEsqInf2Top = 720;
+            var yDonatorEsqInf2Left = 520;
+            var xDonatorDirSup1Top = 180;
+            var yDonatorDirSup1Left = 900;
+            var xDonatorDirSup2Top = 400;
+            var yDonatorDirSup2Left = 1000;
+            var xDonatorDirInf1Top = 570;
+            var yDonatorDirInf1Left = 1110;
+            var xDonatorDirInf2Top =  690;
+            var yDonatorDirInf2Left = 960;
+            var xIndicatorEsqSupTop = 340;
+            var yIndicatorEsqSupLeft = 520;
+            var xIndicatorEsqInfTop = 570;
+            var yIndicatorEsqInfLeft = 600;
+            var xIndicatorDirSupTop = 290;
+            var xIndicatorDirSupLeft = 800;
+            var xIndicatorDirInfTop = 560;
+            var xIndicatorDirInfLeft = 930;
+            var xCoordinatorEsqTop = 440;
+            var yCoordinatorEsqLeft = 580;
+            var xCoordinatorDirTop = 450;
+            var yCoordinatorDirLeft = 870;
+            var xMasterTop = 440;
+            var yMasterLeft = 710;
+
+            
+            if (width <= 991 ) {
+                ajustLeft = -268;
+            }
+
+            if (width <= 1200) {
+                xDonatorEsqSup1Top = 380;
+                yDonatorEsqSup1Left = 390;
+                xDonatorEsqSup2Top = 150;
+                yDonatorEsqSup2Left = 600;
+                xDonatorEsqInf1Top = 140;
+                yDonatorEsqInf1Left = 750;
+                xDonatorEsqInf2Top = 260;
+                yDonatorEsqInf2Left = 990;
+                xDonatorDirSup1Top = 560;
+                yDonatorDirSup1Left = 1060;
+                xDonatorDirSup2Top = 760;
+                yDonatorDirSup2Left = 780;
+                xDonatorDirInf1Top = 740;
+                yDonatorDirInf1Left = 520;
+                xDonatorDirInf2Top = 620;
+                yDonatorDirInf2Left = 420;
+                xIndicatorEsqSupTop = 290; 
+                yIndicatorEsqSupLeft = 860; 
+                xIndicatorEsqInfTop = 290; 
+                yIndicatorEsqInfLeft = 510;
+                xIndicatorDirSupTop = 580; 
+                xIndicatorDirSupLeft = 920; 
+                xIndicatorDirInfTop = 620; 
+                xIndicatorDirInfLeft = 570; 
+                xCoordinatorEsqTop = 310; 
+                yCoordinatorEsqLeft = 700; 
+                xCoordinatorDirTop = 560; 
+                yCoordinatorDirLeft = 760; 
+                xMasterTop = 440;
+                yMasterLeft = 710;
+            }
+
+            //if (width <= 767) {
+            //    ajustLeft = -270;
+            //}
+
+            var posDonatorEsqSup1Top = ajustTop + xDonatorEsqSup1Top;
+            var posDonatorEsqSup1Left = ajustLeft + yDonatorEsqSup1Left;
             var posTxtDonatorEsqSup1Top = posDonatorEsqSup1Top + alinhaTxtTop;
             var posTxtDonatorEsqSup1Left = posDonatorEsqSup1Left + alinhaTxtLeft;
 
-            var posDonatorEsqSup2Top = ajustTop + 280;
-            var posDonatorEsqSup2Left = 300;
+            var posDonatorEsqSup2Top = ajustTop + xDonatorEsqSup2Top;
+            var posDonatorEsqSup2Left = ajustLeft + yDonatorEsqSup2Left;
             var posTxtDonatorEsqSup2Top = posDonatorEsqSup2Top + alinhaTxtTop;
             var posTxtDonatorEsqSup2Left = posDonatorEsqSup2Left + alinhaTxtLeft;
 
-            var posDonatorEsqInf1Top = ajustTop + 500;
-            var posDonatorEsqInf1Left = 400;
+            var posDonatorEsqInf1Top = ajustTop + xDonatorEsqInf1Top;
+            var posDonatorEsqInf1Left = ajustLeft + yDonatorEsqInf1Left;
             var posTxtDonatorEsqInf1Top = posDonatorEsqInf1Top + alinhaTxtTop;
             var posTxtDonatorEsqInf1Left = posDonatorEsqInf1Left + alinhaTxtLeft;
 
-            var posDonatorEsqInf2Top = ajustTop + 720;
-            var posDonatorEsqInf2Left = 520;
+            var posDonatorEsqInf2Top = ajustTop + xDonatorEsqInf2Top;
+            var posDonatorEsqInf2Left = ajustLeft + yDonatorEsqInf2Left;
             var posTxtDonatorEsqInf2Top = posDonatorEsqInf2Top + alinhaTxtTop;
             var posTxtDonatorEsqInf2Left = posDonatorEsqInf2Left + alinhaTxtLeft;
 
-            var posDonatorDirSup1Top = ajustTop + 180;
-            var posDonatorDirSup1Left = 900;
+            var posDonatorDirSup1Top = ajustTop + xDonatorDirSup1Top;
+            var posDonatorDirSup1Left = ajustLeft + yDonatorDirSup1Left;
             var posTxtDonatorDirSup1Top = posDonatorDirSup1Top + alinhaTxtTop;
             var posTxtDonatorDirSup1Left = posDonatorDirSup1Left + alinhaTxtLeft;
 
-            var posDonatorDirSup2Top = ajustTop + 400;
-            var posDonatorDirSup2Left = 1000;
+            var posDonatorDirSup2Top = ajustTop + xDonatorDirSup2Top;
+            var posDonatorDirSup2Left = ajustLeft + yDonatorDirSup2Left;
             var posTxtDonatorDirSup2Top = posDonatorDirSup2Top + alinhaTxtTop;
             var posTxtDonatorDirSup2Left = posDonatorDirSup2Left + alinhaTxtLeft;
 
-            var posDonatorDirInf1Top = ajustTop + 560;
-            var posDonatorDirInf1Left = 1140;
+            var posDonatorDirInf1Top = ajustTop + xDonatorDirInf1Top;
+            var posDonatorDirInf1Left = ajustLeft + yDonatorDirInf1Left;
             var posTxtDonatorDirInf1Top = posDonatorDirInf1Top + alinhaTxtTop;
             var posTxtDonatorDirInf1Left = posDonatorDirInf1Left + alinhaTxtLeft;
 
-            var posDonatorDirInf2Top = ajustTop + 690;
-            var posDonatorDirInf2Left = 960;
+            var posDonatorDirInf2Top = ajustTop + xDonatorDirInf2Top;
+            var posDonatorDirInf2Left = ajustLeft + yDonatorDirInf2Left;
             var posTxtDonatorDirInf2Top = posDonatorDirInf2Top + alinhaTxtTop;
             var posTxtDonatorDirInf2Left = posDonatorDirInf2Left + alinhaTxtLeft;
 
-            var posIndicatorEsqSupTop = ajustTop + 340;
-            var posIndicatorEsqSupLeft = 520;
+            var posIndicatorEsqSupTop = ajustTop + xIndicatorEsqSupTop;
+            var posIndicatorEsqSupLeft = ajustLeft + yIndicatorEsqSupLeft;
             var posTxtIndicatorEsqSupTop = posIndicatorEsqSupTop + alinhaTxtTop;
             var posTxtIndicatorEsqSupLeft = posIndicatorEsqSupLeft + alinhaTxtLeft;
 
-            var posIndicatorEsqInfTop = ajustTop + 570;
-            var posIndicatorEsqInfLeft = 600;
+            var posIndicatorEsqInfTop = ajustTop + xIndicatorEsqInfTop;
+            var posIndicatorEsqInfLeft = ajustLeft + yIndicatorEsqInfLeft;
             var posTxtIndicatorEsqInfTop = posIndicatorEsqInfTop + alinhaTxtTop;
             var posTxtIndicatorEsqInfLeft = posIndicatorEsqInfLeft + alinhaTxtLeft;
 
-            var posIndicatorDirSupTop = ajustTop + 290;
-            var posIndicatorDirSupLeft = 800;
+            var posIndicatorDirSupTop = ajustTop + xIndicatorDirSupTop;
+            var posIndicatorDirSupLeft = ajustLeft + xIndicatorDirSupLeft;
             var posTxtIndicatorDirSupTop = posIndicatorDirSupTop + alinhaTxtTop;
             var posTxtIndicatorDirSupLeft = posIndicatorDirSupLeft + alinhaTxtLeft;
 
-            var posIndicatorDirInfTop = ajustTop + 560;
-            var posIndicatorDirInfLeft = 930;
+            var posIndicatorDirInfTop = ajustTop + xIndicatorDirInfTop;
+            var posIndicatorDirInfLeft = ajustLeft + xIndicatorDirInfLeft;
             var posTxtIndicatorDirInfTop = posIndicatorDirInfTop + alinhaTxtTop;
             var posTxtIndicatorDirInfLeft = posIndicatorDirInfLeft + alinhaTxtLeft;
 
-            var posCoordinatorEsqTop = ajustTop + 440;
-            var posCoordinatorEsqLeft = 580;
+            var posCoordinatorEsqTop = ajustTop + xCoordinatorEsqTop;
+            var posCoordinatorEsqLeft = ajustLeft + yCoordinatorEsqLeft;
             var posTxtCoordinatorEsqTop = posCoordinatorEsqTop + alinhaTxtTop;
             var posTxtCoordinatorEsqLeft = posCoordinatorEsqLeft + alinhaTxtLeft;
 
-            var posCoordinatorDirTop = ajustTop + 450;
-            var posCoordinatorDirLeft = 870;
+            var posCoordinatorDirTop = ajustTop + xCoordinatorDirTop;
+            var posCoordinatorDirLeft = ajustLeft + yCoordinatorDirLeft;
             var posTxtCoordinatorDirTop = posCoordinatorDirTop + alinhaTxtTop;
             var posTxtCoordinatorDirLeft = posCoordinatorDirLeft + alinhaTxtLeft;
 
-            var posMasterTop = ajustTop + 440;
-            var posMasterLeft = 710;
+            var posMasterTop = ajustTop + xMasterTop;
+            var posMasterLeft = ajustLeft + yMasterLeft;
             var posTxtMasterTop = posMasterTop + alinhaTxtTop;
             var posTxtMasterLeft = posMasterLeft + alinhaTxtLeft;
-
 
             $('.DonatorEsqSup1').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorEsqSup1Top + 'px; left: ' + posDonatorEsqSup1Left + 'px;');
             $('.txtDonatorEsqSup1').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px;');
@@ -195,10 +277,11 @@
             $("#chk_@idTabuleiro").removeClass('hidden');
             $("#tab_@idTabuleiro").addClass('selected');
 
-        });
+        }
 
         function widthResizer() {
-            width = window.innerWidth
+            width = window.innerWidth;
+            position();
         }
 
         // Getting the width of the browser on load
@@ -241,7 +324,7 @@
                             if ($('#Master').attr("data-id") == @idUsuario) {
                                 $(".panelBTC").hide();
                                 $("#qrCodePIX").hide();
-                            } 
+                            }
 
                             $('#modDados').modal('show');
                         } else {
@@ -578,9 +661,18 @@
 <div class="portlet solid card-cor" style="max-width: 1600px;">
     <div class="portlet-body">
         <div class="page-head">
-            <div class="column" style="float: left; width: 50%; padding-left: 20px;">
-                <div class="page-title black">
-                    <h2 class="black">@ViewBag.Title </h2>
+            <div class="row">
+                <div class="column col-md-4" style="float: left; padding-left: 20px;">
+                    <div class="page-title black">
+                        <h2 class="black">@ViewBag.Title </h2>
+                    </div>
+                </div>
+                <div class="column pull-right col-md-8" style="float: right;">
+                    <span id="tempo" class="hidden" style="font-size: 14px; font-weight: 700;">@traducaoHelper["TEMPO_PARA_PAGAMENTO"]</span>
+                    <span id="minutes" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
+                    <span id="pontos" class="hidden" style="font-size: 18px; font-weight: 500;">:</span>
+                    <span id="seconds" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
+                    <span id="tempoEsgotado" class="hidden" style="font-size: 18px; font-weight: 500;">@traducaoHelper["TEMPO_ESGOTADO"]</span>
                 </div>
             </div>
         </div>
@@ -594,71 +686,70 @@
                     <li>
                         <a href="#">@ViewBag.Title</a>
                     </li>
+                    
                 </ul>
             </div>
-            <div class="column pull-right" style="float: right; width: 50%;">
-                <span id="tempo" class="hidden" style="font-size: 14px; font-weight: 700;">@traducaoHelper["TEMPO_PARA_PAGAMENTO"]</span>
-                @*<span id="days"></span>&nbsp;days&nbsp;
-                    <span id="hours"></span>&nbsp;Hours&nbsp;*@
-                <span id="minutes" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
-                <span id="pontos" class="hidden" style="font-size: 18px; font-weight: 500;">:</span>
-                <span id="seconds" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
-                <span id="tempoEsgotado" class="hidden" style="font-size: 18px; font-weight: 500;">@traducaoHelper["TEMPO_ESGOTADO"]</span>
+            <div class="column" style="float: left; width: 50%; padding-left: 20px;">
+                <ul class="page-breadcrumb breadcrumb">
+                    <li>
+                        <h6 class="txtTitle"></h6>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Tabuleiro -->
-<div class="portlet" style="padding: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; max-width: 1600px;">
+<div class="portlet posTabuleiro" style="padding: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px; border: 1px solid red; ">
     <div class="portlet-body">
-        <div class="row" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
+        <div class="row galaxy" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
             <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqSup1">
-            <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-circle btnTabuleiro txtDonatorEsqSup1 @(tabuleiro.DonatorEsqSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-circle btnTabuleiro txtDonatorEsqSup1 @(tabuleiro.DonatorEsqSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqSup2">
-            <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-circle btnTabuleiro txtDonatorEsqSup2 @(tabuleiro.DonatorEsqSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-circle btnTabuleiro txtDonatorEsqSup2 @(tabuleiro.DonatorEsqSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqInf1">
-            <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-circle btnTabuleiro txtDonatorEsqInf1 @(tabuleiro.DonatorEsqInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-circle btnTabuleiro txtDonatorEsqInf1 @(tabuleiro.DonatorEsqInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqInf2">
-            <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-circle btnTabuleiro txtDonatorEsqInf2 @(tabuleiro.DonatorEsqInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-circle btnTabuleiro txtDonatorEsqInf2 @(tabuleiro.DonatorEsqInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirSup1">
-            <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-circle btnTabuleiro txtDonatorDirSup1 @(tabuleiro.DonatorDirSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-circle btnTabuleiro txtDonatorDirSup1 @(tabuleiro.DonatorDirSup1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirSup2">
-            <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-circle btnTabuleiro txtDonatorDirSup2 @(tabuleiro.DonatorDirSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-circle btnTabuleiro txtDonatorDirSup2 @(tabuleiro.DonatorDirSup2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirInf1">
-            <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-circle btnTabuleiro txtDonatorDirInf1 @(tabuleiro.DonatorDirInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-circle btnTabuleiro txtDonatorDirInf1 @(tabuleiro.DonatorDirInf1 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirInf2">
-            <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-circle btnTabuleiro txtDonatorDirInf2 @(tabuleiro.DonatorDirInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")">@(traducaoHelper["CONVIDADO"])</button>
+            <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-circle btnTabuleiro txtDonatorDirInf2 @(tabuleiro.DonatorDirInf2 == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["CONVIDADO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorEsqSup">
-            <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-circle btnTabuleiro txtIndicatorEsqSup @(tabuleiro.IndicatorEsqSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-circle btnTabuleiro txtIndicatorEsqSup @(tabuleiro.IndicatorEsqSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["ANFITRIAO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorEsqInf">
-            <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-circle btnTabuleiro txtIndicatorEsqInf @(tabuleiro.IndicatorEsqInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-circle btnTabuleiro txtIndicatorEsqInf @(tabuleiro.IndicatorEsqInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["ANFITRIAO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorDirSup">
-            <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-circle btnTabuleiro txtIndicatorDirSup @(tabuleiro.IndicatorDirSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-circle btnTabuleiro txtIndicatorDirSup @(tabuleiro.IndicatorDirSup == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["ANFITRIAO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorDirInf">
-            <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-circle btnTabuleiro txtIndicatorDirInf @(tabuleiro.IndicatorDirInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")">@(traducaoHelper["ANFITRIAO"])</button>
+            <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-circle btnTabuleiro txtIndicatorDirInf @(tabuleiro.IndicatorDirInf == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["ANFITRIAO"])</p><span style="font-size:12px;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + ".png?v=" + @Helpers.Local.Versao))' class="CoordinatorEsq">
-            <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-circle btnTabuleiro txtCoordinatorEsq @(tabuleiro.CoordinatorEsq == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")">@(traducaoHelper["SUPERVISOR"])</button>
+            <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-circle btnTabuleiro txtCoordinatorEsq @(tabuleiro.CoordinatorEsq == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@(traducaoHelper["SUPERVISOR"])</p><span style="font-size:12px;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + ".png?v=" + @Helpers.Local.Versao))' class="CoordinatorDir">
-            <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-circle btnTabuleiro txtCoordinatorDir @(tabuleiro.CoordinatorDir == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")">@(traducaoHelper["SUPERVISOR"])</button>
+            <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-circle btnTabuleiro txtCoordinatorDir @(tabuleiro.CoordinatorDir == idUsuario ? "btn-warning" : "btn-info") btn-sm @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@traducaoHelper["SUPERVISOR"]</p><span style="font-size:12px;">@tabuleiro.ApelidoCoordinatorDir</span></button>
 
             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + ".png?v=" + @Helpers.Local.Versao)' class="Master">
-            <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-circle btnTabuleiro txtMaster @(tabuleiro.Master == idUsuario ? "btn-warning" : "btn-success") btn-sm @(tabuleiro.pinMaster == 0 ? "hidden" : "")">@traducaoHelper["ALVO"]</button>
+            <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-circle btnTabuleiro txtMaster @(tabuleiro.Master == idUsuario ? "btn-warning" : "btn-success") btn-sm @(tabuleiro.pinMaster == 0 ? "hidden" : "")"><p style="margin: 0; padding: 0; font-size:14px; font-weight:700;">@traducaoHelper["ALVO"]</p><span style="font-size:12px;">@tabuleiro.ApelidoMaster</span></button>
 
         </div>
     </div>

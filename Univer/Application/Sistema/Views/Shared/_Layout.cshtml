@@ -141,9 +141,7 @@
                 <a href=".">
                     <img src="@Url.Content("~/Content/admin/img/" + Helpers.Local.Sistema + "/logo-sistema.png")?vre=@Helpers.Local.Versao" alt="logo" class="logo-default" />
                 </a>
-                <div class="menu-toggler sidebar-toggler">
-                    <!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
-                </div>
+                <div class="menu-toggler sidebar-toggler"></div>
             </div>
             <!-- END LOGO -->
             <!-- BEGIN RESPONSIVE MENU TOGGLER -->
@@ -152,7 +150,7 @@
 
             <!-- END RESPONSIVE MENU TOGGLER -->
             <!-- BEGIN PAGE TOP -->
-            <div class="page-top">
+            <div class="page-top" >
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <div class="col-md-12">
                     <div class="top-menu">
@@ -177,9 +175,8 @@
                                                     <h3>
                                                         <span class="bold">@avisos.Count</span> @traducaoHelper["AVISOS_NAO_LIDOS"]
                                                     </h3>*@
-                            @*<a href="page_user_profile_1.html">view all</a>*@
-                            @*</li>
-
+                                                        @*<a href="page_user_profile_1.html">view all</a>*@
+                                              @*</li>
                                                 <li>
                                                     <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
                                                         @foreach (var aviso in avisos)

@@ -427,8 +427,8 @@ namespace Sistema.Controllers
             try
             {
                 ViewBag.RedeTabuleiro = true;
-                ViewBag.height = "80px";
-                ViewBag.width = "80px";
+                ViewBag.height = "100px";
+                ViewBag.width = "100px";
                 ViewBag.txtMaxWidth = "120px";
 
                 int idTabuleiro = 0;
@@ -577,7 +577,6 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
             }
         }
-
 
         public ActionResult MinhaArvore()
         {
