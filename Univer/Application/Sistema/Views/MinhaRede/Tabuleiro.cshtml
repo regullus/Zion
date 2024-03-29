@@ -65,91 +65,195 @@
 
         function position() {
 
-            var position = $('.posTabuleiro').offset();
+            //var position = $('.porTabuleiro').offset();
+            var position = $('.porTabuleiro').offset();
+            var area = width - $('.porTabuleiro').width() - 275;
+
+            $('.porTabuleiro').css({
+                "width": "980px",
+                "height": "680px",
+            });
+            $('.galaxy').css({
+                "width": "980px",
+                "height": "680px",
+                "border": "none",
+            });
 
             if (width > 0) {
-                $('.txtTitle').html('width:' + width.toString() + ' x=' + position.top + ' y=' + position.left + " w=" + $('.posTabuleiro').width());
+                $('.txtTitle').html('width:' + width.toString() + ' area=' + area + ' | x=' + position.left); //275
             }
-
 
             var alinhaTxtTop = 26;
             var alinhaTxtLeft = -10;
-            var ajustTop = -20;
-            var ajustLeft = -10;
 
-            var xDonatorEsqSup1Top = 160;
-            var yDonatorEsqSup1Left = 480;
-            var xDonatorEsqSup2Top = 280;
-            var yDonatorEsqSup2Left = 300;
-            var xDonatorEsqInf1Top = 500;
-            var yDonatorEsqInf1Left = 400;
-            var xDonatorEsqInf2Top = 720;
-            var yDonatorEsqInf2Left = 520;
-            var xDonatorDirSup1Top = 180;
-            var yDonatorDirSup1Left = 900;
-            var xDonatorDirSup2Top = 400;
-            var yDonatorDirSup2Left = 1000;
-            var xDonatorDirInf1Top = 570;
-            var yDonatorDirInf1Left = 1110;
-            var xDonatorDirInf2Top =  690;
-            var yDonatorDirInf2Left = 960;
-            var xIndicatorEsqSupTop = 340;
-            var yIndicatorEsqSupLeft = 520;
-            var xIndicatorEsqInfTop = 570;
-            var yIndicatorEsqInfLeft = 600;
-            var xIndicatorDirSupTop = 290;
-            var xIndicatorDirSupLeft = 800;
-            var xIndicatorDirInfTop = 560;
-            var xIndicatorDirInfLeft = 930;
-            var xCoordinatorEsqTop = 440;
-            var yCoordinatorEsqLeft = 580;
-            var xCoordinatorDirTop = 450;
-            var yCoordinatorDirLeft = 870;
-            var xMasterTop = 440;
-            var yMasterLeft = 710;
+            var ajustTop = 0;
+            var ajustLeft = 0;
+
+            //width > 1200
+            var xDonatorEsqSup1Top = 10;
+            var yDonatorEsqSup1Left = 240;
+            var xDonatorEsqSup2Top = 130;
+            var yDonatorEsqSup2Left = 60;
+            var xDonatorEsqInf1Top = 350;
+            var yDonatorEsqInf1Left = 160;
+            var xDonatorEsqInf2Top = 570;
+            var yDonatorEsqInf2Left = 280;
+
+            var xDonatorDirSup1Top = 30;
+            var yDonatorDirSup1Left = 660;
+            var xDonatorDirSup2Top = 250;
+            var yDonatorDirSup2Left = 760;
+            var xDonatorDirInf1Top = 420;
+            var yDonatorDirInf1Left = 810;
+            var xDonatorDirInf2Top =  540;
+            var yDonatorDirInf2Left = 680;
+
+            var xIndicatorEsqSupTop = 170;
+            var yIndicatorEsqSupLeft = 250;
+            var xIndicatorEsqInfTop = 440;
+            var yIndicatorEsqInfLeft = 320;
+            var xIndicatorDirSupTop = 140;
+            var xIndicatorDirSupLeft = 590;
+            var xIndicatorDirInfTop = 410;
+            var xIndicatorDirInfLeft = 660;
+
+            var xCoordinatorEsqTop = 300;
+            var yCoordinatorEsqLeft = 270;
+            var xCoordinatorDirTop = 300;
+            var yCoordinatorDirLeft = 580;
+
+            var xMasterTop = 290;
+            var yMasterLeft = 420;
+            //0
+            //1 - 0
+            if (width > 1170 && width <= 1200) {
+                $('.porTabuleiro').css({
+                    "width": "900px",
+                    "height": "680px",
+                });
+                $('.galaxy').css({
+                    "width": "900px",
+                    "height": "680px",
+                });
+                ajustLeft = -36;
+            }
+            //2 - 0
+            if (width > 991 && width <= 1170) {
+                $('.porTabuleiro').css({
+                    "width": "720px",
+                    "height": "680px",
+                });
+                $('.galaxy').css({
+                    "width": "720px",
+                    "height": "680px",
+                });
+                xDonatorEsqSup2Top = 160;
+                yDonatorEsqSup2Left = 120;
+                xDonatorDirSup2Top = 220;
+                yDonatorDirSup2Left = 710;
+                xIndicatorDirInfTop = 460;
+                xIndicatorDirInfLeft = 580;
+                xDonatorDirInf1Top = 400;
+                yDonatorDirInf1Left = 700;
+                ajustLeft = -126;
+            }
+
+            //0 - 0
+            if (width > 961 && width <= 991) {
+                $('.porTabuleiro').css({
+                    "width": "980px",
+                    "height": "680px",
+                });
+                $('.galaxy').css({
+                    "width": "980px",
+                    "height": "680px",
+                });
+            }
+
+            //1 - 1
+            if (width > 931 && width <= 961) {
+                $('.porTabuleiro').css({
+                    "width": "900px",
+                    "height": "680px",
+                });
+                $('.galaxy').css({
+                    "width": "900px",
+                    "height": "680px",
+                });
+                ajustLeft = -36;
+            }
+
+            //2 - 1
+            if (width > 752 && width <= 931) {
+                $('.porTabuleiro').css({
+                    "width": "720px",
+                    "height": "680px",
+                });
+                $('.galaxy').css({
+                    "width": "720px",
+                    "height": "680px",
+                    "border": "1px solid blue",
+                });
+                xDonatorEsqSup2Top = 160;
+                yDonatorEsqSup2Left = 120;
+                xDonatorDirSup2Top = 220;
+                yDonatorDirSup2Left = 710;
+                xIndicatorDirInfTop = 460;
+                xIndicatorDirInfLeft = 580;
+                xDonatorDirInf1Top = 400;
+                yDonatorDirInf1Left = 700;
+                ajustLeft = -126;
+            }
+
+            //3 - 1
+            if (width > 580 && width <= 752) {
+                $('.porTabuleiro').css({
+                    "width": "580px",
+                    "height": "780px",
+                });
+                $('.galaxy').css({
+                    "width": "580px",
+                    "height": "780px",
+                    "border": "1px solid yellow",
+                });
+
+                xIndicatorDirSupTop = 140;
+                xIndicatorDirSupLeft = 520;
+                xIndicatorDirInfTop = 440;
+                xIndicatorDirInfLeft = 600;
+
+                xIndicatorEsqSupTop = 110;
+                yIndicatorEsqSupLeft = 280;
+                xIndicatorEsqInfTop = 440;
+                yIndicatorEsqInfLeft = 320;
+
+                xDonatorDirSup1Top = 0;
+                yDonatorDirSup1Left = 500;
+                xDonatorDirSup2Top = 60;
+                yDonatorDirSup2Left = 640;
+
+                xDonatorDirInf1Top = 550;
+                yDonatorDirInf1Left = 650;
+                xDonatorDirInf2Top = 540;
+                yDonatorDirInf2Left = 480;
+
+                xDonatorEsqSup1Top = -40;
+                yDonatorEsqSup1Left = 320;
+                xDonatorEsqSup2Top = 200;
+                yDonatorEsqSup2Left = 190;
+
+                xDonatorEsqInf1Top = 390;
+                yDonatorEsqInf1Left = 190;
+
+                xDonatorEsqInf2Top = 570;
+                yDonatorEsqInf2Left = 280;
+
+                ajustLeft = -194;
+                ajustTop = 50;
+
+            }
 
             
-            if (width <= 991 ) {
-                ajustLeft = -268;
-            }
-
-            if (width <= 1200) {
-                xDonatorEsqSup1Top = 380;
-                yDonatorEsqSup1Left = 390;
-                xDonatorEsqSup2Top = 150;
-                yDonatorEsqSup2Left = 600;
-                xDonatorEsqInf1Top = 140;
-                yDonatorEsqInf1Left = 750;
-                xDonatorEsqInf2Top = 260;
-                yDonatorEsqInf2Left = 990;
-                xDonatorDirSup1Top = 560;
-                yDonatorDirSup1Left = 1060;
-                xDonatorDirSup2Top = 760;
-                yDonatorDirSup2Left = 780;
-                xDonatorDirInf1Top = 740;
-                yDonatorDirInf1Left = 520;
-                xDonatorDirInf2Top = 620;
-                yDonatorDirInf2Left = 420;
-                xIndicatorEsqSupTop = 290; 
-                yIndicatorEsqSupLeft = 860; 
-                xIndicatorEsqInfTop = 290; 
-                yIndicatorEsqInfLeft = 510;
-                xIndicatorDirSupTop = 580; 
-                xIndicatorDirSupLeft = 920; 
-                xIndicatorDirInfTop = 620; 
-                xIndicatorDirInfLeft = 570; 
-                xCoordinatorEsqTop = 310; 
-                yCoordinatorEsqLeft = 700; 
-                xCoordinatorDirTop = 560; 
-                yCoordinatorDirLeft = 760; 
-                xMasterTop = 440;
-                yMasterLeft = 710;
-            }
-
-            //if (width <= 767) {
-            //    ajustLeft = -270;
-            //}
-
             var posDonatorEsqSup1Top = ajustTop + xDonatorEsqSup1Top;
             var posDonatorEsqSup1Left = ajustLeft + yDonatorEsqSup1Left;
             var posTxtDonatorEsqSup1Top = posDonatorEsqSup1Top + alinhaTxtTop;
@@ -701,7 +805,7 @@
 </div>
 
 <!-- Tabuleiro -->
-<div class="portlet posTabuleiro" style="padding: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px; border: 1px solid red; ">
+<div class="portlet porTabuleiro" style="position: relative; padding: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;">
     <div class="portlet-body">
         <div class="row galaxy" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
             <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
