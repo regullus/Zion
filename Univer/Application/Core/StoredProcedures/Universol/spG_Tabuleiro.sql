@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spG_Tabuleiro'))
    Drop Procedure spG_Tabuleiro
@@ -199,7 +199,7 @@ Begin
                tab.DataInicio as DataInicio,
                tab.DataFim as DataFim
             From
-	            Rede.Tabuleiro Tab,
+	           Rede.Tabuleiro Tab,
                Usuario.Usuario Usu
             Where
                usu.id = @UsuarioPaiID and
@@ -1030,7 +1030,7 @@ Begin
                   --Sobe para proximo Board
                   Set @BoardID = @BoardID + 1
                   --Verifica se ainda há board acima do master
-                  IF Not Exists (Select 'Existe' From Rede.Board Where ID = @BoardID)
+                  IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID)
                   Begin
                      --Caso não haja mais board superiores volta ao inicio
                      Set @BoardID = 1

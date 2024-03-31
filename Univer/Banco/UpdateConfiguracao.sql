@@ -1,13 +1,14 @@
+use Univer
 go
 declare @chave nvarchar(255), @TextoP nvarchar(255), @TextoE nvarchar(255), @TextoI nvarchar(255)
-select @chave = 'PAGAR'
+select @chave = 'MINHA_REDE'
 Select * from Globalizacao.Traducao where chave like '%' + @chave + '%'
---delete Globalizacao.Traducao  where chave = @chave
+delete Globalizacao.Traducao  where chave = @chave
 
 select 
-	@TextoP = 'PAGAR',
-	@TextoE = 'PAGAR',
-	@TextoI = 'PAY'
+	@TextoP = 'Galáxias',
+	@TextoE = 'Galaxias',
+	@TextoI = 'Galaxies'
 	
 	
 --update Globalizacao.Traducao set Texto = @TextoP where chave = @chave and IdiomaID = 1

@@ -427,11 +427,6 @@ namespace Sistema.Controllers
             try
             {
                 ViewBag.RedeTabuleiro = true;
-                ViewBag.width = "100px";
-                ViewBag.height = "100px";
-
-                ViewBag.txtMaxWidth = "96px";
-
                 int idTabuleiro = 0;
 
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
@@ -565,9 +560,7 @@ namespace Sistema.Controllers
                     //Não há dados para ser exibido
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_02");
                 }
-                tabuleiro.ApelidoCoordinatorDir = "Anakin";
-                tabuleiro.ApelidoCoordinatorEsq = "Luke";
-                tabuleiro.ApelidoMaster = "Hanna";
+
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = tabuleiro,

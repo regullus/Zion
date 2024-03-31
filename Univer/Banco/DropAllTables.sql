@@ -66,7 +66,7 @@ if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'L
 if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Loja' and t.name = 'Taxa') Begin drop table Loja.Taxa End;
 if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'Associacao') Begin drop table Rede.Associacao End;
 if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'AssociacaoLimiteGanho') Begin drop table Rede.AssociacaoLimiteGanho End;
-if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'Board') Begin drop table Rede.Board End;
+if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'TabuleiroBoard') Begin drop table Rede.TabuleiroBoard End;
 if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'Bonificacao') Begin drop table Rede.Bonificacao End;
 if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'Ciclo') Begin drop table Rede.Ciclo End;
 if exists (select 'existe' from sys.tables t where schema_name(t.schema_id) = 'Rede' and t.name = 'Classificacao') Begin drop table Rede.Classificacao End;

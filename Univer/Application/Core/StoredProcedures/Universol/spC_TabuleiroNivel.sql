@@ -1,4 +1,4 @@
-use [Univer]
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroNivel'))
    Drop Procedure spC_TabuleiroNivel
@@ -35,7 +35,7 @@ BEGIN
       tn.Observacao
   FROM 
       Rede.TabuleiroNivel tn,
-      Rede.Board boa,
+      Rede.TabuleiroBoard boa,
       Rede.TabuleiroUsuario tab
    WHERE
       tn.UsuarioID = @UsuarioID and

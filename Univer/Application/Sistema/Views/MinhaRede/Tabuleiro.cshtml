@@ -27,12 +27,18 @@
     IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroNivelAtivos = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosNivelAtivos;
     Core.Models.TabuleiroNivelModel tabuleiroAtivo = (Core.Models.TabuleiroNivelModel)ViewBag.tabuleiroAtivo;
 
+    int totalTabuleiro = tabuleiroNivelAtivos.Count();
+
     string planetaCor = "";
 
     int idTabuleiro = ViewBag.idTabuleiro;
     Core.Models.TabuleiroModel tabuleiro = (Core.Models.TabuleiroModel)ViewBag.tabuleiro;
 
     ViewBag.Title = traducaoHelper["MINHA_REDE"].ToLower();
+
+    var porTabuleiroWidth = "200px";
+    var porTabuleiroHeight = "200px";
+    var porTabuleiroMaxWidth = "96px";
 
     #endregion
 
@@ -78,9 +84,11 @@
 
             $(".txtTitle").html(width);
 
-            $('.porTabuleiro').css({
+            $('#porTabuleiro').css({
                 "width": "980px",
                 "height": "680px",
+                "overflow": "visible",
+                "overflow-y": "visible",
             });
 
             $('.galaxy').css({
@@ -88,11 +96,11 @@
                 "height": "680px",
             });
 
-            var alinhaTxtTop = 38;
-            var alinhaTxtLeft = 2;
+            var alinhaTxtTop = 90;
+            var alinhaTxtLeft = 51;
 
-            var ajustTop = 0;
-            var ajustLeft = 0;
+            var ajustTop = -50;
+            var ajustLeft = -46;
 
             //width > 1200
             var xDonatorEsqSup1Top = 10;
@@ -133,16 +141,18 @@
             //0
             //1 - 0
             if (width > 1170 && width <= 1200) {
-                $('.porTabuleiro').css({
+                $('#porTabuleiro').css({
                     "width": "900px",
                     "height": "680px",
+                    "overflow": "visible",
+                    "overflow-y": "visible",
                 });
                 $('.galaxy').css({
                     "width": "900px",
                     "height": "680px",
                 });
 
-                ajustLeft = -36;
+                ajustLeft = -86;
             }
 
             //2 - 0
@@ -165,14 +175,16 @@
                 xIndicatorDirInfLeft = 580;
                 xDonatorDirInf1Top = 400;
                 yDonatorDirInf1Left = 700;
-                ajustLeft = -126;
+                ajustLeft = -176;
             }
 
             //0 - 0
             if (width > 961 && width <= 991) {
-                $('.porTabuleiro').css({
+                $('#porTabuleiro').css({
                     "width": "980px",
                     "height": "680px",
+                    "overflow": "visible",
+                    "overflow-y": "visible",
                 });
                 $('.galaxy').css({
                     "width": "980px",
@@ -190,14 +202,16 @@
                     "width": "900px",
                     "height": "680px",
                 });
-                ajustLeft = -36;
+                ajustLeft = -86;
             }
 
             //2 - 1
             if (width > 752 && width <= 931) {
-                $('.porTabuleiro').css({
+                $('#porTabuleiro').css({
                     "width": "720px",
                     "height": "680px",
+                    "overflow": "visible",
+                    "overflow-y": "visible",
                 });
                 $('.galaxy').css({
                     "width": "720px",
@@ -213,7 +227,7 @@
                 xIndicatorDirInfLeft = 580;
                 xDonatorDirInf1Top = 400;
                 yDonatorDirInf1Left = 700;
-                ajustLeft = -126;
+                ajustLeft = -170;
             }
 
             //3 - 1
@@ -258,21 +272,29 @@
                 xDonatorEsqInf2Top = 570;
                 yDonatorEsqInf2Left = 280;
 
-                ajustLeft = -194;
-                ajustTop = 50;
+                ajustLeft = -246;
+                ajustTop = 0;
 
             }
 
             //3 - 1
             if (width > 0 && width <= 580) {
-                $('.porTabuleiro').css({
+                $('#porTabuleiro').css({
                     "width": "450px",
-                    "height": "1000px",
+                    "height": "1030px",
+                    "overflow": "auto",
+                    "overflow-y": "hidden",
                 });
                 $('.galaxy').css({
                     "width": "450px",
-                    "height": "1000px",
+                    "height": "1030px",
                 });
+                //overflow: auto; overflow-y: hidden;
+                //$('.porTabuleiro').css("overflow", "auto");
+                //$('#porTabuleiro').css("overflow-y", "hidden");
+
+                //$(".porTabuleiro").attr("style", "position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;");
+                
                 //Deckard
                 xCoordinatorEsqTop = 160;
                 yCoordinatorEsqLeft = 500;
@@ -320,11 +342,9 @@
                 xDonatorEsqInf2Top = 230;
                 yDonatorEsqInf2Left = 260;
 
-                ajustLeft = -268;
-                ajustTop = 160;
-
-
-            }
+                ajustLeft = -310;
+                ajustTop = 124;
+            } 
 
             var posDonatorEsqSup1Top = ajustTop + xDonatorEsqSup1Top;
             var posDonatorEsqSup1Left = ajustLeft + yDonatorEsqSup1Left;
@@ -401,64 +421,64 @@
             var posTxtMasterTop = posMasterTop + alinhaTxtTop;
             var posTxtMasterLeft = posMasterLeft + alinhaTxtLeft;
 
-            $('.DonatorEsqSup1').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorEsqSup1Top + 'px; left: ' + posDonatorEsqSup1Left + 'px;');
-            $('#DonatorEsqSup1').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px; border: 2px solid #fff;');
+            $('.DonatorEsqSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup1Top + 'px; left: ' + posDonatorEsqSup1Left + 'px;');
+            $('#DonatorEsqSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px; border: 2px solid #fff;');
             $('#DonatorEsqSup1').addClass('@tabuleiro.corDonatorEsqSup1');
 
-            $('.DonatorEsqSup2').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorEsqSup2Top + 'px; left: ' + posDonatorEsqSup2Left + 'px;');
-            $('#DonatorEsqSup2').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup2Top + 'px; left: ' + posTxtDonatorEsqSup2Left + 'px; border: 2px solid #fff;');
+            $('.DonatorEsqSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup2Top + 'px; left: ' + posDonatorEsqSup2Left + 'px;');
+            $('#DonatorEsqSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup2Top + 'px; left: ' + posTxtDonatorEsqSup2Left + 'px; border: 2px solid #fff;');
             $('#DonatorEsqSup2').addClass('@tabuleiro.corDonatorEsqSup2');
 
-            $('.DonatorEsqInf1').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorEsqInf1Top + 'px; left: ' + posDonatorEsqInf1Left + 'px;');
-            $('#DonatorEsqInf1').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf1Top + 'px; left: ' + posTxtDonatorEsqInf1Left + 'px; border: 2px solid #fff;');
+            $('.DonatorEsqInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf1Top + 'px; left: ' + posDonatorEsqInf1Left + 'px;');
+            $('#DonatorEsqInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf1Top + 'px; left: ' + posTxtDonatorEsqInf1Left + 'px; border: 2px solid #fff;');
             $('#DonatorEsqInf1').addClass('@tabuleiro.corDonatorEsqInf1');
 
-            $('.DonatorEsqInf2').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorEsqInf2Top + 'px; left: ' + posDonatorEsqInf2Left + 'px;');
-            $('#DonatorEsqInf2').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf2Top + 'px; left: ' + posTxtDonatorEsqInf2Left + 'px; border: 2px solid #fff;');
+            $('.DonatorEsqInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf2Top + 'px; left: ' + posDonatorEsqInf2Left + 'px;');
+            $('#DonatorEsqInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf2Top + 'px; left: ' + posTxtDonatorEsqInf2Left + 'px; border: 2px solid #fff;');
             $('#DonatorEsqInf2').addClass('@tabuleiro.corDonatorEsqInf2');
 
-            $('.DonatorDirSup1').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorDirSup1Top + 'px; left: ' + posDonatorDirSup1Left + 'px;');
-            $('#DonatorDirSup1').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup1Top + 'px; left: ' + posTxtDonatorDirSup1Left + 'px; border: 2px solid #fff;');
+            $('.DonatorDirSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup1Top + 'px; left: ' + posDonatorDirSup1Left + 'px;');
+            $('#DonatorDirSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup1Top + 'px; left: ' + posTxtDonatorDirSup1Left + 'px; border: 2px solid #fff;');
             $('#DonatorDirSup1').addClass('@tabuleiro.corDonatorDirSup1');
 
-            $('.DonatorDirSup2').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorDirSup2Top + 'px; left: ' + posDonatorDirSup2Left + 'px;');
-            $('#DonatorDirSup2').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup2Top + 'px; left: ' + posTxtDonatorDirSup2Left + 'px; border: 2px solid #fff;');
+            $('.DonatorDirSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup2Top + 'px; left: ' + posDonatorDirSup2Left + 'px;');
+            $('#DonatorDirSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup2Top + 'px; left: ' + posTxtDonatorDirSup2Left + 'px; border: 2px solid #fff;');
             $('#DonatorDirSup2').addClass('@tabuleiro.corDonatorDirSup2');
 
-            $('.DonatorDirInf1').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorDirInf1Top + 'px; left: ' + posDonatorDirInf1Left + 'px;');
-            $('#DonatorDirInf1').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf1Top + 'px; left: ' + posTxtDonatorDirInf1Left + 'px; border: 2px solid #fff;');
+            $('.DonatorDirInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf1Top + 'px; left: ' + posDonatorDirInf1Left + 'px;');
+            $('#DonatorDirInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf1Top + 'px; left: ' + posTxtDonatorDirInf1Left + 'px; border: 2px solid #fff;');
             $('#DonatorDirInf1').addClass('@tabuleiro.corDonatorDirInf1');
 
-            $('.DonatorDirInf2').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posDonatorDirInf2Top + 'px; left: ' + posDonatorDirInf2Left + 'px;');
-            $('#DonatorDirInf2').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf2Top + 'px; left: ' + posTxtDonatorDirInf2Left + 'px; border: 2px solid #fff;');
+            $('.DonatorDirInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf2Top + 'px; left: ' + posDonatorDirInf2Left + 'px;');
+            $('#DonatorDirInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf2Top + 'px; left: ' + posTxtDonatorDirInf2Left + 'px; border: 2px solid #fff;');
             $('#DonatorDirInf2').addClass('@tabuleiro.corDonatorDirInf2');
 
-            $('.IndicatorEsqSup').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posIndicatorEsqSupTop + 'px; left: ' + posIndicatorEsqSupLeft + 'px;');
-            $('#IndicatorEsqSup').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqSupTop + 'px; left: ' + posTxtIndicatorEsqSupLeft + 'px; border: 2px solid #fff;');
+            $('.IndicatorEsqSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqSupTop + 'px; left: ' + posIndicatorEsqSupLeft + 'px;');
+            $('#IndicatorEsqSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqSupTop + 'px; left: ' + posTxtIndicatorEsqSupLeft + 'px; border: 2px solid #fff;');
             $('#IndicatorEsqSup').addClass('@tabuleiro.corIndicatorEsqSup');
 
-            $('.IndicatorEsqInf').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posIndicatorEsqInfTop + 'px; left: ' + posIndicatorEsqInfLeft + 'px;');
-            $('#IndicatorEsqInf').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqInfTop + 'px; left: ' + posTxtIndicatorEsqInfLeft + 'px; border: 2px solid #fff;');
+            $('.IndicatorEsqInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqInfTop + 'px; left: ' + posIndicatorEsqInfLeft + 'px;');
+            $('#IndicatorEsqInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqInfTop + 'px; left: ' + posTxtIndicatorEsqInfLeft + 'px; border: 2px solid #fff;');
             $('#IndicatorEsqInf').addClass('@tabuleiro.corIndicatorEsqInf');
 
-            $('.IndicatorDirSup').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posIndicatorDirSupTop + 'px; left: ' + posIndicatorDirSupLeft + 'px;');
-            $('#IndicatorDirSup').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtIndicatorDirSupTop + 'px; left: ' + posTxtIndicatorDirSupLeft + 'px; border: 2px solid #fff;');
+            $('.IndicatorDirSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirSupTop + 'px; left: ' + posIndicatorDirSupLeft + 'px;');
+            $('#IndicatorDirSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirSupTop + 'px; left: ' + posTxtIndicatorDirSupLeft + 'px; border: 2px solid #fff;');
             $('#IndicatorDirSup').addClass('@tabuleiro.corIndicatorDirSup');
 
-            $('.IndicatorDirInf').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posIndicatorDirInfTop + 'px; left: ' + posIndicatorDirInfLeft + 'px;');
-            $('#IndicatorDirInf').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtIndicatorDirInfTop + 'px; left: ' + posTxtIndicatorDirInfLeft + 'px; border: 2px solid #fff;');
+            $('.IndicatorDirInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirInfTop + 'px; left: ' + posIndicatorDirInfLeft + 'px;');
+            $('#IndicatorDirInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirInfTop + 'px; left: ' + posTxtIndicatorDirInfLeft + 'px; border: 2px solid #fff;');
             $('#IndicatorDirInf').addClass('@tabuleiro.corIndicatorDirInf');
 
-            $('.CoordinatorEsq').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posCoordinatorEsqTop + 'px; left: ' + posCoordinatorEsqLeft + 'px;');
-            $('#CoordinatorEsq').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtCoordinatorEsqTop + 'px; left: ' + posTxtCoordinatorEsqLeft + 'px; border: 2px solid #fff;');
+            $('.CoordinatorEsq').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorEsqTop + 'px; left: ' + posCoordinatorEsqLeft + 'px;');
+            $('#CoordinatorEsq').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorEsqTop + 'px; left: ' + posTxtCoordinatorEsqLeft + 'px; border: 2px solid #fff;');
             $('#CoordinatorEsq').addClass('@tabuleiro.corCoordinatorEsq');
 
-            $('.CoordinatorDir').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posCoordinatorDirTop + 'px; left: ' + posCoordinatorDirLeft + 'px;');
-            $('#CoordinatorDir').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtCoordinatorDirTop + 'px; left: ' + posTxtCoordinatorDirLeft + 'px; border: 2px solid #fff;');
+            $('.CoordinatorDir').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorDirTop + 'px; left: ' + posCoordinatorDirLeft + 'px;');
+            $('#CoordinatorDir').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorDirTop + 'px; left: ' + posTxtCoordinatorDirLeft + 'px; border: 2px solid #fff;');
             $('#CoordinatorDir').addClass('@tabuleiro.corCoordinatorDir');
 
-            $('.Master').attr('style', 'height: @(ViewBag.height); width: @(ViewBag.width); position: absolute; top: ' + posMasterTop + 'px; left: ' + posMasterLeft + 'px;');
-            $('#Master').attr('style', 'max-width: @(ViewBag.txtMaxWidth); width: @(ViewBag.txtMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff;');
+            $('.Master').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posMasterTop + 'px; left: ' + posMasterLeft + 'px;');
+            $('#Master').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff;');
             $('#Master').addClass('@tabuleiro.corMaster');
 
         }
@@ -572,214 +592,110 @@
                     success: function (data) {
                         if (data != null) {
                             //Master
-                            $(".Master").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinMaster + '.png?v=' + '@Helpers.Local.Versao');
+                            $(".Master").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinMaster + 'x.png?v=' + '@Helpers.Local.Versao');
                             $("#Master").attr('data-id', data.Master);
-                            $("#Master").html(data.ApelidoMaster);
-
-                            if (data.Master == '@idUsuario') {
-                                $("#Master").addClass('btn-warning');
-                            } else {
-                                $("#Master").addClass('btn-success');
-                            }
+                            $("#Master span").html(data.ApelidoMaster);
                             if (data.PinMaster == '0') {
                                 $("#Master").addClass('hidden');
                             }
-                            //CoordinatorDir
-                            $(".CoordinatorDir").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#CoordinatorDir").attr('data-id', '@(tabuleiro.CoordinatorDir)');
-                            $("#CoordinatorDir").removeClass('btn-success');
-                            $("#CoordinatorDir").removeClass('btn-info');
 
-                            if (data.CoordinatorDir == '@idUsuario') {
-                                $("#CoordinatorDir").addClass('btn-warning');
-                            } else {
-                                $("#CoordinatorDir").addClass('btn-info');
-                            }
+                            //CoordinatorDir
+                            $(".CoordinatorDir").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorDir + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#CoordinatorDir").attr('data-id', data.CoordinatorDir);
+                            $("#CoordinatorDir span").html(data.ApelidoCoordinatorDir);
                             if (data.pinCoordinatorDir == 0) {
                                 $("#CoordinatorDir").addClass('hidden');
                             }
                             //CoordinatorEsq
-                            $(".CoordinatorEsq").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#CoordinatorEsq").attr('data-id', '@(tabuleiro.CoordinatorEsq)');
-                            $("#CoordinatorEsq").removeClass('btn-success');
-                            $("#CoordinatorEsq").removeClass('btn-info');
-
-                            if (data.CoordinatorEsq == '@idUsuario') {
-                                $("#CoordinatorEsq").addClass('btn-warning');
-                            } else {
-                                $("#CoordinatorEsq").addClass('btn-info');
-                            }
+                            $(".CoordinatorEsq").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorEsq + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#CoordinatorEsq").attr('data-id', data.CoordinatorEsq);
+                            $("#CoordinatorEsq span").html(data.ApelidoCoordinatorEsq);
                             if (data.PinCoordinatorEsq == '0') {
                                 $("#CoordinatorEsq").addClass('hidden');
                             }
                             //IndicatorDirInf
-                            $(".IndicatorDirInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#IndicatorDirInf").attr('data-id', '@(tabuleiro.IndicatorDirInf)');
-                            $("#IndicatorDirInf").removeClass('btn-success');
-                            $("#IndicatorDirInf").removeClass('btn-info');
-
-                            if (data.IndicatorDirInf == '@idUsuario') {
-                                $("#IndicatorDirInf").addClass('btn-warning');
-                            } else {
-                                $("#IndicatorDirInf").addClass('btn-info');
-                            }
+                            $(".IndicatorDirInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirInf + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#IndicatorDirInf").attr('data-id', data.IndicatorDirInf);
+                            $("#IndicatorDirInf span").html(data.ApelidoIndicatorDirInf);
                             if (data.pinIndicatorDirInf == 0) {
                                 $("#IndicatorDirInf").addClass('hidden');
                             }
                             //IndicatorDirSup
-                            $(".IndicatorDirSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#IndicatorDirSup").attr('data-id', '@(tabuleiro.IndicatorDirSup)');
-                            $("#IndicatorDirSup").removeClass('btn-success');
-                            $("#IndicatorDirSup").removeClass('btn-info');
-
-                            if (data.IndicatorDirSup == '@idUsuario') {
-                                $("#IndicatorDirSup").addClass('btn-warning');
-                            } else {
-                                $("#IndicatorDirSup").addClass('btn-info');
-                            }
+                            $(".IndicatorDirSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirSup + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#IndicatorDirSup").attr('data-id', data.IndicatorDirSup);
+                            $("#IndicatorDirSup span").html(data.ApelidoIndicatorDirSup);
                             if (data.PinIndicatorDirSup == '0') {
                                 $("#IndicatorDirSup").addClass('hidden');
                             }
                             //IndicatorEsqInf
-                            $(".IndicatorEsqInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#IndicatorEsqInf").attr('data-id', '@(tabuleiro.IndicatorEsqInf)');
-                            $("#IndicatorEsqInf").removeClass('btn-success');
-                            $("#IndicatorEsqInf").removeClass('btn-info');
-
-                            if (data.IndicatorEsqInf == '@idUsuario') {
-                                $("#IndicatorEsqInf").addClass('btn-warning');
-                            } else {
-                                $("#IndicatorEsqInf").addClass('btn-info');
-                            }
+                            $(".IndicatorEsqInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqInf + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#IndicatorEsqInf").attr('data-id', data.IndicatorEsqInf);
+                            $("#IndicatorEsqInf span").html(data.ApelidoIndicatorEsqInf);
                             if (data.pinIndicatorEsqInf == 0) {
                                 $("#IndicatorEsqInf").addClass('hidden');
                             }
                             //IndicatorEsqSup
-                            $(".IndicatorEsqSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#IndicatorEsqSup").attr('data-id', '@(tabuleiro.IndicatorEsqSup)');
-                            $("#IndicatorEsqSup").removeClass('btn-success');
-                            $("#IndicatorEsqSup").removeClass('btn-info');
-
-                            if (data.IndicatorEsqSup == '@idUsuario') {
-                                $("#IndicatorEsqSup").addClass('btn-warning');
-                            } else {
-                                $("#IndicatorEsqSup").addClass('btn-info');
-                            }
+                            $(".IndicatorEsqSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqSup + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#IndicatorEsqSup").attr('data-id', data.IndicatorEsqSup);
+                            $("#IndicatorEsqSup span").html(data.ApelidoIndicatorEsqSup);
                             if (data.PinIndicatorEsqSup == '0') {
                                 $("#IndicatorEsqSup").addClass('hidden');
                             }
                             //DonatorDirInf2
-                            $(".DonatorDirInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorDirInf2").attr('data-id', '@(tabuleiro.DonatorDirInf2)');
-                            $("#DonatorDirInf2").removeClass('btn-success');
-                            $("#DonatorDirInf2").removeClass('btn-info');
-
-                            if (data.DonatorDirInf2 == '@idUsuario') {
-                                $("#DonatorDirInf2").addClass('btn-warning');
-                            } else {
-                                $("#DonatorDirInf2").addClass('btn-info');
-                            }
+                            $(".DonatorDirInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorDirInf2").attr('data-id', data.DonatorDirInf2);
+                            $("#DonatorDirInf2 span").html(data.ApelidoDonatorDirInf2);
                             if (data.pinDonatorDirInf2 == 0) {
                                 $("#DonatorDirInf2").addClass('hidden');
                             }
                             //DonatorDirInf1
-                            $(".DonatorDirInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorDirInf1").attr('data-id', '@(tabuleiro.DonatorDirInf1)');
-                            $("#DonatorDirInf1").removeClass('btn-success');
-                            $("#DonatorDirInf1").removeClass('btn-info');
-
-                            if (data.DonatorDirInf1 == '@idUsuario') {
-                                $("#DonatorDirInf1").addClass('btn-warning');
-                            } else {
-                                $("#DonatorDirInf1").addClass('btn-info');
-                            }
+                            $(".DonatorDirInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorDirInf1").attr('data-id', data.DonatorDirInf1);
+                            $("#DonatorDirInf1 span").html(data.ApelidoDonatorDirInf1);
                             if (data.PinDonatorDirInf1 == '0') {
                                 $("#DonatorDirInf1").addClass('hidden');
                             }
                             //DonatorDirSup2
-                            $(".DonatorDirSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorDirSup2").attr('data-id', '@(tabuleiro.DonatorDirSup2)');
-                            $("#DonatorDirSup2").removeClass('btn-success');
-                            $("#DonatorDirSup2").removeClass('btn-info');
-
-                            if (data.DonatorDirSup2 == '@idUsuario') {
-                                $("#DonatorDirSup2").addClass('btn-warning');
-                            } else {
-                                $("#DonatorDirSup2").addClass('btn-info');
-                            }
+                            $(".DonatorDirSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorDirSup2").attr('data-id', data.DonatorDirSup2);
+                            $("#DonatorDirSup2 span").html(data.ApelidoDonatorDirSup2);
                             if (data.pinDonatorDirSup2 == 0) {
                                 $("#DonatorDirSup2").addClass('hidden');
                             }
                             //DonatorDirSup1
-                            $(".DonatorDirSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorDirSup1").attr('data-id', '@(tabuleiro.DonatorDirSup1)');
-                            $("#DonatorDirSup1").removeClass('btn-success');
-                            $("#DonatorDirSup1").removeClass('btn-info');
-
-                            if (data.DonatorDirSup1 == '@idUsuario') {
-                                $("#DonatorDirSup1").addClass('btn-warning');
-                            } else {
-                                $("#DonatorDirSup1").addClass('btn-info');
-                            }
+                            $(".DonatorDirSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorDirSup1").attr('data-id', data.DonatorDirSup1);
+                            $("#DonatorDirSup1 span").html(data.ApelidoDonatorDirSup1);
                             if (data.PinDonatorDirSup1 == '0') {
                                 $("#DonatorDirSup1").addClass('hidden');
                             }
                             //DonatorEsqInf2
-                            $(".DonatorEsqInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorEsqInf2").attr('data-id', '@(tabuleiro.DonatorEsqInf2)');
-                            $("#DonatorEsqInf2").removeClass('btn-success');
-                            $("#DonatorEsqInf2").removeClass('btn-info');
-
-                            if (data.DonatorEsqInf2 == '@idUsuario') {
-                                $("#DonatorEsqInf2").addClass('btn-warning');
-                            } else {
-                                $("#DonatorEsqInf2").addClass('btn-info');
-                            }
+                            $(".DonatorEsqInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorEsqInf2").attr('data-id', data.DonatorEsqInf2);
+                            $("#DonatorEsqInf2 span").html(data.ApelidoDonatorEsqInf2);
                             if (data.pinDonatorEsqInf2 == 0) {
                                 $("#DonatorEsqInf2").addClass('hidden');
                             }
                             //DonatorEsqInf1
-                            $(".DonatorEsqInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorEsqInf1").attr('data-id', '@(tabuleiro.DonatorEsqInf1)');
-                            $("#DonatorEsqInf1").removeClass('btn-success');
-                            $("#DonatorEsqInf1").removeClass('btn-info');
-
-                            if (data.DonatorEsqInf1 == '@idUsuario') {
-                                $("#DonatorEsqInf1").addClass('btn-warning');
-                            } else {
-                                $("#DonatorEsqInf1").addClass('btn-info');
-                            }
+                            $(".DonatorEsqInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorEsqInf1").attr('data-id', data.DonatorEsqInf1);
+                            $("#DonatorEsqInf1 span").html(data.ApelidoDonatorEsqInf1);
                             if (data.PinDonatorEsqInf1 == '0') {
                                 $("#DonatorEsqInf1").addClass('hidden');
                             }
                             //DonatorEsqSup2
-                            $(".DonatorEsqSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorEsqSup2").attr('data-id', '@(tabuleiro.DonatorEsqSup2)');
-                            $("#DonatorEsqSup2").removeClass('btn-success');
-                            $("#DonatorEsqSup2").removeClass('btn-info');
-
-                            if (data.DonatorEsqSup2 == '@idUsuario') {
-                                $("#DonatorEsqSup2").addClass('btn-warning');
-                            } else {
-                                $("#DonatorEsqSup2").addClass('btn-info');
-                            }
+                            $(".DonatorEsqSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                            $("#DonatorEsqSup2").attr('data-id', data.DonatorEsqSup2);
+                            $("#DonatorEsqSup2 span").html(data.ApelidoDonatorEsqSup2);
                             if (data.pinDonatorEsqSup2 == 0) {
                                 $("#DonatorEsqSup2").addClass('hidden');
                             }
                             //DonatorEsqSup1
-                            $(".DonatorEsqSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + ".png?v=" + @Helpers.Local.Versao))');
-                            $("#DonatorEsqSup1").attr('data-id', '@(tabuleiro.DonatorEsqSup1)');
-                            $("#DonatorEsqSup1").removeClass('btn-success');
+                            $(".DonatorEsqSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
                             $("#DonatorEsqSup1").removeClass('btn-info');
-                            if (data.DonatorEsqSup1 == '@idUsuario') {
-                                $("#DonatorEsqSup1").addClass('btn-warning');
-                            } else {
-                                $("#DonatorEsqSup1").addClass('btn-info');
-                            }
-                            if (data.pinDonatorEsqSup1 == 0) {
+                            $("#DonatorEsqSup1 span").html(data.ApelidoDonatorEsqSup1);
+                            if (data.DonatorEsqSup1 == 0) {
                                 $("#DonatorEsqSup1").addClass('hidden');
-                            } else {
-                                $("#DonatorEsqSup1").removeClass('hidden');
                             }
                         } else {
                             Swal.fire({
@@ -886,7 +802,7 @@
 </div>
 
 <!-- Tabuleiro -->
-<div class="portlet porTabuleiro" style="position: relative; padding: 0; margin:0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;">
+<div id="porTabuleiro" class="portlet" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;">
     <div class="portlet-body">
         <div class="row galaxy" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
             <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
@@ -901,49 +817,49 @@
                 </div>
             </div>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqSup1">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1">
             <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqSup2">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2">
             <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqInf1">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1">
             <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorEsqInf2">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2">
             <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirSup1">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1">
             <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirSup2">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2">
             <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirInf1">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1">
             <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + ".png?v=" + @Helpers.Local.Versao))' class="DonatorDirInf2">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2">
             <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorEsqSup">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup">
             <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorEsqInf">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf">
             <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorDirSup">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup">
             <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + ".png?v=" + @Helpers.Local.Versao))' class="IndicatorDirInf">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf">
             <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + ".png?v=" + @Helpers.Local.Versao))' class="CoordinatorEsq">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq">
             <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + ".png?v=" + @Helpers.Local.Versao))' class="CoordinatorDir">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir">
             <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorDir</span></button>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + ".png?v=" + @Helpers.Local.Versao)' class="Master">
+            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + "x.png?v=" + @Helpers.Local.Versao)' class="Master">
             <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro" ><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoMaster</span></button>
 
         </div>
@@ -975,7 +891,7 @@
         }
     }
 
-    @if (tabuleiroNivelAtivos != null)
+    @if (tabuleiroNivelAtivos != null && totalTabuleiro > 1)
     {
         foreach (var item in tabuleiroNivelAtivos)
         {

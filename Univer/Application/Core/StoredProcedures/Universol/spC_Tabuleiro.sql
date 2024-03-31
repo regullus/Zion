@@ -1,4 +1,4 @@
-use [Univer]
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_Tabuleiro'))
    Drop Procedure spC_Tabuleiro
@@ -29,98 +29,99 @@ BEGIN
        @corTerra nvarchar(100),
        @corSol nvarchar(100)
    
-   Set @CorMercurio = 'grey-gallery'
-   Set @corSaturno = 'green-seagreen'
-   Set @corMarte = 'red-thunderbird'
-   Set @corJupiter = 'purple-seance'
-   Set @corVenus = 'yellow-gold'
-   Set @corUrano = 'blue-steel'
-   Set @corTerra = 'blue-soft'
-   Set @CorSol = 'yellow'
+   Select @CorMercurio = CorTexto From Rede.TabuleiroBoard Where ID = 1
+   Select @corSaturno = CorTexto From Rede.TabuleiroBoard Where ID = 2
+   Select @corMarte = CorTexto From Rede.TabuleiroBoard Where ID = 3
+   Select @corJupiter = CorTexto From Rede.TabuleiroBoard Where ID = 4
+   Select @corVenus = CorTexto From Rede.TabuleiroBoard Where ID = 5
+   Select @corUrano = CorTexto From Rede.TabuleiroBoard Where ID = 6
+   Select @corTerra = CorTexto From Rede.TabuleiroBoard Where ID = 7
+   Select @CorSol = CorTexto From Rede.TabuleiroBoard Where ID = 8
  
-CREATE TABLE #temp
-(
-    ID int NULL,
-    BoardID int NULL,
-    StatusID int NULL,
-    Master int NULL,
-    NomeMaster nvarchar(255) NULL,
-    ApelidoMaster nvarchar(15) NULL,
-    corMaster nvarchar(20),
-    pinMaster int NULL,
-    CoordinatorDir int NULL,
-    NomeCoordinatorDir nvarchar(255) NULL,
-    ApelidoCoordinatorDir nvarchar(15) NULL,
-    corCoordinatorDir nvarchar(20),
-    pinCoordinatorDir int NULL,
-    IndicatorDirSup int NULL,
-    NomeIndicatorDirSup nvarchar(255) NULL,
-    ApelidoIndicatorDirSup nvarchar(15) NULL,
-    corIndicatorDirSup nvarchar(20),
-    pinIndicatorDirSup int NULL,
-    IndicatorDirInf int NULL,
-    NomeIndicatorDirInf nvarchar(255) NULL,
-    ApelidoIndicatorDirInf nvarchar(15) NULL,
-    corIndicatorDirInf nvarchar(20),
-    pinIndicatorDirInf int NULL,
-    DonatorDirSup1 int NULL,
-    NomeDonatorDirSup1 nvarchar(255) NULL,
-    ApelidoDonatorDirSup1 nvarchar(15) NULL,
-    corDonatorDirSup1 nvarchar(20),
-    pinDonatorDirSup1 int NULL,
-    DonatorDirSup2 int NULL,
-    NomeDonatorDirSup2 nvarchar(255) NULL,
-    ApelidoDonatorDirSup2 nvarchar(15) NULL,
-    corDonatorDirSup2 nvarchar(20),
-    pinDonatorDirSup2 int NULL,
-    DonatorDirInf1 int NULL,
-    NomeDonatorDirInf1 nvarchar(255) NULL,
-    ApelidoDonatorDirInf1 nvarchar(15) NULL,
-    corDonatorDirInf1 nvarchar(20),
-    pinDonatorDirInf1 int NULL,
-    DonatorDirInf2 int NULL,
-    NomeDonatorDirInf2 nvarchar(255) NULL,
-    ApelidoDonatorDirInf2 nvarchar(15) NULL,
-    corDonatorDirInf2 nvarchar(20),
-    pinDonatorDirInf2 int NULL,
-    CoordinatorEsq int NULL,
-    NomeCoordinatorEsq nvarchar(255) NULL,
-    ApelidoCoordinatorEsq nvarchar(15) NULL,
-    corCoordinatorEsq nvarchar(20),
-    pinCoordinatorEsq int NULL,
-    IndicatorEsqSup int NULL,
-    NomeIndicatorEsqSup nvarchar(255) NULL,
-    ApelidoIndicatorEsqSup nvarchar(15) NULL,
-    corIndicatorEsqSup nvarchar(20),
-    pinIndicatorEsqSup int NULL,
-    IndicatorEsqInf int NULL,
-    NomeIndicatorEsqInf nvarchar(255) NULL,
-    ApelidoIndicatorEsqInf nvarchar(15) NULL,
-    corIndicatorEsqInf nvarchar(20),
-    pinIndicatorEsqInf int NULL,
-    DonatorEsqSup1 int NULL,
-    NomeDonatorEsqSup1 nvarchar(255) NULL,
-    ApelidoDonatorEsqSup1 nvarchar(15) NULL,
-    corDonatorEsqSup1 nvarchar(20),
-    pinDonatorEsqSup1 int NULL,
-    DonatorEsqSup2 int NULL,
-    NomeDonatorEsqSup2 nvarchar(255) NULL,
-    ApelidoDonatorEsqSup2 nvarchar(15) NULL,
-    corDonatorEsqSup2 nvarchar(20),
-    pinDonatorEsqSup2 int NULL,
-    DonatorEsqInf1 int NULL,
-    NomeDonatorEsqInf1 nvarchar(255) NULL,
-    ApelidoDonatorEsqInf1 nvarchar(15) NULL,
-    corDonatorEsqInf1 nvarchar(20),
-    pinDonatorEsqInf1 int NULL,
-    DonatorEsqInf2 int NULL,
-    NomeDonatorEsqInf2 nvarchar(255) NULL,
-    ApelidoDonatorEsqInf2 nvarchar(15) NULL,
-    corDonatorEsqInf2 nvarchar(20),
-    pinDonatorEsqInf2 int NULL,
-    DataInicio int NULL,
-    DataFim int NULL
-)
+    CREATE TABLE #temp
+    (
+        ID int NULL,
+        BoardID int NULL,
+        StatusID int NULL,
+        Master int NULL,
+        NomeMaster nvarchar(255) NULL,
+        ApelidoMaster nvarchar(15) NULL,
+        corMaster nvarchar(20),
+        pinMaster int NULL,
+        CoordinatorDir int NULL,
+        NomeCoordinatorDir nvarchar(255) NULL,
+        ApelidoCoordinatorDir nvarchar(15) NULL,
+        corCoordinatorDir nvarchar(20),
+        pinCoordinatorDir int NULL,
+        IndicatorDirSup int NULL,
+        NomeIndicatorDirSup nvarchar(255) NULL,
+        ApelidoIndicatorDirSup nvarchar(15) NULL,
+        corIndicatorDirSup nvarchar(20),
+        pinIndicatorDirSup int NULL,
+        IndicatorDirInf int NULL,
+        NomeIndicatorDirInf nvarchar(255) NULL,
+        ApelidoIndicatorDirInf nvarchar(15) NULL,
+        corIndicatorDirInf nvarchar(20),
+        pinIndicatorDirInf int NULL,
+        DonatorDirSup1 int NULL,
+        NomeDonatorDirSup1 nvarchar(255) NULL,
+        ApelidoDonatorDirSup1 nvarchar(15) NULL,
+        corDonatorDirSup1 nvarchar(20),
+        pinDonatorDirSup1 int NULL,
+        DonatorDirSup2 int NULL,
+        NomeDonatorDirSup2 nvarchar(255) NULL,
+        ApelidoDonatorDirSup2 nvarchar(15) NULL,
+        corDonatorDirSup2 nvarchar(20),
+        pinDonatorDirSup2 int NULL,
+        DonatorDirInf1 int NULL,
+        NomeDonatorDirInf1 nvarchar(255) NULL,
+        ApelidoDonatorDirInf1 nvarchar(15) NULL,
+        corDonatorDirInf1 nvarchar(20),
+        pinDonatorDirInf1 int NULL,
+        DonatorDirInf2 int NULL,
+        NomeDonatorDirInf2 nvarchar(255) NULL,
+        ApelidoDonatorDirInf2 nvarchar(15) NULL,
+        corDonatorDirInf2 nvarchar(20),
+        pinDonatorDirInf2 int NULL,
+        CoordinatorEsq int NULL,
+        NomeCoordinatorEsq nvarchar(255) NULL,
+        ApelidoCoordinatorEsq nvarchar(15) NULL,
+        corCoordinatorEsq nvarchar(20),
+        pinCoordinatorEsq int NULL,
+        IndicatorEsqSup int NULL,
+        NomeIndicatorEsqSup nvarchar(255) NULL,
+        ApelidoIndicatorEsqSup nvarchar(15) NULL,
+        corIndicatorEsqSup nvarchar(20),
+        pinIndicatorEsqSup int NULL,
+        IndicatorEsqInf int NULL,
+        NomeIndicatorEsqInf nvarchar(255) NULL,
+        ApelidoIndicatorEsqInf nvarchar(15) NULL,
+        corIndicatorEsqInf nvarchar(20),
+        pinIndicatorEsqInf int NULL,
+        DonatorEsqSup1 int NULL,
+        NomeDonatorEsqSup1 nvarchar(255) NULL,
+        ApelidoDonatorEsqSup1 nvarchar(15) NULL,
+        corDonatorEsqSup1 nvarchar(20),
+        pinDonatorEsqSup1 int NULL,
+        DonatorEsqSup2 int NULL,
+        NomeDonatorEsqSup2 nvarchar(255) NULL,
+        ApelidoDonatorEsqSup2 nvarchar(15) NULL,
+        corDonatorEsqSup2 nvarchar(20),
+        pinDonatorEsqSup2 int NULL,
+        DonatorEsqInf1 int NULL,
+        NomeDonatorEsqInf1 nvarchar(255) NULL,
+        ApelidoDonatorEsqInf1 nvarchar(15) NULL,
+        corDonatorEsqInf1 nvarchar(20),
+        pinDonatorEsqInf1 int NULL,
+        DonatorEsqInf2 int NULL,
+        NomeDonatorEsqInf2 nvarchar(255) NULL,
+        ApelidoDonatorEsqInf2 nvarchar(15) NULL,
+        corDonatorEsqInf2 nvarchar(20),
+        pinDonatorEsqInf2 int NULL,
+        DataInicio int NULL,
+        DataFim int NULL
+    )
+
     Insert Into
         #temp
     SELECT 
@@ -280,14 +281,13 @@ CREATE TABLE #temp
    Update #temp Set pinDonatorEsqInf2=0 Where pinDonatorEsqInf2 is null
 
 -- TESTE
-   Update #temp Set pinMaster=1
-   Update #temp Set pinCoordinatorDir=2
-   Update #temp Set pinIndicatorDirSup=3
-   Update #temp Set pinIndicatorDirInf=4 
-   Update #temp Set pinCoordinatorEsq=5
-   Update #temp Set pinIndicatorEsqSup=6 
-   Update #temp Set pinIndicatorEsqInf=7 
-     
+   --Update #temp Set pinMaster=8
+   --Update #temp Set pinCoordinatorDir=2
+   --Update #temp Set pinIndicatorDirSup=3
+   --Update #temp Set pinIndicatorDirInf=4 
+   --Update #temp Set pinCoordinatorEsq=5
+   --Update #temp Set pinIndicatorEsqSup=6 
+   --Update #temp Set pinIndicatorEsqInf=7 
    
    --Master
    if exists (Select 'Existe' From #temp Where pinMaster = 1) update #temp set corMaster = @corMercurio
