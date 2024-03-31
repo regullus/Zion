@@ -26,6 +26,7 @@ BEGIN
       tn.UsuarioID,
       tn.BoardID,
       boa.Nome as BoardNome,
+      boa.Cor as BoardCor,
       tab.TabuleiroID as TabuleiroID,
       tab.Posicao,
       tn.DataInicio,

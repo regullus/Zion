@@ -42,7 +42,7 @@
         }
     }
     string background = "";
-    if(ViewBag.Background != null )
+    if (ViewBag.Background != null)
     {
         background = ViewBag.Background;
     }
@@ -56,7 +56,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@Helpers.Local.Cliente </title>
     <link rel="icon" type="image/png" href="@Url.Content("~/Content/icons/Sistema/" + Helpers.Local.Sistema + "/favicon-32x32.png")?v=@Helpers.Local.Versao" sizes="32x32">
-    
+
     <link rel="manifest" href="@Url.RouteUrl(HomeControllerRoute.GetManifestJson)">
     <meta name="theme-color" content="#1E1E1E">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" />
@@ -150,7 +150,7 @@
 
             <!-- END RESPONSIVE MENU TOGGLER -->
             <!-- BEGIN PAGE TOP -->
-            <div class="page-top" >
+            <div class="page-top">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <div class="col-md-12">
                     <div class="top-menu">
@@ -175,8 +175,8 @@
                                                     <h3>
                                                         <span class="bold">@avisos.Count</span> @traducaoHelper["AVISOS_NAO_LIDOS"]
                                                     </h3>*@
-                                                        @*<a href="page_user_profile_1.html">view all</a>*@
-                                              @*</li>
+                            @*<a href="page_user_profile_1.html">view all</a>*@
+                            @*</li>
                                                 <li>
                                                     <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
                                                         @foreach (var aviso in avisos)
@@ -296,7 +296,7 @@
                     </div>
                     <hr />
                 }
-                <ul class="page-sidebar-menu   " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+                <ul class="page-sidebar-menu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
                     @if (Request.IsAuthenticated)
                     {
                         if (usuario.Status == Core.Entities.Usuario.TodosStatus.NaoAssociado)
@@ -312,8 +312,10 @@
                     {
                         @Html.Partial("_MenuAnonimo")
                     }
+                    @RenderSection("sideBarExtra", required: false)
                 </ul>
                 <!-- END SIDEBAR MENU -->
+
             </div>
         </div>
         <!-- END SIDEBAR -->
@@ -324,6 +326,7 @@
             </div>
         </div>
         <!-- END CONTENT -->
+
     </div>
     <!-- END CONTAINER -->
     <!-- BEGIN FOOTER -->
@@ -570,7 +573,7 @@
 
             </script>
         }*@
-    
+
 
 </body>
 

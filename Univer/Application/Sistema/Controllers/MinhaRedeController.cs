@@ -427,9 +427,10 @@ namespace Sistema.Controllers
             try
             {
                 ViewBag.RedeTabuleiro = true;
-                ViewBag.height = "100px";
                 ViewBag.width = "100px";
-                ViewBag.txtMaxWidth = "120px";
+                ViewBag.height = "100px";
+
+                ViewBag.txtMaxWidth = "96px";
 
                 int idTabuleiro = 0;
 
@@ -447,6 +448,8 @@ namespace Sistema.Controllers
                     //Obtem o tabuleiro que será exibido quando a pag for carregada
                     idTabuleiro = tabuleiroAtivo.TabuleiroID;
                     ViewBag.idTabuleiro = idTabuleiro;
+                    ViewBag.tabuleiroAtivo = tabuleiroAtivo;
+
                     if (idTabuleiro > 0)
                     {
                         tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro);
@@ -562,7 +565,9 @@ namespace Sistema.Controllers
                     //Não há dados para ser exibido
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_02");
                 }
-
+                tabuleiro.ApelidoCoordinatorDir = "Anakin";
+                tabuleiro.ApelidoCoordinatorEsq = "Luke";
+                tabuleiro.ApelidoMaster = "Hanna";
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = tabuleiro,

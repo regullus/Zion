@@ -12,6 +12,7 @@ namespace Core.Models
         public int UsuarioID { get; set; }
         public int BoardID {  get; set; }
         public string BoardNome { get; set; }
+        public string BoardCor { get; set; }
         public int TabuleiroID { get; set; }
         public string Posicao { get; set; }
         public int DataInicio { get; set; }
