@@ -20,8 +20,8 @@
 }
 
 <div class="box">
-    <h1 class="cor">@traducaoHelper["OBRIGADO_INSCRICAO"]</h1>
-    <span class="label">
+    <h1 class="cor" style="color: #fff;">@traducaoHelper["OBRIGADO_INSCRICAO"]</h1>
+    <span class="label" style="color: #eee;">
         @traducaoHelper["NECESSARIO_REALIZAR_ATIVACAO"]
         <br /><br />
         <a href="@Url.Action("enviar-validacao-email", new { login = Model.Login })" class="button fundo" style="width:800px;">@traducaoHelper["ENVIAR_NOVAMENTE_ATIVACAO"]</a>

@@ -316,8 +316,7 @@ namespace Sistema.Controllers
                         }
 
                         //Verifica se Usuário tem o Termo de Aceite marcado como lido
-                        if (Core.Helpers.ConfiguracaoHelper.GetBoolean("TERMO_ACEITE_ATIVO") &&
-                            WebConfigurationManager.AppSettings["Ambiente"] != "dev")
+                        if (Core.Helpers.ConfiguracaoHelper.GetBoolean("TERMO_ACEITE_ATIVO"))
                         {
                             var termoAceiteChecado = Session["TermoAceiteChecado"] == null ? false : (bool)Session["TermoAceiteChecado"];
 

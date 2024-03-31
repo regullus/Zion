@@ -369,8 +369,6 @@ namespace Sistema.Controllers
 
         public ActionResult Index(string sigla = null)
         {
-            return null;
-
             //id do patrocinador
             string strUser = Request["id"];
 
@@ -431,7 +429,7 @@ namespace Sistema.Controllers
         {
             #region localizacao
 
-            string getIdioma = "pt-BR";
+            string getIdioma = "en-US";
 
             Pais getPais = (Pais)Session["pais"];
 
@@ -652,7 +650,7 @@ namespace Sistema.Controllers
             else
             {
                 DateTime _data;
-                string idioma = "pt-BR";
+                string idioma = "en-US";
 
                 Pais pais = (Pais)Session["pais"];
 
@@ -979,7 +977,10 @@ namespace Sistema.Controllers
             {
                 dtMigracao = App.DateTimeZion;
             }
-
+            if(String.IsNullOrEmpty(strApelido))
+            {
+                strApelido = strLogin;
+            }
             Usuario usuario = new Usuario()
             {
                 Apelido = strApelido,
@@ -1018,61 +1019,61 @@ namespace Sistema.Controllers
             var lstEnderecos = new List<Endereco>();
 
             var endereco = new Endereco();
-            if (estadoID == 0)
+            
+            if (ConfiguracaoHelper.GetBoolean("CADASTRO_SOLICITA_ENDERECO"))
             {
-                endereco.CidadeID = 1;
-                endereco.CodigoPostal = "";
-                endereco.Complemento = "";
-                endereco.Distrito = "";
-                endereco.EstadoID = 1;
-                endereco.Logradouro = "";
-                endereco.Numero = "";
-                endereco.Principal = true;
-            }
-            else
-            {
-                endereco.CidadeID = cidadeID;
-                endereco.CodigoPostal = strCodigoPostal;
-                endereco.Complemento = strComplemento;
-                endereco.Distrito = strDistrito;
-                endereco.EstadoID = estadoID;
-                endereco.Logradouro = strLogradouro;
-                endereco.Numero = strNumero;
-                endereco.Principal = true;
-            }
+                if (estadoID == 0)
+                {
+                    endereco.CidadeID = 1;
+                    endereco.CodigoPostal = "";
+                    endereco.Complemento = "";
+                    endereco.Distrito = "";
+                    endereco.EstadoID = 1;
+                    endereco.Logradouro = "";
+                    endereco.Numero = "";
+                    endereco.Principal = true;
+                }
+                else
+                {
+                    endereco.CidadeID = cidadeID;
+                    endereco.CodigoPostal = strCodigoPostal;
+                    endereco.Complemento = strComplemento;
+                    endereco.Distrito = strDistrito;
+                    endereco.EstadoID = estadoID;
+                    endereco.Logradouro = strLogradouro;
+                    endereco.Numero = strNumero;
+                    endereco.Principal = true;
+                }
 
-            lstEnderecos.Add(endereco);
+                lstEnderecos.Add(endereco);
 
-            var endereco2 = new Endereco();
-            if (estadoID2 > 0)
-            {
-                endereco2.CidadeID = cidadeID2;
-                endereco2.CodigoPostal = strCodigoPostal2;
-                endereco2.Complemento = strComplemento2;
-                endereco2.Distrito = strDistrito2;
-                endereco2.EstadoID = estadoID2;
-                endereco2.Logradouro = strLogradouro2;
-                endereco2.Numero = strNumero2;
-                endereco2.Principal = false;
-                endereco2.Observacoes = strObservacao2;
+                var endereco2 = new Endereco();
+                if (estadoID2 > 0)
+                {
+                    endereco2.CidadeID = cidadeID2;
+                    endereco2.CodigoPostal = strCodigoPostal2;
+                    endereco2.Complemento = strComplemento2;
+                    endereco2.Distrito = strDistrito2;
+                    endereco2.EstadoID = estadoID2;
+                    endereco2.Logradouro = strLogradouro2;
+                    endereco2.Numero = strNumero2;
+                    endereco2.Principal = false;
+                    endereco2.Observacoes = strObservacao2;
 
-                lstEnderecos.Add(endereco2);
-            }
-
-            usuario = usuarioFactory.Criar(usuario, lstEnderecos);
+                    lstEnderecos.Add(endereco2);
+                }
+            } 
 
             try
             {
-                //Caso o tipo de rede seja tabuleiro, inclui usuario no tabuleiro
-                if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
-                {
-                    var tabuleiro = posicaoRepository.IncluiNoTabuleiro(usuario.ID, patrocinador.ID, 1, "Principal");
-                }
+                usuario = usuarioFactory.Criar(usuario, lstEnderecos);
             }
             catch (Exception ex)
             {
-                //logar erro
+                string erro = ex.Message;
+                string xuxa = "";
             }
+            
 
             try
             {
@@ -1125,29 +1126,6 @@ namespace Sistema.Controllers
             }
 
             #endregion
-
-            if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
-            {
-                //Inclui usuario no tabuleiro
-                IEnumerable<Core.Models.TabuleiroInclusao> tabuleiroInclusao = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinador.ID, 1); //1 - Convite
-                String Retorno = "";
-                if(tabuleiroInclusao != null)
-                {
-                    Core.Models.TabuleiroInclusao tabuleiroIncluido = tabuleiroInclusao.FirstOrDefault();
-                    if (tabuleiroIncluido != null)
-                    {
-                        String retorno = tabuleiroIncluido.Retorno;
-                        if (retorno == "NOOK")
-                        {
-                            
-                        }
-                    }
-                        
-                }
-
-
-
-            }
 
             return RedirectToAction("sucesso", new { login = usuario.Login });
         }

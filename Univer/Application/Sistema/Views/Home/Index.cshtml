@@ -13,12 +13,12 @@
 
     #region ViewBags
 
-    ViewBag.Title = "Sistema";
-    ViewBag.Description = "Sistema";
+    
+    ViewBag.Description = traducaoHelper["SISTEMA"];
     ViewBag.Author = "";
     ViewBag.ReferrerMode = ReferrerMode.OriginWhenCrossOrigin;
     ViewBag.TwitterCard = new SummaryLargeImageTwitterCard("");
-    ViewBag.Title = traducaoHelper["DOCUMENTOS"].ToString().ToLower();
+    ViewBag.Title = "home";
     var usuarioContainer = (Sistema.Containers.UsuarioContainer)ViewBag.UsuarioContainer;
     var usuario = usuarioContainer.Usuario;
     Boolean blnExibeBanner = ViewBag.ExibeBanners ?? true;
@@ -235,12 +235,74 @@
 <!-- END PAGE BREADCRUMB -->
 <!-- END PAGE HEADER-->
 <!-- BEGIN PAGE CONTENT-->
-@*<div class="portlet light" style="padding-left: 0; padding-right: 10px; max-width: 1600px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg")) no-repeat center center">*@
-<div class="portlet light" style="padding-left: 0; padding-right: 10px; background-color: transparent; max-width: 1600px;">
+<!-- Header -->
+<div class="portlet solid grey-cararra" style="max-width: 1600px;">
     <div class="portlet-body">
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="row">
+                <div class="column col-md-10">
+                    <div class="page-title">
+                        <h2>@ViewBag.Title</h2>
+                    </div>
+                </div>
+                <div class="column col-md-2">
+                    <div class="page-title">
+                        <span id="minutes" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
+                        <span id="pontos" class="hidden" style="font-size: 18px; font-weight: 500;">:</span>
+                        <span id="seconds" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
+                    </div>
+                </div>
+            </div>
 
-        @if (!ViewBag.RedeTabuleiro)
+            <!-- END PAGE TITLE -->
+        </div>
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="">@ViewBag.Title</a>
+            </li>
+            <li>
+                <a href="" class="txtTitle"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="portlet aba box backWrite grey-gallery">
+
+    <div class="portlet-title">
+        <div class="caption"></div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+        </div>
+        <div class="actions">
+            <a href='#'>&nbsp;</a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+    <div class="portlet-body">
+        @if (usuario.Status == Core.Entities.Usuario.TodosStatus.NaoAssociado)
         {
+            <h3>@traducaoHelper["EMAIL_NAO_CONFIRMADO_1"]</h3>
+            <br/>
+            <h4>@traducaoHelper["EMAIL_NAO_CONFIRMADO_2"]</h4>
+            <h4>@traducaoHelper["EMAIL_NAO_CONFIRMADO_3"]</h4>
+        }
+    </div>
+</div>
+
+
+@*<div class="portlet light" style="padding-left: 0; padding-right: 10px; max-width: 1600px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg")) no-repeat center center">*@
+
+@if (!ViewBag.RedeTabuleiro)
+{
+    <div class="portlet light" style="padding-left: 0; padding-right: 10px; background-color: transparent; max-width: 1600px;">
+        <div class="portlet-body">
             <!--BANNER-->
             <div class="row" style="max-width: 1600px;">
                 @if (blnExibeBanner)
@@ -1207,10 +1269,10 @@
                     </div>
                 }
             </div>
-        }
 
+        </div>
     </div>
-</div>
+}
 <!-- END PAGE CONTENT-->
 
 <script>

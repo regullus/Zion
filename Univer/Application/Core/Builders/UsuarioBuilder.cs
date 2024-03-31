@@ -41,6 +41,7 @@ namespace Core.Builders
 
         public void AdicionarUsuario(Entities.Usuario usuario)
         {
+
             //TODO: Revalidar
             _usuario = usuario;
 
@@ -63,13 +64,40 @@ namespace Core.Builders
             _usuario.GeraBonus = true;
             _usuario.RecebeBonus = true;
 
+            if (_usuario.EntradaID == null)
+            {
+                _usuario.EntradaID = 1;
+            }
+
             _usuario.Complemento = new Entities.Complemento()
             {
                 IsLideranca = false,
                 Login = _usuario.Login
             };
 
-            usuarioRepository.Save(_usuario);
+            try
+            {
+                usuarioRepository.Save(_usuario);
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+            {
+                string strRetErro = "";
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        strRetErro += validationError.PropertyName + ": " + validationError.ErrorMessage + " ";
+                    }
+                }
+                string[] strRetorno = new string[] { strRetErro };
+                throw;
+            }
+            catch (Exception ex)
+            {
+                var xuxa = ex.InnerException.Message;
+                throw;
+            }
+
         }
 
         public void AdicionarEndereco(Entities.Endereco endereco)

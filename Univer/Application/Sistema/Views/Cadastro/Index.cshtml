@@ -18,6 +18,8 @@
     var estados = ViewBag.Estados != null ? (IEnumerable<Core.Entities.Estado>)ViewBag.Estados : null;
     var patrocinador = ViewBag.Patrocianador;
 
+    bool exibeRedeSocial = Core.Helpers.ConfiguracaoHelper.GetBoolean("EXIBE_REDES_SOCIAIS");
+
     #endregion
 
     #region Variaveis
@@ -56,24 +58,24 @@
 
                 if ('@tipoPessoa' === "F") {
                     $('.divSexo').show();
-                    $('.divDocPF').show();
-                    $('.divDocPJ').hide();
+                    //$('.divDocPF').show();
+                    //$('.divDocPJ').hide();
                     @*$("#lblDataNascimento").text("@traducaoHelper["DATA_NASCIMENTO"]");*@
                     $("#DocPJ").text("");
                 } else {
                     $('.divSexo').hide();
-                    $('.divDocPF').hide();
-                    $('.divDocPJ').show();
+                    //$('.divDocPF').hide();
+                    //$('.divDocPJ').show();
                     @*$("#lblDataNascimento").text("@traducaoHelper["DATA_ABERTURA"]");*@
                     $("#DocPF").text("");
                 }
 
-                if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA").Trim().Length' != 0) {
+                @*if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA").Trim().Length' != 0) {
                     $('#DocPF').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA")');
                 }
                 if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CNPJ_ENTRADA").Trim().Length' != 0) {
                     $('#DocPJ').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CNPJ_ENTRADA")');
-                }
+                }*@
 
                 @*if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CELULAR_ENTRADA").Trim().Length' != 0) {
                     $('#Celular').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CELULAR_ENTRADA")');
@@ -81,21 +83,20 @@
                 $('#CodigoPostal').inputmask('99999-999');
                 $('#CodigoPostal2').inputmask('99999-999');*@
 
+                //$("#CidadeID2Input").hide();
+                //$("#CidadeID2Input").focus(ExibirListaCidades2);
+                //$("#CidadeIDInput").hide();
+                //$("#CidadeIDInput").focus(ExibirListaCidades);
 
-                $("#CidadeID2Input").hide();
-                $("#CidadeID2Input").focus(ExibirListaCidades2);
-                $("#CidadeIDInput").hide();
-                $("#CidadeIDInput").focus(ExibirListaCidades);
+                //var codigoPostalValue = $("#CodigoPostal").val();
+                //if (codigoPostalValue != "") {
+                //    CarregaCEP('#CodigoPostal');
+                //}
 
-                var codigoPostalValue = $("#CodigoPostal").val();
-                if (codigoPostalValue != "") {
-                    CarregaCEP('#CodigoPostal');
-                }
-
-                var codigoPostalValue2 = $("#CodigoPostal2").val();
-                if (codigoPostalValue2 != "") {
-                    CarregaCEP('#CodigoPostal2');
-                }
+                //var codigoPostalValue2 = $("#CodigoPostal2").val();
+                //if (codigoPostalValue2 != "") {
+                //    CarregaCEP('#CodigoPostal2');
+                //}
             });
 
             $('#Login').on('keypress', function (event) {
@@ -147,13 +148,13 @@
                 }
             });
 
-            $('#EstadoID').on('change', function (event) {
-                Cidades(1);
-            });
+            //$('#EstadoID').on('change', function (event) {
+            //    Cidades(1);
+            //});
 
-            $('#EstadoID2').on('change', function (event) {
-                Cidades(2);
-            });
+            //$('#EstadoID2').on('change', function (event) {
+            //    Cidades(2);
+            //});
 
         </script>
     }
@@ -178,6 +179,7 @@
         //        foto = Url.Content(usuarioBinder.Foto);
         //    }
         //}
+
         if (String.IsNullOrEmpty(foto))
         {
             foto = Url.Content("~/Content/img/" + (getPatrocinador.Sexo == "M" ? Helpers.Local.Sistema + "/Homem" : Helpers.Local.Sistema + "/Mulher") + ".png");
@@ -323,159 +325,152 @@
 
     <script type="text/javascript">
       //Read
-        $(document).ready(function () {
+    $(document).ready(function () {
 
-         $('#Busca').keyup(function (e) {
-            var code = e.which;
-            if (code == 32 || code == 13 || code == 188 || code == 186) {
-               Buscar();
-            }
-         });
+        $('#Busca').keyup(function (e) {
+        var code = e.which;
+        if (code == 32 || code == 13 || code == 188 || code == 186) {
+            Buscar();
+        }
+        });
 
-         $("#EstadoID").on("change paste keyup", function () {
-            Cidades(1);
-         });
+        $("#EstadoID").on("change paste keyup", function () {
+        Cidades(1);
+        });
 
-         $("#EstadoID2").on("change paste keyup", function () {
-             Cidades(2);
-         });
+        $("#EstadoID2").on("change paste keyup", function () {
+            Cidades(2);
+        });
 
           //Validacao Inicio
 
-             $.validator.addMethod("password", function (value) {
-                return (/[A-Z]/.test(value) && // Maiusucula
+        $.validator.addMethod("password", function (value) {
+        return (/[A-Z]/.test(value) && // Maiusucula
 
-                       /[a-z]/.test(value) && // Minuscula
+                /[a-z]/.test(value) && // Minuscula
 
-                       /\d/.test(value) && // digito
+                /\d/.test(value) && // digito
 
-                       /[!?@@#$%&*()--+=|\\/:.,_;]/.test(value)) // caracteres especiais
+                /[!?@@#$%&*()--+=|\\/:.,_;]/.test(value)) // caracteres especiais
 
-                       || !ViewBag.SenhaComplexa
-                 ;
-             },
-                 $.validator.format('@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]')
-             );
+                || !ViewBag.SenhaComplexa
+            ;
+        },
+            $.validator.format('@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]')
+        );
 
 
-         $('#form-cadastro').validate({
-            errorElement: 'span',
-            rules: {
-               Nome: {
-                  required: true,
-                  minlength: 3
-               },
-               DataNascimento: {
-                  required: true,
-                  remote: '@Url.Action("DataValidar", "cadastro")'
-               },
-               @*Documento: {
-                  required: true,
-                  remote: '@Url.Action("DocumentoValidar", "cadastro")'
-               },*@
-               //EstadoID: 'required',
-               //CidadeID: 'required',
-               //Logradouro: 'required',
-               Celular: {
-                  required: true
-               },
-               Email: {
-                  required: true,
-                  email: true,
-                  remote: '@Url.Action("EmailValidar", "cadastro")'
-               },
-               ConfirmarEmail: {
-                  equalTo: '#Email'
-               },
-               Login: {
-                  required: true,
-                  minlength: 3,
-                  remote: '@Url.Action("LoginValidar", "cadastro")'
-               },
-               Senha: {
-                  required: true,
-                  minlength: 6,
-                  password: true
-               },
-               ConfirmarSenha: {
-                  equalTo: '#Senha'
-               },
-               Observacoes2: {
-                   required: true
-               },
-               Numero2: {
-                   required: true
-               }
+        $('#form-cadastro').validate({
+        errorElement: 'span',
+        rules: {
+            Nome: {
+                required: true,
+                minlength: 3
             },
-            messages: {
-               Nome: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]'
-               },
-               DataNascimento: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  remote: '@traducaoHelper["DATA_INVALIDA"]'
-               },
-               @*Documento: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  remote: 'CPF em uso'
-               },*@
-               @*EstadoID: '@traducaoHelper["CAMPO_REQUERIDO"]',
-               CidadeID: '@traducaoHelper["CAMPO_REQUERIDO"]',
-               Logradouro: '@traducaoHelper["CAMPO_REQUERIDO"]',*@
-               Celular: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]'
-               },
-               Email: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
-                  remote: '@traducaoHelper["EMAIL_EM_USO"]'
-               },
-               ConfirmarEmail: {
-                  email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
-                  equalTo: '@traducaoHelper["DIGITE_MESMO_EMAIL"]'
-               },
-               Login: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]',
-                  remote: '@traducaoHelper["LOGIN_EM_USO"]'
-               },
-               Senha: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  minlength: '@traducaoHelper["SENHA_DEVE_CONTER_6_CARACTERES"]',
-                  password: '@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]'
-               },
-               ConfirmarSenha: {
-                  equalTo: '@traducaoHelper["DIGITE_MESMA_SENHA"]',
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]',
-                  minlength: '@traducaoHelper["SENHA_DEVE_CONTER_6_CARACTERES"]',
-                  password: '@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]'
-               },
-               Observacoes2: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]'
-               },
-               Numero2: {
-                  required: '@traducaoHelper["CAMPO_REQUERIDO"]'
-               }
+            DataNascimento: {
+                required: true,
+                remote: '@Url.Action("DataValidar", "cadastro")'
             },
-            errorPlacement: function (error, element) {
-               error.addClass("help-block");
-               error.insertAfter(element);
+            @*Documento: {
+                required: true,
+                remote: '@Url.Action("DocumentoValidar", "cadastro")'
+            },*@
+            //EstadoID: 'required',
+            //CidadeID: 'required',
+            //Logradouro: 'required',
+            Celular: {
+                required: true
+            },
+            Email: {
+                required: true,
+                email: true,
+                remote: '@Url.Action("EmailValidar", "cadastro")'
+            },
+            ConfirmarEmail: {
+                equalTo: '#Email'
+            },
+            Login: {
+                required: true,
+                minlength: 3,
+                remote: '@Url.Action("LoginValidar", "cadastro")'
+            },
+            Senha: {
+                required: true,
+                minlength: 6,
+                password: true
+            },
+            ConfirmarSenha: {
+                equalTo: '#Senha'
+            },
+            Observacoes2: {
+                required: true
+            },
+            Numero2: {
+                required: true
             }
+        },
+        messages: {
+            Nome: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]'
+            },
+            DataNascimento: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                remote: '@traducaoHelper["DATA_INVALIDA"]'
+            },
+            @*Documento: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                remote: 'CPF em uso'
+            },*@
+            @*EstadoID: '@traducaoHelper["CAMPO_REQUERIDO"]',
+            CidadeID: '@traducaoHelper["CAMPO_REQUERIDO"]',
+            Logradouro: '@traducaoHelper["CAMPO_REQUERIDO"]',*@
+            Celular: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]'
+            },
+            Email: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
+                remote: '@traducaoHelper["EMAIL_EM_USO"]'
+            },
+            ConfirmarEmail: {
+                email: '@traducaoHelper["DIGITE_EMAIL_VALIDO"]',
+                equalTo: '@traducaoHelper["DIGITE_MESMO_EMAIL"]'
+            },
+            Login: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                minlength: '@traducaoHelper["MINIMO_3_CARACTERES"]',
+                remote: '@traducaoHelper["LOGIN_EM_USO"]'
+            },
+            Senha: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                minlength: '@traducaoHelper["SENHA_DEVE_CONTER_6_CARACTERES"]',
+                password: '@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]'
+            },
+            ConfirmarSenha: {
+                equalTo: '@traducaoHelper["DIGITE_MESMA_SENHA"]',
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]',
+                minlength: '@traducaoHelper["SENHA_DEVE_CONTER_6_CARACTERES"]',
+                password: '@traducaoHelper["SENHA_DEVE_CONTER_LETRA_NUMERO"]'
+            },
+            Observacoes2: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]'
+            },
+            Numero2: {
+                required: '@traducaoHelper["CAMPO_REQUERIDO"]'
+            }
+        },
+        errorPlacement: function (error, element) {
+            error.addClass("help-block");
+            error.insertAfter(element);
+        }
 
-         });
-         //Validacao Fim
+        });
+        //Validacao Fim
 
       });
 
       //fim Read
-    </script>
-
-    <script>
-        $('#Observacoes2').mouseenter(function () {
-            $('#Observacoes2').tooltip({ 'title': 'Preencha detalhes de quem pode receber na sua ausência' });
-        });
-
     </script>
 
     @if (@cepBuscaEndereco == true)
@@ -1135,17 +1130,13 @@
                                         <div class="row">
 
                                             <div class="col-md-12">
-
-
                                                 @if (Helpers.Local.Ambiente != "dev" && Core.Helpers.ConfiguracaoHelper.GetBoolean("RECAPTCHA_CADASTRO_ATIVO"))
                                                 {
                                                     <div class="form-group">
                                                         <div class="g-recaptcha" data-sitekey="@captchaKey"></div>
                                                     </div>
                                                 }
-
                                             </div>
-
                                         </div>
 
                                         <div class="row">
@@ -1168,7 +1159,7 @@
                         </div>
                     </div>
 
-                    @if (@Core.Helpers.ConfiguracaoHelper.GetString("EXIBE_REDES_SOCIAIS") == "true")
+                    @if (exibeRedeSocial)
                     {
                         <div class="row padding-0 margem-0 padding-top-20">
                             <div class="col-md-12 well bg-blue-hoki">
