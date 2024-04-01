@@ -1,4 +1,4 @@
-use UniverDev
+use Univer
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spG_Tabuleiro'))
    Drop Procedure spG_Tabuleiro
@@ -670,7 +670,7 @@ Begin
                      Insert Into Rede.TabuleiroUsuario
                      (
                         UsuarioID,
-	                     TabuleiroID,
+                        TabuleiroID,
                         BoardID,
                         StatusID,
                         MasterID,
@@ -678,8 +678,8 @@ Begin
                         Posicao,
                         PagoMaster,
                         PagoSistema,
-	                     DataInicio,
-	                     DataFim
+                        DataInicio,
+                        DataFim
                      ) 
                      Values 
                      (
@@ -692,7 +692,7 @@ Begin
                         @PosicaoFilho,
                         'false',
                         'False',
-                        @DataInicio,
+                        GetDate(),
                         null
                      )
 
@@ -1042,10 +1042,10 @@ Begin
                   From 
                      Rede.TabuleiroUsuario
                   Where
-                        UsuarioID = @Master and 
-                        TabuleiroID = @ID and 
-                        BoardID = @BoardID and
-                        StatusID = 1
+                     UsuarioID = @Master and 
+                     TabuleiroID = @ID and 
+                     BoardID = @BoardID and
+                     StatusID = 1
 
                   --Caso não encontre um Pai obtem o primeiro pai disponivel
                   if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
@@ -1118,7 +1118,7 @@ Begin
                      Insert Into Rede.TabuleiroUsuario
                      (
                         UsuarioID,
-	                     TabuleiroID,
+	                    TabuleiroID,
                         BoardID,
                         StatusID,
                         MasterID,
@@ -1126,8 +1126,8 @@ Begin
                         Posicao,
                         PagoMaster,
                         PagoSistema,
-	                     DataInicio,
-	                     DataFim
+	                    DataInicio,
+	                    DataFim
                      ) 
                      Values 
                      (
@@ -1140,7 +1140,7 @@ Begin
                         Coalesce(@PosicaoFilho,@PosicaoFilho,'1'),
                         'false',
                         'False',
-                        @DataInicio,
+                        GetDate(),
                         null
                      )
 
@@ -1250,7 +1250,7 @@ Begin
                Insert Into Rede.TabuleiroUsuario
                (
                   UsuarioID,
-	               TabuleiroID,
+	              TabuleiroID,
                   BoardID,
                   StatusID,
                   MasterID,
@@ -1258,8 +1258,8 @@ Begin
                   Posicao,
                   PagoMaster,
                   PagoSistema,
-	               DataInicio,
-	               DataFim
+	              DataInicio,
+	              DataFim
                ) 
                Values 
                (
@@ -1272,7 +1272,7 @@ Begin
                   'Master',
                   'false',
                   'False',
-                  @DataInicio,
+                  GetDate(),
                   null
                )
 

@@ -1,4 +1,4 @@
-use UniverDev
+use Univer
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_Tabuleiro'))
    Drop Procedure spC_Tabuleiro
@@ -279,15 +279,6 @@ BEGIN
    Update #temp Set pinDonatorEsqSup2=0 Where pinDonatorEsqSup2 is null
    Update #temp Set pinDonatorEsqInf1=0 Where pinDonatorEsqInf1 is null
    Update #temp Set pinDonatorEsqInf2=0 Where pinDonatorEsqInf2 is null
-
--- TESTE
-   --Update #temp Set pinMaster=8
-   --Update #temp Set pinCoordinatorDir=2
-   --Update #temp Set pinIndicatorDirSup=3
-   --Update #temp Set pinIndicatorDirInf=4 
-   --Update #temp Set pinCoordinatorEsq=5
-   --Update #temp Set pinIndicatorEsqSup=6 
-   --Update #temp Set pinIndicatorEsqInf=7 
    
    --Master
    if exists (Select 'Existe' From #temp Where pinMaster = 1) update #temp set corMaster = @corMercurio

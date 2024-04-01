@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Net;
 using Fluentx;
+using System.Globalization;
 
 
 #endregion
@@ -427,7 +428,7 @@ namespace Sistema.Controllers
             try
             {
                 ViewBag.RedeTabuleiro = true;
-                int idTabuleiro = 0;
+                int idTabuleiro = 1;
 
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
@@ -436,6 +437,36 @@ namespace Sistema.Controllers
                 ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
 
                 Core.Models.TabuleiroModel tabuleiro = null;
+
+                Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, idTabuleiro);
+
+                ViewBag.Timer = null;
+                if (tabuleiroUsuario != null)
+                {
+                    int tempo = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_PAGAMENTO");
+                    if(tempo == 0)
+                    {
+                        tempo = 15;
+                    }
+                    DateTime timePagamento = tabuleiroUsuario.DataInicio.AddMinutes(tempo);
+
+                    //string s = DateTime.ParseExact("2010-01-01 23:00:00", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+                    //Console.WriteLine(s.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    if (timePagamento > DateTime.Now)
+                    {
+                        //Format: '03/30/2024 17:59:00'
+                        ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempo).ToString("MM/dd/yyyy HH:mm:ss");
+                    }
+                    else
+                    {
+                        ViewBag.Timer = null;
+                    }
+                } 
+
+                ViewBag.idTabuleiro = 0;
+                ViewBag.tabuleiroAtivo = null;
 
                 if (tabuleirosNivelAtivos.Count() > 0)
                 {
@@ -454,7 +485,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("login", "Account", new { strPopupTitle = "Erro", strPopupMessage = ex.Message, Sair = "true" });
+                return RedirectToAction("Index", "Home", new { strPopupTitle = "Erro", strPopupMessage = ex.Message, Sair = "true" });
             }
 
             return View();
@@ -565,6 +596,63 @@ namespace Sistema.Controllers
                 {
                     Data = tabuleiro,
                     RecursionLimit = 1000 
+                };
+
+                return jsonResult;
+
+            }
+            catch (Exception)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult GetInvite(string usuarioID, string tabuleiroID, string token)
+        {
+            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idTabuleiro = int.Parse(tabuleiroID);
+                
+                //Seta para primeiro tabuleiro caso seja 0
+                if (idTabuleiro == 0)
+                {
+                    idTabuleiro = 1;
+                }
+
+                if (idUsuario <= 0 || idTabuleiro <= 0)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                if (token != tokenLocal)
+                {
+                    //Devolve que tokem é invalido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                }
+
+                //Caso não exista o patrocionador usa o usuario 2580 que é o primeiro alvo Veja a tabela usuario.usuario
+                int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
+
+                //Inclui usuario no novo tabuleiro
+                var tabuleiro = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idTabuleiro);
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = "OK",
+                    RecursionLimit = 1000
                 };
 
                 return jsonResult;

@@ -72,6 +72,12 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public TabuleiroUsuarioModel ObtemTabuleiroUsuario(int idUsuario, int idTabuleiro)
+        {
+            string sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).FirstOrDefault();
 
+            return retorno;
+        }
     }
 }

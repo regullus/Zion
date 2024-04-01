@@ -71,418 +71,6 @@
             position();
         });
 
-        function startPage() {
-            $("#tab_select").addClass('@tabuleiroAtivo.BoardCor');
-            $("#tab_select_name").html('@(traducaoHelper[tabuleiroAtivo.BoardNome])');
-            $("#tab_select_position").html('@traducaoHelper[tabuleiroAtivo.Posicao]');
-            $("#tab_select_img").attr("src", '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)');
-        }
-
-        function position() {
-            var position = $('.porTabuleiro').offset();
-            //var positionMenu = $('.page-sidebar-menu').width();
-
-            $(".txtTitle").html(width);
-
-            $('#porTabuleiro').css({
-                "width": "980px",
-                "height": "680px",
-                "overflow": "visible",
-                "overflow-y": "visible",
-            });
-
-            $('.galaxy').css({
-                "width": "980px",
-                "height": "680px",
-            });
-
-            var alinhaTxtTop = 90;
-            var alinhaTxtLeft = 51;
-
-            var ajustTop = -50;
-            var ajustLeft = -46;
-
-            //width > 1200
-            var xDonatorEsqSup1Top = 10;
-            var yDonatorEsqSup1Left = 240;
-            var xDonatorEsqSup2Top = 130;
-            var yDonatorEsqSup2Left = 60;
-            var xDonatorEsqInf1Top = 350;
-            var yDonatorEsqInf1Left = 160;
-            var xDonatorEsqInf2Top = 570;
-            var yDonatorEsqInf2Left = 280;
-
-            var xDonatorDirSup1Top = 30;
-            var yDonatorDirSup1Left = 660;
-            var xDonatorDirSup2Top = 250;
-            var yDonatorDirSup2Left = 760;
-            var xDonatorDirInf1Top = 420;
-            var yDonatorDirInf1Left = 810;
-            var xDonatorDirInf2Top =  540;
-            var yDonatorDirInf2Left = 680;
-
-            var xIndicatorEsqSupTop = 170;
-            var yIndicatorEsqSupLeft = 250;
-            var xIndicatorEsqInfTop = 440;
-            var yIndicatorEsqInfLeft = 320;
-            var xIndicatorDirSupTop = 140;
-            var xIndicatorDirSupLeft = 590;
-            var xIndicatorDirInfTop = 410;
-            var xIndicatorDirInfLeft = 660;
-
-            var xCoordinatorEsqTop = 300;
-            var yCoordinatorEsqLeft = 270;
-            var xCoordinatorDirTop = 300;
-            var yCoordinatorDirLeft = 580;
-
-            var xMasterTop = 290;
-            var yMasterLeft = 420;
-
-            //0
-            //1 - 0
-            if (width > 1170 && width <= 1200) {
-                $('#porTabuleiro').css({
-                    "width": "900px",
-                    "height": "680px",
-                    "overflow": "visible",
-                    "overflow-y": "visible",
-                });
-                $('.galaxy').css({
-                    "width": "900px",
-                    "height": "680px",
-                });
-
-                ajustLeft = -86;
-            }
-
-            //2 - 0
-            if (width > 991 && width <= 1170) {
-                $('.porTabuleiro').css({
-                    "width": "720px",
-                    "height": "680px",
-                });
-                $('.galaxy').css({
-                    "width": "720px",
-                    "height": "680px",
-                });
-                xDonatorEsqSup1Top = 40;
-                yDonatorEsqSup1Left = 340;
-                xDonatorEsqSup2Top = 160;
-                yDonatorEsqSup2Left = 120;
-                xDonatorDirSup2Top = 220;
-                yDonatorDirSup2Left = 710;
-                xIndicatorDirInfTop = 460;
-                xIndicatorDirInfLeft = 580;
-                xDonatorDirInf1Top = 400;
-                yDonatorDirInf1Left = 700;
-                ajustLeft = -176;
-            }
-
-            //0 - 0
-            if (width > 961 && width <= 991) {
-                $('#porTabuleiro').css({
-                    "width": "980px",
-                    "height": "680px",
-                    "overflow": "visible",
-                    "overflow-y": "visible",
-                });
-                $('.galaxy').css({
-                    "width": "980px",
-                    "height": "680px",
-                });
-            }
-
-            //1 - 1
-            if (width > 931 && width <= 961) {
-                $('.porTabuleiro').css({
-                    "width": "900px",
-                    "height": "680px",
-                });
-                $('.galaxy').css({
-                    "width": "900px",
-                    "height": "680px",
-                });
-                ajustLeft = -86;
-            }
-
-            //2 - 1
-            if (width > 752 && width <= 931) {
-                $('#porTabuleiro').css({
-                    "width": "720px",
-                    "height": "680px",
-                    "overflow": "visible",
-                    "overflow-y": "visible",
-                });
-                $('.galaxy').css({
-                    "width": "720px",
-                    "height": "680px",
-                });
-                xDonatorEsqSup1Top = 40;
-                yDonatorEsqSup1Left = 340;
-                xDonatorEsqSup2Top = 160;
-                yDonatorEsqSup2Left = 120;
-                xDonatorDirSup2Top = 220;
-                yDonatorDirSup2Left = 710;
-                xIndicatorDirInfTop = 460;
-                xIndicatorDirInfLeft = 580;
-                xDonatorDirInf1Top = 400;
-                yDonatorDirInf1Left = 700;
-                ajustLeft = -170;
-            }
-
-            //3 - 1
-            if (width > 580 && width <= 752) {
-                $('.porTabuleiro').css({
-                    "width": "580px",
-                    "height": "780px",
-                });
-                $('.galaxy').css({
-                    "width": "580px",
-                    "height": "780px",
-                });
-
-                xIndicatorDirSupTop = 140;
-                xIndicatorDirSupLeft = 520;
-                xIndicatorDirInfTop = 440;
-                xIndicatorDirInfLeft = 600;
-
-                xIndicatorEsqSupTop = 110;
-                yIndicatorEsqSupLeft = 280;
-                xIndicatorEsqInfTop = 440;
-                yIndicatorEsqInfLeft = 320;
-
-                xDonatorDirSup1Top = 0;
-                yDonatorDirSup1Left = 500;
-                xDonatorDirSup2Top = 60;
-                yDonatorDirSup2Left = 640;
-
-                xDonatorDirInf1Top = 550;
-                yDonatorDirInf1Left = 650;
-                xDonatorDirInf2Top = 540;
-                yDonatorDirInf2Left = 480;
-
-                xDonatorEsqSup1Top = 30;
-                yDonatorEsqSup1Left = 370;
-                xDonatorEsqSup2Top = 200;
-                yDonatorEsqSup2Left = 190;
-
-                xDonatorEsqInf1Top = 390;
-                yDonatorEsqInf1Left = 190;
-
-                xDonatorEsqInf2Top = 570;
-                yDonatorEsqInf2Left = 280;
-
-                ajustLeft = -246;
-                ajustTop = 0;
-
-            }
-
-            //3 - 1
-            if (width > 0 && width <= 580) {
-                $('#porTabuleiro').css({
-                    "width": "450px",
-                    "height": "1030px",
-                    "overflow": "auto",
-                    "overflow-y": "hidden",
-                });
-                $('.galaxy').css({
-                    "width": "450px",
-                    "height": "1030px",
-                });
-                //overflow: auto; overflow-y: hidden;
-                //$('.porTabuleiro').css("overflow", "auto");
-                //$('#porTabuleiro').css("overflow-y", "hidden");
-
-                //$(".porTabuleiro").attr("style", "position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;");
-                
-                //Deckard
-                xCoordinatorEsqTop = 160;
-                yCoordinatorEsqLeft = 500;
-
-                //Han
-                xCoordinatorDirTop = 420;
-                yCoordinatorDirLeft = 400;
-
-                //Richard
-                xIndicatorDirSupTop = 520;
-                xIndicatorDirSupLeft = 500;
-                //Brook
-                xIndicatorDirInfTop = 590;
-                xIndicatorDirInfLeft = 300;
-
-                //Allie
-                xIndicatorEsqSupTop = 10;
-                yIndicatorEsqSupLeft = 560;
-                //John
-                xIndicatorEsqInfTop = 110;
-                yIndicatorEsqInfLeft = 360;
-
-                //Brook
-                xDonatorDirSup1Top = 460;
-                yDonatorDirSup1Left = 260;
-                xDonatorDirSup2Top = 720;
-                yDonatorDirSup2Left = 320;
-
-                //Richard
-                xDonatorDirInf1Top = 400;
-                yDonatorDirInf1Left = 580;
-                xDonatorDirInf2Top = 640;
-                yDonatorDirInf2Left = 480;
-
-                //Allie
-                xDonatorEsqSup1Top = -130;
-                yDonatorEsqSup1Left = 570;
-                xDonatorEsqSup2Top = -40;
-                yDonatorEsqSup2Left = 430;
-
-                //John
-                xDonatorEsqInf1Top = 0;
-                yDonatorEsqInf1Left = 290;
-
-                xDonatorEsqInf2Top = 230;
-                yDonatorEsqInf2Left = 260;
-
-                ajustLeft = -310;
-                ajustTop = 124;
-            } 
-
-            var posDonatorEsqSup1Top = ajustTop + xDonatorEsqSup1Top;
-            var posDonatorEsqSup1Left = ajustLeft + yDonatorEsqSup1Left;
-            var posTxtDonatorEsqSup1Top = posDonatorEsqSup1Top + alinhaTxtTop;
-            var posTxtDonatorEsqSup1Left = posDonatorEsqSup1Left + alinhaTxtLeft;
-
-            var posDonatorEsqSup2Top = ajustTop + xDonatorEsqSup2Top;
-            var posDonatorEsqSup2Left = ajustLeft + yDonatorEsqSup2Left;
-            var posTxtDonatorEsqSup2Top = posDonatorEsqSup2Top + alinhaTxtTop;
-            var posTxtDonatorEsqSup2Left = posDonatorEsqSup2Left + alinhaTxtLeft;
-
-            var posDonatorEsqInf1Top = ajustTop + xDonatorEsqInf1Top;
-            var posDonatorEsqInf1Left = ajustLeft + yDonatorEsqInf1Left;
-            var posTxtDonatorEsqInf1Top = posDonatorEsqInf1Top + alinhaTxtTop;
-            var posTxtDonatorEsqInf1Left = posDonatorEsqInf1Left + alinhaTxtLeft;
-
-            var posDonatorEsqInf2Top = ajustTop + xDonatorEsqInf2Top;
-            var posDonatorEsqInf2Left = ajustLeft + yDonatorEsqInf2Left;
-            var posTxtDonatorEsqInf2Top = posDonatorEsqInf2Top + alinhaTxtTop;
-            var posTxtDonatorEsqInf2Left = posDonatorEsqInf2Left + alinhaTxtLeft;
-
-            var posDonatorDirSup1Top = ajustTop + xDonatorDirSup1Top;
-            var posDonatorDirSup1Left = ajustLeft + yDonatorDirSup1Left;
-            var posTxtDonatorDirSup1Top = posDonatorDirSup1Top + alinhaTxtTop;
-            var posTxtDonatorDirSup1Left = posDonatorDirSup1Left + alinhaTxtLeft;
-
-            var posDonatorDirSup2Top = ajustTop + xDonatorDirSup2Top;
-            var posDonatorDirSup2Left = ajustLeft + yDonatorDirSup2Left;
-            var posTxtDonatorDirSup2Top = posDonatorDirSup2Top + alinhaTxtTop;
-            var posTxtDonatorDirSup2Left = posDonatorDirSup2Left + alinhaTxtLeft;
-
-            var posDonatorDirInf1Top = ajustTop + xDonatorDirInf1Top;
-            var posDonatorDirInf1Left = ajustLeft + yDonatorDirInf1Left;
-            var posTxtDonatorDirInf1Top = posDonatorDirInf1Top + alinhaTxtTop;
-            var posTxtDonatorDirInf1Left = posDonatorDirInf1Left + alinhaTxtLeft;
-
-            var posDonatorDirInf2Top = ajustTop + xDonatorDirInf2Top;
-            var posDonatorDirInf2Left = ajustLeft + yDonatorDirInf2Left;
-            var posTxtDonatorDirInf2Top = posDonatorDirInf2Top + alinhaTxtTop;
-            var posTxtDonatorDirInf2Left = posDonatorDirInf2Left + alinhaTxtLeft;
-
-            var posIndicatorEsqSupTop = ajustTop + xIndicatorEsqSupTop;
-            var posIndicatorEsqSupLeft = ajustLeft + yIndicatorEsqSupLeft;
-            var posTxtIndicatorEsqSupTop = posIndicatorEsqSupTop + alinhaTxtTop;
-            var posTxtIndicatorEsqSupLeft = posIndicatorEsqSupLeft + alinhaTxtLeft;
-
-            var posIndicatorEsqInfTop = ajustTop + xIndicatorEsqInfTop;
-            var posIndicatorEsqInfLeft = ajustLeft + yIndicatorEsqInfLeft;
-            var posTxtIndicatorEsqInfTop = posIndicatorEsqInfTop + alinhaTxtTop;
-            var posTxtIndicatorEsqInfLeft = posIndicatorEsqInfLeft + alinhaTxtLeft;
-
-            var posIndicatorDirSupTop = ajustTop + xIndicatorDirSupTop;
-            var posIndicatorDirSupLeft = ajustLeft + xIndicatorDirSupLeft;
-            var posTxtIndicatorDirSupTop = posIndicatorDirSupTop + alinhaTxtTop;
-            var posTxtIndicatorDirSupLeft = posIndicatorDirSupLeft + alinhaTxtLeft;
-
-            var posIndicatorDirInfTop = ajustTop + xIndicatorDirInfTop;
-            var posIndicatorDirInfLeft = ajustLeft + xIndicatorDirInfLeft;
-            var posTxtIndicatorDirInfTop = posIndicatorDirInfTop + alinhaTxtTop;
-            var posTxtIndicatorDirInfLeft = posIndicatorDirInfLeft + alinhaTxtLeft;
-
-            var posCoordinatorEsqTop = ajustTop + xCoordinatorEsqTop;
-            var posCoordinatorEsqLeft = ajustLeft + yCoordinatorEsqLeft;
-            var posTxtCoordinatorEsqTop = posCoordinatorEsqTop + alinhaTxtTop;
-            var posTxtCoordinatorEsqLeft = posCoordinatorEsqLeft + alinhaTxtLeft;
-
-            var posCoordinatorDirTop = ajustTop + xCoordinatorDirTop;
-            var posCoordinatorDirLeft = ajustLeft + yCoordinatorDirLeft;
-            var posTxtCoordinatorDirTop = posCoordinatorDirTop + alinhaTxtTop;
-            var posTxtCoordinatorDirLeft = posCoordinatorDirLeft + alinhaTxtLeft;
-
-            var posMasterTop = ajustTop + xMasterTop;
-            var posMasterLeft = ajustLeft + yMasterLeft;
-            var posTxtMasterTop = posMasterTop + alinhaTxtTop;
-            var posTxtMasterLeft = posMasterLeft + alinhaTxtLeft;
-
-            $('.DonatorEsqSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup1Top + 'px; left: ' + posDonatorEsqSup1Left + 'px;');
-            $('#DonatorEsqSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px; border: 2px solid #fff;');
-            $('#DonatorEsqSup1').addClass('@tabuleiro.corDonatorEsqSup1');
-
-            $('.DonatorEsqSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup2Top + 'px; left: ' + posDonatorEsqSup2Left + 'px;');
-            $('#DonatorEsqSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup2Top + 'px; left: ' + posTxtDonatorEsqSup2Left + 'px; border: 2px solid #fff;');
-            $('#DonatorEsqSup2').addClass('@tabuleiro.corDonatorEsqSup2');
-
-            $('.DonatorEsqInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf1Top + 'px; left: ' + posDonatorEsqInf1Left + 'px;');
-            $('#DonatorEsqInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf1Top + 'px; left: ' + posTxtDonatorEsqInf1Left + 'px; border: 2px solid #fff;');
-            $('#DonatorEsqInf1').addClass('@tabuleiro.corDonatorEsqInf1');
-
-            $('.DonatorEsqInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf2Top + 'px; left: ' + posDonatorEsqInf2Left + 'px;');
-            $('#DonatorEsqInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf2Top + 'px; left: ' + posTxtDonatorEsqInf2Left + 'px; border: 2px solid #fff;');
-            $('#DonatorEsqInf2').addClass('@tabuleiro.corDonatorEsqInf2');
-
-            $('.DonatorDirSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup1Top + 'px; left: ' + posDonatorDirSup1Left + 'px;');
-            $('#DonatorDirSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup1Top + 'px; left: ' + posTxtDonatorDirSup1Left + 'px; border: 2px solid #fff;');
-            $('#DonatorDirSup1').addClass('@tabuleiro.corDonatorDirSup1');
-
-            $('.DonatorDirSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup2Top + 'px; left: ' + posDonatorDirSup2Left + 'px;');
-            $('#DonatorDirSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup2Top + 'px; left: ' + posTxtDonatorDirSup2Left + 'px; border: 2px solid #fff;');
-            $('#DonatorDirSup2').addClass('@tabuleiro.corDonatorDirSup2');
-
-            $('.DonatorDirInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf1Top + 'px; left: ' + posDonatorDirInf1Left + 'px;');
-            $('#DonatorDirInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf1Top + 'px; left: ' + posTxtDonatorDirInf1Left + 'px; border: 2px solid #fff;');
-            $('#DonatorDirInf1').addClass('@tabuleiro.corDonatorDirInf1');
-
-            $('.DonatorDirInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf2Top + 'px; left: ' + posDonatorDirInf2Left + 'px;');
-            $('#DonatorDirInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf2Top + 'px; left: ' + posTxtDonatorDirInf2Left + 'px; border: 2px solid #fff;');
-            $('#DonatorDirInf2').addClass('@tabuleiro.corDonatorDirInf2');
-
-            $('.IndicatorEsqSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqSupTop + 'px; left: ' + posIndicatorEsqSupLeft + 'px;');
-            $('#IndicatorEsqSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqSupTop + 'px; left: ' + posTxtIndicatorEsqSupLeft + 'px; border: 2px solid #fff;');
-            $('#IndicatorEsqSup').addClass('@tabuleiro.corIndicatorEsqSup');
-
-            $('.IndicatorEsqInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqInfTop + 'px; left: ' + posIndicatorEsqInfLeft + 'px;');
-            $('#IndicatorEsqInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqInfTop + 'px; left: ' + posTxtIndicatorEsqInfLeft + 'px; border: 2px solid #fff;');
-            $('#IndicatorEsqInf').addClass('@tabuleiro.corIndicatorEsqInf');
-
-            $('.IndicatorDirSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirSupTop + 'px; left: ' + posIndicatorDirSupLeft + 'px;');
-            $('#IndicatorDirSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirSupTop + 'px; left: ' + posTxtIndicatorDirSupLeft + 'px; border: 2px solid #fff;');
-            $('#IndicatorDirSup').addClass('@tabuleiro.corIndicatorDirSup');
-
-            $('.IndicatorDirInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirInfTop + 'px; left: ' + posIndicatorDirInfLeft + 'px;');
-            $('#IndicatorDirInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirInfTop + 'px; left: ' + posTxtIndicatorDirInfLeft + 'px; border: 2px solid #fff;');
-            $('#IndicatorDirInf').addClass('@tabuleiro.corIndicatorDirInf');
-
-            $('.CoordinatorEsq').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorEsqTop + 'px; left: ' + posCoordinatorEsqLeft + 'px;');
-            $('#CoordinatorEsq').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorEsqTop + 'px; left: ' + posTxtCoordinatorEsqLeft + 'px; border: 2px solid #fff;');
-            $('#CoordinatorEsq').addClass('@tabuleiro.corCoordinatorEsq');
-
-            $('.CoordinatorDir').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorDirTop + 'px; left: ' + posCoordinatorDirLeft + 'px;');
-            $('#CoordinatorDir').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorDirTop + 'px; left: ' + posTxtCoordinatorDirLeft + 'px; border: 2px solid #fff;');
-            $('#CoordinatorDir').addClass('@tabuleiro.corCoordinatorDir');
-
-            $('.Master').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posMasterTop + 'px; left: ' + posMasterLeft + 'px;');
-            $('#Master').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff;');
-            $('#Master').addClass('@tabuleiro.corMaster');
-
-        }
-
         function widthResizer() {
             width = window.innerWidth;
             position();
@@ -494,268 +82,750 @@
         // Getting the width of the browser whenever the screen resolution changes.
         window.addEventListener('resize', widthResizer)
 
-        $('.btnTabuleiro').on('click', function () {
-            var idTarget = $(this).attr("data-id");
-            var idTabuleiro = $('#tabuleiro').val();
-            var nivel = $(this).attr("data-name");
-            if (idTarget == $('#Master').attr("data-id") || $('#Master').attr("data-id") == @idUsuario) {
-                $.ajax({
-                    url: "@Url.Action("GetDados")",
-                    type: "POST",
-                    data: {
-                        'usuarioID': '@(idUsuario)',
-                        'targetID': idTarget,
-                        'tabuleiroID': idTabuleiro,
-                        'nivel': nivel,
-                        'token': '@(ViewBag.Token)'
-                    },
-                    success: function (data) {
-                        if (data != null) {
-                            $("#infoNome").html(data.Nome);
-                            $("#infoCelular").html(data.Celular);
-                            $("#qrCodePIX").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Celular);
-                            $("#infoTitulo").html('@(traducaoHelper["ALVO"])');
-
-                            if (data.Carteira) {
-                                $("#infoCripto").html(data.Carteira);
-                                $("#carteiraHeader").show();
-                                $("#infoCripto").show();
-                                $("#qrCodeBTC").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
-                            } else {
-                                $("#carteiraHeader").html('@traducaoHelper["CARTEIRA_BTC_NAO_CADASTRADA"]');
-                            }
-
-                            if ($('#Master').attr("data-id") == @idUsuario) {
-                                $(".panelBTC").hide();
-                                $("#qrCodePIX").hide();
-                            }
-
-                            $('#modDados').modal('show');
-                        } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
-                                text: '@traducaoHelper["SEM_DADOS"]',
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
-                            //Reload page
-                            location.reload();
-                        } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
-                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                });
-            }
-        });
-
-        $('.niveis').on('click', function () {
-            var idTabuleiro = $(this).attr("data-id");
-
-            var dataCor = 'tile double ' + $(this).attr("data-cor");
-            var dataBoard = $(this).attr("data-board");
-            var dataName = $(this).attr("data-name");
-            var dataPosition = $(this).attr("data-position");
-            var image = '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + dataBoard + '.png?v=' + '@Helpers.Local.Versao';
-
-            $("#tab_select").removeClass('grey-card');
-            $("#tab_select").removeClass('green-card');
-            $("#tab_select").removeClass('red-card');
-            $("#tab_select").removeClass('pink-card');
-            $("#tab_select").removeClass('orange-card');
-            $("#tab_select").removeClass('blue-card');
-            $("#tab_select").removeClass('turquoise-card');
-            $("#tab_select").removeClass('gold-card');
-            $("#tab_select").removeClass('orange-card');
-            $("#tab_select").addClass(dataCor);
-            $("#tab_select_name").html(dataName);
-            $("#tab_select_position").html(dataPosition);
-            $("#tab_select_img").attr("src", image);
-
-            if (idTabuleiro > 0) {
-                $.ajax({
-                    url: "@Url.Action("GetTabuleiro")",
-                    type: "POST",
-                    data: {
-                        'usuarioID': '@(idUsuario)',
-                        'tabuleiroID': idTabuleiro,
-                        'token': '@(ViewBag.Token)'
-                    },
-                    success: function (data) {
-                        if (data != null) {
-                            //Master
-                            $(".Master").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinMaster + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#Master").attr('data-id', data.Master);
-                            $("#Master span").html(data.ApelidoMaster);
-                            if (data.PinMaster == '0') {
-                                $("#Master").addClass('hidden');
-                            }
-
-                            //CoordinatorDir
-                            $(".CoordinatorDir").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorDir + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#CoordinatorDir").attr('data-id', data.CoordinatorDir);
-                            $("#CoordinatorDir span").html(data.ApelidoCoordinatorDir);
-                            if (data.pinCoordinatorDir == 0) {
-                                $("#CoordinatorDir").addClass('hidden');
-                            }
-                            //CoordinatorEsq
-                            $(".CoordinatorEsq").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorEsq + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#CoordinatorEsq").attr('data-id', data.CoordinatorEsq);
-                            $("#CoordinatorEsq span").html(data.ApelidoCoordinatorEsq);
-                            if (data.PinCoordinatorEsq == '0') {
-                                $("#CoordinatorEsq").addClass('hidden');
-                            }
-                            //IndicatorDirInf
-                            $(".IndicatorDirInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirInf + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#IndicatorDirInf").attr('data-id', data.IndicatorDirInf);
-                            $("#IndicatorDirInf span").html(data.ApelidoIndicatorDirInf);
-                            if (data.pinIndicatorDirInf == 0) {
-                                $("#IndicatorDirInf").addClass('hidden');
-                            }
-                            //IndicatorDirSup
-                            $(".IndicatorDirSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirSup + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#IndicatorDirSup").attr('data-id', data.IndicatorDirSup);
-                            $("#IndicatorDirSup span").html(data.ApelidoIndicatorDirSup);
-                            if (data.PinIndicatorDirSup == '0') {
-                                $("#IndicatorDirSup").addClass('hidden');
-                            }
-                            //IndicatorEsqInf
-                            $(".IndicatorEsqInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqInf + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#IndicatorEsqInf").attr('data-id', data.IndicatorEsqInf);
-                            $("#IndicatorEsqInf span").html(data.ApelidoIndicatorEsqInf);
-                            if (data.pinIndicatorEsqInf == 0) {
-                                $("#IndicatorEsqInf").addClass('hidden');
-                            }
-                            //IndicatorEsqSup
-                            $(".IndicatorEsqSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqSup + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#IndicatorEsqSup").attr('data-id', data.IndicatorEsqSup);
-                            $("#IndicatorEsqSup span").html(data.ApelidoIndicatorEsqSup);
-                            if (data.PinIndicatorEsqSup == '0') {
-                                $("#IndicatorEsqSup").addClass('hidden');
-                            }
-                            //DonatorDirInf2
-                            $(".DonatorDirInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorDirInf2").attr('data-id', data.DonatorDirInf2);
-                            $("#DonatorDirInf2 span").html(data.ApelidoDonatorDirInf2);
-                            if (data.pinDonatorDirInf2 == 0) {
-                                $("#DonatorDirInf2").addClass('hidden');
-                            }
-                            //DonatorDirInf1
-                            $(".DonatorDirInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorDirInf1").attr('data-id', data.DonatorDirInf1);
-                            $("#DonatorDirInf1 span").html(data.ApelidoDonatorDirInf1);
-                            if (data.PinDonatorDirInf1 == '0') {
-                                $("#DonatorDirInf1").addClass('hidden');
-                            }
-                            //DonatorDirSup2
-                            $(".DonatorDirSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorDirSup2").attr('data-id', data.DonatorDirSup2);
-                            $("#DonatorDirSup2 span").html(data.ApelidoDonatorDirSup2);
-                            if (data.pinDonatorDirSup2 == 0) {
-                                $("#DonatorDirSup2").addClass('hidden');
-                            }
-                            //DonatorDirSup1
-                            $(".DonatorDirSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorDirSup1").attr('data-id', data.DonatorDirSup1);
-                            $("#DonatorDirSup1 span").html(data.ApelidoDonatorDirSup1);
-                            if (data.PinDonatorDirSup1 == '0') {
-                                $("#DonatorDirSup1").addClass('hidden');
-                            }
-                            //DonatorEsqInf2
-                            $(".DonatorEsqInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorEsqInf2").attr('data-id', data.DonatorEsqInf2);
-                            $("#DonatorEsqInf2 span").html(data.ApelidoDonatorEsqInf2);
-                            if (data.pinDonatorEsqInf2 == 0) {
-                                $("#DonatorEsqInf2").addClass('hidden');
-                            }
-                            //DonatorEsqInf1
-                            $(".DonatorEsqInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorEsqInf1").attr('data-id', data.DonatorEsqInf1);
-                            $("#DonatorEsqInf1 span").html(data.ApelidoDonatorEsqInf1);
-                            if (data.PinDonatorEsqInf1 == '0') {
-                                $("#DonatorEsqInf1").addClass('hidden');
-                            }
-                            //DonatorEsqSup2
-                            $(".DonatorEsqSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorEsqSup2").attr('data-id', data.DonatorEsqSup2);
-                            $("#DonatorEsqSup2 span").html(data.ApelidoDonatorEsqSup2);
-                            if (data.pinDonatorEsqSup2 == 0) {
-                                $("#DonatorEsqSup2").addClass('hidden');
-                            }
-                            //DonatorEsqSup1
-                            $(".DonatorEsqSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
-                            $("#DonatorEsqSup1").removeClass('btn-info');
-                            $("#DonatorEsqSup1 span").html(data.ApelidoDonatorEsqSup1);
-                            if (data.DonatorEsqSup1 == 0) {
-                                $("#DonatorEsqSup1").addClass('hidden');
-                            }
-                        } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
-                                text: '@traducaoHelper["SEM_DADOS"]',
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
-                            //Reload page
-                            location.reload();
-                        } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
-                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                });
-            } else {
-                 Swal.fire({
-                     title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
-                     text: 'target=',
-                     icon: 'warning',
-                     confirmButtonText: 'OK'
-                });
-            }
-        });
-
-        //Contador de tempo para pagamento
-        const second = 1000;
-        const minute = second * 60;
-        const hour = minute * 60;
-        let count_down = new Date('03/30/2024 17:59:00').getTime();
-        let x = setInterval(() => countDown(), second);
-        function countDown() {
-            let now = new Date(Date.now()).getTime();
-            let diff = count_down - now;
-            if (diff > 0) {
-                var min = Math.floor(diff % hour / minute);
-                var seg = Math.floor(diff % minute / second);
-                document.getElementById('minutes').innerText = min;
-                document.getElementById('seconds').innerText = seg;
-
-                $("#minutes").removeClass('hidden');
-                $("#pontos").removeClass('hidden');
-                $("#seconds").removeClass('hidden');
-            } else {
-                $("#minutes").addClass('hidden');
-                $("#pontos").addClass('hidden');
-                $("#seconds").addClass('hidden');
-            }
-        }
-
     </script>
+
+    @if(ViewBag.Timer != null)
+    {
+        <script>
+            //Contador de tempo para pagamento
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            let count_down = new Date('@ViewBag.Timer').getTime();
+            let x = setInterval(() => countDown(), second);
+            function countDown() {
+                let now = new Date(Date.now()).getTime();
+                let diff = count_down - now;
+                if (diff > 0) {
+                    var min = Math.floor(diff % hour / minute);
+                    var seg = Math.floor(diff % minute / second);
+                    document.getElementById('minutes').innerText = min;
+                    document.getElementById('seconds').innerText = seg;
+
+                    $("#minutes").removeClass('hidden');
+                    $("#pontos").removeClass('hidden');
+                    $("#seconds").removeClass('hidden');
+                } else {
+                    $("#minutes").addClass('hidden');
+                    $("#pontos").addClass('hidden');
+                    $("#seconds").addClass('hidden');
+                }
+            }
+        </script>
+    }
+
+    @if (tabuleiro != null)
+    {
+        <script>
+            function startPage()
+            {
+                $("#tab_select").addClass('@tabuleiroAtivo.BoardCor');
+                $("#tab_select_name").html('@(traducaoHelper[tabuleiroAtivo.BoardNome])');
+                $("#tab_select_position").html('@traducaoHelper[tabuleiroAtivo.Posicao]');
+                $("#tab_select_img").attr("src", '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)');
+            }
+
+            function position() {
+                var position = $('.porTabuleiro').offset();
+                //var positionMenu = $('.page-sidebar-menu').width();
+                //$(".txtTitle").html(width);
+
+                $('#porTabuleiro').css({
+                    "width": "980px",
+                    "height": "680px",
+                    "overflow": "visible",
+                    "overflow-y": "visible",
+                });
+
+                $('.galaxy').css({
+                    "width": "980px",
+                    "height": "680px",
+                });
+
+                var alinhaTxtTop = 90;
+                var alinhaTxtLeft = 51;
+
+                var ajustTop = -50;
+                var ajustLeft = -46;
+
+                //width > 1200
+                var xDonatorEsqSup1Top = 10;
+                var yDonatorEsqSup1Left = 240;
+                var xDonatorEsqSup2Top = 130;
+                var yDonatorEsqSup2Left = 60;
+                var xDonatorEsqInf1Top = 350;
+                var yDonatorEsqInf1Left = 160;
+                var xDonatorEsqInf2Top = 570;
+                var yDonatorEsqInf2Left = 280;
+
+                var xDonatorDirSup1Top = 30;
+                var yDonatorDirSup1Left = 660;
+                var xDonatorDirSup2Top = 250;
+                var yDonatorDirSup2Left = 760;
+                var xDonatorDirInf1Top = 420;
+                var yDonatorDirInf1Left = 810;
+                var xDonatorDirInf2Top =  540;
+                var yDonatorDirInf2Left = 680;
+
+                var xIndicatorEsqSupTop = 170;
+                var yIndicatorEsqSupLeft = 250;
+                var xIndicatorEsqInfTop = 440;
+                var yIndicatorEsqInfLeft = 320;
+                var xIndicatorDirSupTop = 140;
+                var xIndicatorDirSupLeft = 590;
+                var xIndicatorDirInfTop = 410;
+                var xIndicatorDirInfLeft = 660;
+
+                var xCoordinatorEsqTop = 300;
+                var yCoordinatorEsqLeft = 270;
+                var xCoordinatorDirTop = 300;
+                var yCoordinatorDirLeft = 580;
+
+                var xMasterTop = 290;
+                var yMasterLeft = 420;
+
+                //0
+                //1 - 0
+                if (width > 1170 && width <= 1200) {
+                    $('#porTabuleiro').css({
+                        "width": "900px",
+                        "height": "680px",
+                        "overflow": "visible",
+                        "overflow-y": "visible",
+                    });
+                    $('.galaxy').css({
+                        "width": "900px",
+                        "height": "680px",
+                    });
+
+                    ajustLeft = -86;
+                }
+
+                //2 - 0
+                if (width > 991 && width <= 1170) {
+                    $('.porTabuleiro').css({
+                        "width": "720px",
+                        "height": "680px",
+                    });
+                    $('.galaxy').css({
+                        "width": "720px",
+                        "height": "680px",
+                    });
+                    xDonatorEsqSup1Top = 40;
+                    yDonatorEsqSup1Left = 340;
+                    xDonatorEsqSup2Top = 160;
+                    yDonatorEsqSup2Left = 120;
+                    xDonatorDirSup2Top = 220;
+                    yDonatorDirSup2Left = 710;
+                    xIndicatorDirInfTop = 460;
+                    xIndicatorDirInfLeft = 580;
+                    xDonatorDirInf1Top = 400;
+                    yDonatorDirInf1Left = 700;
+                    ajustLeft = -176;
+                }
+
+                //0 - 0
+                if (width > 961 && width <= 991) {
+                    $('#porTabuleiro').css({
+                        "width": "980px",
+                        "height": "680px",
+                        "overflow": "visible",
+                        "overflow-y": "visible",
+                    });
+                    $('.galaxy').css({
+                        "width": "980px",
+                        "height": "680px",
+                    });
+                }
+
+                //1 - 1
+                if (width > 931 && width <= 961) {
+                    $('.porTabuleiro').css({
+                        "width": "900px",
+                        "height": "680px",
+                    });
+                    $('.galaxy').css({
+                        "width": "900px",
+                        "height": "680px",
+                    });
+                    ajustLeft = -86;
+                }
+
+                //2 - 1
+                if (width > 752 && width <= 931) {
+                    $('#porTabuleiro').css({
+                        "width": "720px",
+                        "height": "680px",
+                        "overflow": "visible",
+                        "overflow-y": "visible",
+                    });
+                    $('.galaxy').css({
+                        "width": "720px",
+                        "height": "680px",
+                    });
+                    xDonatorEsqSup1Top = 40;
+                    yDonatorEsqSup1Left = 340;
+                    xDonatorEsqSup2Top = 160;
+                    yDonatorEsqSup2Left = 120;
+                    xDonatorDirSup2Top = 220;
+                    yDonatorDirSup2Left = 710;
+                    xIndicatorDirInfTop = 460;
+                    xIndicatorDirInfLeft = 580;
+                    xDonatorDirInf1Top = 400;
+                    yDonatorDirInf1Left = 700;
+                    ajustLeft = -170;
+                }
+
+                //3 - 1
+                if (width > 580 && width <= 752) {
+                    $('.porTabuleiro').css({
+                        "width": "580px",
+                        "height": "780px",
+                    });
+                    $('.galaxy').css({
+                        "width": "580px",
+                        "height": "780px",
+                    });
+
+                    xIndicatorDirSupTop = 140;
+                    xIndicatorDirSupLeft = 520;
+                    xIndicatorDirInfTop = 440;
+                    xIndicatorDirInfLeft = 600;
+
+                    xIndicatorEsqSupTop = 110;
+                    yIndicatorEsqSupLeft = 280;
+                    xIndicatorEsqInfTop = 440;
+                    yIndicatorEsqInfLeft = 320;
+
+                    xDonatorDirSup1Top = 0;
+                    yDonatorDirSup1Left = 500;
+                    xDonatorDirSup2Top = 60;
+                    yDonatorDirSup2Left = 640;
+
+                    xDonatorDirInf1Top = 550;
+                    yDonatorDirInf1Left = 650;
+                    xDonatorDirInf2Top = 540;
+                    yDonatorDirInf2Left = 480;
+
+                    xDonatorEsqSup1Top = 30;
+                    yDonatorEsqSup1Left = 370;
+                    xDonatorEsqSup2Top = 200;
+                    yDonatorEsqSup2Left = 190;
+
+                    xDonatorEsqInf1Top = 390;
+                    yDonatorEsqInf1Left = 190;
+
+                    xDonatorEsqInf2Top = 570;
+                    yDonatorEsqInf2Left = 280;
+
+                    ajustLeft = -246;
+                    ajustTop = 0;
+
+                }
+
+                //3 - 1
+                if (width > 0 && width <= 580) {
+                    $('#porTabuleiro').css({
+                        "width": "450px",
+                        "height": "1030px",
+                        "overflow": "auto",
+                        "overflow-y": "hidden",
+                    });
+                    $('.galaxy').css({
+                        "width": "450px",
+                        "height": "1030px",
+                    });
+                    //overflow: auto; overflow-y: hidden;
+                    //$('.porTabuleiro').css("overflow", "auto");
+                    //$('#porTabuleiro').css("overflow-y", "hidden");
+
+                    //$(".porTabuleiro").attr("style", "position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;");
+
+                    //Deckard
+                    xCoordinatorEsqTop = 160;
+                    yCoordinatorEsqLeft = 500;
+
+                    //Han
+                    xCoordinatorDirTop = 420;
+                    yCoordinatorDirLeft = 400;
+
+                    //Richard
+                    xIndicatorDirSupTop = 520;
+                    xIndicatorDirSupLeft = 500;
+                    //Brook
+                    xIndicatorDirInfTop = 590;
+                    xIndicatorDirInfLeft = 300;
+
+                    //Allie
+                    xIndicatorEsqSupTop = 10;
+                    yIndicatorEsqSupLeft = 560;
+                    //John
+                    xIndicatorEsqInfTop = 110;
+                    yIndicatorEsqInfLeft = 360;
+
+                    //Brook
+                    xDonatorDirSup1Top = 460;
+                    yDonatorDirSup1Left = 260;
+                    xDonatorDirSup2Top = 720;
+                    yDonatorDirSup2Left = 320;
+
+                    //Richard
+                    xDonatorDirInf1Top = 400;
+                    yDonatorDirInf1Left = 580;
+                    xDonatorDirInf2Top = 640;
+                    yDonatorDirInf2Left = 480;
+
+                    //Allie
+                    xDonatorEsqSup1Top = -130;
+                    yDonatorEsqSup1Left = 570;
+                    xDonatorEsqSup2Top = -40;
+                    yDonatorEsqSup2Left = 430;
+
+                    //John
+                    xDonatorEsqInf1Top = 0;
+                    yDonatorEsqInf1Left = 290;
+
+                    xDonatorEsqInf2Top = 230;
+                    yDonatorEsqInf2Left = 260;
+
+                    ajustLeft = -310;
+                    ajustTop = 124;
+                }
+
+                var posDonatorEsqSup1Top = ajustTop + xDonatorEsqSup1Top;
+                var posDonatorEsqSup1Left = ajustLeft + yDonatorEsqSup1Left;
+                var posTxtDonatorEsqSup1Top = posDonatorEsqSup1Top + alinhaTxtTop;
+                var posTxtDonatorEsqSup1Left = posDonatorEsqSup1Left + alinhaTxtLeft;
+
+                var posDonatorEsqSup2Top = ajustTop + xDonatorEsqSup2Top;
+                var posDonatorEsqSup2Left = ajustLeft + yDonatorEsqSup2Left;
+                var posTxtDonatorEsqSup2Top = posDonatorEsqSup2Top + alinhaTxtTop;
+                var posTxtDonatorEsqSup2Left = posDonatorEsqSup2Left + alinhaTxtLeft;
+
+                var posDonatorEsqInf1Top = ajustTop + xDonatorEsqInf1Top;
+                var posDonatorEsqInf1Left = ajustLeft + yDonatorEsqInf1Left;
+                var posTxtDonatorEsqInf1Top = posDonatorEsqInf1Top + alinhaTxtTop;
+                var posTxtDonatorEsqInf1Left = posDonatorEsqInf1Left + alinhaTxtLeft;
+
+                var posDonatorEsqInf2Top = ajustTop + xDonatorEsqInf2Top;
+                var posDonatorEsqInf2Left = ajustLeft + yDonatorEsqInf2Left;
+                var posTxtDonatorEsqInf2Top = posDonatorEsqInf2Top + alinhaTxtTop;
+                var posTxtDonatorEsqInf2Left = posDonatorEsqInf2Left + alinhaTxtLeft;
+
+                var posDonatorDirSup1Top = ajustTop + xDonatorDirSup1Top;
+                var posDonatorDirSup1Left = ajustLeft + yDonatorDirSup1Left;
+                var posTxtDonatorDirSup1Top = posDonatorDirSup1Top + alinhaTxtTop;
+                var posTxtDonatorDirSup1Left = posDonatorDirSup1Left + alinhaTxtLeft;
+
+                var posDonatorDirSup2Top = ajustTop + xDonatorDirSup2Top;
+                var posDonatorDirSup2Left = ajustLeft + yDonatorDirSup2Left;
+                var posTxtDonatorDirSup2Top = posDonatorDirSup2Top + alinhaTxtTop;
+                var posTxtDonatorDirSup2Left = posDonatorDirSup2Left + alinhaTxtLeft;
+
+                var posDonatorDirInf1Top = ajustTop + xDonatorDirInf1Top;
+                var posDonatorDirInf1Left = ajustLeft + yDonatorDirInf1Left;
+                var posTxtDonatorDirInf1Top = posDonatorDirInf1Top + alinhaTxtTop;
+                var posTxtDonatorDirInf1Left = posDonatorDirInf1Left + alinhaTxtLeft;
+
+                var posDonatorDirInf2Top = ajustTop + xDonatorDirInf2Top;
+                var posDonatorDirInf2Left = ajustLeft + yDonatorDirInf2Left;
+                var posTxtDonatorDirInf2Top = posDonatorDirInf2Top + alinhaTxtTop;
+                var posTxtDonatorDirInf2Left = posDonatorDirInf2Left + alinhaTxtLeft;
+
+                var posIndicatorEsqSupTop = ajustTop + xIndicatorEsqSupTop;
+                var posIndicatorEsqSupLeft = ajustLeft + yIndicatorEsqSupLeft;
+                var posTxtIndicatorEsqSupTop = posIndicatorEsqSupTop + alinhaTxtTop;
+                var posTxtIndicatorEsqSupLeft = posIndicatorEsqSupLeft + alinhaTxtLeft;
+
+                var posIndicatorEsqInfTop = ajustTop + xIndicatorEsqInfTop;
+                var posIndicatorEsqInfLeft = ajustLeft + yIndicatorEsqInfLeft;
+                var posTxtIndicatorEsqInfTop = posIndicatorEsqInfTop + alinhaTxtTop;
+                var posTxtIndicatorEsqInfLeft = posIndicatorEsqInfLeft + alinhaTxtLeft;
+
+                var posIndicatorDirSupTop = ajustTop + xIndicatorDirSupTop;
+                var posIndicatorDirSupLeft = ajustLeft + xIndicatorDirSupLeft;
+                var posTxtIndicatorDirSupTop = posIndicatorDirSupTop + alinhaTxtTop;
+                var posTxtIndicatorDirSupLeft = posIndicatorDirSupLeft + alinhaTxtLeft;
+
+                var posIndicatorDirInfTop = ajustTop + xIndicatorDirInfTop;
+                var posIndicatorDirInfLeft = ajustLeft + xIndicatorDirInfLeft;
+                var posTxtIndicatorDirInfTop = posIndicatorDirInfTop + alinhaTxtTop;
+                var posTxtIndicatorDirInfLeft = posIndicatorDirInfLeft + alinhaTxtLeft;
+
+                var posCoordinatorEsqTop = ajustTop + xCoordinatorEsqTop;
+                var posCoordinatorEsqLeft = ajustLeft + yCoordinatorEsqLeft;
+                var posTxtCoordinatorEsqTop = posCoordinatorEsqTop + alinhaTxtTop;
+                var posTxtCoordinatorEsqLeft = posCoordinatorEsqLeft + alinhaTxtLeft;
+
+                var posCoordinatorDirTop = ajustTop + xCoordinatorDirTop;
+                var posCoordinatorDirLeft = ajustLeft + yCoordinatorDirLeft;
+                var posTxtCoordinatorDirTop = posCoordinatorDirTop + alinhaTxtTop;
+                var posTxtCoordinatorDirLeft = posCoordinatorDirLeft + alinhaTxtLeft;
+
+                var posMasterTop = ajustTop + xMasterTop;
+                var posMasterLeft = ajustLeft + yMasterLeft;
+                var posTxtMasterTop = posMasterTop + alinhaTxtTop;
+                var posTxtMasterLeft = posMasterLeft + alinhaTxtLeft;
+
+                $('.DonatorEsqSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup1Top + 'px; left: ' + posDonatorEsqSup1Left + 'px;');
+                $('#DonatorEsqSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px; border: 2px solid #fff;');
+                $('#DonatorEsqSup1').addClass('@tabuleiro.corDonatorEsqSup1');
+
+                $('.DonatorEsqSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup2Top + 'px; left: ' + posDonatorEsqSup2Left + 'px;');
+                $('#DonatorEsqSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup2Top + 'px; left: ' + posTxtDonatorEsqSup2Left + 'px; border: 2px solid #fff;');
+                $('#DonatorEsqSup2').addClass('@tabuleiro.corDonatorEsqSup2');
+
+                $('.DonatorEsqInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf1Top + 'px; left: ' + posDonatorEsqInf1Left + 'px;');
+                $('#DonatorEsqInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf1Top + 'px; left: ' + posTxtDonatorEsqInf1Left + 'px; border: 2px solid #fff;');
+                $('#DonatorEsqInf1').addClass('@tabuleiro.corDonatorEsqInf1');
+
+                $('.DonatorEsqInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf2Top + 'px; left: ' + posDonatorEsqInf2Left + 'px;');
+                $('#DonatorEsqInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf2Top + 'px; left: ' + posTxtDonatorEsqInf2Left + 'px; border: 2px solid #fff;');
+                $('#DonatorEsqInf2').addClass('@tabuleiro.corDonatorEsqInf2');
+
+                $('.DonatorDirSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup1Top + 'px; left: ' + posDonatorDirSup1Left + 'px;');
+                $('#DonatorDirSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup1Top + 'px; left: ' + posTxtDonatorDirSup1Left + 'px; border: 2px solid #fff;');
+                $('#DonatorDirSup1').addClass('@tabuleiro.corDonatorDirSup1');
+
+                $('.DonatorDirSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup2Top + 'px; left: ' + posDonatorDirSup2Left + 'px;');
+                $('#DonatorDirSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup2Top + 'px; left: ' + posTxtDonatorDirSup2Left + 'px; border: 2px solid #fff;');
+                $('#DonatorDirSup2').addClass('@tabuleiro.corDonatorDirSup2');
+
+                $('.DonatorDirInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf1Top + 'px; left: ' + posDonatorDirInf1Left + 'px;');
+                $('#DonatorDirInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf1Top + 'px; left: ' + posTxtDonatorDirInf1Left + 'px; border: 2px solid #fff;');
+                $('#DonatorDirInf1').addClass('@tabuleiro.corDonatorDirInf1');
+
+                $('.DonatorDirInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf2Top + 'px; left: ' + posDonatorDirInf2Left + 'px;');
+                $('#DonatorDirInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf2Top + 'px; left: ' + posTxtDonatorDirInf2Left + 'px; border: 2px solid #fff;');
+                $('#DonatorDirInf2').addClass('@tabuleiro.corDonatorDirInf2');
+
+                $('.IndicatorEsqSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqSupTop + 'px; left: ' + posIndicatorEsqSupLeft + 'px;');
+                $('#IndicatorEsqSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqSupTop + 'px; left: ' + posTxtIndicatorEsqSupLeft + 'px; border: 2px solid #fff;');
+                $('#IndicatorEsqSup').addClass('@tabuleiro.corIndicatorEsqSup');
+
+                $('.IndicatorEsqInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqInfTop + 'px; left: ' + posIndicatorEsqInfLeft + 'px;');
+                $('#IndicatorEsqInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqInfTop + 'px; left: ' + posTxtIndicatorEsqInfLeft + 'px; border: 2px solid #fff;');
+                $('#IndicatorEsqInf').addClass('@tabuleiro.corIndicatorEsqInf');
+
+                $('.IndicatorDirSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirSupTop + 'px; left: ' + posIndicatorDirSupLeft + 'px;');
+                $('#IndicatorDirSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirSupTop + 'px; left: ' + posTxtIndicatorDirSupLeft + 'px; border: 2px solid #fff;');
+                $('#IndicatorDirSup').addClass('@tabuleiro.corIndicatorDirSup');
+
+                $('.IndicatorDirInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirInfTop + 'px; left: ' + posIndicatorDirInfLeft + 'px;');
+                $('#IndicatorDirInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirInfTop + 'px; left: ' + posTxtIndicatorDirInfLeft + 'px; border: 2px solid #fff;');
+                $('#IndicatorDirInf').addClass('@tabuleiro.corIndicatorDirInf');
+
+                $('.CoordinatorEsq').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorEsqTop + 'px; left: ' + posCoordinatorEsqLeft + 'px;');
+                $('#CoordinatorEsq').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorEsqTop + 'px; left: ' + posTxtCoordinatorEsqLeft + 'px; border: 2px solid #fff;');
+                $('#CoordinatorEsq').addClass('@tabuleiro.corCoordinatorEsq');
+
+                $('.CoordinatorDir').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorDirTop + 'px; left: ' + posCoordinatorDirLeft + 'px;');
+                $('#CoordinatorDir').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorDirTop + 'px; left: ' + posTxtCoordinatorDirLeft + 'px; border: 2px solid #fff;');
+                $('#CoordinatorDir').addClass('@tabuleiro.corCoordinatorDir');
+
+                $('.Master').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posMasterTop + 'px; left: ' + posMasterLeft + 'px;');
+                $('#Master').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff;');
+                $('#Master').addClass('@tabuleiro.corMaster');
+            }
+
+            $('.btnTabuleiro').on('click', function () {
+                var idTarget = $(this).attr("data-id");
+                var idTabuleiro = $('#tabuleiro').val();
+                var nivel = $(this).attr("data-name");
+                if (idTarget == $('#Master').attr("data-id") || $('#Master').attr("data-id") == @idUsuario) {
+                    $.ajax({
+                        url: "@Url.Action("GetDados")",
+                        type: "POST",
+                        data: {
+                            'usuarioID': '@(idUsuario)',
+                            'targetID': idTarget,
+                            'tabuleiroID': idTabuleiro,
+                            'nivel': nivel,
+                            'token': '@(ViewBag.Token)'
+                        },
+                        success: function (data) {
+                            if (data != null) {
+                                $("#infoNome").html(data.Nome);
+                                $("#infoCelular").html(data.Celular);
+                                $("#qrCodePIX").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Celular);
+                                $("#infoTitulo").html('@(traducaoHelper["ALVO"])');
+
+                                if (data.Carteira) {
+                                    $("#infoCripto").html(data.Carteira);
+                                    $("#carteiraHeader").show();
+                                    $("#infoCripto").show();
+                                    $("#qrCodeBTC").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
+                                } else {
+                                    $("#carteiraHeader").html('@traducaoHelper["CARTEIRA_BTC_NAO_CADASTRADA"]');
+                                }
+
+                                if ($('#Master').attr("data-id") == @idUsuario) {
+                                    $(".panelBTC").hide();
+                                    $("#qrCodePIX").hide();
+                                }
+
+                                $('#modDados').modal('show');
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                    text: '@traducaoHelper["SEM_DADOS"]',
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                                //Reload page
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                    text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                    });
+                }
+            });
+
+            $('.niveis').on('click', function () {
+                var idTabuleiro = $(this).attr("data-id");
+
+                var dataCor = 'tile double ' + $(this).attr("data-cor");
+                var dataBoard = $(this).attr("data-board");
+                var dataName = $(this).attr("data-name");
+                var dataPosition = $(this).attr("data-position");
+                var image = '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + dataBoard + '.png?v=' + '@Helpers.Local.Versao';
+
+                $("#tab_select").removeClass('grey-card');
+                $("#tab_select").removeClass('green-card');
+                $("#tab_select").removeClass('red-card');
+                $("#tab_select").removeClass('pink-card');
+                $("#tab_select").removeClass('orange-card');
+                $("#tab_select").removeClass('blue-card');
+                $("#tab_select").removeClass('turquoise-card');
+                $("#tab_select").removeClass('gold-card');
+                $("#tab_select").removeClass('orange-card');
+                $("#tab_select").addClass(dataCor);
+                $("#tab_select_name").html(dataName);
+                $("#tab_select_position").html(dataPosition);
+                $("#tab_select_img").attr("src", image);
+
+                if (tabuleiro != null) {
+                    $.ajax({
+                        url: "@Url.Action("GetTabuleiro")",
+                        type: "POST",
+                        data: {
+                            'usuarioID': '@(idUsuario)',
+                            'tabuleiroID': idTabuleiro,
+                            'token': '@(ViewBag.Token)'
+                        },
+                        success: function (data) {
+                            if (data != null) {
+                                //Master
+                                $(".Master").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinMaster + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#Master").attr('data-id', data.Master);
+                                $("#Master span").html(data.ApelidoMaster);
+                                if (data.PinMaster == '0') {
+                                    $("#Master").addClass('hidden');
+                                }
+
+                                //CoordinatorDir
+                                $(".CoordinatorDir").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorDir + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#CoordinatorDir").attr('data-id', data.CoordinatorDir);
+                                $("#CoordinatorDir span").html(data.ApelidoCoordinatorDir);
+                                if (data.pinCoordinatorDir == 0) {
+                                    $("#CoordinatorDir").addClass('hidden');
+                                }
+                                //CoordinatorEsq
+                                $(".CoordinatorEsq").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorEsq + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#CoordinatorEsq").attr('data-id', data.CoordinatorEsq);
+                                $("#CoordinatorEsq span").html(data.ApelidoCoordinatorEsq);
+                                if (data.PinCoordinatorEsq == '0') {
+                                    $("#CoordinatorEsq").addClass('hidden');
+                                }
+                                //IndicatorDirInf
+                                $(".IndicatorDirInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirInf + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#IndicatorDirInf").attr('data-id', data.IndicatorDirInf);
+                                $("#IndicatorDirInf span").html(data.ApelidoIndicatorDirInf);
+                                if (data.pinIndicatorDirInf == 0) {
+                                    $("#IndicatorDirInf").addClass('hidden');
+                                }
+                                //IndicatorDirSup
+                                $(".IndicatorDirSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirSup + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#IndicatorDirSup").attr('data-id', data.IndicatorDirSup);
+                                $("#IndicatorDirSup span").html(data.ApelidoIndicatorDirSup);
+                                if (data.PinIndicatorDirSup == '0') {
+                                    $("#IndicatorDirSup").addClass('hidden');
+                                }
+                                //IndicatorEsqInf
+                                $(".IndicatorEsqInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqInf + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#IndicatorEsqInf").attr('data-id', data.IndicatorEsqInf);
+                                $("#IndicatorEsqInf span").html(data.ApelidoIndicatorEsqInf);
+                                if (data.pinIndicatorEsqInf == 0) {
+                                    $("#IndicatorEsqInf").addClass('hidden');
+                                }
+                                //IndicatorEsqSup
+                                $(".IndicatorEsqSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqSup + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#IndicatorEsqSup").attr('data-id', data.IndicatorEsqSup);
+                                $("#IndicatorEsqSup span").html(data.ApelidoIndicatorEsqSup);
+                                if (data.PinIndicatorEsqSup == '0') {
+                                    $("#IndicatorEsqSup").addClass('hidden');
+                                }
+                                //DonatorDirInf2
+                                $(".DonatorDirInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorDirInf2").attr('data-id', data.DonatorDirInf2);
+                                $("#DonatorDirInf2 span").html(data.ApelidoDonatorDirInf2);
+                                if (data.pinDonatorDirInf2 == 0) {
+                                    $("#DonatorDirInf2").addClass('hidden');
+                                }
+                                //DonatorDirInf1
+                                $(".DonatorDirInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorDirInf1").attr('data-id', data.DonatorDirInf1);
+                                $("#DonatorDirInf1 span").html(data.ApelidoDonatorDirInf1);
+                                if (data.PinDonatorDirInf1 == '0') {
+                                    $("#DonatorDirInf1").addClass('hidden');
+                                }
+                                //DonatorDirSup2
+                                $(".DonatorDirSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorDirSup2").attr('data-id', data.DonatorDirSup2);
+                                $("#DonatorDirSup2 span").html(data.ApelidoDonatorDirSup2);
+                                if (data.pinDonatorDirSup2 == 0) {
+                                    $("#DonatorDirSup2").addClass('hidden');
+                                }
+                                //DonatorDirSup1
+                                $(".DonatorDirSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorDirSup1").attr('data-id', data.DonatorDirSup1);
+                                $("#DonatorDirSup1 span").html(data.ApelidoDonatorDirSup1);
+                                if (data.PinDonatorDirSup1 == '0') {
+                                    $("#DonatorDirSup1").addClass('hidden');
+                                }
+                                //DonatorEsqInf2
+                                $(".DonatorEsqInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorEsqInf2").attr('data-id', data.DonatorEsqInf2);
+                                $("#DonatorEsqInf2 span").html(data.ApelidoDonatorEsqInf2);
+                                if (data.pinDonatorEsqInf2 == 0) {
+                                    $("#DonatorEsqInf2").addClass('hidden');
+                                }
+                                //DonatorEsqInf1
+                                $(".DonatorEsqInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorEsqInf1").attr('data-id', data.DonatorEsqInf1);
+                                $("#DonatorEsqInf1 span").html(data.ApelidoDonatorEsqInf1);
+                                if (data.PinDonatorEsqInf1 == '0') {
+                                    $("#DonatorEsqInf1").addClass('hidden');
+                                }
+                                //DonatorEsqSup2
+                                $(".DonatorEsqSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorEsqSup2").attr('data-id', data.DonatorEsqSup2);
+                                $("#DonatorEsqSup2 span").html(data.ApelidoDonatorEsqSup2);
+                                if (data.pinDonatorEsqSup2 == 0) {
+                                    $("#DonatorEsqSup2").addClass('hidden');
+                                }
+                                //DonatorEsqSup1
+                                $(".DonatorEsqSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $("#DonatorEsqSup1").removeClass('btn-info');
+                                $("#DonatorEsqSup1 span").html(data.ApelidoDonatorEsqSup1);
+                                if (data.DonatorEsqSup1 == 0) {
+                                    $("#DonatorEsqSup1").addClass('hidden');
+                                }
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                    text: '@traducaoHelper["SEM_DADOS"]',
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                                //Reload page
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                    text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                    });
+                } else {
+                     Swal.fire({
+                         title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                         text: 'target=',
+                         icon: 'warning',
+                         confirmButtonText: 'OK'
+                    });
+                }
+            });
+
+        </script>
+    }
+    else
+    {
+        <script>
+
+            $('.invite').on('click', function () {
+            var idTabuleiro = $(this).attr("data-id");
+            $.ajax({
+                url: "@Url.Action("GetInvite")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'tabuleiroID': idTabuleiro,
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data == "OK") {
+                            location.reload();
+                             Swal.fire({
+                                title: '@traducaoHelper["SUCESSO"]',
+                                text: '@traducaoHelper["OPERACAO_SUCESSO"]',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]',
+                                text: '@traducaoHelper["DATA"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        location.reload();
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+
+            });
+
+        </script>
+    }
 }
 
 @section PageLevelScripts{
@@ -775,15 +845,18 @@
                         <h2>@ViewBag.Title</h2>
                     </div>
                 </div>
-                <div class="column col-md-2">
-                    <div class="page-title">
-                        <span id="minutes" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
-                        <span id="pontos" class="hidden" style="font-size: 18px; font-weight: 500;">:</span>
-                        <span id="seconds" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
+                @if (ViewBag.Timer != null)
+                {
+                    <div class="column col-md-2">
+                        <div class="page-title">
+                            <span id="minutes" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
+                            <span id="pontos" style="font-size: 18px; font-weight: 500; color: darkred;">:</span>
+                            <span id="seconds" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
-            
+
             <!-- END PAGE TITLE -->
         </div>
         <ul class="page-breadcrumb breadcrumb">
@@ -802,69 +875,108 @@
 </div>
 
 <!-- Tabuleiro -->
-<div id="porTabuleiro" class="portlet" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;">
-    <div class="portlet-body">
-        <div class="row galaxy" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
-            <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
+@if (tabuleiro != null)
+{
+    <div id="porTabuleiro" class="portlet" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;">
+        <div class="portlet-body">
+            <div class="row galaxy" style="width: 980px; height: 680px; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
+                <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
+
+                <div class="tiles" style="padding-left: 15px;">
+                    <div id="tab_select" class="tile double" style="max-height: 80px; max-width: 200px;">
+                        <div class="tile-body" style="padding:5px;">
+                            <img id="tab_select_img" src='' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                            <h3 id="tab_select_name"></h3>
+                            <p id="tab_select_position"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1">
+                <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2">
+                <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1">
+                <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2">
+                <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1">
+                <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2">
+                <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1">
+                <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2">
+                <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup">
+                <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf">
+                <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup">
+                <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf">
+                <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq">
+                <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir">
+                <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorDir</span></button>
+
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + "x.png?v=" + @Helpers.Local.Versao)' class="Master">
+                <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoMaster</span></button>
+
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="portlet aba box backWrite grey-gallery">
+
+        <div class="portlet-title">
+            <div class="caption"></div>
+            <div class="tools">
+                <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+            </div>
+            <div class="actions">
+                <a href='#'>&nbsp;</a>
+                <label>&nbsp;</label>
+            </div>
+        </div>
+
+        <div class="portlet-body">
+
+            <h3>@traducaoHelper["TABULEIRO_NAO_INICIADO_1"]</h3>
+            <br />
+            <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_2"]</h4>
+            <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4>
 
             <div class="tiles" style="padding-left: 15px;">
-                <div id="tab_select" class="tile double" style="max-height: 80px; max-width: 200px;">
-                    <div class="tile-body">
-                        <img id="tab_select_img" src='' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                        <h3 id="tab_select_name"></h3>
-                        <p id="tab_select_position"></p>
+                <div class="tile double grey-card invite" data-id="0" style="max-height: 80px; max-width: 200px;">
+                    <div class="tile-body" style="padding:5px;">
+                        <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                        <h3>@(traducaoHelper["MERCURIO"])</h3>
+                        <p>@traducaoHelper["CONVITE"]</p>
                     </div>
                 </div>
             </div>
 
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1">
-            <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2">
-            <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1">
-            <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2">
-            <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1">
-            <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2">
-            <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1">
-            <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2">
-            <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup">
-            <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf">
-            <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup">
-            <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf">
-            <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq">
-            <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir">
-            <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorDir</span></button>
-
-            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + "x.png?v=" + @Helpers.Local.Versao)' class="Master">
-            <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro" ><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoMaster</span></button>
-
+            <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_4"]</h4>
         </div>
     </div>
-</div>
+}
 
 @section sideBarExtra {
     @if (tabuleiroNivelConvites != null)
@@ -873,7 +985,7 @@
         {
             <!-- Invite -->
             <li class="nav-item start">
-                @*<a href="" style="margin: 0; padding: 0;">*@
+                <a href="javascript:;" id="ïnvite_@item.ID" data-id="@item.ID" class="invite" style="margin: 0; padding: 0;">
                     <div class="title" style="margin: 0; padding:5px;">
                         <div class="card-frame card-home springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)" style="padding: 0; margin: 0;">
                             <div class="col-md-4" style="padding: 5px; margin: 0;">
@@ -886,7 +998,7 @@
                             </div>
                         </div>
                     </div>
-                @*</a>*@
+                </a>
             </li>
         }
     }
@@ -926,7 +1038,7 @@
                     break;
             }
             <li class="nav-item start">
-                <a href="#" style="margin: 0; padding: 0;">
+                <a href="javascript:;" style="margin: 0; padding: 0;">
                     <div class="title" style="margin: 0; padding:5px;">
                         <div class="tile card-frame card-home @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="padding: 0; margin: 0;">
                             <div class="col-md-4" style="padding: 5px; margin: 0;">
@@ -998,3 +1110,4 @@
         </div>
     </div>
 </div>
+
