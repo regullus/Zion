@@ -20,6 +20,7 @@ namespace Core.Services.Sistema
             smtp = new SmtpClient(Helpers.ConfiguracaoHelper.GetString("SMTP_HOST"), Helpers.ConfiguracaoHelper.GetInt("SMTP_PORT"));
             smtp.EnableSsl = Helpers.ConfiguracaoHelper.GetBoolean("SMTP_ENABLE_SSL");
             smtp.UseDefaultCredentials = Helpers.ConfiguracaoHelper.GetBoolean("SMTP_USE_DEFAULT_CREDENTIALS");
+
             string strPassword = Helpers.ConfiguracaoHelper.GetString("SMTP_PASSWORD");
 
             strPassword = objEncryption.Morpho(strPassword, "Ava2014", TipoCriptografia.Descriptografa);

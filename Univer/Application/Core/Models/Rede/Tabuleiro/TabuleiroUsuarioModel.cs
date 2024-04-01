@@ -15,6 +15,7 @@ namespace Core.Models
         public int BoardID { get; set; }
         public int StatusID { get; set; }
         public int MasterID { get; set; }
+        public bool InformePag { get; set; }
         public int Ciclo { get; set; }
         public string Posicao { get; set; }
         public bool PagoMaster { get; set; }

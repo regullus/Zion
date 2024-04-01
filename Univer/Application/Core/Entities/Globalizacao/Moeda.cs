@@ -20,8 +20,8 @@ namespace Core.Entities
             USD = 3,
             [Description("Nenhuma")]
             NEN = 4,
-            [Description("LiteCoin")]
-            LTC = 5,
+            [Description("Pix")]
+            PIX = 5,
             [Description("Bitcoin")]
             BTC = 6,
             [Description("USDT (TRC20)")]

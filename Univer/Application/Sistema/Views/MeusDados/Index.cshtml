@@ -710,7 +710,7 @@
                             <div class="col-md-6">
                                 <div class="form-group form-md-line-input form-md-floating-label">
                                     <input type="text" maxlength="15" class="form-control" required id="Apelido" name="Apelido" value="@Model.Apelido">
-                                    <label for="form_control_1">@traducaoHelper["APELIDO"] @traducaoHelper["MAXIMO_15_CARACTERES"]</label>
+                                    <label for="form_control_1">@traducaoHelper["APELIDO"] @traducaoHelper["MAXIMO_12_CARACTERES"]</label>
                                 </div>
                             </div>
                         </div>
@@ -940,7 +940,7 @@
         <div class="portlet box backWrite grey-gallery">
 
             <div class="portlet-title">
-                <div class="caption"></div>
+                <div class="captionx"></div>
                 <div class="tools">
                     <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
                 </div>
@@ -955,9 +955,7 @@
                 @using (Html.BeginForm("Salvar", "MeusDados", FormMethod.Post, new { enctype = "multipart/form-data", role = "form", id = "formDadosBancarios" }))
                 {
                     <div class="row">
-
                         <div class="col-md-12 padding-20">
-
                             <input id="Tab" name="Tab" type="hidden" value="@Sistema.Controllers.MeusDadosController.Tabs.DadosBancarios" />
                             <input type="hidden" id="formDadosBancariosToken" name="formDadosBancariosToken" class="form-control" value="" />
 
@@ -968,7 +966,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input form-md-floating-label has-info">
                                         @Html.DropDownList("InstituicaoID", instituicoes, new { @class = "form-control form-md-line-input form-md-floating-label has-info", @onchange = "InstituicaoChange(this.value)" })<i></i>
-                                        <label for="InstituicaoID">@traducaoHelper["MOEDA"]</label>
+                                        <label for="InstituicaoID">@traducaoHelper["TIPO"]</label>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -1143,7 +1141,7 @@
                                     <div class="col-md-5">
                                         <div class="form-group form-md-line-input  has-info">
                                             <select class="form-control" id="EstadoID" name="EstadoID">
-                                                <option value="">Selecione seu Estado</option>
+                                                <option value="">@traducaoHelper["SELECIONE_SEU_ESTADO"]</option>
                                                 @foreach (var estado in estados)
                                                 {
                                                     <option value="@estado.ID" @(estado.ID == Model.EnderecoPrincipal.EstadoID ? "selected=selected" : "")>@estado.Nome</option>

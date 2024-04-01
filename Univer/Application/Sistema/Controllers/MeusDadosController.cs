@@ -732,7 +732,7 @@ namespace Sistema.Controllers
                     case Tabs.DadosBancarios:
                         #region DadosBancarios
 
-                        var conta = usuario.ContaDeposito.FirstOrDefault(c => c.IDTipoConta == 2);
+                        ContaDeposito conta = usuario.ContaDeposito.FirstOrDefault(c => c.IDTipoConta == 2);
                         if (conta == null)
                         {
                             conta = new ContaDeposito()
@@ -753,17 +753,17 @@ namespace Sistema.Controllers
                         {
                             switch (conta.IDInstituicao)
                             {
-                                case 107: //Litecoin
-                                    if (!BlockchainService.ValidarCarteiraLitecoin(form["Bitcoin"]))
-                                    {
-                                        strMensagem = new string[] { traducaoHelper["CARTEIRA_LTC_INVALIDA"] };
-                                        Mensagem(traducaoHelper["ERRO"], strMensagem, "err");
+                                case 107: //PIX -- Usando o antigo livecoin
+                                    //if (!BlockchainService.ValidarCarteiraLitecoin(form["Bitcoin"]))
+                                    //{
+                                    //    strMensagem = new string[] { traducaoHelper["CARTEIRA_LTC_INVALIDA"] };
+                                    //    Mensagem(traducaoHelper["ERRO"], strMensagem, "err");
 
-                                        return RedirectToAction("dados-bancarios");
-                                    }
+                                    //    return RedirectToAction("dados-bancarios");
+                                    //}
                                     conta.IDMeioPagamento = (int)PedidoPagamento.MeiosPagamento.CryptoPayments;
                                     conta.Litecoin = Core.Helpers.CriptografiaHelper.Morpho(form["Bitcoin"], Core.Helpers.CriptografiaHelper.TipoCriptografia.Criptografa);
-                                    conta.MoedaIDCripto = (int)Moeda.Moedas.LTC;
+                                    conta.MoedaIDCripto = (int)Moeda.Moedas.PIX;
                                     ViewBag.CriptoAtual = "Litecoin";
 
                                     break;
@@ -781,10 +781,12 @@ namespace Sistema.Controllers
                                     ViewBag.CriptoAtual = "Bitcoin";
 
                                     break;
+                                
+
                                 default: //Tether
                                     if (!BlockchainService.ValidarCarteiraTether(form["Bitcoin"]))
                                     {
-                                        strMensagem = new string[] { traducaoHelper["CONTA_INVALIDA"] };
+                                        strMensagem = new string[] { traducaoHelper["CARTEIRA_TETHER_INVALIDA"] };
                                         Mensagem(traducaoHelper["ERRO"], strMensagem, "err");
 
                                         return RedirectToAction("dados-bancarios");
@@ -816,7 +818,15 @@ namespace Sistema.Controllers
                             conta.Bitcoin = "";
                         }
 
-                        contaDepositoRepository.Save(conta);
+                        try
+                        {
+                            contaDepositoRepository.Save(conta);
+                        }
+                        catch (Exception ex)
+                        { 
+                            String erro = ex.Message;
+                        }
+                        
                         await SendEmailEdicaoCadastro("DADOS_BANCARIOS");
                         
                         strMensagem = new string[] { traducaoHelper["DADOS_SALVOS_SUCESSO"] };

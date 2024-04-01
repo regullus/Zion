@@ -309,13 +309,13 @@ namespace Sistema.Controllers
                     contaBTC = cpUtilities.Gerais.Morpho(contaBTC, TipoCriptografia.Descriptografa);
                     ViewBag.ContaBTC = contaBTC;
                 }
-                if (conta.MoedaIDCripto == (int)Moeda.Moedas.LTC)
-                {
-                    string contaLTC = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Litecoin);
-                    contaLTC = cpUtilities.Gerais.Morpho(contaLTC, TipoCriptografia.Descriptografa);
-                    ViewBag.ContaDeposito = "LTC";
-                    ViewBag.ContaLTC = contaLTC;
-                }
+                //if (conta.MoedaIDCripto == (int)Moeda.Moedas.LTC)
+                //{
+                //    string contaLTC = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Litecoin);
+                //    contaLTC = cpUtilities.Gerais.Morpho(contaLTC, TipoCriptografia.Descriptografa);
+                //    ViewBag.ContaDeposito = "LTC";
+                //    ViewBag.ContaLTC = contaLTC;
+                //}
                 if (conta.MoedaIDCripto == (int)Moeda.Moedas.USDT)
                 {
                     string contaUSDT = Core.Helpers.CriptografiaHelper.Descriptografar(conta.Tether);

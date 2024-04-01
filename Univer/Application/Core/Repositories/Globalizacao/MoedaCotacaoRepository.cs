@@ -84,15 +84,15 @@ namespace Core.Repositories.Globalizacao
             return GetBTCDolar(MoedaCotacao.Tipos.Saida);
         }
 
-        public double GetValorParaSaidaLTCDolar()
-        {
-            return GetLTCDolar(MoedaCotacao.Tipos.Saida);
-        }
+        //public double GetValorParaSaidaLTCDolar()
+        //{
+        //    return GetLTCDolar(MoedaCotacao.Tipos.Saida);
+        //}
 
-        public double GetValorParaEntradaLTCDolar()
-        {
-            return GetLTCDolar(MoedaCotacao.Tipos.Entrada);
-        }
+        //public double GetValorParaEntradaLTCDolar()
+        //{
+        //    return GetLTCDolar(MoedaCotacao.Tipos.Entrada);
+        //}
 
         private double GetBTCDolar(MoedaCotacao.Tipos tipo)
         {
@@ -107,18 +107,18 @@ namespace Core.Repositories.Globalizacao
             return bitcoinValue;
         }
 
-        private double GetLTCDolar(MoedaCotacao.Tipos tipo)
-        {
-            var valor = ConfiguracaoHelper.GetDouble("COTACAO_LTC_USD_DEFAULT");
+        //private double GetLTCDolar(MoedaCotacao.Tipos tipo)
+        //{
+        //    var valor = ConfiguracaoHelper.GetDouble("COTACAO_LTC_USD_DEFAULT");
 
-            var cotacao = this.GetByExpression(e => e.MoedaOrigemID == (int)Moeda.Moedas.LTC && e.MoedaDestinoID == (int)Moeda.Moedas.USD && e.TipoID == (int)tipo).FirstOrDefault();
-            if (cotacao != null)
-            {
-                valor = (double)cotacao.Valor;
-            }
+        //    var cotacao = this.GetByExpression(e => e.MoedaOrigemID == (int)Moeda.Moedas.LTC && e.MoedaDestinoID == (int)Moeda.Moedas.USD && e.TipoID == (int)tipo).FirstOrDefault();
+        //    if (cotacao != null)
+        //    {
+        //        valor = (double)cotacao.Valor;
+        //    }
 
-            return valor;
-        }
+        //    return valor;
+        //}
 
         //public async Task<double> GetBTCDolar1Async()
         //{

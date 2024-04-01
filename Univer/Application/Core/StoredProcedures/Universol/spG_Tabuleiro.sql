@@ -674,6 +674,7 @@ Begin
                         BoardID,
                         StatusID,
                         MasterID,
+                        InformePag,
                         Ciclo,
                         Posicao,
                         PagoMaster,
@@ -688,6 +689,7 @@ Begin
                         @BoardID,
                         1, --Ativo
                         @MasterTabuleiro,
+                        0,
                         @Ciclo,
                         @PosicaoFilho,
                         'false',
@@ -1122,6 +1124,7 @@ Begin
                         BoardID,
                         StatusID,
                         MasterID,
+                        InformePag,
                         Ciclo,
                         Posicao,
                         PagoMaster,
@@ -1136,6 +1139,7 @@ Begin
                         @BoardID,
                         1, --Ativo
                         Coalesce(@MasterTabuleiro,@MasterTabuleiro,1),
+                        0,
                         @Ciclo,
                         Coalesce(@PosicaoFilho,@PosicaoFilho,'1'),
                         'false',
@@ -1254,6 +1258,7 @@ Begin
                   BoardID,
                   StatusID,
                   MasterID,
+                  InformePag,
                   Ciclo,
                   Posicao,
                   PagoMaster,
@@ -1268,6 +1273,7 @@ Begin
                   @BoardID,
                   1, --Ativo
                   @UsuarioID,
+                  0,
                   @Ciclo,
                   'Master',
                   'false',

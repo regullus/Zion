@@ -11,6 +11,7 @@ namespace Core.Models
         public int UsuarioID { get; set; }
         public string Nome { get; set; }
         public string Celular { get; set; }
+        public string Pix { get; set; }
         public string Carteira { get; set; }
     }
 }

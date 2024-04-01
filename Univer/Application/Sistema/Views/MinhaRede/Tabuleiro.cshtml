@@ -97,8 +97,14 @@
                 let now = new Date(Date.now()).getTime();
                 let diff = count_down - now;
                 if (diff > 0) {
-                    var min = Math.floor(diff % hour / minute);
-                    var seg = Math.floor(diff % minute / second);
+                    var min = Math.floor(diff % hour / minute).toString();
+                    var seg = Math.floor(diff % minute / second).toString();
+                    if (min.length == 1) {
+                        min = '0' + min;
+                    } 
+                    if (seg.length == 1) {
+                        seg = '0' + seg;
+                    } 
                     document.getElementById('minutes').innerText = min;
                     document.getElementById('seconds').innerText = seg;
 
@@ -546,22 +552,28 @@
                         success: function (data) {
                             if (data != null) {
                                 $("#infoNome").html(data.Nome);
-                                $("#infoCelular").html(data.Celular);
-                                $("#qrCodePIX").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Celular);
-                                $("#infoTitulo").html('@(traducaoHelper["ALVO"])');
+                                $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
+                                $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
+
+                                if (data.Pix) {
+                                    $("#PixCode").html(data.Pix);
+                                    $("#PixHeader").show();
+                                    $("#PixCode").show();
+                                } else {
+                                    $("#PixHeader").html('@traducaoHelper["PIX_NAO_CADASTRADO"]');
+                                }
 
                                 if (data.Carteira) {
-                                    $("#infoCripto").html(data.Carteira);
-                                    $("#carteiraHeader").show();
-                                    $("#infoCripto").show();
-                                    $("#qrCodeBTC").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
+                                    $("#CriptoCode").html(data.Carteira);
+                                    $("#CriptoHeader").show();
+                                    $("#CriptoCode").show();
+                                    //$("#qrCode").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
                                 } else {
-                                    $("#carteiraHeader").html('@traducaoHelper["CARTEIRA_BTC_NAO_CADASTRADA"]');
+                                    $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
                                 }
 
                                 if ($('#Master').attr("data-id") == @idUsuario) {
-                                    $(".panelBTC").hide();
-                                    $("#qrCodePIX").hide();
+                                    $(".panelCripto").hide();
                                 }
 
                                 $('#modDados').modal('show');
@@ -764,12 +776,66 @@
                 }
             });
 
+            $('.reportPayment').on('click', function () {
+                var idTabuleiro = $(this).attr("data-id");
+                $.ajax({
+                    url: "@Url.Action("ReportPayment")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'tabuleiroID': idTabuleiro,
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data == "OK") {
+                                location.reload();
+                                 Swal.fire({
+                                    title: '@traducaoHelper["SUCESSO"]',
+                                    text: '@traducaoHelper["OPERACAO_SUCESSO"]',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: '@traducaoHelper["SEM_DADOS"]',
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
+
+                });
+
+
         </script>
     }
     else
     {
         <script>
-
             $('.invite').on('click', function () {
             var idTabuleiro = $(this).attr("data-id");
             $.ajax({
@@ -793,7 +859,7 @@
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ALERTA"]',
-                                text: '@traducaoHelper["DATA"]',
+                                text: '@traducaoHelper["SEM_DADOS"]',
                                 icon: 'warning',
                                 confirmButtonText: 'OK'
                             });
@@ -823,7 +889,6 @@
             });
 
             });
-
         </script>
     }
 }
@@ -1068,35 +1133,36 @@ else
             <div class="modal-body" style="background-color: #fff;">
                 <div class="row">
                     <div class="col-md-12">
-                        <h3 style="font-weight: 500;">@(traducaoHelper["NOME"])</h3>
-                        <h3 style="padding-left: 10px;" id="infoNome"></h3>
+                        <h3 style="font-weight: 500;" id="infoNome"></h3>
+                        <h4 style="font-weight: 500;" id="infoCelular"></h4>
 
-                        <div class="panel-group accordion" id="accordion1">
-                            <div class="panel panel-default">
+                        <div class="panel-group accordion" id="accordion1" style="padding-top: 20px;">
+
+                            <div class="panel panel-default panelPix">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
                                         <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion1" href="#collapse_1"> @traducaoHelper["DADOS_PAGAMENTE_PIX"] </a>
                                     </h4>
                                 </div>
-                                <div id="collapse_1" class="panel-collapse in">
-                                    <div class="panel-body" style="height:400px; overflow-y:auto; background-color: #eee;">
-                                        <h3 style="font-weight: 500;">@(traducaoHelper["CELULAR"]) @(traducaoHelper["IDIOMA"] == "pt-BR" ? "(PIX)" : "")</h3>
-                                        <h3 style="padding-left: 10px;" id="infoCelular"></h3>
-                                        <img id="qrCodePIX" class="center" src="" />
+                                <div id="collapse_1" class="panel-collapse">
+                                    <div class="panel-body" style="overflow-y:auto; background-color: #eee;">
+                                        <h3 style="font-weight: 500;" id="PixHeader">@(traducaoHelper["PIX"])</h3>
+                                        <h4 id="PixCode" style="font-weight: 500;"></h4>
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel panel-default panelBTC">
+
+                            <div class="panel panel-default panelCripto">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
-                                        <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion1" href="#collapse_2"> @traducaoHelper["DADOS_PAGAMENTE_BTC"] </a>
+                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion1" href="#collapse_2"> @traducaoHelper["DADOS_PAGAMENTE_USDT"] </a>
                                     </h4>
                                 </div>
-                                <div id="collapse_2" class="panel-collapse collapse">
-                                    <div class="panel-body" style="height:400px; overflow-y:auto; background-color: #eee;">
-                                        <h3 style="font-weight: 500;" id="carteiraHeader">@(traducaoHelper["CARTEIRA_BTC"])</h3>
-                                        <h3 style="padding-left: 10px;" id="infoCripto"></h3>
-                                        <img id="qrCodeBTC" class="center" src="" />
+                                <div id="collapse_2" class="panel-collapse">
+                                    <div class="panel-body" style="overflow-y:auto; background-color: #eee;">
+                                        <h3 style="font-weight: 500;" id="CriptoHeader">@(traducaoHelper["CARTEIRA"])</h3>
+                                        <h4 id="CriptoCode" style="font-weight: 500;"></h4>
+                                        @*<img id="qrCode" class="center" src="" />*@
                                     </div>
                                 </div>
                             </div>
@@ -1105,7 +1171,8 @@ else
                 </div>
             </div>
             <div class="modal-footer" style="background-color: #eee;">
-                <button data-dismiss="modal" class="btn btn-success">OK</button>
+                <button data-dismiss="modal" class="btn btn-success reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
+                <button data-dismiss="modal" class="btn btn-info">@(traducaoHelper["SAIR"])</button>
             </div>
         </div>
     </div>

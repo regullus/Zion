@@ -26,6 +26,7 @@ BEGIN
         BoardID,
         StatusID,
         MasterID,
+        InformePag,
         Ciclo,
         Posicao,
         PagoMaster,
