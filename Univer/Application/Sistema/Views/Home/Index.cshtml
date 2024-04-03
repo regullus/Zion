@@ -273,6 +273,34 @@
     </div>
 </div>
 
+<div class="portlet solid grey-cararra" style="max-width: 1600px;">
+    <div class="portlet-body">
+        <!--BANNER-->
+        <div class="row" style="max-width: 1600px;">
+            @if (blnExibeBanner)
+            {
+                <div class="owl-carousel" style="margin-bottom:20px; margin-left: 60px;">
+                    @if (banners != null && banners.Count > 0)
+                    {
+                        foreach (var banner in banners)
+                        {
+                            @*<img src="@Url.Content(banner.CaminhoVirtual)" class="img-responsive" alt="@banner.Nome">*@
+                            <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/" + @banner.Nome)" alt="@banner.Nome" class="img-responsive" style="max-width: 60%;">
+                        }
+                    }
+                    else
+                    {
+                        <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner2.png")" class="img-responsive center-align" style="height: 800px; height: 800px;">
+                    }
+                </div>
+            }
+        </div>
+
+
+    </div>
+</div>
+
+
 @if (usuario.Status == Core.Entities.Usuario.TodosStatus.NaoAssociado)
 {
     <div class="portlet aba box backWrite grey-gallery">
