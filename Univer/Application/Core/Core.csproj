@@ -538,6 +538,7 @@
     <Compile Include="Models\Loja\CarrinhoItemModel.cs" />
     <Compile Include="Models\Loja\CarrinhoModel.cs" />
     <Compile Include="Models\Loja\CarrinhoPagamentoModel.cs" />
+    <Compile Include="Models\Rede\Tabuleiro\TabuleiroBoardModel.cs" />
     <Compile Include="Models\Rede\Tabuleiro\TabuleiroUsuarioModel.cs" />
     <Compile Include="Models\Rede\Tabuleiro\TabuleiroModel.cs" />
     <Compile Include="Models\Rede\Tabuleiro\TabuleiroInclusaoModel.cs" />

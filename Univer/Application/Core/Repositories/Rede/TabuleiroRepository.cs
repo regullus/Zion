@@ -42,9 +42,9 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public TabuleiroModel ObtemTabuleiro(int id)
+        public TabuleiroModel ObtemTabuleiro(int id, int usuarioID)
         {
-            string sql = "Exec spC_Tabuleiro @id=" + id ;
+            string sql = "Exec spC_Tabuleiro @id=" + id + ", @UsuarioID = " + usuarioID;
 
             var retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).FirstOrDefault();;
 
@@ -53,7 +53,7 @@ namespace Core.Repositories.Rede
 
         public IEnumerable<TabuleiroInclusao> IncluiTabuleiro(int idUsuario, int idPai, int idBoard)
         {
-            //idUsuario usuarioa ser incluido no tabuleiro
+            //idUsuario usuario a ser incluido no tabuleiro
             //idPai patrocinador do usuario acima
             //idBoard board a ser inserido o usuario
             //chamada deve ser principal para incluir novo usuario
@@ -63,6 +63,34 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+
+        public string InformarPagamento(int idUsuario, int idTabuleiro)
+        {
+            string sql = "Exec spC_TabuleiroInformarPagto @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
+        public string InformarPagtoSistema(int idUsuario, int idTabuleiro)
+        {
+            string sql = "Exec spC_TabuleiroInformarPagtoSistema @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
+        public string InformarRecebimento(int idUsuario, int idTabuleiro)
+        {
+            string sql = "Exec spC_TabuleiroInformarRecebimento @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
 
         public TabuleiroInfoUsuarioModel ObtemInfoUsuario(int idTarget, int idUsuario, int idTabuleiro)
         {
@@ -79,5 +107,14 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+
+        public TabuleiroBoardModel ObtemTabuleiroBoard(int idTabuleiro)
+        {
+            string sql = "Exec spC_TabuleiroBoard @TabuleiroID=" + idTabuleiro;
+            var retorno = _context.Database.SqlQuery<TabuleiroBoardModel>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
     }
 }

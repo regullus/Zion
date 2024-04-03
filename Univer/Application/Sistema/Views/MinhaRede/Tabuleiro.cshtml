@@ -40,6 +40,13 @@
     var porTabuleiroHeight = "200px";
     var porTabuleiroMaxWidth = "96px";
 
+    bool showReportPayment = false;
+
+    if (ViewBag.ShowReportPayment != null)
+    {
+        showReportPayment = ViewBag.ShowReportPayment;
+    }
+
     #endregion
 
 }
@@ -61,6 +68,9 @@
     <script type="text/javascript" src="~/Content/scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/countUp.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/Content/global/plugins/jquery.pulsate.min.js" type="text/javascript"></script>
+    <script src="~/Content/global/plugins/jquery-bootpag/jquery.bootpag.min.js" type="text/javascript"></script>
+    <script src="~/Content/pages/scripts/ui-general.min.js" type="text/javascript"></script>
 
     <script>
         var width = 0;
@@ -84,7 +94,7 @@
 
     </script>
 
-    @if(ViewBag.Timer != null)
+    @if (ViewBag.Timer != null)
     {
         <script>
             //Contador de tempo para pagamento
@@ -101,10 +111,10 @@
                     var seg = Math.floor(diff % minute / second).toString();
                     if (min.length == 1) {
                         min = '0' + min;
-                    } 
+                    }
                     if (seg.length == 1) {
                         seg = '0' + seg;
-                    } 
+                    }
                     document.getElementById('minutes').innerText = min;
                     document.getElementById('seconds').innerText = seg;
 
@@ -133,8 +143,6 @@
 
             function position() {
                 var position = $('.porTabuleiro').offset();
-                //var positionMenu = $('.page-sidebar-menu').width();
-                //$(".txtTitle").html(width);
 
                 $('#porTabuleiro').css({
                     "width": "980px",
@@ -326,7 +334,6 @@
 
                     ajustLeft = -246;
                     ajustTop = 0;
-
                 }
 
                 //3 - 1
@@ -532,15 +539,18 @@
                 $('.Master').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posMasterTop + 'px; left: ' + posMasterLeft + 'px;');
                 $('#Master').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff;');
                 $('#Master').addClass('@tabuleiro.corMaster');
+                $('.Master').addClass('@(showReportPayment ? "blob" : "")');
             }
 
             $('.btnTabuleiro').on('click', function () {
                 var idTarget = $(this).attr("data-id");
                 var idTabuleiro = $('#tabuleiro').val();
                 var nivel = $(this).attr("data-name");
+                $("#infoID").val($(this).attr("data-id"));
+
                 if (idTarget == $('#Master').attr("data-id") || $('#Master').attr("data-id") == @idUsuario) {
                     $.ajax({
-                        url: "@Url.Action("GetDados")",
+                        url: "@Url.Action("GetData")",
                         type: "POST",
                         data: {
                             'usuarioID': '@(idUsuario)',
@@ -555,11 +565,13 @@
                                 $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
 
+
                                 if (data.Pix) {
                                     $("#PixCode").html(data.Pix);
                                     $("#PixHeader").show();
                                     $("#PixCode").show();
                                 } else {
+                                    $(".panelPix").hide();
                                     $("#PixHeader").html('@traducaoHelper["PIX_NAO_CADASTRADO"]');
                                 }
 
@@ -569,11 +581,18 @@
                                     $("#CriptoCode").show();
                                     //$("#qrCode").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
                                 } else {
+                                    $(".panelCripto").hide();
                                     $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
                                 }
 
                                 if ($('#Master').attr("data-id") == @idUsuario) {
                                     $(".panelCripto").hide();
+                                }
+
+                                if (data.ConfirmarRecebimento) {
+                                    $(".reportReceipt").show();
+                                } else {
+                                    $(".reportReceipt").hide();
                                 }
 
                                 $('#modDados').modal('show');
@@ -774,10 +793,11 @@
                          confirmButtonText: 'OK'
                     });
                 }
+
             });
 
             $('.reportPayment').on('click', function () {
-                var idTabuleiro = $(this).attr("data-id");
+                var idTabuleiro = $('#tabuleiro').val();
                 $.ajax({
                     url: "@Url.Action("ReportPayment")",
                     type: "POST",
@@ -788,18 +808,12 @@
                     },
                     success: function (data) {
                         if (data != null) {
-                            if (data == "OK") {
+                            if (data.toString() == "OK") {
                                 location.reload();
-                                 Swal.fire({
-                                    title: '@traducaoHelper["SUCESSO"]',
-                                    text: '@traducaoHelper["OPERACAO_SUCESSO"]',
-                                    icon: 'success',
-                                    confirmButtonText: 'OK'
-                                });
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
-                                    text: '@traducaoHelper["SEM_DADOS"]',
+                                    text: data.toString(),  @*'@traducaoHelper["SEM_DADOS"]',*@
                                     icon: 'warning',
                                     confirmButtonText: 'OK'
                                 });
@@ -828,8 +842,57 @@
                     },
                 });
 
+            });
+
+            $('.reportReceipt').on('click', function () {
+                var idTabuleiro = $('#tabuleiro').val();
+                var idUsuarioConvidado = $("#infoID").val();
+                $.ajax({
+                    url: "@Url.Action("ReportReceipt")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'UsuarioConvidadoID': idUsuarioConvidado,
+                        'tabuleiroID': idTabuleiro,
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data.toString() == "OK") {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),  @*'@traducaoHelper["SEM_DADOS"]',*@
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
                 });
 
+            });
 
         </script>
     }
@@ -957,51 +1020,51 @@
                     </div>
                 </div>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1 @(tabuleiro.pulseDonatorEsqSup1 ? "blob" : "")">
                 <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2 @(tabuleiro.pulseDonatorEsqSup2 ? "blob" : "")">
                 <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1 @(tabuleiro.pulseDonatorEsqInf1 ? "blob" : "")">
                 <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorEsqInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2 @(tabuleiro.pulseDonatorEsqInf2 ? "blob" : "")">
                 <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1 @(tabuleiro.pulseDonatorDirSup1 ? "blob" : "")">
                 <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirSup2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2 @(tabuleiro.pulseDonatorDirSup2 ? "blob" : "")">
                 <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf1 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1 @(tabuleiro.pulseDonatorDirInf1 ? "blob" : "")">
                 <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinDonatorDirInf2 + "x.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2 @(tabuleiro.pulseDonatorDirInf2 ? "blob" : "")">
                 <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqSup + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup @(tabuleiro.pulseIndicatorEsqSup ? "blob" : "")">
                 <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorEsqInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqInf + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf @(tabuleiro.pulseIndicatorEsqInf ? "blob" : "")">
                 <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirSup + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirSup + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup @(tabuleiro.pulseIndicatorDirSup ? "blob" : "")">
                 <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinIndicatorDirInf + "x.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirInf + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf @(tabuleiro.pulseIndicatorDirInf ? "blob" : "")">
                 <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorEsq + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorEsq + "_" + "sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq @(tabuleiro.pulseCoordinatorEsq ? "blob" : "")">
                 <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinCoordinatorDir + "x.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorDir + "_" + "sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir @(tabuleiro.pulseCoordinatorDir ? "blob" : "")">
                 <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorDir</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiro.pinMaster + "x.png?v=" + @Helpers.Local.Versao)' class="Master">
-                <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoMaster</span></button>
-
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinMaster + "_" + "alv.png?v=" + @Helpers.Local.Versao)' class="Master @(tabuleiro.pulseMaster ? "blob" : "")">
+                <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro"><span style="font-size: 14px; font-weight: 700;"> @tabuleiro.ApelidoMaster</span></button>
+                
             </div>
         </div>
     </div>
@@ -1135,9 +1198,8 @@ else
                     <div class="col-md-12">
                         <h3 style="font-weight: 500;" id="infoNome"></h3>
                         <h4 style="font-weight: 500;" id="infoCelular"></h4>
-
+                        <input type="hidden" id="infoID" />
                         <div class="panel-group accordion" id="accordion1" style="padding-top: 20px;">
-
                             <div class="panel panel-default panelPix">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
@@ -1151,7 +1213,6 @@ else
                                     </div>
                                 </div>
                             </div>
-
                             <div class="panel panel-default panelCripto">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
@@ -1171,7 +1232,11 @@ else
                 </div>
             </div>
             <div class="modal-footer" style="background-color: #eee;">
-                <button data-dismiss="modal" class="btn btn-success reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
+                @if (ViewBag.ShowReportPayment)
+                {
+                    <button data-dismiss="modal" class="btn btn-success reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
+                }
+                <button data-dismiss="modal" class="btn btn-success reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
                 <button data-dismiss="modal" class="btn btn-info">@(traducaoHelper["SAIR"])</button>
             </div>
         </div>

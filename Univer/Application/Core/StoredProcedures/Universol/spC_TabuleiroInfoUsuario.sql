@@ -1,4 +1,4 @@
-use UniverDev
+use Univer
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInfoUsuario'))
    Drop Procedure spC_TabuleiroInfoUsuario
@@ -26,7 +26,9 @@ BEGIN
         UsuarioID int,
         Nome nvarchar(255),
         Celular nvarchar(100),
-        Carteira nvarchar(255)
+        Pix nvarchar(255),
+        Carteira nvarchar(255),
+        ConfirmarRecebimento bit
     )
 
     Select 
@@ -36,14 +38,32 @@ BEGIN
     Where
         id = @idTabuleiro
 
-    If(@master = @idUsuario Or @master = @idTarget)
+    If(@master = @idUsuario)
     Begin
         insert into #temp
         Select
             @idTarget,
             Nome,
             Celular,
-            ''
+            '',
+            '',
+            0
+        from
+            Usuario.Usuario
+        Where 
+            id = @idTarget
+    End
+
+    If(@master = @idTarget)
+    Begin
+        insert into #temp
+        Select
+            @idTarget,
+            Nome,
+            Celular,
+            '',
+            '',
+            0
         from
             Usuario.Usuario
         Where 
@@ -52,7 +72,8 @@ BEGIN
         Update 
             temp
         Set
-            temp.Carteira = cd.Bitcoin
+            temp.Pix = cd.Litecoin, --Usando o campo litecoin para pix
+            temp.Carteira = cd.Tether
         From 
             #temp temp,
             Financeiro.ContaDeposito cd
@@ -64,7 +85,9 @@ BEGIN
         UsuarioID,
         Nome,
         Celular,
-        Carteira
+        Pix,
+        Carteira,
+        ConfirmarRecebimento
     From
         #temp
 

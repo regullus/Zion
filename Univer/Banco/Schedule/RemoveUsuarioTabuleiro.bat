@@ -1,0 +1,2 @@
+sqlcmd -S universol.crug824sutel.us-east-2.rds.amazonaws.com -d Univer -U saUniversol -P BetSoFar593=128 -i D:\Schedule\producao\RemoveUsuarioTabuleiro.sql -o D:\Schedule\producao\RemoveUsuarioTabuleiro.txt
+sqlcmd -S universol.crug824sutel.us-east-2.rds.amazonaws.com -d UniverDev -U saUniversol -P BetSoFar593=128 -i D:\Schedule\producao\RemoveUsuarioTabuleiroDev.sql -o D:\Schedule\producao\RemoveUsuarioTabuleiroDev.txt

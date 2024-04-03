@@ -253,36 +253,7 @@
 
                 #endregion
 
-                if (ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
-                {
-                    ViewBag.RedeTabuleiro = true;
-                    
-                    IEnumerable <Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
-                    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
-                    
-                    ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
-                    ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
-
-                    Core.Models.TabuleiroModel tabuleiro = null; 
-                    
-                    if (tabuleirosNivelConvite.Count() > 0)
-                    {
-                        Core.Models.TabuleiroNivelModel tabuleiroConviteList = tabuleirosNivelConvite.FirstOrDefault();
-                    }
-                    if (tabuleirosNivelAtivos.Count() > 0)
-                    {
-                        Core.Models.TabuleiroNivelModel tabuleiroAtivosList = tabuleirosNivelAtivos.FirstOrDefault();
-                        //Obtem o primeiro tabuleiro que sera mostrado na pagina
-                        int tabuleiroAtivosID = tabuleiroAtivosList.TabuleiroID;
-                        if (tabuleiroAtivosID > 0)
-                        {
-                            tabuleiro = tabuleiroRepository.ObtemTabuleiro(tabuleiroAtivosID);
-                            ViewBag.tabuleiroID = tabuleiroAtivosID;
-                            ViewBag.tabuleiro=tabuleiro;
-                        }
-                    }
-                }
-                else
+                if (!ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
                 {
                     ViewBag.RedeTabuleiro = false;
 

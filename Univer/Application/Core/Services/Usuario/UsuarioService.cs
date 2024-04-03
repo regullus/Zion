@@ -951,7 +951,7 @@ namespace Core.Services.Usuario
                 }
 
                 string strLink = ConfiguracaoHelper.GetString("DOMINIO") + "cadastro/ativar?codigo=" + CriptografiaHelper.Morpho(usuario.Login, CriptografiaHelper.TipoCriptografia.Criptografa);
-                string strLogo = ConfiguracaoHelper.GetString("DOMINIO") + "/content/img/" + sistema + "/logo-sistema.png";
+                string strLogo = ConfiguracaoHelper.GetString("DOMINIO") + "content/img/" + sistema + "/logo-sistema.png";
 
 
                 var campos = new List<KeyValuePair<string, string>>();
@@ -969,7 +969,7 @@ namespace Core.Services.Usuario
                 cont++;
                 campos.Add(new KeyValuePair<string, string>("SISTEMA", sistema));
                 cont++;
-                campos.Add(new KeyValuePair<string, string>("MSG_HEADER", traducaoHelper["CONFIRMAR_EMAIL_HEADER"]));
+                campos.Add(new KeyValuePair<string, string>("MSG_HEADER", traducaoHelper["CONFIRMAR"]));
                 cont++;
                 campos.Add(new KeyValuePair<string, string>("TEXT_LINK", traducaoHelper["CONFIRMAR_EMAIL_LINK"]));
                 cont++;
