@@ -83,6 +83,7 @@
 
         function widthResizer() {
             width = window.innerWidth;
+            $('.titleSmall').html(width);
             position();
         }
 
@@ -143,7 +144,7 @@
 
             function position() {
                 var position = $('.porTabuleiro').offset();
-
+                
                 $('#porTabuleiro').css({
                     "width": "980px",
                     "height": "680px",
@@ -968,18 +969,28 @@
         <div class="page-head">
             <!-- BEGIN PAGE TITLE -->
             <div class="row">
-                <div class="column col-md-10">
+                <div class="column col-md-9">
                     <div class="page-title">
-                        <h2>@ViewBag.Title</h2>
+                        <h2>@ViewBag.Title <small class="titleSmall">xuxa</small></h2>
                     </div>
                 </div>
                 @if (ViewBag.Timer != null)
                 {
-                    <div class="column col-md-2">
+                    <div class="column col-md-3">
                         <div class="page-title">
                             <span id="minutes" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
                             <span id="pontos" style="font-size: 18px; font-weight: 500; color: darkred;">:</span>
                             <span id="seconds" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.Pagar != null && ViewBag.Pagar)
+                {
+                    <div class="column col-md-3">
+                        <div class="page-title" style="padding: 10px;">
+                            <button type="button" class="btn btn-success pull-right">
+                                @traducaoHelper["PAGAR_SISTEMA"]
+                            </button>
                         </div>
                     </div>
                 }
@@ -1064,7 +1075,7 @@
 
                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinMaster + "_" + "alv.png?v=" + @Helpers.Local.Versao)' class="Master @(tabuleiro.pulseMaster ? "blob" : "")">
                 <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro"><span style="font-size: 14px; font-weight: 700;"> @tabuleiro.ApelidoMaster</span></button>
-                
+
             </div>
         </div>
     </div>
@@ -1114,15 +1125,14 @@ else
             <!-- Invite -->
             <li class="nav-item start">
                 <a href="javascript:;" id="ïnvite_@item.ID" data-id="@item.ID" class="invite" style="margin: 0; padding: 0;">
-                    <div class="title" style="margin: 0; padding:5px;">
-                        <div class="card-frame card-home springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)" style="padding: 0; margin: 0;">
-                            <div class="col-md-4" style="padding: 5px; margin: 0;">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 54px; width: 54px; padding: 0; margin: 0;">
-                            </div>
-                            <div class="col-md-8" style="padding: 5px; margin: 0;">
-                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["CONVITE"]</span></div>
-                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
-                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
+                    <div class="tiles" style="padding-left: 15px;">
+                        <div class="tile double springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)" style="max-height: 90px; max-width: 200px;">
+
+                            <div class="tile-body" style="padding:5px;">
+                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                <p class="card-content2-txt">@(traducaoHelper[item.Posicao])</p>
+                                <p class="card-title-txt">@traducaoHelper["CONVITE"]</p>
                             </div>
                         </div>
                     </div>
@@ -1167,15 +1177,15 @@ else
             }
             <li class="nav-item start">
                 <a href="javascript:;" style="margin: 0; padding: 0;">
-                    <div class="title" style="margin: 0; padding:5px;">
-                        <div class="tile card-frame card-home @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="padding: 0; margin: 0;">
-                            <div class="col-md-4" style="padding: 5px; margin: 0;">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 54px; width: 54px; padding: 0; margin: 0;">
-                            </div>
-                            <div class="col-md-8" style="padding: 5px; margin: 0;">
-                                <div class="col-md-12 card-title-div"><span class="card-title-txt">@traducaoHelper["ATIVO"]</span></div>
-                                <div class="col-md-12 card-title-div"><span class="card-content-txt">@(traducaoHelper[item.BoardNome])</span></div>
-                                <div class="col-md-12 card-title-div"><span class="card-content2-txt">@(traducaoHelper[item.Posicao])</span></div>
+
+                    <div class="tiles" style="padding-left: 15px;">
+                        <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 80px; max-width: 200px;">
+
+                            <div class="tile-body" style="padding:5px;">
+                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                <p class="card-content2-txt">@(traducaoHelper[item.Posicao])</p>
+                                <p class="card-title-txt"></p>
                             </div>
                         </div>
                     </div>

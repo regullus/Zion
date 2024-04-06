@@ -437,7 +437,6 @@ namespace Sistema.Controllers
                 ViewBag.RedeTabuleiro = true;
                 int idTabuleiro = 1;
 
-
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
 
@@ -498,6 +497,13 @@ namespace Sistema.Controllers
                     {
                         tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
                         ViewBag.tabuleiro = tabuleiro;
+                        if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
+                        {
+                            ViewBag.Pagar = true;
+                        } else
+                        {
+                            ViewBag.Pagar = false;
+                        }
                     }
                 }
             }
