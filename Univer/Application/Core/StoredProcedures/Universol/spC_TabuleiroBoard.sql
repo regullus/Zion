@@ -48,6 +48,6 @@ go
 Grant Exec on spC_TabuleiroBoard To public
 go
 
-Exec spC_TabuleiroBoard @TabuleiroID = 3
+--Exec spC_TabuleiroBoard @TabuleiroID = 3
 
 

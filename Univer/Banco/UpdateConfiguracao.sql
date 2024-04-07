@@ -1,15 +1,15 @@
 use Univer
 go
 declare @chave nvarchar(255), @TextoP nvarchar(255), @TextoE nvarchar(255), @TextoI nvarchar(255)
-select @chave = 'EMAIL_NAO_CONFIRMADO_3'
+select @chave = 'INFORMAR_PAGAMENTO_SISTEMA'
 Select * from Globalizacao.Traducao where chave like '%' + @chave + '%'
 
 delete Globalizacao.Traducao  where chave = @chave
 
 select 
-    @TextoP = 'Por favor,  acesse esse email para validar seu cadastro.',
-	@TextoE = 'Por favor acceda a este correo electrónico para validar su registro.',
-	@TextoI = 'Please access this email to validate your registration.'
+    @TextoP = 'Informar pagamento ao sistema',
+	@TextoE = 'Reportar pago al sistema',
+	@TextoI = 'Report payment to the system'
 	
 --update Globalizacao.Traducao set Texto = @TextoP where chave = @chave and IdiomaID = 1
 --update Globalizacao.Traducao set Texto = @TextoE where chave = @chave and IdiomaID = 2
@@ -22,7 +22,7 @@ insert into  Globalizacao.Traducao values (3,1,@chave,@TextoI,'',getdate())
 Select * from Globalizacao.Traducao where chave = @chave
 
 -----------CONFIGURACAO------------
-use UniverDev
+use Univer
 go
 declare @chaveC nvarchar(255), @dados nvarchar(255)
 select @chaveC = 'PRODUTO_VALOR_VARIAVEL'

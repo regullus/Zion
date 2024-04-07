@@ -52,6 +52,18 @@ BEGIN
             Usuario.Usuario
         Where 
             id = @idTarget
+
+        Update
+            temp
+        Set
+            ConfirmarRecebimento = 1
+        From
+            #temp temp,
+            Rede.TabuleiroUsuario usu
+        Where
+            temp.UsuarioID = usu.UsuarioID and
+            usu.PagoMaster = 0
+
     End
 
     If(@master = @idTarget)
@@ -97,8 +109,8 @@ go
 Grant Exec on spC_TabuleiroInfoUsuario To public
 go
 
-Exec spC_TabuleiroInfoUsuario @idTarget = 2580, @idUsuario = 2581, @idTabuleiro = 1
-Exec spC_TabuleiroInfoUsuario @idTarget = 2581, @idUsuario = 2580, @idTabuleiro = 1
-Exec spC_TabuleiroInfoUsuario @idTarget = 2581, @idUsuario = 2582, @idTabuleiro = 1
-
-    --Select * from Rede.Tabuleiro Where id = 1
+--Exec spC_TabuleiroInfoUsuario @idTarget = 2588, @idUsuario = 2580, @idTabuleiro = 1
+--Exec spC_TabuleiroInfoUsuario @idTarget = 2587, @idUsuario = 2580, @idTabuleiro = 1
+--Exec spC_TabuleiroInfoUsuario @idTarget = 2590, @idUsuario = 2580, @idTabuleiro = 1
+--Exec spC_TabuleiroInfoUsuario @idTarget = 2581, @idUsuario = 2580, @idTabuleiro = 1
+--Exec spC_TabuleiroInfoUsuario @idTarget = 2581, @idUsuario = 2582, @idTabuleiro = 1

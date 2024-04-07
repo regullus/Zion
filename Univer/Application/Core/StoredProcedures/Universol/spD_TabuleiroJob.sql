@@ -133,5 +133,5 @@ End -- Sp
 go
 Grant Exec on spD_TabuleiroJob To public
 go
-Exec spD_TabuleiroJob
+--Exec spD_TabuleiroJob
 

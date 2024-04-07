@@ -1,4 +1,4 @@
-use UniverDev
+use Univer
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInformarPagto'))
    Drop Procedure spC_TabuleiroInformarPagto
@@ -56,6 +56,6 @@ go
 Grant Exec on spC_TabuleiroInformarPagto To public
 go
 
-Exec spC_TabuleiroInformarPagto @UsuarioID = 2587, @TabuleiroID = 1
+--Exec spC_TabuleiroInformarPagto @UsuarioID = 2587, @TabuleiroID = 1
 
 

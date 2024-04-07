@@ -83,7 +83,7 @@
 
         function widthResizer() {
             width = window.innerWidth;
-            $('.titleSmall').html(width);
+            /*$('.titleSmall').html(width);*/
             position();
         }
 
@@ -135,7 +135,7 @@
             {
                 $("#tab_select").addClass('@tabuleiroAtivo.BoardCor');
                 $("#tab_select_name").html('@(traducaoHelper[tabuleiroAtivo.BoardNome])');
-                $("#tab_select_position").html('@traducaoHelper[tabuleiroAtivo.Posicao]');
+                $("#tab_select_position").html('@(traducaoHelper[tabuleiroAtivo.Posicao].ToUpper())');
                 $("#tab_select_img").attr("src", '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)');
             }
 
@@ -154,7 +154,7 @@
                     "height": "680px",
                 });
 
-                var alinhaTxtTop = 90;
+                var alinhaTxtTop = 94;
                 var alinhaTxtLeft = 51;
 
                 var ajustTop = -50;
@@ -346,53 +346,40 @@
                         "width": "450px",
                         "height": "1030px",
                     });
-                    //overflow: auto; overflow-y: hidden;
-                    //$('.porTabuleiro').css("overflow", "auto");
-                    //$('#porTabuleiro').css("overflow-y", "hidden");
 
-                    //$(".porTabuleiro").attr("style", "position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; width: 980px; height: 680px;");
-
-                    //Deckard
                     xCoordinatorEsqTop = 160;
                     yCoordinatorEsqLeft = 500;
 
-                    //Han
                     xCoordinatorDirTop = 420;
                     yCoordinatorDirLeft = 400;
 
-                    //Richard
                     xIndicatorDirSupTop = 520;
                     xIndicatorDirSupLeft = 500;
-                    //Brook
+
                     xIndicatorDirInfTop = 590;
                     xIndicatorDirInfLeft = 300;
 
-                    //Allie
                     xIndicatorEsqSupTop = 10;
                     yIndicatorEsqSupLeft = 560;
-                    //John
+
                     xIndicatorEsqInfTop = 110;
                     yIndicatorEsqInfLeft = 360;
 
-                    //Brook
                     xDonatorDirSup1Top = 460;
                     yDonatorDirSup1Left = 260;
                     xDonatorDirSup2Top = 720;
                     yDonatorDirSup2Left = 320;
 
-                    //Richard
                     xDonatorDirInf1Top = 400;
                     yDonatorDirInf1Left = 580;
                     xDonatorDirInf2Top = 640;
                     yDonatorDirInf2Left = 480;
 
-                    //Allie
                     xDonatorEsqSup1Top = -130;
                     yDonatorEsqSup1Left = 570;
                     xDonatorEsqSup2Top = -40;
                     yDonatorEsqSup2Left = 430;
 
-                    //John
                     xDonatorEsqInf1Top = 0;
                     yDonatorEsqInf1Left = 290;
 
@@ -563,7 +550,6 @@
                                 $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
 
-
                                 if (data.Pix) {
                                     $("#PixCode").html(data.Pix);
                                     $("#PixHeader").show();
@@ -592,6 +578,7 @@
                                 } else {
                                     $(".reportReceipt").hide();
                                 }
+                                $(".reportPaymentSystem").hide();
 
                                 $('#modDados').modal('show');
                             } else {
@@ -655,7 +642,7 @@
                         success: function (data) {
                             if (data != null) {
                                 //Master
-                                $(".Master").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinMaster + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".Master").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinMaster + '_alv.png?v=' + '@Helpers.Local.Versao');
                                 $("#Master").attr('data-id', data.Master);
                                 $("#Master span").html(data.ApelidoMaster);
                                 if (data.PinMaster == '0') {
@@ -663,98 +650,98 @@
                                 }
 
                                 //CoordinatorDir
-                                $(".CoordinatorDir").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorDir + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".CoordinatorDir").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinCoordinatorDir + '_sup.png?v=' + '@Helpers.Local.Versao');
                                 $("#CoordinatorDir").attr('data-id', data.CoordinatorDir);
                                 $("#CoordinatorDir span").html(data.ApelidoCoordinatorDir);
                                 if (data.pinCoordinatorDir == 0) {
                                     $("#CoordinatorDir").addClass('hidden');
                                 }
                                 //CoordinatorEsq
-                                $(".CoordinatorEsq").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinCoordinatorEsq + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".CoordinatorEsq").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinCoordinatorEsq + '_sup.png?v=' + '@Helpers.Local.Versao');
                                 $("#CoordinatorEsq").attr('data-id', data.CoordinatorEsq);
                                 $("#CoordinatorEsq span").html(data.ApelidoCoordinatorEsq);
                                 if (data.PinCoordinatorEsq == '0') {
                                     $("#CoordinatorEsq").addClass('hidden');
                                 }
                                 //IndicatorDirInf
-                                $(".IndicatorDirInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirInf + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".IndicatorDirInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinIndicatorDirInf + '_anf.png?v=' + '@Helpers.Local.Versao');
                                 $("#IndicatorDirInf").attr('data-id', data.IndicatorDirInf);
                                 $("#IndicatorDirInf span").html(data.ApelidoIndicatorDirInf);
                                 if (data.pinIndicatorDirInf == 0) {
                                     $("#IndicatorDirInf").addClass('hidden');
                                 }
                                 //IndicatorDirSup
-                                $(".IndicatorDirSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorDirSup + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".IndicatorDirSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinIndicatorDirSup + '_anf.png?v=' + '@Helpers.Local.Versao');
                                 $("#IndicatorDirSup").attr('data-id', data.IndicatorDirSup);
                                 $("#IndicatorDirSup span").html(data.ApelidoIndicatorDirSup);
                                 if (data.PinIndicatorDirSup == '0') {
                                     $("#IndicatorDirSup").addClass('hidden');
                                 }
                                 //IndicatorEsqInf
-                                $(".IndicatorEsqInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqInf + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".IndicatorEsqInf").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinIndicatorEsqInf + '_anf.png?v=' + '@Helpers.Local.Versao');
                                 $("#IndicatorEsqInf").attr('data-id', data.IndicatorEsqInf);
                                 $("#IndicatorEsqInf span").html(data.ApelidoIndicatorEsqInf);
                                 if (data.pinIndicatorEsqInf == 0) {
                                     $("#IndicatorEsqInf").addClass('hidden');
                                 }
                                 //IndicatorEsqSup
-                                $(".IndicatorEsqSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinIndicatorEsqSup + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".IndicatorEsqSup").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinIndicatorEsqSup + '_anf.png?v=' + '@Helpers.Local.Versao');
                                 $("#IndicatorEsqSup").attr('data-id', data.IndicatorEsqSup);
                                 $("#IndicatorEsqSup span").html(data.ApelidoIndicatorEsqSup);
                                 if (data.PinIndicatorEsqSup == '0') {
                                     $("#IndicatorEsqSup").addClass('hidden');
                                 }
                                 //DonatorDirInf2
-                                $(".DonatorDirInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorDirInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorDirInf2 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorDirInf2").attr('data-id', data.DonatorDirInf2);
                                 $("#DonatorDirInf2 span").html(data.ApelidoDonatorDirInf2);
                                 if (data.pinDonatorDirInf2 == 0) {
                                     $("#DonatorDirInf2").addClass('hidden');
                                 }
                                 //DonatorDirInf1
-                                $(".DonatorDirInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorDirInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorDirInf1 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorDirInf1").attr('data-id', data.DonatorDirInf1);
                                 $("#DonatorDirInf1 span").html(data.ApelidoDonatorDirInf1);
                                 if (data.PinDonatorDirInf1 == '0') {
                                     $("#DonatorDirInf1").addClass('hidden');
                                 }
                                 //DonatorDirSup2
-                                $(".DonatorDirSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorDirSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorDirSup2 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorDirSup2").attr('data-id', data.DonatorDirSup2);
                                 $("#DonatorDirSup2 span").html(data.ApelidoDonatorDirSup2);
                                 if (data.pinDonatorDirSup2 == 0) {
                                     $("#DonatorDirSup2").addClass('hidden');
                                 }
                                 //DonatorDirSup1
-                                $(".DonatorDirSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorDirSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorDirSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorDirSup1 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorDirSup1").attr('data-id', data.DonatorDirSup1);
                                 $("#DonatorDirSup1 span").html(data.ApelidoDonatorDirSup1);
                                 if (data.PinDonatorDirSup1 == '0') {
                                     $("#DonatorDirSup1").addClass('hidden');
                                 }
                                 //DonatorEsqInf2
-                                $(".DonatorEsqInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorEsqInf2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorEsqInf2 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorEsqInf2").attr('data-id', data.DonatorEsqInf2);
                                 $("#DonatorEsqInf2 span").html(data.ApelidoDonatorEsqInf2);
                                 if (data.pinDonatorEsqInf2 == 0) {
                                     $("#DonatorEsqInf2").addClass('hidden');
                                 }
                                 //DonatorEsqInf1
-                                $(".DonatorEsqInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqInf1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorEsqInf1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorEsqInf1 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorEsqInf1").attr('data-id', data.DonatorEsqInf1);
                                 $("#DonatorEsqInf1 span").html(data.ApelidoDonatorEsqInf1);
                                 if (data.PinDonatorEsqInf1 == '0') {
                                     $("#DonatorEsqInf1").addClass('hidden');
                                 }
                                 //DonatorEsqSup2
-                                $(".DonatorEsqSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup2 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorEsqSup2").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorEsqSup2 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorEsqSup2").attr('data-id', data.DonatorEsqSup2);
                                 $("#DonatorEsqSup2 span").html(data.ApelidoDonatorEsqSup2);
                                 if (data.pinDonatorEsqSup2 == 0) {
                                     $("#DonatorEsqSup2").addClass('hidden');
                                 }
                                 //DonatorEsqSup1
-                                $(".DonatorEsqSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/")' + data.pinDonatorEsqSup1 + 'x.png?v=' + '@Helpers.Local.Versao');
+                                $(".DonatorEsqSup1").attr('src', '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_")' + data.pinDonatorEsqSup1 + '_con.png?v=' + '@Helpers.Local.Versao');
                                 $("#DonatorEsqSup1").removeClass('btn-info');
                                 $("#DonatorEsqSup1 span").html(data.ApelidoDonatorEsqSup1);
                                 if (data.DonatorEsqSup1 == 0) {
@@ -811,7 +798,7 @@
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
-                                    text: data.toString(),  @*'@traducaoHelper["SEM_DADOS"]',*@
+                                    text: data.toString(),
                                     icon: 'warning',
                                     confirmButtonText: 'OK'
                                 });
@@ -861,7 +848,7 @@
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
-                                    text: data.toString(),  @*'@traducaoHelper["SEM_DADOS"]',*@
+                                    text: data.toString(),
                                     icon: 'warning',
                                     confirmButtonText: 'OK'
                                 });
@@ -889,7 +876,124 @@
                         }
                     },
                 });
+            });
 
+            $('.paymentSystem').on('click', function () {
+                var idTabuleiro = $('#tabuleiro').val();
+                $.ajax({
+                    url: "@Url.Action("GetDataSysPag")",
+                    type: "POST",
+                    data: {
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            $("#infoNome").html(data.Nome);
+                            $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
+                            $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
+
+                            if (data.Pix) {
+                                $("#PixCode").html(data.Pix);
+                                $("#PixHeader").show();
+                                $("#PixCode").show();
+                            } else {
+                                $(".panelPix").hide();
+                                $("#PixHeader").html('@traducaoHelper["PIX_NAO_CADASTRADO"]');
+                            }
+
+                            if (data.Carteira) {
+                                $("#CriptoCode").html(data.Carteira);
+                                $("#CriptoHeader").show();
+                                $("#CriptoCode").show();
+                                //$("#qrCode").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
+                            } else {
+                                $(".panelCripto").hide();
+                                $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
+                            }
+
+                            if ($('#Master').attr("data-id") == @idUsuario) {
+                                $(".panelCripto").hide();
+                            }
+
+                            if (data.ConfirmarRecebimento) {
+                                $(".paymentSystem").show();
+                            } else {
+                                $(".paymentSystem").hide();
+                            }
+                            $(".reportReceipt").hide();
+
+                            $('#modDados').modal('show');
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
+            });
+
+            $('.reportPaymentSystem').on('click', function () {
+                var idTabuleiro = $('#tabuleiro').val();
+                var idUsuarioConvidado = $("#infoID").val();
+                $.ajax({
+                    url: "@Url.Action("ReportPaymentSystem")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'tabuleiroID': idTabuleiro,
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data.toString() == "OK") {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
             });
 
         </script>
@@ -968,7 +1072,7 @@
             <div class="row">
                 <div class="column col-md-9">
                     <div class="page-title">
-                        <h2>@ViewBag.Title <small class="titleSmall">xuxa</small></h2>
+                        <h2>@ViewBag.Title <small class="titleSmall"></small></h2>
                     </div>
                 </div>
                 @if (ViewBag.Timer != null)
@@ -985,7 +1089,7 @@
                 {
                     <div class="column col-md-3">
                         <div class="page-title" style="padding: 10px;">
-                            <button type="button" class="btn btn-success pull-right">
+                            <button type="button" class="btn btn-success pull-right paymentSystem">
                                 @traducaoHelper["PAGAR_SISTEMA"]
                             </button>
                         </div>
@@ -1028,49 +1132,49 @@
                     </div>
                 </div>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1 @(tabuleiro.pulseDonatorEsqSup1 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1 @(tabuleiro.pulseDonatorEsqSup1 ? "blob" : "")">
                 <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2 @(tabuleiro.pulseDonatorEsqSup2 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2 @(tabuleiro.pulseDonatorEsqSup2 ? "blob" : "")">
                 <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1 @(tabuleiro.pulseDonatorEsqInf1 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1 @(tabuleiro.pulseDonatorEsqInf1 ? "blob" : "")">
                 <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2 @(tabuleiro.pulseDonatorEsqInf2 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2 @(tabuleiro.pulseDonatorEsqInf2 ? "blob" : "")">
                 <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1 @(tabuleiro.pulseDonatorDirSup1 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1 @(tabuleiro.pulseDonatorDirSup1 ? "blob" : "")">
                 <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2 @(tabuleiro.pulseDonatorDirSup2 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2 @(tabuleiro.pulseDonatorDirSup2 ? "blob" : "")">
                 <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf1 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1 @(tabuleiro.pulseDonatorDirInf1 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1 @(tabuleiro.pulseDonatorDirInf1 ? "blob" : "")">
                 <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf2 + "_" + "con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2 @(tabuleiro.pulseDonatorDirInf2 ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2 @(tabuleiro.pulseDonatorDirInf2 ? "blob" : "")">
                 <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqSup + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup @(tabuleiro.pulseIndicatorEsqSup ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqSup + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup @(tabuleiro.pulseIndicatorEsqSup ? "blob" : "")">
                 <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqInf + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf @(tabuleiro.pulseIndicatorEsqInf ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqInf + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf @(tabuleiro.pulseIndicatorEsqInf ? "blob" : "")">
                 <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirSup + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup @(tabuleiro.pulseIndicatorDirSup ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirSup + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup @(tabuleiro.pulseIndicatorDirSup ? "blob" : "")">
                 <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirInf + "_" + "anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf @(tabuleiro.pulseIndicatorDirInf ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirInf + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf @(tabuleiro.pulseIndicatorDirInf ? "blob" : "")">
                 <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorEsq + "_" + "sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq @(tabuleiro.pulseCoordinatorEsq ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorEsq + "_sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq @(tabuleiro.pulseCoordinatorEsq ? "blob" : "")">
                 <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorDir + "_" + "sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir @(tabuleiro.pulseCoordinatorDir ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorDir + "_sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir @(tabuleiro.pulseCoordinatorDir ? "blob" : "")">
                 <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorDir</span></button>
 
-                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinMaster + "_" + "alv.png?v=" + @Helpers.Local.Versao)' class="Master @(tabuleiro.pulseMaster ? "blob" : "")">
+                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinMaster + "_alv.png?v=" + @Helpers.Local.Versao)' class="Master @(tabuleiro.pulseMaster ? "blob" : "")">
                 <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro"><span style="font-size: 14px; font-weight: 700;"> @tabuleiro.ApelidoMaster</span></button>
 
             </div>
@@ -1123,13 +1227,12 @@ else
             <li class="nav-item start">
                 <a href="javascript:;" id="ïnvite_@item.ID" data-id="@item.ID" class="invite" style="margin: 0; padding: 0;">
                     <div class="tiles" style="padding-left: 15px;">
-                        <div class="tile double springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)" style="max-height: 90px; max-width: 200px;">
+                        <div class="tile double springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)" style="max-height: 76px; max-width: 200px;">
 
                             <div class="tile-body" style="padding:5px;">
                                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
                                 <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
-                                <p class="card-content2-txt">@(traducaoHelper[item.Posicao])</p>
-                                <p class="card-title-txt">@traducaoHelper["CONVITE"]</p>
+                                <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
                             </div>
                         </div>
                     </div>
@@ -1176,13 +1279,11 @@ else
                 <a href="javascript:;" style="margin: 0; padding: 0;">
 
                     <div class="tiles" style="padding-left: 15px;">
-                        <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 80px; max-width: 200px;">
-
+                        <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px;">
                             <div class="tile-body" style="padding:5px;">
                                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
                                 <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
                                 <p class="card-content2-txt">@(traducaoHelper[item.Posicao])</p>
-                                <p class="card-title-txt"></p>
                             </div>
                         </div>
                     </div>
@@ -1244,6 +1345,7 @@ else
                     <button data-dismiss="modal" class="btn btn-success reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
                 }
                 <button data-dismiss="modal" class="btn btn-success reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
+                <button data-dismiss="modal" class="btn btn-success reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
                 <button data-dismiss="modal" class="btn btn-info">@(traducaoHelper["SAIR"])</button>
             </div>
         </div>

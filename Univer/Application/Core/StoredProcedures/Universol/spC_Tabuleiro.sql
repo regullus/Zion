@@ -5,7 +5,8 @@ If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_Tabuleiro'))
 go
 
 Create  Proc [dbo].[spC_Tabuleiro]
-   @id int
+   @id int,
+   @UsuarioID int
 
 As
 -- =============================================================================================
@@ -38,7 +39,8 @@ BEGIN
         @DonatorEsqSup1 int,
         @DonatorEsqSup2 int,
         @DonatorEsqInf1 int,
-        @DonatorEsqInf2 int
+        @DonatorEsqInf2 int,
+        @MasterID int
    
     Select @dadosTempoPagto = CONVERT(INT, Dados)  from Sistema.Configuracao where chave = 'TABULEIRO_TEMPO_PAGAMENTO'
     Select @dadosTempoMaxPagto = CONVERT(INT, Dados) from Sistema.Configuracao where chave = 'TABULEIRO_TEMPO_MAX_PAGAMENTO'
@@ -486,14 +488,22 @@ BEGIN
     Select @DonatorEsqInf1=DonatorEsqInf1 From #temp
     Select @DonatorEsqInf2=DonatorEsqInf2 From #temp
 
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup1 And PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirSup1 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirSup2 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirInf1 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirInf2 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqSup1 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqSup2 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqInf1 = 1
-    if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqInf2 = 1
+    Select
+        @MasterID = Master
+    From
+        #temp
+
+    if(@MasterID = @UsuarioID)
+    Begin
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup1 And PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirSup1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirSup2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirInf1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirInf2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqSup1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqSup2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqInf1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqInf2 = 1
+    End
 
     Select 
         ID,
@@ -598,12 +608,12 @@ BEGIN
  
 End -- Sp
 
+
 go
 Grant Exec on spC_Tabuleiro To public
 go
 
-Exec spC_Tabuleiro @id = 1
---Exec spC_Tabuleiro @id = 20
+--Exec spC_Tabuleiro @id = 1, @UsuarioID = 2580
 
 
 

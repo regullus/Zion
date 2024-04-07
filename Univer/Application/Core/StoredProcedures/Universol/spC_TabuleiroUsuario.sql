@@ -45,7 +45,9 @@ go
 Grant Exec on spC_TabuleiroUsuario To public
 go
 
-Exec spC_TabuleiroUsuario @UsuarioId = 2587, @TabuleiroID = 1
+--Exec spC_TabuleiroUsuario @UsuarioId = 2587, @TabuleiroID = 1
+--Exec spC_TabuleiroUsuario @UsuarioId = 2593, @TabuleiroID = 1
+
 
 
 
