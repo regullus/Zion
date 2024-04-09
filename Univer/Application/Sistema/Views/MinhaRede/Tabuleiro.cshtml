@@ -58,6 +58,37 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
     <link rel="stylesheet" href="~/Content/home/styles.css">
+    <style>
+        #overlay {
+            position: fixed;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            transition: 1s 0.4s;
+        }
+
+        #progress {
+            height: 1px;
+            background: #fff;
+            position: absolute;
+            width: 0; /* will be increased by JS */
+            top: 50%;
+        }
+
+        #progstat {
+            font-size: 0.7em;
+            letter-spacing: 3px;
+            position: absolute;
+            top: 50%;
+            margin-top: -40px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+        }
+    </style>
 }
 
 @section head {
@@ -90,6 +121,42 @@
         // Getting the width of the browser whenever the screen resolution changes.
         window.addEventListener('resize', widthResizer)
 
+        const el = (sel, par) => (par || document).querySelector(sel);
+
+        function loadbar() {
+            const elOverlay = el("#overlay");
+            const elProgress = el("#progress");
+            const elProgstat = el("#progstat");
+            const images = document.images;
+            const tot = images.length;
+            let c = 0;
+
+            if (tot == 0) return doneLoading();
+
+            function imgLoaded() {
+                c += 1;
+                const perc = Math.floor(100 / tot * c) + "%";
+                elProgress.style.width = perc;
+                elProgstat.textContent = `Loading ${perc}`;
+                if (c === tot) return doneLoading();
+            }
+
+            function doneLoading() {
+                elOverlay.style.opacity = 0;
+                setTimeout(() => {
+                    elOverlay.style.display = "none";
+                }, 600);
+            }
+
+            [...images].forEach(img => {
+                const tmpImg = new Image();
+                tmpImg.onload = imgLoaded;
+                tmpImg.onerror = imgLoaded;
+                tmpImg.src = img.src;
+            });
+        }
+
+        addEventListener('DOMContentLoaded', loadbar, false);
     </script>
 
     @if (ViewBag.Timer != null)
@@ -608,19 +675,21 @@
             });
 
             $('.niveis').on('click', function () {
-                 var idTab = $(this).attr("data-id");
-                 var url = "/MinhaRede/Tabuleiro/?idTab=" + idTab;
-                 window.location.href = url;
+                var idTabuleiro = $(this).attr("data-id");
+                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                window.location.href = url;
              });
 
             $('.reportPayment').on('click', function () {
                 var idTabuleiro = $('#tabuleiro').val();
+                var idUsuarioPag = $("#infoID").val();
                 $.ajax({
                     url: "@Url.Action("ReportPayment")",
                     type: "POST",
                     data: {
                         'usuarioID': '@(idUsuario)',
                         'tabuleiroID': idTabuleiro,
+                        'usuarioIDPag': idUsuarioPag,
                         'token': '@(ViewBag.Token)'
                     },
                     success: function (data) {
@@ -875,57 +944,102 @@
                 });
             });
 
+            $('.inviteNew').on('click', function () {
+                var idBoard = $(this).attr("data-id");
+                $.ajax({
+                    url: "@Url.Action("GetInvite")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'boardID': idBoard,
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data == "OK") {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data,
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
+            });
+
         </script>
     }
     else
     {
         <script>
             $('.invite').on('click', function () {
-            var idTabuleiro = $(this).attr("data-id");
-            $.ajax({
-                url: "@Url.Action("GetInvite")",
-                type: "POST",
-                data: {
-                    'usuarioID': '@(idUsuario)',
-                    'tabuleiroID': idTabuleiro,
-                    'token': '@(ViewBag.Token)'
-                },
-                success: function (data) {
-                    if (data != null) {
-                        if (data == "OK") {
-                            location.reload();
+                $.ajax({
+                    url: "@Url.Action("GetInvite")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'boardID': '0',
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data == "OK") {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data,
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
                         } else {
                             Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]',
-                                text: data,
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
                                 icon: 'warning',
                                 confirmButtonText: 'OK'
                             });
                         }
-                    } else {
-                        Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
-                            text: '@traducaoHelper["SEM_DADOS"]',
-                            icon: 'warning',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
-                        //Reload page
-                        location.reload();
-                    } else {
-                        Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
-                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                },
-            });
-
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
             });
         </script>
     }
@@ -1091,7 +1205,7 @@
                 <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4>
 
                 <div class="tiles" style="padding-left: 15px;">
-                    <div class="tile double grey-card invite" data-id="0" style="max-height: 80px; max-width: 200px;">
+                    <div class="tile double grey-card invite" style="max-height: 80px; max-width: 200px;">
                         <div class="tile-body" style="padding:5px;">
                             <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
                             <h3>@(traducaoHelper["MERCURIO"])</h3>
@@ -1115,8 +1229,7 @@
                 <li class="nav-item start">
                     <a href="javascript:;" id="invite_@item.ID" data-id="@item.ID" class="invite" style="margin: 0; padding: 0;">
                         <div class="tiles title" style="padding-left: 15px;">
-                            <div class="tile double springgreen-card convite" data-id="@(item.TabuleiroID)" id="cardGrid@(item.ID)" style="max-height: 76px; max-width: 200px;">
-
+                            <div class="tile double springgreen-card inviteNew" data-id="@(item.BoardID)" id="cardGrid@(item.ID)" style="max-height: 76px; max-width: 200px;">
                                 <div class="tile-body" style="padding:5px;">
                                     <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
                                     <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
@@ -1165,7 +1278,6 @@
                 }
                 <li class="nav-item start">
                     <a href="javascript:;" style="margin: 0; padding: 0;">
-
                         <div class="tiles title" style="padding-left: 15px;">
                             <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px;">
                                 <div class="tile-body" style="padding:5px;">
@@ -1240,74 +1352,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    #overlay {
-        position: fixed;
-        z-index: 99999;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.9);
-        transition: 1s 0.4s;
-    }
-
-    #progress {
-        height: 1px;
-        background: #fff;
-        position: absolute;
-        width: 0; /* will be increased by JS */
-        top: 50%;
-    }
-
-    #progstat {
-        font-size: 0.7em;
-        letter-spacing: 3px;
-        position: absolute;
-        top: 50%;
-        margin-top: -40px;
-        width: 100%;
-        text-align: center;
-        color: #fff;
-    }
-</style>
-
-<script>
-    const el = (sel, par) => (par || document).querySelector(sel);
-
-    function loadbar() {
-        const elOverlay = el("#overlay");
-        const elProgress = el("#progress");
-        const elProgstat = el("#progstat");
-        const images = document.images;
-        const tot = images.length;
-        let c = 0;
-
-        if (tot == 0) return doneLoading();
-
-        function imgLoaded() {
-            c += 1;
-            const perc = Math.floor(100 / tot * c) + "%";
-            elProgress.style.width = perc;
-            elProgstat.textContent = `Loading ${perc}`;
-            if (c === tot) return doneLoading();
-        }
-
-        function doneLoading() {
-            elOverlay.style.opacity = 0;
-            setTimeout(() => {
-                elOverlay.style.display = "none";
-            }, 600);
-        }
-
-        [...images].forEach(img => {
-            const tmpImg = new Image();
-            tmpImg.onload = imgLoaded;
-            tmpImg.onerror = imgLoaded;
-            tmpImg.src = img.src;
-        });
-    }
-
-    addEventListener('DOMContentLoaded', loadbar, false);
-</script>

@@ -115,10 +115,9 @@ namespace Core.Repositories.Rede
             return ret;
         }
 
-        public string InformarPagamento(int idUsuario, int idTabuleiro)
+        public string InformarPagamento(int idUsuario, int idTabuleiro, int idUsuarioPag)
         {
-            string sql = "Exec spC_TabuleiroInformarPagto @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
-
+            string sql = "Exec spC_TabuleiroInformarPagto @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro + ",@UsuarioIDPag=" + idUsuarioPag;
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 
             return retorno;

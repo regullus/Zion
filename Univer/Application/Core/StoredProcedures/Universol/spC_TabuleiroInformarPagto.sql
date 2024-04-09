@@ -6,7 +6,8 @@ go
 
 Create  Proc [dbo].[spC_TabuleiroInformarPagto]
    @UsuarioID int,
-   @TabuleiroID int
+   @TabuleiroID int,
+   @UsuarioIDPag int
 
 As
 -- =============================================================================================
@@ -39,7 +40,8 @@ BEGIN
         Update
             rede.TabuleiroUsuario 
         Set
-            InformePag = 1
+            InformePag = 1,
+            UsuarioIDPag = @UsuarioIDPag
         where 
             UsuarioID = @UsuarioID and 
             TabuleiroID  = @TabuleiroID 
@@ -56,6 +58,6 @@ go
 Grant Exec on spC_TabuleiroInformarPagto To public
 go
 
---Exec spC_TabuleiroInformarPagto @UsuarioID = 2587, @TabuleiroID = 1
+--Exec spC_TabuleiroInformarPagto @UsuarioID = 2587, @TabuleiroID = 1, @UsuarioIDPag = 2580
 
 

@@ -1297,6 +1297,7 @@ Begin
             End
             Else 
             Begin
+                Set @log = @log + '| 05.1 #temp não tem conteudo'
                 if(@Chamada <> 'Completa')
                 Begin
                     --Caso NÃO exista o tabuleiro com o board informado
@@ -1321,9 +1322,26 @@ Begin
                         End
                         Else
                         Begin
-                            Set @log = @log + '| 40 Chama novamente essa sp recursivo'
+                            Set @log = @log + '| 40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
                             --Chama novamente essa sp, agora com um pai valido
-                            Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
+                            if(@Chamada = 'Convite')
+                            Begin
+                                --Já estando no tabuleiro seta para StatusID = 2 --(Já incluido)
+                                Set @log = @log + '| 43.1 Chamada é convite: BoardID=' + TRIM(STR(@BoardID))
+
+                                Delete
+                                    Rede.TabuleiroNivel
+                                Where
+                                    UsuarioID = @UsuarioID And
+                                    BoardID = @BoardID And
+                                    StatusID = 1 --Aguardando ser incluido
+
+                                Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = @Chamada    
+                            End
+                            Else
+                            Begin
+                                Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
+                            End
                         End
                     End
                     Else
@@ -1481,19 +1499,6 @@ Begin
                 '' as Historico, 
                 '' as Debug,
                 @chamada as Chamada
-        End
-        if(@Chamada = 'Convite')
-        Begin
-            --Já estando no tabuleiro seta para StatusID = 2 --(Já incluido)
-            Update
-                Rede.TabuleiroNivel
-            Set
-                StatusID = 2, --Aceite
-                Observacao = Observacao + ' | Aceite '
-            Where
-                UsuarioID = @UsuarioID And
-                BoardID = @BoardID And
-                StatusID = 1 --Aguardando ser incluido
         End
     End
     Else

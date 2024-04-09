@@ -360,8 +360,8 @@ else
                     <div class="col-md-7">
                         <div class="input-group">
                             <input type="text" id="cadastroLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)">
-                            <span class="input-group-btn">
-                                <input class="btn btn-danger" id="cadastroLinkCopiar" value=" @traducaoHelper["COPIAR"]">
+                            <span class="input-group-btn" style="padding-left: 10px;" >
+                                <input class="btn btn-info" id="cadastroLinkCopiar" value="@traducaoHelper["COPIAR"]">
                             </span>
                         </div>
                     </div>

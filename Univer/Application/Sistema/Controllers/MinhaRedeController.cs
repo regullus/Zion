@@ -420,6 +420,8 @@ namespace Sistema.Controllers
 
         #region Actions
 
+        #region Tabuleiro
+
         public ActionResult Tabuleiro(int? idTab)
         {
             obtemMensagem();
@@ -830,9 +832,9 @@ namespace Sistema.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetInvite(string usuarioID, string tabuleiroID, string token)
+        public ActionResult GetInvite(string usuarioID, string boardID, string token)
         {
-            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            if (usuarioID.IsNullOrEmpty() || boardID.IsNullOrEmpty())
             {
                 string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
@@ -842,15 +844,15 @@ namespace Sistema.Controllers
             try
             {
                 int idUsuario = int.Parse(usuarioID);
-                int idTabuleiro = int.Parse(tabuleiroID);
+                int idBoard = int.Parse(boardID);
                 
                 //Seta para primeiro tabuleiro caso seja 0
-                if (idTabuleiro == 0)
+                if (idBoard == 0)
                 {
-                    idTabuleiro = 1;
+                    idBoard = 1;
                 }
 
-                if (idUsuario <= 0 || idTabuleiro <= 0)
+                if (idUsuario <= 0 || idBoard <= 0)
                 {
                     string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
@@ -881,7 +883,7 @@ namespace Sistema.Controllers
                 int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
 
                 //Inclui usuario no novo tabuleiro
-                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idTabuleiro, "Principal");
+                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idBoard, "Convite");
 
                 JsonResult jsonResult = new JsonResult
                 {
@@ -899,9 +901,9 @@ namespace Sistema.Controllers
         }
 
         [HttpPost]
-        public ActionResult ReportPayment(string usuarioID, string tabuleiroID, string token)
+        public ActionResult ReportPayment(string usuarioID, string tabuleiroID, string usuarioIDPag, string token)
         {
-            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || usuarioIDPag.IsNullOrEmpty())
             {
                 string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
@@ -912,8 +914,9 @@ namespace Sistema.Controllers
             {
                 int idUsuario = int.Parse(usuarioID);
                 int idTabuleiro = int.Parse(tabuleiroID);
+                int idUsuarioPag = int.Parse(usuarioIDPag);
 
-                if (idUsuario <= 0 || idTabuleiro <= 0)
+                if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioPag <= 0)
                 {
                     string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
@@ -941,7 +944,7 @@ namespace Sistema.Controllers
                 }
 
                 //Informar Pagamento
-                string retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idTabuleiro);
+                string retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idTabuleiro, idUsuarioPag);
                 switch (retorno)
                 {
                     case "OK":
@@ -1287,6 +1290,9 @@ namespace Sistema.Controllers
             }
         }
 
+        #endregion Tabuleiro
+
+        #region Outros Sistemas
 
         public ActionResult MinhaArvore()
         {
@@ -1836,10 +1842,12 @@ namespace Sistema.Controllers
             return View(usuario);
         }
 
-        #endregion
+        #endregion Outros Sistemas
+
+        #endregion Actions
 
         #region Json
-               
+
         public JsonResult GetUsuarios(string search)
         {
             IQueryable<Usuario> usuarios = usuarioRepository.GetByExpression(x => x.Login.Contains(search) && x.Assinatura.StartsWith(usuario.Assinatura));
