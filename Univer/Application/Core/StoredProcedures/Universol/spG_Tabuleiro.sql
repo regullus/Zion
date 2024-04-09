@@ -346,7 +346,7 @@ Begin
                         Begin
                             Set @log = @log + '| 09 é um donator'
                             --Problemas nenhum pai foi encontrado!
-                            Set @Historico = '|Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') é um Donator, não é possível adicionar um novo usuário. Chamada: ' + @Chamada
+                            Set @Historico = '02 Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') é um Donator, não é possível adicionar um novo usuário. Chamada: ' + @Chamada
                             Set @PosicaoFilho = 'Quando o Pai é um Donator, não é possível adicionar um novo usuário'
                         End
                         Else 
@@ -472,241 +472,7 @@ Begin
                     --Tabuleiro completo
                     Begin
                         Set @log = @log + '| 23 TABULEIRO COMPLETO'
-
-                        --*********INICIO UPDATES***********
-
-                        --*********** MASTER **************
-                        if(@Chamada <> 'Completa' and @PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true')
-                        Begin
-                            --*********** COORDINATOR **************
-                            Set @log = @log + '| 14 COORDINATOR'
-                            --Verifica se há coordinator, caso não inclui usuario como coordinator na direita
-                            if (@CoordinatorDir is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        CoordinatorDir = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @CoordinatorDir = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'CoordinatorDir'
-                                End
-                            --Verifica se há coordinator, caso não inclui usuario como coordinator na esquerda
-                            if (@CoordinatorEsq is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        CoordinatorEsq = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @CoordinatorEsq = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'CoordinatorEsq'
-                                End
-                        End --Master
-            
-                        --*********** COORDINATOR DIREITA **************
-                        if(@Incluido = 'false' and @Chamada <> 'Completa' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
-                        Begin
-                            Set @log = @log + '| 15 COORDINATOR DIREITA'
-                            --Verifica se há Indicator, caso não inclui usuario como indicator superior direita
-                            if (@IndicatorDirSup is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorDirSup = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @IndicatorDirSup = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorDirSup'
-                                End
-                            --Verifica se há Indicator, caso não inclui usuario como indicator inferior direita
-                            if (@IndicatorDirInf is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorDirInf = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @IndicatorDirInf = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorDirInf'
-                                End
-                        End
-            
-                        --*********** COORDINATOR ESQUERDA **************
-                        if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
-                        Begin
-                            Set @log = @log + '| 16 COORDINATOR ESQUERDA'
-                            --Verifica se há Indicator, caso não inclui usuario como indicator superior esquerda
-                            if (@IndicatorEsqSup is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorEsqSup = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @IndicatorEsqSup = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorEsqSup'
-                                End
-                            --Verifica se há Indicator, caso não inclui usuario como indicator inferior esquerda
-                            if (@IndicatorEsqInf is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorEsqInf = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @IndicatorEsqInf = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorEsqInf'
-                                End
-                        End
-            
-                        --*********** INDICATOR DIREITA Superior ************** 
-                        if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
-                        Begin
-                            Set @log = @log + '| 17 INDICATOR DIREITA Superior'
-                            if (@DonatorDirSup1 is null and @Incluido = 'false')
-                                Begin
-                                Update
-                                    Rede.Tabuleiro
-                                Set
-                                    DonatorDirSup1 = @UsuarioID
-                                Where
-                                    ID = @ID
-               
-                                Set @DonatorDirSup1 = @UsuarioID
-                                Set @Incluido = 'true'
-                                Set @PosicaoFilho = 'DonatorDirSup1'
-                                End
-                            if (@DonatorDirSup2 is null and @Incluido = 'false')
-                                Begin
-                                Update
-                                    Rede.Tabuleiro
-                                Set
-                                    DonatorDirSup2 = @UsuarioID
-                                Where
-                                    ID = @ID
-               
-                                Set @DonatorDirSup2 = @UsuarioID
-                                Set @Incluido = 'true'
-                                Set @PosicaoFilho = 'DonatorDirSup2'
-                                End
-                        End
-            
-                        --*********** INDICATOR DIREITA Inferior ************** 
-                        if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
-                        Begin
-                            Set @log = @log + '| 18 INDICATOR DIREITA Inferior'
-                            if (@DonatorDirInf1 is null and @Incluido = 'false')
-                                Begin
-                                Update
-                                    Rede.Tabuleiro
-                                Set
-                                    DonatorDirInf1 = @UsuarioID
-                                Where
-                                    ID = @ID
-               
-                                Set @DonatorDirInf1 = @UsuarioID
-                                Set @Incluido = 'true'
-                                Set @PosicaoFilho = 'DonatorDirInf1'
-                                End
-                            if (@DonatorDirInf2 is null and @Incluido = 'false')
-                                Begin
-                                Update
-                                    Rede.Tabuleiro
-                                Set
-                                    DonatorDirInf2 = @UsuarioID
-                                Where
-                                    ID = @ID
-               
-                                Set @DonatorDirInf2 = @UsuarioID
-                                Set @Incluido = 'true'
-                                Set @PosicaoFilho = 'DonatorDirInf2'
-                                End
-                        End
-            
-                        --*********** INDICATOR ESQUERDA Superior **************
-                        if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
-                        Begin
-                            Set @log = @log + '| 19 INDICATOR ESQUERDA Superior'
-                            if (@DonatorEsqSup1 is null and @Incluido = 'false')
-                                Begin
-                                Update
-                                    Rede.Tabuleiro
-                                Set
-                                    DonatorEsqSup1 = @UsuarioID
-                                Where
-                                    ID = @ID
-               
-                                Set @DonatorEsqSup1 = @UsuarioID
-                                Set @Incluido = 'true'
-                                Set @PosicaoFilho = 'DonatorEsqSup1'
-                                End
-                            if (@DonatorEsqSup2 is null and @Incluido = 'false')
-                                Begin
-                                Update
-                                    Rede.Tabuleiro
-                                Set
-                                    DonatorEsqSup2 = @UsuarioID
-                                Where
-                                    ID = @ID
-               
-                                Set @DonatorEsqSup2 = @UsuarioID
-                                Set @Incluido = 'true'
-                                Set @PosicaoFilho = 'DonatorEsqSup2'
-                                End
-                        End
-            
-                        --*********** INDICATOR ESQUERDA Inferior **************
-                        if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
-                        Begin
-                            Set @log = @log + '| 20 INDICATOR ESQUERDA Superior'
-                            if (@DonatorEsqInf1 is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorEsqInf1 = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @DonatorEsqInf1 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorEsqInf1'
-                                End
-                            if (@DonatorEsqInf2 is null and @Incluido = 'false')
-                                Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorEsqInf2 = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @DonatorEsqInf2 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorEsqInf2'
-                                End
-                        End
-
-                        --*********FIM UPDATES***********
+                        Set @Historico = '08 - Check Completa true'
 
                         --Verifica se todos pagaram o Master, para realmente encerrar o Tabuleiro
                         Select
@@ -1144,7 +910,7 @@ Begin
                                 if not Exists (Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioPaiID and BoardID = @BoardID and StatusID = 1)
                                 Begin
                                     Set @log = @log + '| 31 Não foi possível encontrar um master'
-                                    Set @Historico = '|Não foi possível encontrar um master para o usuario: ' + TRIM(STR(@UsuarioPaiID)) + ' para o Board: ' + TRIM(STR(@BoardID)) + '. Chamada: ' + @Chamada
+                                    Set @Historico = '03 Não foi possível encontrar um master para o usuario: ' + TRIM(STR(@UsuarioPaiID)) + ' para o Board: ' + TRIM(STR(@BoardID)) + '. Chamada: ' + @Chamada
                                     INSERT INTO Rede.TabuleiroNivel (UsuarioID, BoardID, DataInicio, DataFim, StatusID, Observacao) VALUES (@UsuarioPaiID, @BoardID, @DataInicio, null, 1, 'Convite (2)')
                                     Set @PosicaoFilho = '***'
                                 End
@@ -1172,352 +938,359 @@ Begin
                     Else
                     --Tabuleiro incompleto
                     Begin
-                        Set @log = @log + '| 34 TABULEIRO INCOMPLETO'
-
-                        --Verifica se tabuleiro possui possições livres
-                         if(
-                            @Master is not null And 
-                            @CoordinatorDir is not null And 
-                            @IndicatorDirSup is not null And 
-                            @IndicatorDirInf is not null And 
-                            @IndicatorEsqSup is not null And 
-                            @IndicatorEsqInf is not null And 
-                            @DonatorDirSup1 is not null And 
-                            @DonatorDirSup2 is not null And 
-                            @DonatorDirInf1 is not null And 
-                            @DonatorDirInf2 is not null And 
-                            @CoordinatorEsq is not null And 
-                            @DonatorEsqSup1 is not null And 
-                            @DonatorEsqSup2 is not null And 
-                            @DonatorEsqInf1 is not null And 
-                            @DonatorEsqInf2 is not null 
-                        ) 
+                        if(@Chamada <> 'Completa')
                         Begin
-                            Set @log = @log + '| 34.1 Posicões estão ocupadas'
-                            Set @Historico = '|Não há posiçoes livres no momento para o usuario: ' + TRIM(STR(@UsuarioID)) + ' no Tabuleiro: ' +TRIM(STR(@ID)) + ' no BoardID: ' + TRIM(STR(@BoardID))
-                        End
-                        Else
-                        Begin
-                            Set @log = @log + '| 34.2 Há posições livres'
-                            
-                            --*********INICIO UPDATES***********
+                            Set @log = @log + '| 34 TABULEIRO INCOMPLETO'
 
-                            --*********** MASTER **************
-                            if(@Chamada <> 'Completa' and @PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true')
+                            --Verifica se tabuleiro possui possições livres
+                             if(
+                                @Master is not null And 
+                                @CoordinatorDir is not null And 
+                                @IndicatorDirSup is not null And 
+                                @IndicatorDirInf is not null And 
+                                @IndicatorEsqSup is not null And 
+                                @IndicatorEsqInf is not null And 
+                                @DonatorDirSup1 is not null And 
+                                @DonatorDirSup2 is not null And 
+                                @DonatorDirInf1 is not null And 
+                                @DonatorDirInf2 is not null And 
+                                @CoordinatorEsq is not null And 
+                                @DonatorEsqSup1 is not null And 
+                                @DonatorEsqSup2 is not null And 
+                                @DonatorEsqInf1 is not null And 
+                                @DonatorEsqInf2 is not null 
+                            ) 
                             Begin
-                                --*********** COORDINATOR **************
-                                Set @log = @log + '| 14 COORDINATOR'
-                                --Verifica se há coordinator, caso não inclui usuario como coordinator na direita
-                                if (@CoordinatorDir is null and @Incluido = 'false')
-                                    Begin
+                                Set @log = @log + '| 34.1 Posicões estão ocupadas'
+                                Set @Historico = '04 Não há posições livres no momento para o usuario: ' + TRIM(STR(@UsuarioID)) + ' no Tabuleiro: ' +TRIM(STR(@ID)) + ' no BoardID: ' + TRIM(STR(@BoardID))
+                            End
+                            Else
+                            Begin
+                                Set @log = @log + '| 34.2 Há posições livres'
+                            
+                                --*********INICIO UPDATES***********
+
+                                --*********** MASTER **************
+                                if(@PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true')
+                                Begin
+                                    --*********** COORDINATOR **************
+                                    Set @log = @log + '| 14 COORDINATOR'
+                                    --Verifica se há coordinator, caso não inclui usuario como coordinator na direita
+                                    if (@CoordinatorDir is null and @Incluido = 'false')
+                                        Begin
+                                            Update
+                                                Rede.Tabuleiro
+                                            Set
+                                                CoordinatorDir = @UsuarioID
+                                            Where
+                                                ID = @ID
+               
+                                            Set @CoordinatorDir = @UsuarioID
+                                            Set @Incluido = 'true'
+                                            Set @PosicaoFilho = 'CoordinatorDir'
+                                        End
+                                    --Verifica se há coordinator, caso não inclui usuario como coordinator na esquerda
+                                    if (@CoordinatorEsq is null and @Incluido = 'false')
+                                        Begin
                                         Update
                                             Rede.Tabuleiro
                                         Set
-                                            CoordinatorDir = @UsuarioID
+                                            CoordinatorEsq = @UsuarioID
                                         Where
                                             ID = @ID
                
-                                        Set @CoordinatorDir = @UsuarioID
+                                        Set @CoordinatorEsq = @UsuarioID
                                         Set @Incluido = 'true'
-                                        Set @PosicaoFilho = 'CoordinatorDir'
-                                    End
-                                --Verifica se há coordinator, caso não inclui usuario como coordinator na esquerda
-                                if (@CoordinatorEsq is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        CoordinatorEsq = @UsuarioID
-                                    Where
-                                        ID = @ID
-               
-                                    Set @CoordinatorEsq = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'CoordinatorEsq'
-                                    End
-                            End --Master
+                                        Set @PosicaoFilho = 'CoordinatorEsq'
+                                        End
+                                End --Master
             
-                            --*********** COORDINATOR DIREITA **************
-                            if(@Incluido = 'false' and @Chamada <> 'Completa' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
-                            Begin
-                                Set @log = @log + '| 15 COORDINATOR DIREITA'
-                                --Verifica se há Indicator, caso não inclui usuario como indicator superior direita
-                                if (@IndicatorDirSup is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorDirSup = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                --*********** COORDINATOR DIREITA **************
+                                if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
+                                Begin
+                                    Set @log = @log + '| 15 COORDINATOR DIREITA'
+                                    --Verifica se há Indicator, caso não inclui usuario como indicator superior direita
+                                    if (@IndicatorDirSup is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            IndicatorDirSup = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @IndicatorDirSup = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorDirSup'
-                                    End
-                                --Verifica se há Indicator, caso não inclui usuario como indicator inferior direita
-                                if (@IndicatorDirInf is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorDirInf = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                        Set @IndicatorDirSup = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'IndicatorDirSup'
+                                        End
+                                    --Verifica se há Indicator, caso não inclui usuario como indicator inferior direita
+                                    if (@IndicatorDirInf is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            IndicatorDirInf = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @IndicatorDirInf = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorDirInf'
-                                    End
-                            End
+                                        Set @IndicatorDirInf = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'IndicatorDirInf'
+                                        End
+                                End
             
-                            --*********** COORDINATOR ESQUERDA **************
-                            if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
-                            Begin
-                                Set @log = @log + '| 16 COORDINATOR ESQUERDA'
-                                --Verifica se há Indicator, caso não inclui usuario como indicator superior esquerda
-                                if (@IndicatorEsqSup is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorEsqSup = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                --*********** COORDINATOR ESQUERDA **************
+                                if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
+                                Begin
+                                    Set @log = @log + '| 16 COORDINATOR ESQUERDA'
+                                    --Verifica se há Indicator, caso não inclui usuario como indicator superior esquerda
+                                    if (@IndicatorEsqSup is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            IndicatorEsqSup = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @IndicatorEsqSup = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorEsqSup'
-                                    End
-                                --Verifica se há Indicator, caso não inclui usuario como indicator inferior esquerda
-                                if (@IndicatorEsqInf is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        IndicatorEsqInf = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                        Set @IndicatorEsqSup = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'IndicatorEsqSup'
+                                        End
+                                    --Verifica se há Indicator, caso não inclui usuario como indicator inferior esquerda
+                                    if (@IndicatorEsqInf is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            IndicatorEsqInf = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @IndicatorEsqInf = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'IndicatorEsqInf'
-                                    End
-                            End
+                                        Set @IndicatorEsqInf = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'IndicatorEsqInf'
+                                        End
+                                End
             
-                            --*********** INDICATOR DIREITA Superior ************** 
-                            if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
-                            Begin
-                                Set @log = @log + '| 17 INDICATOR DIREITA Superior'
-                                if (@DonatorDirSup1 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorDirSup1 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                --*********** INDICATOR DIREITA Superior ************** 
+                                if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
+                                Begin
+                                    Set @log = @log + '| 17 INDICATOR DIREITA Superior'
+                                    if (@DonatorDirSup1 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorDirSup1 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorDirSup1 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorDirSup1'
-                                    End
-                                if (@DonatorDirSup2 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorDirSup2 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                        Set @DonatorDirSup1 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorDirSup1'
+                                        End
+                                    if (@DonatorDirSup2 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorDirSup2 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorDirSup2 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorDirSup2'
-                                    End
-                            End
+                                        Set @DonatorDirSup2 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorDirSup2'
+                                        End
+                                End
             
-                            --*********** INDICATOR DIREITA Inferior ************** 
-                            if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
-                            Begin
-                                Set @log = @log + '| 18 INDICATOR DIREITA Inferior'
-                                if (@DonatorDirInf1 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorDirInf1 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                --*********** INDICATOR DIREITA Inferior ************** 
+                                if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
+                                Begin
+                                    Set @log = @log + '| 18 INDICATOR DIREITA Inferior'
+                                    if (@DonatorDirInf1 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorDirInf1 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorDirInf1 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorDirInf1'
-                                    End
-                                if (@DonatorDirInf2 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorDirInf2 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                        Set @DonatorDirInf1 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorDirInf1'
+                                        End
+                                    if (@DonatorDirInf2 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorDirInf2 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorDirInf2 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorDirInf2'
-                                    End
-                            End
+                                        Set @DonatorDirInf2 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorDirInf2'
+                                        End
+                                End
             
-                            --*********** INDICATOR ESQUERDA Superior **************
-                            if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
-                            Begin
-                                Set @log = @log + '| 19 INDICATOR ESQUERDA Superior'
-                                if (@DonatorEsqSup1 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorEsqSup1 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                --*********** INDICATOR ESQUERDA Superior **************
+                                if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
+                                Begin
+                                    Set @log = @log + '| 19 INDICATOR ESQUERDA Superior'
+                                    if (@DonatorEsqSup1 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorEsqSup1 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorEsqSup1 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorEsqSup1'
-                                    End
-                                if (@DonatorEsqSup2 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorEsqSup2 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                        Set @DonatorEsqSup1 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorEsqSup1'
+                                        End
+                                    if (@DonatorEsqSup2 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorEsqSup2 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorEsqSup2 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorEsqSup2'
-                                    End
-                            End
+                                        Set @DonatorEsqSup2 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorEsqSup2'
+                                        End
+                                End
             
-                            --*********** INDICATOR ESQUERDA Inferior **************
-                            if(@Chamada <> 'Completa' and @Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
-                            Begin
-                                Set @log = @log + '| 20 INDICATOR ESQUERDA Superior'
-                                if (@DonatorEsqInf1 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorEsqInf1 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                --*********** INDICATOR ESQUERDA Inferior **************
+                                if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
+                                Begin
+                                    Set @log = @log + '| 20 INDICATOR ESQUERDA Superior'
+                                    if (@DonatorEsqInf1 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorEsqInf1 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorEsqInf1 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorEsqInf1'
-                                    End
-                                if (@DonatorEsqInf2 is null and @Incluido = 'false')
-                                    Begin
-                                    Update
-                                        Rede.Tabuleiro
-                                    Set
-                                        DonatorEsqInf2 = @UsuarioID
-                                    Where
-                                        ID = @ID
+                                        Set @DonatorEsqInf1 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorEsqInf1'
+                                        End
+                                    if (@DonatorEsqInf2 is null and @Incluido = 'false')
+                                        Begin
+                                        Update
+                                            Rede.Tabuleiro
+                                        Set
+                                            DonatorEsqInf2 = @UsuarioID
+                                        Where
+                                            ID = @ID
                
-                                    Set @DonatorEsqInf2 = @UsuarioID
-                                    Set @Incluido = 'true'
-                                    Set @PosicaoFilho = 'DonatorEsqInf2'
-                                    End
-                            End
+                                        Set @DonatorEsqInf2 = @UsuarioID
+                                        Set @Incluido = 'true'
+                                        Set @PosicaoFilho = 'DonatorEsqInf2'
+                                        End
+                                End
 
-                            --*********FIM UPDATES***********
+                                --*********FIM UPDATES***********
 
-                            Select
-                                @Ciclo = MAX(Ciclo)
-                            From
-                                Rede.TabuleiroUsuario
-                            Where
-                                UsuarioID = @UsuarioID and
-                                BoardID = @BoardID
-
-                            if(@Ciclo is null)
-                            Begin
-                                Set @Ciclo = 1
-                            End
-
-                            if Not Exists (Select 'Existe' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and TabuleiroID = @ID and BoardID = @BoardID And Ciclo = @Ciclo)
-                            Begin
-                                Set @log = @log + '| 35 Obtem Master do usuario'
-                                --Obtem Master do usuario passado como parametro
-                                Select Top(1)
-                                    @MasterTabuleiro = MasterID 
-                                From 
+                                Select
+                                    @Ciclo = MAX(Ciclo)
+                                From
                                     Rede.TabuleiroUsuario
                                 Where
-                                    StatusID = 1 and
-                                    UsuarioID = @UsuarioPaiID and
+                                    UsuarioID = @UsuarioID and
                                     BoardID = @BoardID
-                  
-                                --inclui novo usuario no TabuleiroUsuario 1
-                                Insert Into Rede.TabuleiroUsuario
-                                (
-                                    UsuarioID,
-                                    TabuleiroID,
-                                    BoardID,
-                                    StatusID,
-                                    MasterID,
-                                    InformePag,
-                                    Ciclo,
-                                    Posicao,
-                                    PagoMaster,
-                                    PagoSistema,
-                                    ConviteProximoNivel,
-                                    DataInicio,
-                                    DataFim
-                                ) 
-                                Values 
-                                (
-                                    @UsuarioID,
-                                    @ID,
-                                    @BoardID,
-                                    1, --Ativo
-                                    Coalesce(@MasterTabuleiro,@MasterTabuleiro,1),
-                                    0,
-                                    @Ciclo,
-                                    Coalesce(@PosicaoFilho,@PosicaoFilho,'1'),
-                                    'false',
-                                    'False',
-                                    'False',
-                                    GetDate(),
-                                    null
-                                )
 
-                                if not Exists (Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioID and BoardID = @BoardID and StatusID = 1)
+                                if(@Ciclo is null)
                                 Begin
-                                    Set @log = @log + '| 36 insert Into Rede.TabuleiroNivel'
-                                    Insert Into Rede.TabuleiroNivel
+                                    Set @Ciclo = 1
+                                End
+
+                                if Not Exists (Select 'Existe' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and TabuleiroID = @ID and BoardID = @BoardID And Ciclo = @Ciclo)
+                                Begin
+                                    Set @log = @log + '| 35 Obtem Master do usuario'
+                                    --Obtem Master do usuario passado como parametro
+                                    Select Top(1)
+                                        @MasterTabuleiro = MasterID 
+                                    From 
+                                        Rede.TabuleiroUsuario
+                                    Where
+                                        StatusID = 1 and
+                                        UsuarioID = @UsuarioPaiID and
+                                        BoardID = @BoardID
+                  
+                                    --inclui novo usuario no TabuleiroUsuario 1
+                                    Insert Into Rede.TabuleiroUsuario
                                     (
                                         UsuarioID,
+                                        TabuleiroID,
                                         BoardID,
-                                        DataInicio,
-                                        DataFim,
                                         StatusID,
-                                        Observacao
-                                    )
-                                    VALUES
+                                        MasterID,
+                                        InformePag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        PagoSistema,
+                                        ConviteProximoNivel,
+                                        DataInicio,
+                                        DataFim
+                                    ) 
+                                    Values 
                                     (
                                         @UsuarioID,
+                                        @ID,
                                         @BoardID,
-                                        @DataInicio,
-                                        null,
-                                        2, --inclusão normal
-                                        'Novo Usuário (2)'
+                                        1, --Ativo
+                                        Coalesce(@MasterTabuleiro,@MasterTabuleiro,1),
+                                        0,
+                                        @Ciclo,
+                                        Coalesce(@PosicaoFilho,@PosicaoFilho,'1'),
+                                        'false',
+                                        'False',
+                                        'False',
+                                        GetDate(),
+                                        null
                                     )
+
+                                    if not Exists (Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioID and BoardID = @BoardID and StatusID = 1)
+                                    Begin
+                                        Set @log = @log + '| 36 insert Into Rede.TabuleiroNivel'
+                                        Insert Into Rede.TabuleiroNivel
+                                        (
+                                            UsuarioID,
+                                            BoardID,
+                                            DataInicio,
+                                            DataFim,
+                                            StatusID,
+                                            Observacao
+                                        )
+                                        VALUES
+                                        (
+                                            @UsuarioID,
+                                            @BoardID,
+                                            @DataInicio,
+                                            null,
+                                            2, --inclusão normal
+                                            'Novo Usuário (2)'
+                                        )
+                                    End
                                 End
                             End
+                        End
+                        Else 
+                        Begin
+                            Set @Historico = '07 - Check Completa false'
                         End
                     End
                 End
@@ -1544,7 +1317,7 @@ Begin
                         if(@MasterTabuleiro is null)
                         Begin
                             Set @log = @log + '| 39 Master é null'
-                            Set @Historico = '|Usuário pai (' + TRIM(STR(@MasterTabuleiro)) + ') não existe! Chamada: ' + @Chamada
+                            Set @Historico = '05 Usuário pai (' + TRIM(STR(@MasterTabuleiro)) + ') não existe! Chamada: ' + @Chamada
                         End
                         Else
                         Begin
@@ -1668,7 +1441,7 @@ Begin
         Else
         Begin
             Set @log = @log + '| 43 Usuario não cadastrado'
-            Set @Historico = '|Novo usuário ' + TRIM(STR(@UsuarioID)) + ' não está cadastrado! Chamada: ' + @Chamada
+            Set @Historico = '06 Novo usuário ' + TRIM(STR(@UsuarioID)) + ' não está cadastrado! Chamada: ' + @Chamada
         End
     End
 

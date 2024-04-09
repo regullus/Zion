@@ -6019,6 +6019,7 @@
     <Content Include="Content\img\Universol\Pins\es_0_alv.png" />
     <Content Include="Content\img\Universol\Pins\es_0_anf.png" />
     <Content Include="Content\img\Universol\Pins\es_0_con.png" />
+    <Content Include="Content\img\Universol\Pins\es_0_con.png" />
     <Content Include="Content\img\Universol\Pins\es_0_sup.png" />
     <Content Include="Content\img\Universol\Pins\es_1_alv.png" />
     <Content Include="Content\img\Universol\Pins\es_1_anf.png" />
@@ -6054,6 +6055,7 @@
     <Content Include="Content\img\Universol\Pins\es_8_sup.png" />
     <Content Include="Content\img\Universol\Pins\pt_0_alv.png" />
     <Content Include="Content\img\Universol\Pins\pt_0_anf.png" />
+    <Content Include="Content\img\Universol\Pins\pt_0_con.png" />
     <Content Include="Content\img\Universol\Pins\pt_0_con.png" />
     <Content Include="Content\img\Universol\Pins\pt_0_sup.png" />
     <Content Include="Content\img\Universol\Pins\pt_1_alv.png" />

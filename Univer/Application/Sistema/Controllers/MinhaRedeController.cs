@@ -420,7 +420,7 @@ namespace Sistema.Controllers
 
         #region Actions
 
-        public ActionResult Tabuleiro()
+        public ActionResult Tabuleiro(int? idTab)
         {
             obtemMensagem();
 
@@ -430,12 +430,18 @@ namespace Sistema.Controllers
             string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
             tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
             ViewBag.Token = tokenLocal;
+            
+            int idTabuleiro = idTab ?? 0;
+
+            if(idTabuleiro < 0)
+            {
+                idTabuleiro = 0;
+            }
 
             try
             {
                 ViewBag.ShowReportPayment = false;
                 ViewBag.RedeTabuleiro = true;
-                int idTabuleiro = 1;
 
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
                 IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
@@ -444,15 +450,20 @@ namespace Sistema.Controllers
                 ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
 
                 Core.Models.TabuleiroModel tabuleiro = null;
-
-                //Obtem 1º Tabuleiro ativo do usuario
-                if (tabuleirosNivelAtivos != null)
+                
+                if (tabuleirosNivelAtivos != null && idTabuleiro == 0)
                 {
+                    //Obtem 1º Tabuleiro ativo do usuario
                     Core.Models.TabuleiroNivelModel tabuleirosNivelAtivo = tabuleirosNivelAtivos.FirstOrDefault();
                     if (tabuleirosNivelAtivo != null)
                     {
                         idTabuleiro = tabuleirosNivelAtivo.TabuleiroID;
                     }
+                }
+
+                if (idTabuleiro < 1)
+                {
+                    idTabuleiro = 1;
                 }
 
                 Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, idTabuleiro);
@@ -492,18 +503,18 @@ namespace Sistema.Controllers
                     }
                 } 
 
-                ViewBag.idTabuleiro = 0;
+                ViewBag.idTabuleiro = idTabuleiro;
                 ViewBag.tabuleiroAtivo = null;
 
                 if (tabuleirosNivelAtivos.Count() > 0)
                 {
-                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
+                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
+                    
                     //Obtem o tabuleiro que será exibido quando a pag for carregada
-                    idTabuleiro = tabuleiroAtivo.TabuleiroID;
-                    ViewBag.idTabuleiro = idTabuleiro;
+                    int idTabuleiroAtivo = tabuleiroAtivo.TabuleiroID;
                     ViewBag.tabuleiroAtivo = tabuleiroAtivo;
 
-                    if (idTabuleiro > 0)
+                    if (idTabuleiroAtivo > 0)
                     {
                         tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
                         ViewBag.tabuleiro = tabuleiro;
@@ -1013,8 +1024,6 @@ namespace Sistema.Controllers
                 switch (retorno)
                 {
                     case "OK":
-                        string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"]};
-                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
 
                         TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
 
@@ -1051,6 +1060,15 @@ namespace Sistema.Controllers
                         //Chama incluir no tabuleiro para ver se 
                         //o tabuleiro esta completo
                         string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, idTabuleiro, "Completa");
+                        if(tabuleiroIncluir == "COMPLETO")
+                        {
+                            string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
+                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                        } else
+                        {
+                            string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
+                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                        }
 
                         break;
                     case "NOOK":

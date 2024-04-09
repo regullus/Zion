@@ -92,6 +92,16 @@ namespace Core.Repositories.Rede
                         case "06":
                             ret = "USUARIO_JA_POSICIONADO";
                             break;
+                        case "07":
+                            //Retorno para tipo de chamda = "COMPLETA"
+                            //07 indica que o tabuleiro ainda não esta completo
+                            ret = "OK";
+                            break;
+                        case "08":
+                            //Retorno para tipo de chamda = "COMPLETA"
+                            //08 indica que o Tabuleiro esta completo
+                            ret = "COMPLETO";
+                            break;
                         default:
                             ret = "OK";
                             break;
