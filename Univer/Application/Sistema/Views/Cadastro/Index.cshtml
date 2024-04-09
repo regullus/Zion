@@ -56,47 +56,6 @@
 
             $(document).ready(function () {
 
-                if ('@tipoPessoa' === "F") {
-                    $('.divSexo').show();
-                    //$('.divDocPF').show();
-                    //$('.divDocPJ').hide();
-                    @*$("#lblDataNascimento").text("@traducaoHelper["DATA_NASCIMENTO"]");*@
-                    $("#DocPJ").text("");
-                } else {
-                    $('.divSexo').hide();
-                    //$('.divDocPF').hide();
-                    //$('.divDocPJ').show();
-                    @*$("#lblDataNascimento").text("@traducaoHelper["DATA_ABERTURA"]");*@
-                    $("#DocPF").text("");
-                }
-
-                @*if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA").Trim().Length' != 0) {
-                    $('#DocPF').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CPF_ENTRADA")');
-                }
-                if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CNPJ_ENTRADA").Trim().Length' != 0) {
-                    $('#DocPJ').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CNPJ_ENTRADA")');
-                }*@
-
-                @*if ('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CELULAR_ENTRADA").Trim().Length' != 0) {
-                    $('#Celular').inputmask('@Core.Helpers.ConfiguracaoHelper.GetString("MASCARA_CELULAR_ENTRADA")');
-                }
-                $('#CodigoPostal').inputmask('99999-999');
-                $('#CodigoPostal2').inputmask('99999-999');*@
-
-                //$("#CidadeID2Input").hide();
-                //$("#CidadeID2Input").focus(ExibirListaCidades2);
-                //$("#CidadeIDInput").hide();
-                //$("#CidadeIDInput").focus(ExibirListaCidades);
-
-                //var codigoPostalValue = $("#CodigoPostal").val();
-                //if (codigoPostalValue != "") {
-                //    CarregaCEP('#CodigoPostal');
-                //}
-
-                //var codigoPostalValue2 = $("#CodigoPostal2").val();
-                //if (codigoPostalValue2 != "") {
-                //    CarregaCEP('#CodigoPostal2');
-                //}
             });
 
             $('#Login').on('keypress', function (event) {
@@ -133,20 +92,20 @@
                 }
             });
 
-            $('#Celular').on('keypress', function (event) {
-                var regex = new RegExp("^[0-9 ()-]+$");
-                var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            //$('#Celular').on('keypress', function (event) {
+            //    var regex = new RegExp("^[0-9 ()-]+$");
+            //    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
 
-                if (navigator.userAgent.includes("Firefox")) {
-                    if (key == '\u0008' || key == '\u0000') // Left / Up / Right / Down Arrow, Backspace, Delete, Tab keys
-                        return;
-                }
+            //    if (navigator.userAgent.includes("Firefox")) {
+            //        if (key == '\u0008' || key == '\u0000') // Left / Up / Right / Down Arrow, Backspace, Delete, Tab keys
+            //            return;
+            //    }
 
-                if (!regex.test(key)) {
-                    event.preventDefault();
-                    return false;
-                }
-            });
+            //    if (!regex.test(key)) {
+            //        event.preventDefault();
+            //        return false;
+            //    }
+            //});
 
             //$('#EstadoID').on('change', function (event) {
             //    Cidades(1);
@@ -208,7 +167,7 @@
 
     <script type="text/javascript">
 
-        $('#Celular').inputmask('@pais.MascaraCel');
+        @*$('#Celular').inputmask('@pais.MascaraCel');*@
         $('#CodigoPostal').inputmask('@pais.MascaraCep');
         $('#CodigoPostal2').inputmask('@pais.MascaraCep');
 

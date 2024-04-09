@@ -13,7 +13,6 @@
 
     #region ViewBags
 
-
     ViewBag.Description = traducaoHelper["SISTEMA"];
     ViewBag.Author = "";
     ViewBag.ReferrerMode = ReferrerMode.OriginWhenCrossOrigin;
@@ -53,7 +52,7 @@
     }
 
     ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
-    if (ViewBag.MascaraData == null)
+    if (ViewBag.MascaraData == null || ViewBag.MascaraData == "[MASCARA_DATA]")
     {
         ViewBag.MascaraData = "dd/MM/yyyy";
     }
@@ -110,6 +109,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
     <link rel="stylesheet" href="~/Content/home/styles.css">
+    <style>
+        .container {
+            background: url('@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "//logo-vertical.png?v=" + @Helpers.Local.Versao)') no-repeat center  ;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            min-height: 1024px;
+        }
+    </style>
 }
 
 @section head {
@@ -212,8 +221,44 @@
                 }, 500);
             }
         </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                var btnCopiarCadastro = $("#cadastroLinkCopiar");
+                var copiado = $("#copiado");
+                var copiadoTemp = 0;
+                copiado.hide();
+
+                btnCopiarCadastro.on('click', function () {
+
+                    var el = document.createElement('textarea');
+
+                    el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)';
+
+                    el.setAttribute('readonly', '');
+                    el.style = { position: 'absolute', left: '-9999px' };
+                    document.body.appendChild(el);
+
+                    el.select();
+
+                    document.execCommand('copy');
+
+                    copiado.fadeIn();
+                    clearTimeout(copiadoTemp);
+                    copiadoTemp = setTimeout(function () { copiado.fadeOut(); }, 1000);
+
+                    document.body.removeChild(el);
+                });
+
+
+            });
+        </script>
 
     }
+
     <script type="text/javascript" src="~/Content/scripts/jquery.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/countUp.js"></script>
@@ -289,39 +334,43 @@
         </div>
 
         <div class="portlet-body">
-
             <h3>@traducaoHelper["EMAIL_NAO_CONFIRMADO_1"]</h3>
             <br />
             <h4>@traducaoHelper["EMAIL_NAO_CONFIRMADO_2"]</h4>
             <h4>@traducaoHelper["EMAIL_NAO_CONFIRMADO_3"]</h4>
+            <br />
+            <a href="@Url.Action("EnviarValidacaoEmail", "Home")" class="button fundo" style="width:800px;">@traducaoHelper["ENVIAR_NOVAMENTE_ATIVACAO"]</a>
 
         </div>
+
     </div>
 }
 else
 {
-    <div class="portlet solid grey-cararra" style="max-width: 1600px;">
-        <div class="portlet-body">
-            <!--BANNER-->
-            <div class="row" style="max-width: 1600px;">
-                @if (blnExibeBanner)
-                {
-                    <div class="owl-carousel">
-                        @if (banners != null && banners.Count > 0)
-                        {
-                            foreach (var banner in banners)
-                            {
-                                @*<img src="@Url.Content(banner.CaminhoVirtual)" class="img-responsive" alt="@banner.Nome">*@
-                                <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/" + @banner.Nome)" alt="@banner.Nome" class="img-responsive" style="max-width: 60%;">
-                            }
-                        }
-                        else
-                        {
-                            <img src="@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/logo-vertical.png")" class="img-responsive center-align">
-                        }
+    <div class="portlet solid grey-cararra container" style="max-width: 1600px;">
+        <div class="portlet-body content">
+            <div class="row" style="padding: 10px;">
+                <div class="col-md-12 padding-lateral-10">
+                    <div class="col-md-2 padding-Right-0" style="width: 111px !important; padding-top: 9px;">
+                        <i class="fa fa-pencil-square-o"></i>
+                        <span class="title">
+                            @traducaoHelper["LINK_CADASTRO"]:
+                        </span>
                     </div>
-                }
+                    <div class="col-md-7">
+                        <div class="input-group">
+                            <input type="text" id="cadastroLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)">
+                            <span class="input-group-btn">
+                                <input class="btn btn-danger" id="cadastroLinkCopiar" value=" @traducaoHelper["COPIAR"]">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <span id="copiado">@traducaoHelper["COPIANDO"]</span>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 }
@@ -1302,6 +1351,7 @@ else
         </div>
     </div>
 }
+
 <!-- END PAGE CONTENT-->
 
 <script>

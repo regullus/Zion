@@ -271,7 +271,7 @@
             </li>
         }
 
-        <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
+        <li>
             <a href="~/p/@Helpers.Local.nomeUsuario">
                 <i class="fa fa-pencil-square-o"></i>
                 <span class="title">
@@ -361,16 +361,16 @@ else
         </li>
     }
 
-    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_UNILEVEL") == "true" ? "" : "hidden")>
+    <li>
         <a href="@Url.Action("tabuleiro", "minha-rede", new { area = "" })">
-            <i class="fa fa-sitemap"></i>
+            <i class="fa fa-rocket"></i>
             <span class="title">
                 @traducaoHelper["MINHA_REDE"]
             </span>
         </a>
     </li>
 
-    <li @(Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_LINK_SITE_LOJA") ? "" : "hidden")>
+    <li>
         <a href="~/p/@Helpers.Local.nomeUsuario">
             <i class="fa fa-pencil-square-o"></i>
             <span class="title">

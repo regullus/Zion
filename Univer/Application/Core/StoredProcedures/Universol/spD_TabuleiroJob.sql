@@ -105,6 +105,12 @@ BEGIN
             Where
                ID = @ID
 
+            Delete
+                Rede.TabuleiroNivel
+            Where
+                UsuarioID = @UsuarioID and
+                BoardID = @BoardID
+
             --Remove usuario que nao pagou no tabuleiro
             if(@Posicao = 'DonatorDirSup1') Update Rede.Tabuleiro Set DonatorDirSup1 = null Where ID = @TabuleiroID 
             if(@Posicao = 'DonatorDirSup2') Update Rede.Tabuleiro Set DonatorDirSup2 = null Where ID = @TabuleiroID 

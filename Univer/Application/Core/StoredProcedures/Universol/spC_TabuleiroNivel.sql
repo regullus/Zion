@@ -152,13 +152,15 @@ BEGIN
         Observacao
     From 
         #temp
+    Order By
+        TabuleiroID
     
 End -- Sp
 
 go
 Grant Exec on spC_TabuleiroNivel To public
 go
---Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 1
+Exec spC_TabuleiroNivel @UsuarioID = 2596, @StatusID = 2
 --Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 2
 --Exec spC_TabuleiroNivel @UsuarioID = 2581, @StatusID = 2
 --Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 3

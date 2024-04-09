@@ -51,7 +51,7 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public IEnumerable<TabuleiroInclusao> IncluiTabuleiro(int idUsuario, int idPai, int idBoard, string Chamada)
+        public string IncluiTabuleiro(int idUsuario, int idPai, int idBoard, string Chamada)
         {
             //idUsuario usuario a ser incluido no tabuleiro
             //idPai patrocinador do usuario acima
@@ -64,9 +64,45 @@ namespace Core.Repositories.Rede
 
             string sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
 
-            var retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).ToList();
+            TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
 
-            return retorno;
+            string ret = "OK";
+            
+            if (retorno !=  null )
+            {
+                if (retorno.Retorno != "OK")
+                {
+                    switch (retorno.Historico.Substring(0, 2))
+                    {
+                        case "01":
+                            ret = "USUARIO_JA_POSICIONADO";
+                            break;
+                        case "02":
+                            ret = "CONVIDADO_INCLUIR";
+                            break;
+                        case "03":
+                            ret = "ALVO_USUARIO";
+                            break;
+                        case "04":
+                            ret = "TABULEIRO_SEM_POSICAO";
+                            break;
+                        case "05":
+                            ret = "MASTER_NAO_EXISTE";
+                            break;
+                        case "06":
+                            ret = "USUARIO_JA_POSICIONADO";
+                            break;
+                        default:
+                            ret = "OK";
+                            break;
+                    }
+                }
+            } else
+            {
+                ret = "SEM_DADOS";
+            }
+
+            return ret;
         }
 
         public string InformarPagamento(int idUsuario, int idTabuleiro)
@@ -95,7 +131,6 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
-
 
         public TabuleiroInfoUsuarioModel ObtemInfoUsuario(int idTarget, int idUsuario, int idTabuleiro)
         {
@@ -145,6 +180,15 @@ namespace Core.Repositories.Rede
         {
             string sql = "Exec spC_TabuleiroBoard @TabuleiroID=" + idTabuleiro;
             var retorno = _context.Database.SqlQuery<TabuleiroBoardModel>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
+        public string TabuleiroSair(int idUsuario, int idTabuleiro)
+        {
+            string sql = "Exec spG_TabuleiroSair @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 
             return retorno;
         }

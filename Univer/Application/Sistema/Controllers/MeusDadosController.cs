@@ -474,18 +474,18 @@ namespace Sistema.Controllers
                         strDataNascimento = cpUtilities.Gerais.ConverterDataBanco(strDataNascimento, usuario.Pais.Idioma.Sigla);
                         DateTime dataAniversario = DateTime.Parse(strDataNascimento);
 
-                        usuario.NomeFantasia = form["NomeFantasia"];
-                        usuario.Apelido = form["Apelido"];
+                        //usuario.NomeFantasia = form["NomeFantasia"];
+                        //usuario.Apelido = form["Apelido"];
                         usuario.Nome = form["Nome"];
                         usuario.Sexo = form["Sexo"];
                         usuario.Documento = strDocumento;
-                        usuario.FilialID = int.Parse(form["FilialID"]);
+                        //usuario.FilialID = int.Parse(form["FilialID"]);
                         usuario.DataNascimento = dataAniversario;
                         usuario.PaisID = Convert.ToInt32(strPais);
 
                         //Truncar em 15 caracteres
-                        string truncate = usuario.Apelido;
-                        usuario.Apelido = truncate.Length <= 15 ? truncate : truncate.Substring(0, 15);
+                        //string truncate = usuario.Apelido;
+                        //usuario.Apelido = truncate.Length <= 12 ? truncate : truncate.Substring(0, 12);
 
                         repository.Save(usuario);
 

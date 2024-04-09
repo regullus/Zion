@@ -1584,6 +1584,31 @@
         //    return RedirectToAction("index", "home");
         //}
 
+        public ActionResult EnviarValidacaoEmail()
+        {
+            try
+            {
+                usuarioService.EnviarValidacaoEmail(usuario, Helpers.Local.Sistema);
+                string[] strMensagemParam1 = new string[] { traducaoHelper["EMAIL_ENVIADO_PARA"], usuario.Email };
+                Mensagem(traducaoHelper["SUCESSO"], strMensagemParam1, "msg");
+
+            //    Session["TituloMensagem"] = traducaoHelper["SUCESSO"];
+            //    Session["Mensagem"] = traducaoHelper["EMAIL_ENVIADO_PARA"] + ": " + usuario.Email;
+            }
+            catch (Exception ex)
+            {
+                cpUtilities.LoggerHelper.WriteFile("erro envio de email " + usuario.Email + " : " + ex.Message, "HomeEnvioEmail");
+                string[] strMensagemParam2 = new string[] { traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+
+                //Session["TituloMensagem"] = traducaoHelper["ALERTA"];
+                //Session["Mensagem"] = traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] + ": " + usuario.Email;
+            }
+
+            return RedirectToAction("index", "home");
+        }
+
+
         #endregion
 
     }

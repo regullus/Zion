@@ -449,7 +449,10 @@ namespace Sistema.Controllers
                 if (tabuleirosNivelAtivos != null)
                 {
                     Core.Models.TabuleiroNivelModel tabuleirosNivelAtivo = tabuleirosNivelAtivos.FirstOrDefault();
-                    idTabuleiro = tabuleirosNivelAtivo.TabuleiroID;
+                    if (tabuleirosNivelAtivo != null)
+                    {
+                        idTabuleiro = tabuleirosNivelAtivo.TabuleiroID;
+                    }
                 }
 
                 Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, idTabuleiro);
@@ -867,16 +870,14 @@ namespace Sistema.Controllers
                 int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
 
                 //Inclui usuario no novo tabuleiro
-                var tabuleiro = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idTabuleiro, "Principal");
+                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idTabuleiro, "Principal");
 
                 JsonResult jsonResult = new JsonResult
                 {
-                    Data = "OK",
+                    Data = traducaoHelper[tabuleiroIncluir],
                     RecursionLimit = 1000
                 };
-
                 return jsonResult;
-
             }
             catch (Exception)
             {
@@ -1049,7 +1050,7 @@ namespace Sistema.Controllers
 
                         //Chama incluir no tabuleiro para ver se 
                         //o tabuleiro esta completo
-                        var tabuleiro = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, idTabuleiro, "Completa");
+                        string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, idTabuleiro, "Completa");
 
                         break;
                     case "NOOK":
@@ -1169,6 +1170,85 @@ namespace Sistema.Controllers
                     string[] strMensagemParam4 = new string[] { traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"]);
+                }
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = retorno,
+                    RecursionLimit = 1000
+                };
+
+                return jsonResult;
+
+            }
+            catch (Exception ex)
+            {
+                string erro = ex.Message;
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ExitNivel(string usuarioID, string tabuleiroID, string token)
+        {
+            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idTabuleiro = int.Parse(tabuleiroID);
+
+                if (idUsuario <= 0 || idTabuleiro <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                if (token != tokenLocal)
+                {
+                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                    //Devolve que tokem é invalido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                }
+
+                if (idUsuario != usuario.ID)
+                {
+                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                //Remove usuario do tabuleiro informado
+               String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idTabuleiro);
+
+                switch (retorno)
+                {
+                    case "OK":
+                        string[] strMensagem = new string[] { traducaoHelper["SAIDA_REALIZADA_COM_SUCESSO"]};
+                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                        break;
+                    case "NOOK":
+                        string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]);
+                    default:
+                        string[] strMensagemParam5 = new string[] { traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]);
                 }
 
                 JsonResult jsonResult = new JsonResult

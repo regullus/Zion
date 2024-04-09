@@ -965,7 +965,8 @@ namespace Core.Services.Usuario
                 cont++;
                 campos.Add(new KeyValuePair<string, string>("TEXT_1", traducaoHelper["LOGIN"] + " :" + usuario.Login));
                 cont++;
-                campos.Add(new KeyValuePair<string, string>("TEXT_2", traducaoHelper["SENHA"] + " :" + senhaDescripto));
+                //campos.Add(new KeyValuePair<string, string>("TEXT_2", traducaoHelper["SENHA"] + " :" + senhaDescripto));
+                campos.Add(new KeyValuePair<string, string>("TEXT_2", ""));
                 cont++;
                 campos.Add(new KeyValuePair<string, string>("SISTEMA", sistema));
                 cont++;
@@ -1138,6 +1139,7 @@ namespace Core.Services.Usuario
             if (usuario != null)
             {
                 usuario.StatusEmail = Entities.Usuario.TodosStatusEmail.Validado;
+                usuario.StatusID = 2; //Ativo
                 usuarioRepository.Save(usuario);
             }
             return usuario;
