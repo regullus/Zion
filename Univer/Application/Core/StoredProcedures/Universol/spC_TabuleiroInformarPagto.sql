@@ -60,4 +60,3 @@ go
 
 --Exec spC_TabuleiroInformarPagto @UsuarioID = 2587, @TabuleiroID = 1, @UsuarioIDPag = 2580
 
-

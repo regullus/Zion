@@ -90,25 +90,64 @@ BEGIN
             tn.BoardID,
             boa.Nome as BoardNome,
             boa.Cor as BoardCor,
-            tab.TabuleiroID as TabuleiroID,
-            tab.Posicao,
+            0 as TabuleiroID,
+            '' as Posicao,
             tn.DataInicio,
             tn.DataFim,
             tn.StatusID,
             tn.Observacao
         FROM 
             Rede.TabuleiroNivel tn,
-            Rede.TabuleiroBoard boa,
-            Rede.TabuleiroUsuario tab
+            Rede.TabuleiroBoard boa
         WHERE
             tn.UsuarioID = @UsuarioID and
             tn.StatusID = 1 and
-            tn.BoardID = boa.id and
-            tn.UsuarioID = tab.UsuarioID and
-            tn.BoardID = tab.boardID and
-            tab.StatusID = 1
+            tn.BoardID = boa.id
         Order By 
             StatusID
+        
+        -- ******* Inicio Cursor *******
+        Declare
+            @ID int,
+            @BoardID int,
+            @AntFetch int,
+            @TabuleiroID int
+
+        Declare
+            curRegistro 
+        Cursor Local For
+            Select 
+                ID,
+                BoardID
+            FROM 
+                #temp
+
+        Open curRegistro
+        Fetch Next From curRegistro Into  @ID, @BoardID
+        Select @AntFetch = @@fetch_status
+        While @AntFetch = 0
+        Begin
+            Select top(1)
+                @TabuleiroID = ID
+            From
+                Rede.TabuleiroUsuario
+            Where
+                StatusID = 1 and
+                BoardID = @BoardID and
+                Posicao = 'Master'
+            Order by
+                ID
+
+            Update 
+                #temp
+            Set
+                TabuleiroID = @TabuleiroID
+            Where
+                ID = @ID
+
+            Fetch Next From curRegistro Into @ID, @BoardID
+            Select @AntFetch = @@fetch_status       
+        End
     End
 
    If(@StatusID = 2)
@@ -163,7 +202,7 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroNivel To public
 go
-Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 2
+Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 1
 
 --Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 2
 --Exec spC_TabuleiroNivel @UsuarioID = 2581, @StatusID = 2

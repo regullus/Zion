@@ -36,4 +36,15 @@ update Sistema.Configuracao set Dados = @dados where chave = @chaveC
 
 select * from Sistema.Configuracao where chave = @chaveC
 
+--select * from Sistema.Configuracao where dados like  '%http%'
+
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/office//Home/MTRetorno' where Dados = 'https://universol.global/office//Home/MTRetorno'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global' where Dados = 'https://donator.universol.global'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/' where Dados = 'https://donator.universol.global/'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/office//Home/MTRetorno' where Dados = 'https://universol.global/office//Home/MTRetorno'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/account/loginexterno' where Dados = 'https://donator.universol.global/account/loginexterno'
+
+
+
+
 
