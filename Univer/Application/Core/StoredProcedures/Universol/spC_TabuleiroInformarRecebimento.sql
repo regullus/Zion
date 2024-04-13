@@ -6,6 +6,7 @@ go
 
 Create  Proc [dbo].[spC_TabuleiroInformarRecebimento]
    @UsuarioID int,
+   @UsuarioPaiID int,
    @TabuleiroID int
 
 As
@@ -23,6 +24,26 @@ BEGIN
         @Count int,
         @MasterID int
     
+    if not Exists (
+        Select 'OK'
+        From
+            rede.TabuleiroUsuario 
+        where 
+            InformePag = 1 and
+            UsuarioID = @UsuarioID and 
+            TabuleiroID  = @TabuleiroID 
+    )
+    Begin
+        Update
+            rede.TabuleiroUsuario 
+        Set
+            InformePag = 1,
+            UsuarioIDPag = @UsuarioPaiID
+        where 
+            UsuarioID = @UsuarioID and 
+            TabuleiroID  = @TabuleiroID 
+    End
+
     Update
         rede.TabuleiroUsuario 
     Set
@@ -39,6 +60,7 @@ BEGIN
     Where
         UsuarioID = @UsuarioID and 
         TabuleiroID  = @TabuleiroID
+
     if Exists (Select 'OK' From rede.TabuleiroUsuario Where UsuarioID = @MasterID and TabuleiroID  = @TabuleiroID and PagoSistema = 1 and ConviteProximoNivel = 0)
     Begin
         Select 
@@ -77,5 +99,3 @@ Grant Exec on spC_TabuleiroInformarRecebimento To public
 go
 
 --Exec spC_TabuleiroInformarRecebimento @UsuarioID = 2590, @TabuleiroID = 1
-
---select * from rede.TabuleiroUsuario where UsuarioId = 2587

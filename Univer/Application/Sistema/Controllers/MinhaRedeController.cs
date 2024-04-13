@@ -485,7 +485,7 @@ namespace Sistema.Controllers
                         tempoMax = 60;
                     }
 
-                    if (!tabuleiroUsuario.InformePag)
+                    if (!tabuleiroUsuario.InformePag && (tabuleiroUsuario.Posicao == "DonatorDirSup1" || tabuleiroUsuario.Posicao == "DonatorEsqSup1" || tabuleiroUsuario.Posicao == "DonatorDirSup2" || tabuleiroUsuario.Posicao == "DonatorEsqSup2" || tabuleiroUsuario.Posicao == "DonatorDirInf1" || tabuleiroUsuario.Posicao == "DonatorEsqInf1" || tabuleiroUsuario.Posicao == "DonatorDirInf2" || tabuleiroUsuario.Posicao == "DonatorEsqInf2"))
                     {
                         DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
 
@@ -510,7 +510,7 @@ namespace Sistema.Controllers
 
                 if (tabuleirosNivelAtivos.Count() > 0)
                 {
-                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
+                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
                     
                     //Obtem o tabuleiro que será exibido quando a pag for carregada
                     int idTabuleiroAtivo = tabuleiroAtivo.TabuleiroID;
@@ -658,7 +658,6 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult GetDataSysPag(string token)
         {
-
             try
             {
                 string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
@@ -711,7 +710,6 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult GetDataSystem(string token)
         {
-
             try
             {
                 string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
@@ -1023,7 +1021,7 @@ namespace Sistema.Controllers
                 }
 
                 //Informar Recebimento
-                string retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idTabuleiro);
+                string retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuario, idTabuleiro);
                 switch (retorno)
                 {
                     case "OK":
@@ -1062,7 +1060,7 @@ namespace Sistema.Controllers
 
                         //Chama incluir no tabuleiro para ver se 
                         //o tabuleiro esta completo
-                        string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, idTabuleiro, "Completa");
+                        string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
                         if(tabuleiroIncluir == "COMPLETO")
                         {
                             string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };

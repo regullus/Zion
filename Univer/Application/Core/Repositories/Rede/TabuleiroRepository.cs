@@ -132,9 +132,9 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public string InformarRecebimento(int idUsuario, int idTabuleiro)
+        public string InformarRecebimento(int idUsuario, int idUsuarioPai, int idTabuleiro)
         {
-            string sql = "Exec spC_TabuleiroInformarRecebimento @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+            string sql = "Exec spC_TabuleiroInformarRecebimento @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idUsuarioPai + ",@TabuleiroID =" + idTabuleiro;
 
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 

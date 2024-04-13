@@ -323,22 +323,21 @@ BEGIN
     Update tmp Set tmp.ApelidoDonatorEsqInf2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf2 = usu.id 
 
     --Pin
-
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select master from #temp) Update #temp Set pinmaster= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorDir from #temp) Update #temp Set pinCoordinatorDir= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirSup from #temp) Update #temp Set pinIndicatorDirSup= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirInf from #temp) Update #temp Set pinIndicatorDirInf= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup1 from #temp) Update #temp Set pinDonatorDirSup1= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup2 from #temp) Update #temp Set pinDonatorDirSup2= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf1 from #temp) Update #temp Set pinDonatorDirInf1= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf2 from #temp) Update #temp Set pinDonatorDirInf2= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorEsq from #temp) Update #temp Set pinCoordinatorEsq= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqSup from #temp) Update #temp Set pinIndicatorEsqSup= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqInf from #temp) Update #temp Set pinIndicatorEsqInf= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup1 from #temp) Update #temp Set pinDonatorEsqSup1= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup2 from #temp) Update #temp Set pinDonatorEsqSup2= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf1 from #temp) Update #temp Set pinDonatorEsqInf1= @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf2 from #temp) Update #temp Set pinDonatorEsqInf2= @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select master from #temp) Update #temp Set pinmaster = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorDir from #temp) Update #temp Set pinCoordinatorDir = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirSup from #temp) Update #temp Set pinIndicatorDirSup = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirInf from #temp) Update #temp Set pinIndicatorDirInf = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup1 from #temp) Update #temp Set pinDonatorDirSup1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup2 from #temp) Update #temp Set pinDonatorDirSup2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf1 from #temp) Update #temp Set pinDonatorDirInf1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf2 from #temp) Update #temp Set pinDonatorDirInf2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorEsq from #temp) Update #temp Set pinCoordinatorEsq = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqSup from #temp) Update #temp Set pinIndicatorEsqSup = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqInf from #temp) Update #temp Set pinIndicatorEsqInf = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup1 from #temp) Update #temp Set pinDonatorEsqSup1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup2 from #temp) Update #temp Set pinDonatorEsqSup2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf1 from #temp) Update #temp Set pinDonatorEsqInf1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf2 from #temp) Update #temp Set pinDonatorEsqInf2 = @Pin 
    
     Update #temp Set pinMaster=0 Where pinMaster is null
     Update #temp Set pinCoordinatorDir=0 Where pinCoordinatorDir is null
@@ -524,35 +523,35 @@ BEGIN
 
     if(@MasterID = @UsuarioID)
     Begin
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup1 And PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirSup1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirSup2 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirInf1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorDirInf2 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqSup1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqSup2 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqInf1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio) Update #Temp Set pulseDonatorEsqInf2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup1 And PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorDirSup1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorDirSup2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorDirInf1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorDirInf2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorEsqSup1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorEsqSup2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorEsqInf1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id) Update #Temp Set pulseDonatorEsqInf2 = 1
     End
-    
+
     --Alerta Vermelho - Donator não informou o pagamento ao Master
-    Update temp Set corTextoDonatorDirSup1 = '#fff', corDonatorDirSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorDirSup2 = '#fff', corDonatorDirSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorDirInf1 = '#fff', corDonatorDirInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorDirInf2 = '#fff', corDonatorDirInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorEsqSup1 = '#fff', corDonatorEsqSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorEsqSup2 = '#fff', corDonatorEsqSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorEsqInf1 = '#fff', corDonatorEsqInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 0
-    Update temp Set corTextoDonatorEsqInf2 = '#fff', corDonatorEsqInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 0
+    Update temp Set corTextoDonatorDirSup1 = '#fff', corDonatorDirSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorDirSup2 = '#fff', corDonatorDirSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorDirInf1 = '#fff', corDonatorDirInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorDirInf2 = '#fff', corDonatorDirInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqSup1 = '#fff', corDonatorEsqSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqSup2 = '#fff', corDonatorEsqSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqInf1 = '#fff', corDonatorEsqInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqInf2 = '#fff', corDonatorEsqInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id
 
     --Alerta Amarelo - Master ainda não validou pagamento do Convidado
-    Update temp Set corTextoDonatorDirSup1 = '#333', corDonatorDirSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorDirSup2 = '#333', corDonatorDirSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorDirInf1 = '#333', corDonatorDirInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorDirInf2 = '#333', corDonatorDirInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorEsqSup1 = '#333', corDonatorEsqSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorEsqSup2 = '#333', corDonatorEsqSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorEsqInf1 = '#333', corDonatorEsqInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
-    Update temp Set corTextoDonatorEsqInf2 = '#333', corDonatorEsqInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0
+    Update temp Set corTextoDonatorDirSup1 = '#333', corDonatorDirSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorDirSup2 = '#333', corDonatorDirSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorDirInf1 = '#333', corDonatorDirInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorDirInf2 = '#333', corDonatorDirInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqSup1 = '#333', corDonatorEsqSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqSup2 = '#333', corDonatorEsqSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqInf1 = '#333', corDonatorEsqInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
+    Update temp Set corTextoDonatorEsqInf2 = '#333', corDonatorEsqInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id
 
     Select 
         ID,
@@ -677,8 +676,9 @@ go
 Grant Exec on spC_Tabuleiro To public
 go
 
-Exec spC_Tabuleiro @id = 1, @UsuarioID = 2580
 
+--Exec spC_Tabuleiro @id=1, @UsuarioID = 2580
+--Exec spC_Tabuleiro @id=9, @UsuarioID = 2591
 
 
 
