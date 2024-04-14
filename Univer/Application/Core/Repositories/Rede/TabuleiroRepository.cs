@@ -141,6 +141,15 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public string RemoverUsuario(int idUsuario, int idUsuarioPai, int idTabuleiro)
+        {
+            string sql = "Exec spD_TabuleiroExcluirUsuario @UsuarioID=" + idUsuario + ", @TabuleiroID =" + idTabuleiro;
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
         public TabuleiroInfoUsuarioModel ObtemInfoUsuario(int idTarget, int idUsuario, int idTabuleiro)
         {
             string sql = "Exec spC_TabuleiroInfoUsuario @idTarget=" + idTarget + ", @idUsuario=" + idUsuario + ", @idTabuleiro=" + idTabuleiro;

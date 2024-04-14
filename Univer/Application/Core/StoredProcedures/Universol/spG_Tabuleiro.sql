@@ -7,7 +7,7 @@ Go
 Create Proc [dbo].[spG_Tabuleiro]
     @UsuarioID int,
     @UsuarioPaiID int,
-    @TabuleiroID int,
+    @BoardID int,
     @Chamada nvarchar(100)
 As
 Begin
@@ -2779,8 +2779,4 @@ go
 Grant Exec on spG_Tabuleiro To public
 go
 
---exec spG_Tabuleiro @UsuarioID = 2606, @UsuarioPaiID =2591, @BoardID = 1, @Chamada = 'Convite'
-
---exec spG_Tabuleiro @UsuarioID = 2596, @UsuarioPaiID =2580, @BoardID = 1, @Chamada = 'Completa'
-
---Exec spG_Tabuleiro @UsuarioID=2602,@UsuarioPaiID=2581,@BoardID=10,@Chamada='Completa'
+--Exec spG_Tabuleiro @UsuarioID=2590,@UsuarioPaiID=2583,@BoardID=1,@Chamada='Convite'

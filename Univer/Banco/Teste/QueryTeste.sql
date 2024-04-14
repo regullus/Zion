@@ -1,63 +1,48 @@
 use univerDev
 go
 --delete Rede.TabuleiroLog
-Select * from  Rede.TabuleiroLog
-
-Select * from Rede.TabuleiroNivel Where BoardID = 1 and StatusID < 3
-
-Select id,login, Apelido from usuario.usuario where id in (2581,2583,2584,2589,2590,2587,2588,2582,2585,2586,2591,2593,2594,2595,2580)
-
-Select id,login, Apelido from usuario.usuario where id in (2596,2597,2598,2599,2600,2601,2602,2603,2604,2605,2606)
+--Select * from  Rede.TabuleiroLog
 go
---Select id,login from usuario.usuario where id in (2580,2581,2582,2583,2584,2585,2586) order by id
---Select id,login from usuario.usuario where id in (2587,2588,2589,2590,2591,2593,2595,2594,2596,2597,2598,2599,2600,2601,2602) order by id
 
---Select id,login, * from usuario.usuario where id in (2580,2581,2582,2583,2584,2585,2586,2587,2588,2589,2590,2591,2593,2595,2594,2596,2597,2598,2599,2600,2601,2602) 
-
---select * from Rede.TabuleiroUsuario where tabuleiroID = 1
+Select id,login from usuario.usuario where id in (2582,2587,2588,2589,2590,2591,2592,2593,2594,2595,2596,2597,2598,2599,2600,2601,2602,2603,2604,2605,2606,2607,2608,2609,2610,2611,2612,2613,2614,2615,2616,2617,2618,2619,2620,2621,2622,2623,2624,2625,2626,2627) 
 
 
-delete Rede.TabuleiroLog
-Select * from  Rede.TabuleiroLog
+use univerDev
+go
+declare @BoardID int,
+@UsuarioID int
+set @UsuarioID = 2590
+set @BoardID =1
 
-select * from Rede.Tabuleiro where boardID = 1
+Select 
+        'Existe'   
+    From
+        Rede.Tabuleiro 
+    Where
+        BoardID = @BoardID and
+        (
+            Master = @UsuarioID Or
+            CoordinatorDir = @UsuarioID Or
+            IndicatorDirSup = @UsuarioID Or
+            IndicatorDirInf = @UsuarioID Or
+            DonatorDirSup1 = @UsuarioID Or
+            DonatorDirSup2 = @UsuarioID Or
+            DonatorDirInf1 = @UsuarioID Or
+            DonatorDirInf2 = @UsuarioID Or
+            CoordinatorEsq = @UsuarioID Or
+            IndicatorEsqSup = @UsuarioID Or
+            IndicatorEsqInf = @UsuarioID Or
+            DonatorEsqSup1 = @UsuarioID Or
+            DonatorEsqSup2 = @UsuarioID Or
+            DonatorEsqInf1 = @UsuarioID Or
+            DonatorEsqInf2 = @UsuarioID
+        ) and
+        StatusID = 1 
 
-select 
-    tn.ID,
-    tn.UsuarioID,
-    usu.login,
-    usu.PatrocinadorDiretoID,
-    tn.StatusID,
-    tn.Observacao
-from 
-    Rede.TabuleiroNivel tn,
-    usuario.usuario usu
-where 
-    tn.BoardID = 1 and
-    tn.UsuarioID = usu.ID
-
---Select * from usuario.usuario
-Select id,login, Apelido from usuario.usuario where id in (2590)
---luciano e tony
-
---2582	SOLIDARIO
---2591 Enzo
---2606	paulo
-
-Select
-    UsuarioID,
-    DireitaFechada,
-    EsquerdaFechada
-From
-    Rede.TabuleiroUsuario
-Where
-    --UsuarioID = @Master and
-    TabuleiroID = 1 and 
-    BoardID = 1 and
-    StatusID = 1
-
-Select * from Rede.TabuleiroUsuario where boardID = 1 and Posicao = 'Master'
+	Select * from rede.Tabuleiro
 
 
 
-Exec spG_Tabuleiro @UsuarioID=2602,@UsuarioPaiID=2581,@BoardID=10,@Chamada='Completa'
+
+
+

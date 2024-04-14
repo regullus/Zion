@@ -43,19 +43,18 @@ BEGIN
         UsuarioID = @MasterID and
         TabuleiroID = @TabuleiroID 
     
+	--Verifica total de pagamentos que master recebeu sem pagar o sistema
+	Select 
+		@total = Count(*)
+	From 
+		Rede.TabuleiroUsuario 
+	Where
+		MasterID = @MasterID and
+		TabuleiroID = @TabuleiroID and
+		PagoMaster = 1 
+
     if(@PagoSistema = 0)
     Begin
-
-        --Verifica total de pagamentos que master recebeu sem pagar o sistema
-        Select 
-            @total = Count(*)
-        From 
-            Rede.TabuleiroUsuario 
-        Where
-            MasterID = @MasterID and
-            TabuleiroID = @TabuleiroID and
-            PagoMaster = 1 
-
         -- Se total for maior que 4, informa 'NOOK'
         --pois o Master deve pagar o sistema até os 4 primeiros pagamentos
         if(@Total > 3)
@@ -72,6 +71,50 @@ BEGIN
         --Já pagou o sistema
         Select @retorno = 'OK'
     End
+
+	--Fevifica se master já teve alguma indicacao
+	if(@retorno = 'OK')
+	Begin
+	    --Não considera os 7 principais usuarios
+		if(@UsuarioID > 2586)
+		Begin
+		    --Faz a verificação somente se recebeu mais que 4 pag
+			if(@Total > 4)
+			Begin 
+				Declare
+					@totalBoard int,
+					@totalIndicados int
+
+				Select 
+				  Distinct BoardID
+				Into
+					#tempBoard
+				from
+					Rede.TabuleiroUsuario
+				Where
+					UsuarioID = 2580 
+
+				Select 
+					@totalBoard = Count(*)
+				From
+					#tempBoard
+
+				Select 
+				  @totalIndicados = count(*)
+				from
+					Usuario.Usuario
+				Where
+					PatrocinadorDiretoID = 2580
+	
+				if(@totalBoard > @totalIndicados)
+				Begin
+					--Usuario não tem indicações maior ou igual ao numero de tabuleiros que ele pertence
+					Select @retorno = 'NOOK'
+				End
+			End
+		End
+	End
+
     Select @retorno as Retorno
 End -- Sp
 
@@ -79,7 +122,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID = 2592, @TabuleiroID = 1
+Exec spC_TabuleiroMasterRule @UsuarioID = 2580, @TabuleiroID = 1
 
 
 

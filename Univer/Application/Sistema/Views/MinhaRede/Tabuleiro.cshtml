@@ -202,11 +202,12 @@
                 $("#tab_select_name").html('@(traducaoHelper[tabuleiroAtivo.BoardNome])');
                 $("#tab_select_position").html('@(traducaoHelper[tabuleiroAtivo.Posicao].ToUpper())');
                 $("#tab_select_img").attr("src", '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)');
+                $(".divReloadPage").show();
             }
 
             function position() {
                 width = window.innerWidth;
-                $('.titleSmall').html(@idTabuleiro);
+                @*$('.titleSmall').html(@idTabuleiro);*@
 
                 $('#porTabuleiro').css({
                     "width": "980px",
@@ -227,7 +228,7 @@
 
                 var ajustTop = 80;
                 var ajustLeft = 0;
-                    
+
                 //width > 1200
                 //OK
                 var xDonatorEsqSup1Top = -50;
@@ -618,9 +619,12 @@
 
                                 if (data.ConfirmarRecebimento) {
                                     $(".reportReceipt").show();
+                                    $(".deleteUser").show();
                                 } else {
                                     $(".reportReceipt").hide();
+                                    $(".deleteUser").hide();
                                 }
+
                                 $(".reportPaymentSystem").hide();
 
                                 $('#modDados').modal('show');
@@ -721,7 +725,12 @@
                     success: function (data) {
                         if (data != null) {
                             if (data.toString() == "OK") {
-                                location.reload();
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
@@ -753,6 +762,7 @@
                         }
                     },
                 });
+
             });
 
             $('.paymentSystem').on('click', function () {
@@ -967,11 +977,97 @@
                 });
             });
 
+            $('.reloadPage').on('click', function () {
+                var idTabuleiro = $(this).attr("data-id");
+                if (idTabuleiro != null && idTabuleiro > 0) {
+                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                    window.location.href = url;
+                } else {
+                    location.reload();
+                }
+            });
+
+            $('.deleteUser').on('click', function () {
+                var idTabuleiro = $('#tabuleiro').val();
+                var idUsuarioConvidado = $("#infoID").val();
+                Swal.fire({
+                    title: "@traducaoHelper["TEM_CERTEZA_DE_QUE_DESEJA_EXCLUIR_CONVIDADO"]",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '@traducaoHelper["SIM"]',
+                    cancelButtonText: '@traducaoHelper["NAO"]'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                         url: "@Url.Action("DeleteUser")",
+                         type: "POST",
+                         data: {
+                             'usuarioID': '@(idUsuario)',
+                             'UsuarioConvidadoID': idUsuarioConvidado,
+                             'tabuleiroID': idTabuleiro,
+                             'token': '@(ViewBag.Token)'
+                         },
+                         success: function (data) {
+                             if (data != null) {
+                                 if (data.toString() == "OK") {
+                                     if (idTabuleiro != null && idTabuleiro > 0) {
+                                         var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                         window.location.href = url;
+                                     } else {
+                                         location.reload();
+                                     }
+                                 } else {
+                                     Swal.fire({
+                                         title: '@traducaoHelper["ALERTA"]',
+                                         text: data.toString(),
+                                         icon: 'warning',
+                                         confirmButtonText: 'OK'
+                                     });
+                                 }
+                             } else {
+                                 Swal.fire({
+                                     title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                     text: '@traducaoHelper["SEM_DADOS"]',
+                                     icon: 'warning',
+                                     confirmButtonText: 'OK'
+                                 });
+                             }
+                         },
+                         error: function (xhr, ajaxOptions, thrownError) {
+                             if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                                 //Reload page
+                                 location.reload();
+                             } else {
+                                 Swal.fire({
+                                     title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                     text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                     icon: 'error',
+                                     confirmButtonText: 'OK'
+                                 });
+                             }
+                         },
+                     });
+                    } else {
+                        Swal.fire(
+                            '@traducaoHelper["CANCELADO"]',
+                            '',
+                            'info'
+                        )
+                    }
+                });
+          });
+
         </script>
     }
     else
     {
         <script>
+            function startPage() {
+                $(".divReloadPage").hide();
+            }
+
             $('.invite').on('click', function () {
                 $.ajax({
                     url: "@Url.Action("GetInvite")",
@@ -1032,7 +1128,6 @@
     <div id="progress"></div>
 </div>
 
-
 <!-- Header -->
 <div class="portlet solid grey-cararra" style="max-width: 1600px;">
     <div class="portlet-body">
@@ -1041,38 +1136,38 @@
             <div class="row">
                 <div class="column col-md-6">
                     <div class="page-title">
-                        <h2>@ViewBag.Title <small class="titleSmall"></small></h2>
+                        <h2>@(ViewBag.tabuleiroName) <small class="titleSmall"></small></h2>
                     </div>
                 </div>
-                @if (ViewBag.Timer != null)
-                {
-                    <div class="column col-md-3">
+                <div class="column col-md-6">
+                    <div class="page-title pull-right divReloadPage" style="padding: 10px;">
+                        <button type="button" class="btn btn-info reloadPage">
+                            @traducaoHelper["RELOAD"]
+                        </button>
+                    </div>
+                    @if (ViewBag.Timer != null)
+                    {
                         <div class="page-title">
                             <span id="minutes" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
                             <span id="pontos" style="font-size: 18px; font-weight: 500; color: darkred;">:</span>
                             <span id="seconds" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
                         </div>
-                    </div>
-                    <div class="column col-md-3">
-                        <div class="page-title" style="padding: 10px;">
+                        <div class="page-title pull-right" style="padding: 10px;">
                             <button type="button" class="btn btn-success pull-right exitNivel">
                                 @traducaoHelper["SAIR_TABULEIRO"]
                             </button>
                         </div>
-                    </div>
-                }
-                @if (ViewBag.Pagar != null && ViewBag.Pagar)
-                {
-                    <div class="column col-md-3">
-                        <div class="page-title" style="padding: 10px;">
+                    }
+                    @if (ViewBag.Pagar != null && ViewBag.Pagar)
+                    {
+                        <div class="page-title pull-right" style="padding: 10px;">
                             <button type="button" class="btn btn-success pull-right paymentSystem">
                                 @traducaoHelper["PAGAR_SISTEMA"]
                             </button>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-
             <!-- END PAGE TITLE -->
         </div>
         <ul class="page-breadcrumb breadcrumb">
@@ -1268,7 +1363,6 @@ else
     }
 }
 
-
 <!-- Dados -->
 <div id="modDados" class="modal fade modalPosition" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
     <div class="modal-dialog">
@@ -1318,11 +1412,12 @@ else
             <div class="modal-footer" style="background-color: #eee;">
                 @if (ViewBag.ShowReportPayment)
                 {
-                    <button data-dismiss="modal" class="btn btn-success reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
+                    <button data-dismiss="modal" class="btn btn-success btn-circle reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
                 }
-                <button data-dismiss="modal" class="btn btn-success reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
-                <button data-dismiss="modal" class="btn btn-success reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
-                <button data-dismiss="modal" class="btn btn-info">@(traducaoHelper["SAIR"])</button>
+                <button data-dismiss="modal" class="btn btn-circle red-flamingo deleteUser">@(traducaoHelper["EXCLUIR"])</button>
+                <button data-dismiss="modal" class="btn btn-success btn-circle reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
+                <button data-dismiss="modal" class="btn btn-success btn-circle reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
+                <button data-dismiss="modal" class="btn btn-info btn-circle">@(traducaoHelper["SAIR"])</button>
             </div>
         </div>
     </div>

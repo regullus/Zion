@@ -429,6 +429,8 @@ namespace Sistema.Controllers
             ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
             ViewBag.idUsuario = usuario.ID;
 
+            ViewBag.tabuleiroName = traducaoHelper["GALAXIA"];
+
             string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
             tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
             ViewBag.Token = tokenLocal;
@@ -510,16 +512,23 @@ namespace Sistema.Controllers
 
                 if (tabuleirosNivelAtivos.Count() > 0)
                 {
-                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
-                    
+                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
+                    if(tabuleiroAtivo == null)
+                    {
+                        tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
+                    }
+
                     //Obtem o tabuleiro que será exibido quando a pag for carregada
                     int idTabuleiroAtivo = tabuleiroAtivo.TabuleiroID;
                     ViewBag.tabuleiroAtivo = tabuleiroAtivo;
-
                     if (idTabuleiroAtivo > 0)
                     {
                         tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
                         ViewBag.tabuleiro = tabuleiro;
+                        if(!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
+                        {
+                            ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                        }
                         if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
                         {
                             ViewBag.Pagar = true;
@@ -1080,6 +1089,81 @@ namespace Sistema.Controllers
                         string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
                         Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
                         return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                }
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = retorno,
+                    RecursionLimit = 1000
+                };
+
+                return jsonResult;
+
+            }
+            catch (Exception ex)
+            {
+                string erro = ex.Message;
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult DeleteUser(string usuarioID, string UsuarioConvidadoID, string tabuleiroID, string token)
+        {
+            if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || UsuarioConvidadoID.IsNullOrEmpty())
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idUsuarioConvidado = int.Parse(UsuarioConvidadoID);
+                int idTabuleiro = int.Parse(tabuleiroID);
+
+                if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioConvidado <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                if (token != tokenLocal)
+                {
+                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                    //Devolve que tokem é invalido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                }
+
+                if (idUsuario != usuario.ID)
+                {
+                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                //Informar Recebimento
+                string retorno = tabuleiroRepository.RemoverUsuario(idUsuarioConvidado, idUsuario, idTabuleiro);
+                switch (retorno)
+                {
+                    case "OK":
+                        string[] strMensagem = new string[] { traducaoHelper["CONVIDADO_REMOVIDO_SUCESSO"]};
+                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                        break;
+                    default:
+                        string[] strMensagemParam5 = new string[] { traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"]);
                 }
 
                 JsonResult jsonResult = new JsonResult

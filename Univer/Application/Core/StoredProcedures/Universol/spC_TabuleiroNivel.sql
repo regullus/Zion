@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroNivel'))
    Drop Procedure spC_TabuleiroNivel
@@ -76,7 +76,9 @@ BEGIN
             tn.BoardID = boa.id and
             tn.UsuarioID = tab.UsuarioID and
             tn.BoardID = tab.boardID and
-            tab.StatusID = 1
+            tab.StatusID = 1 and
+			tab.DireitaFechada = 0 and
+			tab.EsquerdaFechada = 0
         Order By 
             StatusID
     End
@@ -175,7 +177,9 @@ BEGIN
             tn.BoardID = boa.id and
             tn.UsuarioID = tab.UsuarioID and
             tn.BoardID = tab.boardID and
-            tab.StatusID = 1
+            tab.StatusID = 1 and
+			tab.DireitaFechada = 0 and
+			tab.EsquerdaFechada = 0
         Order By 
             StatusID
     End
@@ -202,7 +206,8 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroNivel To public
 go
-Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 1
+
+Exec spC_TabuleiroNivel @UsuarioID=2582, @StatusID=2
 
 --Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 2
 --Exec spC_TabuleiroNivel @UsuarioID = 2581, @StatusID = 2
