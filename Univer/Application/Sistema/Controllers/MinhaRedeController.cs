@@ -434,10 +434,10 @@ namespace Sistema.Controllers
             string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
             tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
             ViewBag.Token = tokenLocal;
-            
+
             int idTabuleiro = idTab ?? 0;
 
-            if(idTabuleiro < 0)
+            if (idTabuleiro < 0)
             {
                 idTabuleiro = 0;
             }
@@ -452,9 +452,10 @@ namespace Sistema.Controllers
 
                 ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
                 ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
+                ViewBag.idTabuleiro = 0;
 
                 Core.Models.TabuleiroModel tabuleiro = null;
-                
+
                 if (tabuleirosNivelAtivos != null && idTabuleiro == 0)
                 {
                     //Obtem 1º Tabuleiro ativo do usuario
@@ -472,69 +473,89 @@ namespace Sistema.Controllers
 
                 Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, idTabuleiro);
 
-                ViewBag.Timer = null;
-                if (tabuleiroUsuario != null)
+                if (tabuleiroUsuario == null)
                 {
-                    int tempoMin = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_PAGAMENTO");
-                    int tempoMax = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_MAX_PAGAMENTO");
+                    //Pega primeiro disponivel
+                    tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, 0);
 
-                    if (tempoMin == 0)
+                    if (tabuleiroUsuario == null)
                     {
-                        tempoMin = 15;
+                        //Usuariop não possui tabuleiro
+                        idTabuleiro = 0;
                     }
-                    if (tempoMax == 0)
-                    {
-                        tempoMax = 60;
-                    }
-
-                    if (!tabuleiroUsuario.InformePag && (tabuleiroUsuario.Posicao == "DonatorDirSup1" || tabuleiroUsuario.Posicao == "DonatorEsqSup1" || tabuleiroUsuario.Posicao == "DonatorDirSup2" || tabuleiroUsuario.Posicao == "DonatorEsqSup2" || tabuleiroUsuario.Posicao == "DonatorDirInf1" || tabuleiroUsuario.Posicao == "DonatorEsqInf1" || tabuleiroUsuario.Posicao == "DonatorDirInf2" || tabuleiroUsuario.Posicao == "DonatorEsqInf2"))
-                    {
-                        DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
-
-                        if (timePagamentoMin > DateTime.Now)
-                        {
-                            //Format: '03/30/2024 17:59:00'
-                            ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin).ToString("MM/dd/yyyy HH:mm:ss");
-                            ViewBag.ShowReportPayment = true;
-                        }
-
-                        //Convidado tem até 1h para pagar
-                        DateTime timePagamentoMax = tabuleiroUsuario.DataInicio.AddMinutes(tempoMax);
-                        if (timePagamentoMax > DateTime.Now)
-                        {
-                            ViewBag.ShowReportPayment = true;
-                        }
-                    }
-                } 
-
-                ViewBag.idTabuleiro = idTabuleiro;
-                ViewBag.tabuleiroAtivo = null;
-
-                if (tabuleirosNivelAtivos.Count() > 0)
+                }
+                else
                 {
-                    Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
-                    if(tabuleiroAtivo == null)
+                    idTabuleiro = tabuleiroUsuario.TabuleiroID;
+                }
+
+                if (idTabuleiro != 0)
+                {
+                    ViewBag.Timer = null;
+                    if (tabuleiroUsuario != null)
                     {
-                        tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
+                        int tempoMin = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_PAGAMENTO");
+                        int tempoMax = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_MAX_PAGAMENTO");
+
+                        if (tempoMin == 0)
+                        {
+                            tempoMin = 15;
+                        }
+                        if (tempoMax == 0)
+                        {
+                            tempoMax = 60;
+                        }
+
+                        if (!tabuleiroUsuario.InformePag)
+                        {
+                            DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
+
+                            if (timePagamentoMin > DateTime.Now)
+                            {
+                                //Format: '03/30/2024 17:59:00'
+                                ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin).ToString("MM/dd/yyyy HH:mm:ss");
+                                ViewBag.ShowReportPayment = true;
+                            }
+
+                            //Convidado tem até 1h para pagar
+                            DateTime timePagamentoMax = tabuleiroUsuario.DataInicio.AddMinutes(tempoMax);
+                            if (timePagamentoMax > DateTime.Now)
+                            {
+                                ViewBag.ShowReportPayment = true;
+                            }
+                        }
                     }
 
-                    //Obtem o tabuleiro que será exibido quando a pag for carregada
-                    int idTabuleiroAtivo = tabuleiroAtivo.TabuleiroID;
-                    ViewBag.tabuleiroAtivo = tabuleiroAtivo;
-                    if (idTabuleiroAtivo > 0)
+                    ViewBag.idTabuleiro = idTabuleiro;
+                    ViewBag.tabuleiroAtivo = null;
+
+                    if (tabuleirosNivelAtivos.Count() > 0)
                     {
-                        tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
-                        ViewBag.tabuleiro = tabuleiro;
-                        if(!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
+                        Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
+                        if (tabuleiroAtivo == null)
                         {
-                            ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                            tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
                         }
-                        if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
+
+                        //Obtem o tabuleiro que será exibido quando a pag for carregada
+                        int idTabuleiroAtivo = tabuleiroAtivo.TabuleiroID;
+                        ViewBag.tabuleiroAtivo = tabuleiroAtivo;
+                        if (idTabuleiroAtivo > 0)
                         {
-                            ViewBag.Pagar = true;
-                        } else
-                        {
-                            ViewBag.Pagar = false;
+                            tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
+                            ViewBag.tabuleiro = tabuleiro;
+                            if (!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
+                            {
+                                ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                            }
+                            if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
+                            {
+                                ViewBag.Pagar = true;
+                            }
+                            else
+                            {
+                                ViewBag.Pagar = false;
+                            }
                         }
                     }
                 }
@@ -554,7 +575,7 @@ namespace Sistema.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            
+
             try
             {
                 //Usuario Logado
@@ -824,7 +845,7 @@ namespace Sistema.Controllers
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = tabuleiro,
-                    RecursionLimit = 1000 
+                    RecursionLimit = 1000
                 };
 
                 return jsonResult;
@@ -852,7 +873,7 @@ namespace Sistema.Controllers
             {
                 int idUsuario = int.Parse(usuarioID);
                 int idBoard = int.Parse(boardID);
-                
+
                 //Seta para primeiro tabuleiro caso seja 0
                 if (idBoard == 0)
                 {
@@ -916,7 +937,7 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            
+
             try
             {
                 int idUsuario = int.Parse(usuarioID);
@@ -1002,7 +1023,7 @@ namespace Sistema.Controllers
                 int idUsuarioConvidado = int.Parse(UsuarioConvidadoID);
                 int idTabuleiro = int.Parse(tabuleiroID);
 
-                if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioConvidado <=0)
+                if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioConvidado <= 0)
                 {
                     string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
@@ -1044,7 +1065,7 @@ namespace Sistema.Controllers
                         lancamento.UsuarioID = idUsuario;
                         lancamento.Tipo = Lancamento.Tipos.Credito;
                         lancamento.ReferenciaID = lancamento.UsuarioID;
-                        lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome] , " - ", usuarioConvidado.Nome);
+                        lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome], " - ", usuarioConvidado.Nome);
                         lancamento.DataLancamento = App.DateTimeZion;
                         lancamento.DataCriacao = App.DateTimeZion;
                         lancamento.ContaID = 7; //Transferencia
@@ -1070,11 +1091,12 @@ namespace Sistema.Controllers
                         //Chama incluir no tabuleiro para ver se 
                         //o tabuleiro esta completo
                         string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
-                        if(tabuleiroIncluir == "COMPLETO")
+                        if (tabuleiroIncluir == "COMPLETO")
                         {
                             string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
                             Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                        } else
+                        }
+                        else
                         {
                             string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
                             Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
@@ -1157,7 +1179,7 @@ namespace Sistema.Controllers
                 switch (retorno)
                 {
                     case "OK":
-                        string[] strMensagem = new string[] { traducaoHelper["CONVIDADO_REMOVIDO_SUCESSO"]};
+                        string[] strMensagem = new string[] { traducaoHelper["CONVIDADO_REMOVIDO_SUCESSO"] };
                         Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
                         break;
                     default:
@@ -1268,7 +1290,8 @@ namespace Sistema.Controllers
                             Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
                             return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"]);
                     }
-                } else
+                }
+                else
                 {
                     string[] strMensagemParam4 = new string[] { traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
@@ -1336,12 +1359,12 @@ namespace Sistema.Controllers
                 }
 
                 //Remove usuario do tabuleiro informado
-               String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idTabuleiro);
+                String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idTabuleiro);
 
                 switch (retorno)
                 {
                     case "OK":
-                        string[] strMensagem = new string[] { traducaoHelper["SAIDA_REALIZADA_COM_SUCESSO"]};
+                        string[] strMensagem = new string[] { traducaoHelper["SAIDA_REALIZADA_COM_SUCESSO"] };
                         Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
                         break;
                     case "NOOK":
@@ -1600,7 +1623,7 @@ namespace Sistema.Controllers
             JsonResult jsonResult = new JsonResult
             {
                 Data = data,
-                RecursionLimit = 1000 
+                RecursionLimit = 1000
             };
 
             return jsonResult;

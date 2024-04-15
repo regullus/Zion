@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroUsuario'))
    Drop Procedure spC_TabuleiroUsuario
@@ -19,26 +19,65 @@ BEGIN
     Set FMTONLY OFF
     Set nocount on
 
-    Select 
-        ID,
-        UsuarioID,
-        TabuleiroID,
-        BoardID,
-        StatusID,
-        MasterID,
-        InformePag,
-        Ciclo,
-        Posicao,
-        PagoMaster,
-        PagoSistema,
-        DataInicio,
-        DataFim
-    From 
-        Rede.TabuleiroUsuario
-    Where
-        UsuarioID = @UsuarioID and
-        TabuleiroID = @TabuleiroID
-    
+	if Exists(
+		Select 
+			'OK'
+		From 
+			Rede.TabuleiroUsuario
+		Where
+			UsuarioID = @UsuarioID and
+			TabuleiroID = @TabuleiroID and
+			StatusID = 1
+	)
+	Begin
+	    --Select '1'
+		Select 
+			ID,
+			UsuarioID,
+			TabuleiroID,
+			BoardID,
+			StatusID,
+			MasterID,
+			InformePag,
+			Ciclo,
+			Posicao,
+			PagoMaster,
+			PagoSistema,
+			DataInicio,
+			DataFim
+		From 
+			Rede.TabuleiroUsuario
+		Where
+			UsuarioID = @UsuarioID and
+			TabuleiroID = @TabuleiroID and
+			StatusID = 1
+	End
+	Else
+	Begin
+		--Select '2'
+		Select TOP(1)
+			ID,
+			UsuarioID,
+			TabuleiroID,
+			BoardID,
+			StatusID,
+			MasterID,
+			InformePag,
+			Ciclo,
+			Posicao,
+			PagoMaster,
+			PagoSistema,
+			DataInicio,
+			DataFim
+		From 
+			Rede.TabuleiroUsuario
+		Where
+			UsuarioID = @UsuarioID and
+			StatusID = 1
+		Order By
+			TabuleiroID
+	End
+
 End -- Sp
 
 go
@@ -48,7 +87,9 @@ go
 --Exec spC_TabuleiroUsuario @UsuarioId = 2587, @TabuleiroID = 1
 --Exec spC_TabuleiroUsuario @UsuarioId = 2593, @TabuleiroID = 1
 
+--Exec spC_TabuleiroUsuario @UsuarioID=2580, @TabuleiroID=0
 
+Exec spC_TabuleiroUsuario @UsuarioID=2580, @TabuleiroID=2
 
 
 

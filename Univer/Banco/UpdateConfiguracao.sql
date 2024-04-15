@@ -1,15 +1,15 @@
-use Univer
+use UniverDev
 go
 declare @chave nvarchar(255), @TextoP nvarchar(255), @TextoE nvarchar(255), @TextoI nvarchar(255)
-select @chave = 'INFORMAR_PAGAMENTO_SISTEMA'
+select @chave = 'TABULEIRO_INVALIDO'
 Select * from Globalizacao.Traducao where chave like '%' + @chave + '%'
 
 delete Globalizacao.Traducao  where chave = @chave
 
 select 
-    @TextoP = 'Informar pagamento ao sistema',
-	@TextoE = 'Reportar pago al sistema',
-	@TextoI = 'Report payment to the system'
+    @TextoP = 'Galáxia inválida',
+	@TextoE = 'galaxia no válida',
+	@TextoI = 'Invalid galaxy'
 	
 --update Globalizacao.Traducao set Texto = @TextoP where chave = @chave and IdiomaID = 1
 --update Globalizacao.Traducao set Texto = @TextoE where chave = @chave and IdiomaID = 2

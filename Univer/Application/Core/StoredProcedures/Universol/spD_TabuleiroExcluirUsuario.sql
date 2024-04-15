@@ -33,7 +33,6 @@ BEGIN
 	FROM 
 		Rede.TabuleiroUsuario
 	Where
-		InformePag = 0 and
 		PagoMaster = 0 and
 		StatusID = 1 and --Ativo
 		UsuarioID = @UsuarioID and
@@ -129,7 +128,10 @@ BEGIN
 		End
     
 	End
-
+	Else 
+	Begin
+		Set @Retorno = 'Convidado não esta ativo no tabuleiro'
+	End
     Select @Retorno
 
 End -- Sp
@@ -138,5 +140,5 @@ go
 Grant Exec on spD_TabuleiroExcluirUsuario To public
 go
 
-Exec spD_TabuleiroExcluirUsuario @UsuarioID = 2595, @TabuleiroID = 1
+Exec spD_TabuleiroExcluirUsuario @UsuarioID=2590, @TabuleiroID =1
 

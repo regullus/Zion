@@ -92,7 +92,7 @@ BEGIN
             tn.BoardID,
             boa.Nome as BoardNome,
             boa.Cor as BoardCor,
-            0 as TabuleiroID,
+            tn.TabuleiroID,
             '' as Posicao,
             tn.DataInicio,
             tn.DataFim,
@@ -107,81 +107,65 @@ BEGIN
             tn.BoardID = boa.id
         Order By 
             StatusID
-        
-        -- ******* Inicio Cursor *******
-        Declare
-            @ID int,
-            @BoardID int,
-            @AntFetch int,
-            @TabuleiroID int
-
-        Declare
-            curRegistro 
-        Cursor Local For
-            Select 
-                ID,
-                BoardID
-            FROM 
-                #temp
-
-        Open curRegistro
-        Fetch Next From curRegistro Into  @ID, @BoardID
-        Select @AntFetch = @@fetch_status
-        While @AntFetch = 0
-        Begin
-            Select top(1)
-                @TabuleiroID = ID
-            From
-                Rede.TabuleiroUsuario
-            Where
-                StatusID = 1 and
-                BoardID = @BoardID and
-                Posicao = 'Master'
-            Order by
-                ID
-
-            Update 
-                #temp
-            Set
-                TabuleiroID = @TabuleiroID
-            Where
-                ID = @ID
-
-            Fetch Next From curRegistro Into @ID, @BoardID
-            Select @AntFetch = @@fetch_status       
-        End
     End
 
    If(@StatusID = 2)
     Begin
+	    
         Insert Into #temp
         SELECT
-            tn.ID,
-            tn.UsuarioID,
-            tn.BoardID,
-            boa.Nome as BoardNome,
-            boa.Cor as BoardCor,
-            tab.TabuleiroID as TabuleiroID,
-            tab.Posicao,
-            tn.DataInicio,
-            tn.DataFim,
-            tn.StatusID,
-            tn.Observacao
-        FROM 
-            Rede.TabuleiroNivel tn,
-            Rede.TabuleiroBoard boa,
-            Rede.TabuleiroUsuario tab
-        WHERE
-            tn.UsuarioID = @UsuarioID and
-            tn.StatusID = 2 and
-            tn.BoardID = boa.id and
-            tn.UsuarioID = tab.UsuarioID and
-            tn.BoardID = tab.boardID and
-            tab.StatusID = 1 and
-			tab.DireitaFechada = 0 and
-			tab.EsquerdaFechada = 0
-        Order By 
-            StatusID
+			tn.ID,
+			tn.UsuarioID,
+			tn.BoardID,
+			boa.Nome as BoardNome,
+			boa.Cor as BoardCor,
+			tab.TabuleiroID as TabuleiroID,
+			tab.Posicao,
+			tn.DataInicio,
+			tn.DataFim,
+			tn.StatusID,
+			tn.Observacao
+		FROM 
+			Rede.TabuleiroNivel tn,
+			Rede.TabuleiroBoard boa,
+			Rede.TabuleiroUsuario tab
+		WHERE
+			tn.UsuarioID = @UsuarioID and
+			tn.StatusID = 2 and
+			tn.BoardID = boa.id and
+			tn.UsuarioID = tab.UsuarioID and
+			tn.BoardID = tab.boardID and
+			tab.StatusID = 1 and
+			posicao <> 'Master' and
+			--Para os q não são master identifica se são da direita ou da esquerda, daí exibe caso seu lado não tenha sido fechado
+			tab.DireitaFechada = CASE WHEN CHARINDEX('Dir', tab.Posicao) > 1 THEN 0 ELSE tab.DireitaFechada END and
+			tab.EsquerdaFechada = CASE WHEN CHARINDEX('Esq', tab.Posicao) > 1 THEN 0 ELSE tab.EsquerdaFechada END
+		Union
+		SELECT
+			tn.ID,
+			tn.UsuarioID,
+			tn.BoardID,
+			boa.Nome as BoardNome,
+			boa.Cor as BoardCor,
+			tab.TabuleiroID as TabuleiroID,
+			tab.Posicao,
+			tn.DataInicio,
+			tn.DataFim,
+			tn.StatusID,
+			tn.Observacao
+		FROM 
+			Rede.TabuleiroNivel tn,
+			Rede.TabuleiroBoard boa,
+			Rede.TabuleiroUsuario tab
+		WHERE
+			tn.UsuarioID = @UsuarioID and
+			tn.StatusID = 2 and
+			tn.BoardID = boa.id and
+			tn.UsuarioID = tab.UsuarioID and
+			tn.BoardID = tab.boardID and
+			tab.StatusID = 1 and
+			posicao = 'Master'
+		
     End
 
     Select 
@@ -199,7 +183,7 @@ BEGIN
     From 
         #temp
     Order By
-        TabuleiroID
+        BoardID
     
 End -- Sp
 
@@ -207,12 +191,6 @@ go
 Grant Exec on spC_TabuleiroNivel To public
 go
 
-Exec spC_TabuleiroNivel @UsuarioID=2582, @StatusID=2
 
---Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 2
---Exec spC_TabuleiroNivel @UsuarioID = 2581, @StatusID = 2
---Exec spC_TabuleiroNivel @UsuarioID = 2580, @StatusID = 3
-
-
-
+Exec spC_TabuleiroNivel @UsuarioID=2581, @StatusID=1
 

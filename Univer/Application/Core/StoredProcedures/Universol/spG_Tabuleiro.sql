@@ -153,6 +153,7 @@ Begin
         --Regra: Caso usuário já exista no tabuleiro, não se pode incluí-lo novamente
         Set @Historico = '01 Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (0). Chamada: ' + @Chamada
         Set @log = @log + '|01 Já se encontra no tabuleiro'
+
     End
     Else
     Begin
@@ -1415,11 +1416,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo Master Direita',
                                 null
                             )
 
-                            --@CoordinatorDir Direita
+                            --CoordinatorDir Direita
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1436,11 +1437,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo CoordinatorDir Direita',
                                 null
                             )
 
-                            --@CoordinatorEsq Direita
+                            --CoordinatorEsq Direita
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1457,11 +1458,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo CoordinatorEsq Direita',
                                 null
                             )
 
-                            --@IndicatorDirSup Direita
+                            --IndicatorDirSup Direita
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1478,11 +1479,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorDirSup Direita',
                                 null
                             )
 
-                            --@IndicatorDirInf Direita
+                            --IndicatorDirInf Direita
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1499,11 +1500,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorDirInf Direita',
                                 null
                             )
 
-                            --@IndicatorEsqSup Direita
+                            --IndicatorEsqSup Direita
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1520,11 +1521,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorEsqSup Direita',
                                 null
                             )
 
-                            --@IndicatorEsqInf Direita
+                            --IndicatorEsqInf Direita
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1541,7 +1542,7 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorEsqInf Direita',
                                 null
                             )
                             
@@ -1562,11 +1563,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo Master Esquerda',
                                 null
                             )
 
-                            --@CoordinatorDir Esquerda
+                            --CoordinatorDir Esquerda
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1583,11 +1584,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo CoordinatorDir Esquerda',
                                 null
                             )
 
-                            --@CoordinatorEsq Esquerda
+                            --CoordinatorEsq Esquerda
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1604,11 +1605,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo CoordinatorEsq Esquerda',
                                 null
                             )
 
-                            --@IndicatorDirSup Esquerda
+                            --IndicatorDirSup Esquerda
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1625,11 +1626,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorDirSup Esquerda',
                                 null
                             )
 
-                            --@IndicatorDirInf Esquerda
+                            --IndicatorDirInf Esquerda
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1646,11 +1647,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorDirInf Esquerda',
                                 null
                             )
 
-                            --@IndicatorEsqSup Esquerda
+                            --IndicatorEsqSup Esquerda
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1667,11 +1668,11 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorEsqSup Esquerda',
                                 null
                             )
 
-                            --@IndicatorEsqInf Esquerda
+                            --IndicatorEsqInf Esquerda
                             INSERT INTO Rede.TabuleiroNivel (
                                 UsuarioID,
                                 BoardID,
@@ -1688,9 +1689,17 @@ Begin
                                 @DataInicio,
                                 null,
                                 2, --Em andamento
-                                'Novo',
+                                'Novo IndicatorEsqInf Esquerda',
                                 null
                             )
+
+							--Remove Convite enviado, caso exista
+							Delete
+								Rede.TabuleiroNivel
+							Where
+								TabuleiroID = @ID and
+								BoardID = @BoardID and
+								StatusId = 1 --convite
 
                             --Usuario finalizou o Board 1, este é um convite para ele entrar no sistema no board 1 novamente
                             If (@BoardID = 1)
@@ -2779,4 +2788,4 @@ go
 Grant Exec on spG_Tabuleiro To public
 go
 
---Exec spG_Tabuleiro @UsuarioID=2590,@UsuarioPaiID=2583,@BoardID=1,@Chamada='Convite'
+Exec spG_Tabuleiro @UsuarioID=2581,@UsuarioPaiID=2580,@BoardID=1,@Chamada='Convite'
