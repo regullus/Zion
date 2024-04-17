@@ -122,7 +122,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
-Exec spC_TabuleiroMasterRule @UsuarioID = 2580, @TabuleiroID = 1
+--Exec spC_TabuleiroMasterRule @UsuarioID = 2580, @TabuleiroID = 1
 
 
 

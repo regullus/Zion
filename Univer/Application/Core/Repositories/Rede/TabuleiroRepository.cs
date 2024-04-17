@@ -42,6 +42,25 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public IEnumerable<TabuleiroUsuarioModel> ObtemTabuleirosUsuario(int idUsuario)
+        {
+            string sql = "";
+            
+            sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @BoardID=null";
+
+            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).ToList();
+
+            return retorno;
+        }
+       
+        public TabuleiroUsuarioModel ObtemTabuleiroUsuario(int idUsuario, int idBoard)
+        {
+            string sql = "Exec spC_TabuleiroUsuarioID @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
+            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
         public TabuleiroModel ObtemTabuleiro(int id, int usuarioID)
         {
             string sql = "Exec spC_Tabuleiro @id=" + id + ", @UsuarioID = " + usuarioID;
@@ -106,6 +125,14 @@ namespace Core.Repositories.Rede
                             ret = "OK";
                             break;
                     }
+                } else
+                {
+                    if (Chamada == "Convite")
+                    {
+                        //Remove Convite
+                        sql = "Exec spD_TabuleiroNivel @UsuarioID=" + idUsuario + ",@BoardID=" + idBoard;
+                        String retornoDelNivel = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+                    }
                 }
             } else
             {
@@ -115,9 +142,77 @@ namespace Core.Repositories.Rede
             return ret;
         }
 
-        public string InformarPagamento(int idUsuario, int idTabuleiro, int idUsuarioPag)
+        public string IncluiTabuleiroNew(int idUsuario, int idPai)
         {
-            string sql = "Exec spC_TabuleiroInformarPagto @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro + ",@UsuarioIDPag=" + idUsuarioPag;
+            //idUsuario usuario a ser incluido no tabuleiro
+            //idPai patrocinador do usuario acima
+            //idBoard board a ser inserido o usuario
+            //chamada deve ser principal para incluir novo usuario
+            string sql = "Exec spI_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @MasterID=" + idPai;
+            string ret = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+            
+            if (ret == "OK")
+            {
+                sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=1,@Chamada='Convite'";
+
+                TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
+
+                if (retorno != null)
+                {
+                    ret = "OK";
+                    if (retorno.Retorno != "OK")
+                    {
+                        switch (retorno.Historico.Substring(0, 2))
+                        {
+                            case "01":
+                                ret = "USUARIO_JA_POSICIONADO";
+                                break;
+                            case "02":
+                                ret = "CONVIDADO_INCLUIR";
+                                break;
+                            case "03":
+                                ret = "ALVO_USUARIO";
+                                break;
+                            case "04":
+                                ret = "TABULEIRO_SEM_POSICAO";
+                                break;
+                            case "05":
+                                ret = "MASTER_NAO_EXISTE";
+                                break;
+                            case "06":
+                                ret = "USUARIO_JA_POSICIONADO";
+                                break;
+                            case "07":
+                                //Retorno para tipo de chamda = "COMPLETA"
+                                //07 indica que o tabuleiro ainda não esta completo
+                                ret = "OK";
+                                break;
+                            case "08":
+                                //Retorno para tipo de chamda = "COMPLETA"
+                                //08 indica que o Tabuleiro esta completo
+                                ret = "COMPLETO";
+                                break;
+                            default:
+                                ret = "OK";
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    ret = "SEM_DADOS";
+                }
+            } else
+            {
+                ret = "SEM_DADOS";
+            }
+
+            return ret;
+        }
+
+        public string InformarPagamento(int idUsuario, int idBoard, int idUsuarioPag)
+        {
+            string sql = "Exec spC_TabuleiroInformarPagto @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard + ",@UsuarioIDPag=" + idUsuarioPag;
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 
             return retorno;
@@ -132,18 +227,18 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public string InformarRecebimento(int idUsuario, int idUsuarioPai, int idTabuleiro)
+        public string InformarRecebimento(int idUsuario, int idUsuarioPai, int idBoard)
         {
-            string sql = "Exec spC_TabuleiroInformarRecebimento @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idUsuarioPai + ",@TabuleiroID =" + idTabuleiro;
+            string sql = "Exec spC_TabuleiroInformarRecebimento @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idUsuarioPai + ",@BoardID =" + idBoard;
 
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 
             return retorno;
         }
 
-        public string RemoverUsuario(int idUsuario, int idUsuarioPai, int idTabuleiro)
+        public string RemoverUsuario(int idUsuario, int idMaster, int idBoard)
         {
-            string sql = "Exec spD_TabuleiroExcluirUsuario @UsuarioID=" + idUsuario + ", @TabuleiroID =" + idTabuleiro;
+            string sql = "Exec spD_TabuleiroExcluirUsuario @UsuarioID=" + idUsuario + ", @MasterID=" + idMaster + ", @BoardID =" + idBoard;
 
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 
@@ -173,6 +268,13 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+        public int ObtemBoardIDByTabuleiroID(int idUsuario, int idTabuleiro)
+        {
+            string sql = "Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID=" + idUsuario + ",@TabuleiroId=" + idTabuleiro;
+            var ret = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+            int retorno = int.Parse(ret);
+            return retorno;
+        }
 
         public bool MasterRuleOK(int idUsuario, int idTabuleiro)
         {
@@ -185,15 +287,7 @@ namespace Core.Repositories.Rede
             }
             return retorno;
         }
-
-        public TabuleiroUsuarioModel ObtemTabuleiroUsuario(int idUsuario, int idTabuleiro)
-        {
-            string sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
-            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).FirstOrDefault();
-
-            return retorno;
-        }
-
+              
         public TabuleiroBoardModel ObtemTabuleiroBoard(int idTabuleiro)
         {
             string sql = "Exec spC_TabuleiroBoard @TabuleiroID=" + idTabuleiro;

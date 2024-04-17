@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInformarPagto'))
    Drop Procedure spC_TabuleiroInformarPagto
@@ -6,7 +6,7 @@ go
 
 Create  Proc [dbo].[spC_TabuleiroInformarPagto]
    @UsuarioID int,
-   @TabuleiroID int,
+   @BoardID int,
    @UsuarioIDPag int
 
 As
@@ -33,7 +33,7 @@ BEGIN
         rede.TabuleiroUsuario
     where 
         UsuarioID = @UsuarioID and 
-        TabuleiroID  = @TabuleiroID 
+        TabuleiroID  = @BoardID 
 
     if(@tempoFim > @tempoIni)
     Begin
@@ -44,7 +44,7 @@ BEGIN
             UsuarioIDPag = @UsuarioIDPag
         where 
             UsuarioID = @UsuarioID and 
-            TabuleiroID  = @TabuleiroID 
+            TabuleiroID  = @BoardID 
         Select 'OK'
     End
     Else

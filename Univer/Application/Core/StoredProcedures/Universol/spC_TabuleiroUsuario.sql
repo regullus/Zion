@@ -6,7 +6,7 @@ go
 
 Create  Proc [dbo].[spC_TabuleiroUsuario]
    @UsuarioID int,
-   @TabuleiroID int
+   @BoardID int 
 
 As
 -- =============================================================================================
@@ -19,61 +19,63 @@ BEGIN
     Set FMTONLY OFF
     Set nocount on
 
-	if Exists(
-		Select 
-			'OK'
-		From 
-			Rede.TabuleiroUsuario
-		Where
-			UsuarioID = @UsuarioID and
-			TabuleiroID = @TabuleiroID and
-			StatusID = 1
-	)
+	if (@BoardID is null or @BoardID = 0)
 	Begin
-	    --Select '1'
+	    --Obtem todos os Boards (niveis)
 		Select 
-			ID,
-			UsuarioID,
-			TabuleiroID,
-			BoardID,
-			StatusID,
-			MasterID,
-			InformePag,
-			Ciclo,
-			Posicao,
-			PagoMaster,
-			PagoSistema,
-			DataInicio,
-			DataFim
+			tab.ID,
+			tab.UsuarioID,
+			tab.TabuleiroID,
+			tab.BoardID,
+			tb.Nome as BoardNome,
+			tb.Cor as BoardCor,
+			tab.StatusID,
+			tab.MasterID,
+			tab.InformePag,
+			tab.Ciclo,
+			tab.Posicao,
+			tab.PagoMaster,
+			tab.PagoSistema,
+			tab.DataInicio,
+			tab.DataFim
 		From 
-			Rede.TabuleiroUsuario
+			Rede.TabuleiroUsuario tab,
+			Rede.TabuleiroBoard tb
 		Where
-			UsuarioID = @UsuarioID and
-			TabuleiroID = @TabuleiroID and
-			StatusID = 1
+			tab.UsuarioID = @UsuarioID and
+			tab.StatusID = 1 and
+			tab.BoardID = tb.ID
+
+		Order By
+			TabuleiroID
 	End
 	Else
 	Begin
-		--Select '2'
-		Select TOP(1)
-			ID,
-			UsuarioID,
-			TabuleiroID,
-			BoardID,
-			StatusID,
-			MasterID,
-			InformePag,
-			Ciclo,
-			Posicao,
-			PagoMaster,
-			PagoSistema,
-			DataInicio,
-			DataFim
+	    --Obtem para um dado tabuleiro
+		Select 
+			tab.ID,
+			tab.UsuarioID,
+			tab.TabuleiroID,
+			tab.BoardID,
+			tb.Nome as BoardNome,
+			tb.Cor as BoardCor,
+			tab.StatusID,
+			tab.MasterID,
+			tab.InformePag,
+			tab.Ciclo,
+			tab.Posicao,
+			tab.PagoMaster,
+			tab.PagoSistema,
+			tab.DataInicio,
+			tab.DataFim
 		From 
-			Rede.TabuleiroUsuario
+			Rede.TabuleiroUsuario tab,
+			Rede.TabuleiroBoard tb
 		Where
-			UsuarioID = @UsuarioID and
-			StatusID = 1
+			tab.UsuarioID = @UsuarioID and
+			tab.BoardID = @BoardID and
+			tab.StatusID = 1 and
+			tab.BoardID = tb.ID
 		Order By
 			TabuleiroID
 	End
@@ -83,13 +85,9 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroUsuario To public
 go
+Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=1
+Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=null
 
---Exec spC_TabuleiroUsuario @UsuarioId = 2587, @TabuleiroID = 1
---Exec spC_TabuleiroUsuario @UsuarioId = 2593, @TabuleiroID = 1
-
---Exec spC_TabuleiroUsuario @UsuarioID=2580, @TabuleiroID=0
-
-Exec spC_TabuleiroUsuario @UsuarioID=2580, @TabuleiroID=2
 
 
 

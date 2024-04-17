@@ -6,7 +6,8 @@ go
 
 Create Proc [dbo].[spD_TabuleiroExcluirUsuario]
    @UsuarioID int,
-   @TabuleiroID int
+   @MasterID int,
+   @BoardID int
 
 As
 -- =============================================================================================
@@ -20,7 +21,7 @@ BEGIN
     Set nocount on
 
 	Declare
-		@BoardID int,
+	    @TabuleiroID int,
 		@Posicao nvarchar(255),
 		@Retorno nvarchar(50)
 
@@ -33,58 +34,36 @@ BEGIN
 	FROM 
 		Rede.TabuleiroUsuario
 	Where
+	    UsuarioID = @UsuarioID and
+		BoardID = @BoardID and
 		PagoMaster = 0 and
-		StatusID = 1 and --Ativo
-		UsuarioID = @UsuarioID and
-		TabuleiroID = @TabuleiroID
+		StatusID = 1 --Ativo
 	)
 	Begin
 	    
 		Select
-			@BoardID = BoardID,
+			@TabuleiroID = TabuleiroID,
 			@posicao = Posicao
 		From
 			Rede.TabuleiroUsuario
 		Where
 			UsuarioID = @UsuarioID and
-			TabuleiroID = @TabuleiroID
+			BoardID = @BoardID
 
-		Insert Into
-			Rede.TabuleiroUsuarioExcluidos
-		SELECT 
-			ID,
-			UsuarioID,
-			TabuleiroID,
-			BoardID,
-			StatusID,
-			MasterID,
-			InformePag,
-			Ciclo,
-			Posicao,
-			PagoMaster,
-			PagoSistema,
-			DataInicio,
-			DataFim
-		FROM 
+		--Zera statusID do usuario 
+		Update
 			Rede.TabuleiroUsuario
+		Set
+			StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+			Posicao = '',
+			TabuleiroID = null,
+			InformePag = 'false',
+			UsuarioIDPag = null,
+			Debug = 'Removeido pelo master:' + TRIM(STR(@MasterID))
 		Where
 			UsuarioID = @UsuarioID and
-			TabuleiroID = @TabuleiroID
+			BoardID = @BoardID
 
-	 --Remove usuario que nao pagou no tabuleiroUsuario
-		Delete
-			Rede.TabuleiroUsuario
-		Where
-			UsuarioID = @UsuarioID and
-			TabuleiroID = @TabuleiroID
-
-		Delete
-			Rede.TabuleiroNivel
-		Where
-			UsuarioID = @UsuarioID and
-			BoardID = @BoardID and
-			TabuleiroID = @TabuleiroID
-	
 		--Remove usuario que nao pagou no tabuleiro
 		if Exists (Select 'OK' from Rede.Tabuleiro Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID) 
 		Begin
@@ -140,5 +119,5 @@ go
 Grant Exec on spD_TabuleiroExcluirUsuario To public
 go
 
-Exec spD_TabuleiroExcluirUsuario @UsuarioID=2590, @TabuleiroID =1
+--Exec spD_TabuleiroExcluirUsuario @UsuarioID=2590, @TabuleiroID =1
 

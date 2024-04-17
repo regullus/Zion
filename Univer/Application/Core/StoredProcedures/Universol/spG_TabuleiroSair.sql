@@ -6,7 +6,7 @@ go
 
 Create  Proc [dbo].[spG_TabuleiroSair]
     @UsuarioID int,
-    @TabuleiroID int
+    @BoardID int
 
 As
 -- =============================================================================================
@@ -19,35 +19,32 @@ BEGIN
     Set FMTONLY OFF
     Set nocount on
     Declare
+	    @TabuleiroID int,
         @Posicao nvarchar(255),
-        @Retorno nvarchar(4),
-        @BoardID int
+        @Retorno nvarchar(4)
 
     Select
         @Posicao = Posicao,
-        @BoardID = BoardID
+        @TabuleiroID = TabuleiroID
     From
         Rede.TabuleiroUsuario
     Where
         UsuarioID = @UsuarioID and
-        TabuleiroID = @TabuleiroID and
+        BoardID = @BoardID and
         PagoMaster = 0 and --Não pagou o Master
         StatusID = 1       --Não se ativou
 
-    --Remove usuario que nao pagou no tabuleiroUsuario
-    Delete
-        Rede.TabuleiroUsuario
-    Where
-        UsuarioID = @UsuarioID and
-        TabuleiroID = @TabuleiroID and
-        PagoMaster = 0 and --Não pagou o Master
+		
+	--Zera statusID do usuario 
+	Update
+		Rede.TabuleiroUsuario
+	Set
+		StatusID = 0 -- Esta disponivel para entrar em um tabuleiro
+	Where
+		UsuarioID = @UsuarioID and
+		BoardID = @BoardID and
+		PagoMaster = 0 and --Não pagou o Master
         StatusID = 1       --Não se ativou
-
-    Delete
-        Rede.TabuleiroNivel 
-    Where 
-        UsuarioID = @UsuarioID And
-        BoardID = @BoardID
 
     --Remove usuario que nao pagou no tabuleiro
     if(@Posicao = 'DonatorDirSup1') Update Rede.Tabuleiro Set DonatorDirSup1 = null Where ID = @TabuleiroID 

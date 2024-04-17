@@ -153,7 +153,6 @@ Begin
         --Regra: Caso usuário já exista no tabuleiro, não se pode incluí-lo novamente
         Set @Historico = '01 Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (0). Chamada: ' + @Chamada
         Set @log = @log + '|01 Já se encontra no tabuleiro'
-
     End
     Else
     Begin
@@ -262,7 +261,6 @@ Begin
             --Caso esteja ativo no board
             Begin
                 Set @log = @log + '| 05 Temp tem conteudo'
-                --Select 'panda 01 [' + @log +']'
                 --Determina qual a posiçao do pai no board
                 Select 
                     @ID = ID,
@@ -326,11 +324,13 @@ Begin
                     Set @PosicaoPai = 'Donator'
                 End
 
-                    --*********** DONATOR **************
+                --*********** DONATOR **************
                 if(@PosicaoPai = 'Donator')
                 Begin
+				    --***Donator não pode incluir um usuario, daí busca um pai valido, se possível, para usar na inclussão do novo usuario***
+
                     --Não continua o processo se for um donator
-                    Set @log = @log + '| 07 Não continua o processo se for um donator'
+                    Set @log = @log + '| 07 DONATOR'
                     Set @Continua = 'false'
                     --Obtem Master do usuario pai passado como parametro e usa este master como pai
                     Select Top(1)
@@ -376,7 +376,7 @@ Begin
 
                     if(@MasterTabuleiro is not Null)
                     Begin
-                        Set @log = @log + '| 12 Chama a sp novamente recurssivo'
+                        Set @log = @log + '| 12 Chama a sp novamente recursivo, agora com um pai valido Já que o antigo era um donator'
                         Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
                     End
                 End
@@ -477,7 +477,6 @@ Begin
                                 Posicao = 'DonatorDirInf2' 
                             )
                         Set @log = @log + '| 22 PagoMaster direita count: ' + TRIM(STR(@count))
-                        --Select 'panda 05 [' + @log +']'
                         if(@count=4)
                         Begin
                             Set @log = @log + '| 22.1 PagoMaster direita true'
@@ -509,7 +508,6 @@ Begin
                     Begin
                        Set @log = @log + '| 21 PagoMaster esquerda false esquerda'
                        Set @PagoMasterEsquerda = 'false'     
-                       --Select 'panda 06 [' + @log +']'
                     End
                     Else 
                     Begin
@@ -627,7 +625,7 @@ Begin
 
                             --Update posicao no TabuleiroUsuario do pessoal da Esquerda
                             Select
-                                @Ciclo = MAX(Ciclo)
+                                @Ciclo = MAX(Ciclo) + 1
                             From
                                 Rede.TabuleiroUsuario
                             Where
@@ -638,310 +636,153 @@ Begin
                             Begin
                                 Set @Ciclo = 1
                             End
-                            
-                            --Master
-                            INSERT INTO Rede.TabuleiroUsuario (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @CoordinatorDir, --Ele vira o Master
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'Master',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
+							
+							--Master
+                            Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'Master',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update Master'
+							Where
+								UsuarioID = @CoordinatorDir and --Ele vira o Master
+								BoardID = @BoardID
 
                             --CoordinatorDir
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @IndicatorDirSup,  --ele vira o CoordinatorDir
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir,  --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'CoordinatorDir',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId = 1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'CoordinatorDir',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update CoordinatorDir'
+							Where
+								UsuarioID = @IndicatorDirSup and --Ele vira o CoordinatorDir
+								BoardID = @BoardID
 
                             --CoordinatorEsq
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @IndicatorDirInf, --Ele vira o CoordinatorEsq
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir,  --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'CoordinatorEsq',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId = 1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'CoordinatorEsq',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update CoordinatorDir'
+							Where
+								UsuarioID = @IndicatorDirInf and --Ele vira o CoordinatorEsq
+								BoardID = @BoardID
                             
                             --IndicatorDirSup
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorDirSup1, --Ele vira o IndicatorDirSup
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir,  --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorDirSup',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId = 1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorDirSup',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update IndicatorDirSup'
+							Where
+								UsuarioID = @DonatorDirSup1 and --Ele vira o CoordinatorEsq
+								BoardID = @BoardID
                             
                             --IndicatorDirInf
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorDirSup2, --Ele vira o IndicatorDirInf
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir,  --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorDirInf',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId = 1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorDirInf',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update IndicatorDirInf'
+							Where
+								UsuarioID = @DonatorDirSup2 and --Ele vira o CoordinatorEsq
+								BoardID = @BoardID
 
                             --IndicatorEsqSup
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorDirInf1, --Ele vira o IndicatorEsqSup
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir,  --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorEsqSup',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId = 1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorEsqSup',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update IndicatorEsqSup'
+							Where
+								UsuarioID = @DonatorDirInf1 and --Ele vira o CoordinatorEsq
+								BoardID = @BoardID
 
                             --IndicatorEsqInf
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorDirInf2, --Ele vira o IndicatorEsqInf
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorDir,  --Fixo pois o CoordinatorDir vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorEsqInf',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Direita Fechada'
-                            )
-                                                       
-                            Set @log = @log + '| 23.2.2 Seta true na DireitaFechada para todos os usuarios do tabuleiro tabuleiroID=' + TRIM(STR(@ID))
-                            --Seta true para todos os usuarios do tabuleiro, informando que o lado direito esta finalizado
-                            Update
-                                Rede.TabuleiroUsuario
-                            Set
-                                DireitaFechada = 'true'
-                            Where
-                                TabuleiroID = @ID and 
-                                BoardID = @BoardID and
-                                StatusID = 1
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId = 1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorEsqInf',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Direita Fechada - Update IndicatorEsqInf'
+							Where
+								UsuarioID = @DonatorDirInf2 and --Ele vira o CoordinatorEsq
+								BoardID = @BoardID
                                                        
                             Set @direitaFechada = 'true'
                         End
@@ -965,8 +806,6 @@ Begin
                     Begin
                         Set @log = @log + '| 23.2 TABULEIRO COMPLETO ESQUERDA'
                         Set @Historico = '08.2 - Check Completa true ESQUERDA'
-                        --Select 'panda 14 [' + @log +']'
-                        --Select 'panda 15 ESQUERDA COMPLETO'
                         
                         if(@esquerdaFechada = 'false')
                         Begin
@@ -1024,7 +863,7 @@ Begin
 
                             --Update posicao no TabuleiroUsuario do pessoal da Esquerda
                             Select
-                                @Ciclo = MAX(Ciclo)
+                                @Ciclo = MAX(Ciclo) + 1
                             From
                                 Rede.TabuleiroUsuario
                             Where
@@ -1037,309 +876,151 @@ Begin
                             End
 
                             --Master
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @CoordinatorEsq, --ele vira o Master
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq, --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                @Ciclo,
-                                'Master',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'Master',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update Master'
+							Where
+								UsuarioID = @CoordinatorEsq and --Ele vira o Master
+								BoardID = @BoardID
 
                             --CoordinatorDir
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @IndicatorEsqSup,  --ele vira o CoordinatorDir
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq,  --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'CoordinatorDir',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'CoordinatorDir',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update CoordinatorDir'
+							Where
+								UsuarioID = @IndicatorEsqSup and --Ele vira o Master
+								BoardID = @BoardID
 
                             --CoordinatorEsq
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @IndicatorEsqInf, --Ele vira o CoordinatorEsq
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq,  --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'CoordinatorEsq',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'CoordinatorEsq',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update CoordinatorEsq'
+							Where
+								UsuarioID = @IndicatorEsqInf and --Ele vira o Master
+								BoardID = @BoardID
                             
                             --IndicatorDirSup
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorEsqSup1, --Ele vira o IndicatorDirSup
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq,  --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorDirSup',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorDirSup',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update CoordinatorEsq'
+							Where
+								UsuarioID = @DonatorEsqSup1 and --Ele vira o IndicatorDirSup
+								BoardID = @BoardID
                             
                             --IndicatorDirInf
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorEsqSup2, --Ele vira o IndicatorDirInf
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq,  --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorDirInf',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorDirInf',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update IndicatorDirInf'
+							Where
+								UsuarioID = @DonatorEsqSup2 and --Ele vira o IndicatorDirSup
+								BoardID = @BoardID
 
                             --IndicatorEsqSup
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorEsqInf1, --Ele vira o IndicatorEsqSup
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq,  --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorEsqSup',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorEsqSup',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update IndicatorEsqSup'
+							Where
+								UsuarioID = @DonatorEsqInf1 and --Ele vira o IndicatorDirSup
+								BoardID = @BoardID
 
                             --IndicatorEsqInf
-                            Insert Into Rede.TabuleiroUsuario 
-                            (
-                                UsuarioID,
-                                TabuleiroID,
-                                BoardID,
-                                StatusID,
-                                MasterID,
-                                InformePag,
-                                UsuarioIDPag,
-                                Ciclo,
-                                Posicao,
-                                PagoMaster,
-                                PagoSistema,
-                                ConviteProximoNivel,
-                                DireitaFechada,
-                                EsquerdaFechada,
-                                DataInicio,
-                                DataFim,
-                                Debug
-                            ) 
-                            Values 
-                            (
-                                @DonatorEsqInf2, --Ele vira o IndicatorEsqInf
-                                @Identity,
-                                @BoardID,
-                                1, --Ativo
-                                @CoordinatorEsq,  --Fixo pois o CoordinatorEsq vira o master
-                                0,
-                                null,
-                                coalesce(@Ciclo,@Ciclo,1),
-                                'IndicatorEsqInf',
-                                'true',
-                                'true',
-                                'false',
-                                'false',
-                                'false',
-                                GetDate(),
-                                null,
-                                'Esquerda Fechada'
-                            )
-
-                            Set @log = @log + '| 23.2.2 Seta true na EsquerdaFechada para todos os usuarios do tabuleiro tabuleiroID=' + TRIM(STR(@ID))
-                            
-                            Update
-                                Rede.TabuleiroUsuario
-                            Set
-                                EsquerdaFechada = 'true'
-                            Where
-                                TabuleiroID = @ID and 
-                                BoardID = @BoardID and
-                                StatusID = 1
+							Update
+								Rede.TabuleiroUsuario 
+							Set
+                                TabuleiroID = @Identity,
+								StatusId =1, --Ativo
+								informePag = 1, 
+                                MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
+                                Ciclo = coalesce(@Ciclo,@Ciclo,1),
+                                Posicao = 'IndicatorEsqInf',
+                                PagoMaster = 'true',
+                                PagoSistema = 'true',
+                                ConviteProximoNivel = 'false',
+                                DireitaFechada = 'false',
+                                EsquerdaFechada = 'false',
+								DataInicio = GetDate(),
+                                Debug = 'Esquerda Fechada - Update IndicatorEsqSup'
+							Where
+								UsuarioID = @DonatorEsqInf2 and --Ele vira o IndicatorEsqInf
+								BoardID = @BoardID
 
                             Set @esquerdaFechada = 'true'
                         End
@@ -1363,10 +1044,11 @@ Begin
                             Rede.Tabuleiro
                         Where
                             ID = @ID and
-                            StatusId = 2 --Finalizado
+                            StatusID = 2 --Finalizado
                         
                         Set @log = @log + '| 41.0 Verifica se tabuleiro já esta fechado: ' + TRIM(STR(@tabuleiroFechado))
-                        if(@tabuleiroFechado = 'false')
+                        
+						if(@tabuleiroFechado = 'false')
                         Begin
                             Set @log = @log + '| 26 Encerra tabuleiro'
 
@@ -1377,476 +1059,26 @@ Begin
                                 DataFim = CONVERT(VARCHAR(8),GETDATE(),112)
                             Where
                                 ID = @ID
-
-                            Update
-                                Rede.TabuleiroUsuario
-                            Set
-                                StatusID = 2, --Finalizado
-                                DataFim = @DataFim
-                            Where
-                                TabuleiroID = @ID and 
-                                BoardID = @BoardID and
-                                StatusID = 1
-                     
-                            Update 
-                                Rede.TabuleiroNivel
-                            Set
-                                StatusID = 3, --Finalizado
-                                DataFim = @DataFim,
-                                Observacao = 'Finalizado.' 
-                            Where
-                                TabuleiroID = @ID and
-                                BoardID = @BoardID and
-                                StatusID = 2 --Em andamento
-
-                            --Master Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @CoordinatorDir, 
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo Master Direita',
-                                null
-                            )
-
-                            --CoordinatorDir Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @IndicatorDirSup,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo CoordinatorDir Direita',
-                                null
-                            )
-
-                            --CoordinatorEsq Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @IndicatorDirInf,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo CoordinatorEsq Direita',
-                                null
-                            )
-
-                            --IndicatorDirSup Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorDirSup1,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorDirSup Direita',
-                                null
-                            )
-
-                            --IndicatorDirInf Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorDirSup2,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorDirInf Direita',
-                                null
-                            )
-
-                            --IndicatorEsqSup Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorDirInf1,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorEsqSup Direita',
-                                null
-                            )
-
-                            --IndicatorEsqInf Direita
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorDirInf2,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorEsqInf Direita',
-                                null
-                            )
-                            
-                            --Master Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @CoordinatorEsq,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo Master Esquerda',
-                                null
-                            )
-
-                            --CoordinatorDir Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @IndicatorEsqSup,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo CoordinatorDir Esquerda',
-                                null
-                            )
-
-                            --CoordinatorEsq Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @IndicatorEsqInf,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo CoordinatorEsq Esquerda',
-                                null
-                            )
-
-                            --IndicatorDirSup Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorEsqSup1,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorDirSup Esquerda',
-                                null
-                            )
-
-                            --IndicatorDirInf Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorEsqSup2,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorDirInf Esquerda',
-                                null
-                            )
-
-                            --IndicatorEsqSup Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorEsqInf1,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorEsqSup Esquerda',
-                                null
-                            )
-
-                            --IndicatorEsqInf Esquerda
-                            INSERT INTO Rede.TabuleiroNivel (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao,
-                                Licenca
-                            ) VALUES (
-                                @DonatorEsqInf2,
-                                @BoardID,
-                                @ID,
-                                @DataInicio,
-                                null,
-                                2, --Em andamento
-                                'Novo IndicatorEsqInf Esquerda',
-                                null
-                            )
-
-							--Remove Convite enviado, caso exista
-							Delete
-								Rede.TabuleiroNivel
-							Where
-								TabuleiroID = @ID and
-								BoardID = @BoardID and
-								StatusId = 1 --convite
-
+							
                             --Usuario finalizou o Board 1, este é um convite para ele entrar no sistema no board 1 novamente
                             If (@BoardID = 1)
                             Begin
                                 Set @log = @log + '| 27 Convite para: Master: ' + TRIM(STR(@UsuarioPaiID))
-                                --Select 'panda 21 [' + @log +']'
-                                --Novo Nível
-                                Insert Into Rede.TabuleiroNivel
-                                (
-                                    UsuarioID,
-                                    BoardID,
-                                    TabuleiroID,
-                                    DataInicio,
-                                    DataFim,
-                                    StatusID,
-                                    Observacao
-                                )
-                                VALUES
-                                (
-                                    @Master,
-                                    1,
-                                    @ID,
-                                    @DataInicio,
-                                    null,
-                                    1,
-                                    'Convite (1)'
-                                )
+                                
+								--Master
+								Update
+									Rede.TabuleiroUsuario 
+								Set
+									StatusId = 2, --Convite
+									Debug = 'Tabuleiro Fechado - Convite (1)'
+								Where
+									UsuarioID = @Master and --Ele vira o Master
+									BoardID = @BoardID
                             End
 
-                            --*********** Promove Usuario Master para novo Board ***********
-                            --Sobe para proximo Board
-                            Set @BoardID = @BoardID + 1
-                            --Verifica se ainda há board acima do master
-                            IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID)
-                            Begin
-                                Set @log = @log + '| 29 Sem board Superior'
-                                --Select 'panda 22 [' + @log +']'
-                                --Caso não haja mais board superiores volta ao inicio
-                                Set @BoardID = 1
-                            End
-
-                            --Obtem Master do usuario passado como parametro e inclui o novo usuário nesse tabuleiro
-                            Select Top(1)
-                                @UsuarioPaiID = MasterID 
-                            From 
-                                Rede.TabuleiroUsuario
-                            Where
-                                UsuarioID = @Master and 
-                                TabuleiroID = @ID and 
-                                BoardID = @BoardID and
-                                StatusID = 1
-
-                            --Caso não encontre um Pai obtem o primeiro pai disponivel
-                            if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
-                            Begin
-                                Set @log = @log + '| 30 Obtem primeiro Master ativo'
-                                --Select 'panda 23 [' + @log +']'
-                                --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
-                                Select Top(1)
-                                    @UsuarioPaiID = UsuarioID 
-                                From 
-                                    Rede.TabuleiroUsuario
-                                Where
-                                    StatusID = 1 and
-                                    BoardID = @BoardID
-
-                                if(@UsuarioPaiID is null Or @UsuarioPaiID = 0)
-                                Begin
-                                    if not Exists (Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioPaiID and BoardID = @BoardID and StatusID = 1)
-                                    Begin
-                                        Set @log = @log + '| 31 Não foi possível encontrar um master'
-                                        Set @Historico = '03 Não foi possível encontrar um master para o usuario: ' + TRIM(STR(@UsuarioPaiID)) + ' para o Board: ' + TRIM(STR(@BoardID)) + '. Chamada: ' + @Chamada
-                                        INSERT INTO 
-                                            Rede.TabuleiroNivel (
-                                                UsuarioID, 
-                                                BoardID,
-                                                TabuleiroID,
-                                                DataInicio, 
-                                                DataFim, StatusID, 
-                                                Observacao
-                                            ) VALUES (
-                                                @UsuarioPaiID, 
-                                                @BoardID, 
-                                                null, --Quando StatusID é 1 trata-se de um convite
-                                                @DataInicio, 
-                                                null, 
-                                                1, 
-                                                'Convite (2)'
-                                            )
-                                        Set @PosicaoFilho = '***'
-                                    End
-                                End
-                                Else
-                                Begin
-                                    if not Exists(Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioPaiID and BoardID = @BoardID and StatusID = 1)
-                                    Begin
-                                        Set @log = @log + '| 32 Inclui master em novo com novo ciclo 1'
-                                        --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (1)
-                                        INSERT INTO 
-                                            Rede.TabuleiroNivel (
-                                                UsuarioID, 
-                                                BoardID, 
-                                                TabuleiroID,
-                                                DataInicio, 
-                                                DataFim, 
-                                                StatusID, 
-                                                Observacao
-                                            ) VALUES (
-                                                @UsuarioPaiID, 
-                                                @BoardID,
-                                                null,
-                                                @DataInicio, 
-                                                null,  --Quando StatusID é 1 trata-se de um convite
-                                                1,
-                                                'Convite (3)'
-                                            )
-                                    End
-                                End
-                            End
-                            Else
-                            Begin
-                                if not Exists( Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioPaiID and BoardID = @BoardID)
-                                Begin
-                                    Set @log = @log + '| 33 Inclui master em novo com novo ciclo 2'
-                                    --Inclui master em novo com novo ciclo e em novo tabuleiro em board superior (2)
-                                    INSERT INTO 
-                                        Rede.TabuleiroNivel (
-                                            UsuarioID, 
-                                            BoardID, 
-                                            TabuleiroID,
-                                            DataInicio, 
-                                            DataFim, 
-                                            StatusID, 
-                                            Observacao
-                                        ) VALUES (
-                                            @UsuarioPaiID, 
-                                            @BoardID,
-                                            null, --Quando StatusID é 1 trata-se de um convite
-                                            @DataInicio, 
-                                            null, 
-                                            1,
-                                            'Convite (4)'
-                                        )
-                                End
-                            End
-                        End
-                    --*************** Encerra tabuleiro Fim ****************
+						End
+					
+					   --*************** Encerra tabuleiro Fim ****************
                     End
                     Else
                     --Tabuleiro incompleto
@@ -1854,7 +1086,6 @@ Begin
                         if(@Chamada <> 'Completa')
                         Begin
                             Set @log = @log + '| 34 TABULEIRO INCOMPLETO'
-                            --Select 'panda 24 [' + @log +']'
                             --Verifica se tabuleiro possui possições livres
                              if(
                                 @Master is not null And 
@@ -1879,12 +1110,11 @@ Begin
                             End
                             Else
                             Begin
-                                Set @log = @log + '| 34.2 Há posições livres'
+                                Set @log = @log + '| 34.2 Há posições livres para o TabuleiroID=' + TRIM(STR(@ID))
                             
                                 --*********INICIO UPDATES***********
 
                                 --*********** MASTER **************
-                                Set @log = @log + '| 34.3 Master PosicaoPai: ' + @PosicaoPai
                                 if(@PosicaoPai = 'Master')
                                 Begin
                                     Set @log = @log + '| 34.3.1 Pai é master:' + @PosicaoPai
@@ -2130,7 +1360,6 @@ Begin
                                 End
 
                                 --**********************Segunda Passagem Caso não seja incluido acima *******************************
-                                Set @log = @log + '| 34.4 Master PosicaoPai: ' + @PosicaoPai
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true'))
                                 Begin
                                     Set @log = @log + '| 34.4.1 Pai é master:' + @PosicaoPai
@@ -2375,105 +1604,29 @@ Begin
                                         End
                                 End
 
+								--Atualiza Rede.TabuleiroUsuario para o novo usuario no Tabuleiro
+								Update
+									Rede.TabuleiroUsuario
+								Set
+									StatusID = 1,
+									TabuleiroID = @ID,
+									MasterID = @Master,
+									InformePag = 'false',
+									Ciclo = 1,
+									Posicao = @PosicaoFilho,
+									DataInicio = GetDate(),
+									Debug = 'Update: Posições livres'
+								Where
+									UsuarioId = @UsuarioID and
+									BoardID = @BoardID
+
+
                                 --*********FIM UPDATES***********
-
-                                Select
-                                    @Ciclo = MAX(Ciclo)
-                                From
-                                    Rede.TabuleiroUsuario
-                                Where
-                                    UsuarioID = @UsuarioID and
-                                    BoardID = @BoardID
-
-                                if(@Ciclo is null)
-                                Begin
-                                    Set @Ciclo = 1
-                                End
-
-                                if Not Exists (Select 'Existe' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and TabuleiroID = @ID and BoardID = @BoardID And Ciclo = @Ciclo)
-                                Begin
-                                    Set @log = @log + '| 35 Obtem Master do usuario'
-                                    --Obtem Master do usuario passado como parametro
-                                    Select Top(1)
-                                        @MasterTabuleiro = MasterID 
-                                    From 
-                                        Rede.TabuleiroUsuario
-                                    Where
-                                        StatusID = 1 and
-                                        UsuarioID = @UsuarioPaiID and
-                                        BoardID = @BoardID
-                  
-                                    --inclui novo usuario no TabuleiroUsuario 1
-                                    Insert Into Rede.TabuleiroUsuario
-                                    (
-                                        UsuarioID,
-                                        TabuleiroID,
-                                        BoardID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        PagoSistema,
-                                        ConviteProximoNivel,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    ) 
-                                    Values 
-                                    (
-                                        @UsuarioID,
-                                        @ID,
-                                        @BoardID,
-                                        1, --Ativo
-                                        Coalesce(@MasterTabuleiro,@MasterTabuleiro,1),
-                                        0,
-                                        null,
-                                        @Ciclo,
-                                        Coalesce(@PosicaoFilho,@PosicaoFilho,'1'),
-                                        'false',
-                                        'false',
-                                        'false',
-                                        'false',
-                                        'false',
-                                        GetDate(),
-                                        null,
-                                        'log 1'
-                                    )
-
-                                    if not Exists (Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioID and BoardID = @BoardID and StatusID = 1)
-                                    Begin
-                                        Set @log = @log + '| 36 insert Into Rede.TabuleiroNivel'
-                                        Insert Into Rede.TabuleiroNivel
-                                        (
-                                            UsuarioID,
-                                            BoardID,
-                                            TabuleiroID,
-                                            DataInicio,
-                                            DataFim,
-                                            StatusID,
-                                            Observacao
-                                        )
-                                        VALUES
-                                        (
-                                            @UsuarioID,
-                                            @BoardID,
-                                            @ID,  --Quando StatusID é 2 trata-se de um usuario ativo no tabuleiro
-                                            @DataInicio,
-                                            null,
-                                            2, --inclusão normal
-                                            'Novo Usuário (2)'
-                                        )
-                                    End
-                                End
                             End
                         End
                         Else 
                         Begin
+							Set @log = @log + '|100 Não completou o tauleiro ainda'
                             Set @Historico = '07 - Check Completa false: chamada:' + @Chamada
                         End
                     End
@@ -2499,65 +1652,62 @@ Begin
                             Posicao = 'DonatorEsqInf2' 
                         )
 
-                    --Envia convite para o master para um nivel superior se já tebe 4 agamentos
+                    --Envia convite para o master para um nivel superior se já teve 4 agamentos
                     If(@count >= 4)
                     Begin
                         Set @log = @log + '|50.1 Já teve 4 pagamentos, verifica se ja esta em nivel superior'
-                        Set @BoardIDProximo = @BoardID + 1
                         
-                        --Obtem total de Boards 
-                        Select @aux = Count(*) From Rede.TabuleiroBoard
-                        --Verifica se ultrapassou total de boards, se sim, volta ao boardID 1
-                        if(@BoardIDProximo > @aux)
-                        Begin
-                            set @BoardIDProximo = 1
-                        End
-
-                        if not Exists(
-                            Select 
-                                'OK' 
-                            From
-                                Rede.TabuleiroUsuario
-                            Where 
-                                UsuarioID = @Master and
-                                BoardID = @BoardIDProximo and
-                                StatusID = 1 --Ativo
-                        )
-                        Begin
-                            Set @log = @log + '|50.2 Não esta em nivel superior, cria um convite para o nivel superior'
-                            Insert Into Rede.TabuleiroNivel
-                                (
-                                    UsuarioID,
-                                    BoardID,
-                                    TabuleiroID,
-                                    DataInicio,
-                                    DataFim,
-                                    StatusID,
-                                    Observacao
-                                )
-                                VALUES
-                                (
-                                    @Master,
-                                    @BoardIDProximo,
-                                    @ID, --Quando StatusID é 1 trata-se de um convite
-                                    @DataInicio,
-                                    null,
-                                    1,
-                                    'Convite (2)'
-                                )
-                        End
+                            --*********** Promove Usuario Master para novo Board ***********
+                            --Sobe para proximo Board
+                            Set @BoardID = @BoardID + 1
+                            --Verifica se ainda há board acima do master
+                            IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID)
+                            Begin
+                                Set @log = @log + '| 29 Sem board Superior'
+                                --Caso não haja mais board superiores volta ao inicio
+                                Set @BoardID = 1
+                            End
+                            
+                            --Verifica se ele esta ou não no Board superior
+							if Exists (
+								Select 
+									'OK' 
+								From
+									Rede.TabuleiroUsuario 
+								Where 
+									UsuarioID = @Master and 
+									BoardID = @BoardID and
+									StatusID = 0 --Não esta no board superior, se estivesse seria = 1 e 2 já foi convidado
+								)	
+							Begin
+								--Não estando no BoardSuperior, envia um convite para sua entrada nele
+								Set @log = @log + '| 101.0 Não deveria entrar aqui!!!'
+								Update
+									Rede.TabuleiroUsuario 
+								Set 
+									StatusID = 2 --StatusID 2 é um convite para entrar no proximo board
+								Where 
+									UsuarioID = @Master and 
+									BoardID = @BoardID and
+									StatusID = 0 --Não esta no boardSuperior
+							End
                     End
+					Else
+					Begin
+						Set @log = @log + '|50.2 não teve 4 pagamentos'
+					End
                 End
             End
             Else 
             Begin
+			    --PANDA VERIFICAR
                 Set @log = @log + '| 05.1 #temp não tem conteudo'
                 if(@Chamada <> 'Completa')
                 Begin
                     --Caso NÃO exista o tabuleiro com o board informado
                     Set @log = @log + '| 37 Caso NÃO exista o tabuleiro com o board informado'
                     --Verifica se há usuario ativo no board corrente
-                    if Exists( Select 'Existe' From Rede.TabuleiroUsuario Where StatusID = 1 and BoardID = @BoardID)
+                    if Exists(Select 'Existe' From Rede.TabuleiroUsuario Where StatusID = 1 and BoardID = @BoardID)
                     Begin
                         Set @log = @log + '| 38 Obtem primeiro Master ativo '
                         --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
@@ -2578,143 +1728,13 @@ Begin
                         Begin
                             Set @log = @log + '| 40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
                             --Chama novamente essa sp, agora com um pai valido
-                            if(@Chamada = 'Convite')
-                            Begin
-                                Set @log = @log + '| 43.1 Chamada é convite: BoardID=' + TRIM(STR(@BoardID))
-
-                                Delete
-                                    Rede.TabuleiroNivel
-                                Where
-                                    UsuarioID = @UsuarioID And
-                                    BoardID = @BoardID And
-                                    StatusID = 1 --Aguardando ser incluido
-
-                                Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = @Chamada    
-                            End
-                            Else
-                            Begin
-                                Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
-                            End
+                            Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
                         End
                     End
                     Else
                     Begin
-                        Set @log = @log + '| 41 Não existindo usuario no board'
-                        --Não existindo usuario no board corrente cria um novo
-                        Insert into Rede.Tabuleiro
-                        (
-                            BoardID,
-                            StatusID,
-                            Master,
-                            CoordinatorDir,
-                            CoordinatorEsq,
-                            IndicatorDirSup,
-                            IndicatorDirInf,
-                            DonatorDirSup1,
-                            DonatorDirSup2,
-                            DonatorDirInf1,
-                            DonatorDirInf2,
-                            IndicatorEsqSup,
-                            IndicatorEsqInf,
-                            DonatorEsqSup1,
-                            DonatorEsqSup2,
-                            DonatorEsqInf1,
-                            DonatorEsqInf2,
-                            DataInicio,
-                            DataFim
-                        )
-                        Values
-                        (
-                            @BoardID,
-                            1, --StatusId = 1 é ativo
-                            @UsuarioID, --Master
-                            Null, --CoordinatorDir
-                            Null, --CoordinatorEsq
-                            Null, --IndicatorDirSup
-                            Null, --IndicatorDirInf
-                            null, --DonatorDirSup1
-                            null, --DonatorDirSup2
-                            null, --DonatorDirInf1
-                            null, --DonatorDirInf2
-                            Null, --IndicatorEsqSup
-                            Null, --IndicatorEsqInf
-                            null, --DonatorEsqSup1
-                            null, --DonatorEsqSup2
-                            null, --DonatorEsqInf1
-                            null, --DonatorEsqInf2
-                            @DataInicio, --DataInicio
-                            null --DataFim
-                        )
-
-                        Set @Identity = @@IDentity
-                        Set @Ciclo = 1
-
-                        --inclui novo usuario no TabuleiroUsuario 2
-                        Insert Into Rede.TabuleiroUsuario
-                        (
-                            UsuarioID,
-                            TabuleiroID,
-                            BoardID,
-                            StatusID,
-                            MasterID,
-                            InformePag,
-                            UsuarioIDPag,
-                            Ciclo,
-                            Posicao,
-                            PagoMaster,
-                            PagoSistema,
-                            ConviteProximoNivel,
-                            DireitaFechada,
-                            EsquerdaFechada,
-                            DataInicio,
-                            DataFim,
-                            Debug
-                        ) 
-                        Values 
-                        (
-                            @UsuarioID,
-                            @Identity,
-                            @BoardID,
-                            1, --Ativo
-                            @UsuarioID,
-                            0,
-                            null,
-                            @Ciclo,
-                            'Master',
-                            'false',
-                            'false',
-                            'false',
-                            'false',
-                            'false',
-                            GetDate(),
-                            null,
-                            'Log 2'
-                        )
-
-                        if not Exists (Select 'Existe' From Rede.TabuleiroNivel Where UsuarioID = @UsuarioID and BoardID = @BoardID and StatusID = 1)
-                        Begin
-                            Set @log = @log + '| 42 Into Rede.TabuleiroNivel'
-                            Insert Into Rede.TabuleiroNivel
-                            (
-                                UsuarioID,
-                                BoardID,
-                                TabuleiroID,
-                                DataInicio,
-                                DataFim,
-                                StatusID,
-                                Observacao
-                            )
-                            VALUES
-                            (
-                                @UsuarioID,
-                                @BoardID,
-                                @ID, --Quando StatusID é 1 trata-se de um convite
-                                @DataInicio,
-                                null,
-                                1,
-                                'Novo Usuário (3)'
-                            )
-                        End
+					    --Não deve entrar aqui, mas por precausão, cria o log
+                        Set @log = @log + '| 41 Não existe usuario no board informado UsuarioID: '  + TRIM(STR(@tabuleiroFechado)) + ' BoardID: '  + TRIM(STR(@tabuleiroFechado))
                     End
                 End
             End
@@ -2725,7 +1745,7 @@ Begin
             Set @Historico = '06 Novo usuário ' + TRIM(STR(@UsuarioID)) + ' não está cadastrado! Chamada: ' + @Chamada
         End
     End
-        
+    
     Insert Into Rede.TabuleiroLog 
     (
         UsuarioID,
@@ -2788,4 +1808,4 @@ go
 Grant Exec on spG_Tabuleiro To public
 go
 
-Exec spG_Tabuleiro @UsuarioID=2581,@UsuarioPaiID=2580,@BoardID=1,@Chamada='Convite'
+--Exec spG_Tabuleiro @UsuarioID=2587,@UsuarioPaiID=2584,@BoardID=2,@Chamada='Convite'

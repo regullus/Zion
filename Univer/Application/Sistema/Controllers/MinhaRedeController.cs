@@ -428,7 +428,6 @@ namespace Sistema.Controllers
 
             ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
             ViewBag.idUsuario = usuario.ID;
-
             ViewBag.tabuleiroName = traducaoHelper["GALAXIA"];
 
             string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
@@ -446,68 +445,60 @@ namespace Sistema.Controllers
             {
                 ViewBag.ShowReportPayment = false;
                 ViewBag.RedeTabuleiro = true;
-
-                IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelConvite = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 1); //1 - Convite
-                IEnumerable<Core.Models.TabuleiroNivelModel> tabuleirosNivelAtivos = tabuleiroRepository.ObtemNivelTabuleiro(usuario.ID, 2); //2 - em andamento
-
-                ViewBag.TabuleirosNivelConvite = tabuleirosNivelConvite;
-                ViewBag.TabuleirosNivelAtivos = tabuleirosNivelAtivos;
                 ViewBag.idTabuleiro = 0;
+                ViewBag.tabuleiro = null;
+                ViewBag.tabuleirosUsuario = null;
+                ViewBag.tabuleiroAtivo = null;
+                ViewBag.Timer = null;
+                ViewBag.NovoUsuario = false;
 
-                Core.Models.TabuleiroModel tabuleiro = null;
+                TabuleiroModel tabuleiro = null;
+                TabuleiroUsuarioModel tabuleiroUsuario = null;
 
-                if (tabuleirosNivelAtivos != null && idTabuleiro == 0)
+                IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(usuario.ID);
+                ViewBag.tabuleirosUsuario = tabuleirosUsuario;
+
+                if (idTabuleiro > 0)
                 {
-                    //Obtem 1º Tabuleiro ativo do usuario
-                    Core.Models.TabuleiroNivelModel tabuleirosNivelAtivo = tabuleirosNivelAtivos.FirstOrDefault();
-                    if (tabuleirosNivelAtivo != null)
-                    {
-                        idTabuleiro = tabuleirosNivelAtivo.TabuleiroID;
-                    }
-                }
-
-                if (idTabuleiro < 1)
-                {
-                    idTabuleiro = 1;
-                }
-
-                Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, idTabuleiro);
-
-                if (tabuleiroUsuario == null)
-                {
-                    //Pega primeiro disponivel
-                    tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, 0);
-
-                    if (tabuleiroUsuario == null)
-                    {
-                        //Usuariop não possui tabuleiro
-                        idTabuleiro = 0;
-                    }
+                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
                 }
                 else
                 {
-                    idTabuleiro = tabuleiroUsuario.TabuleiroID;
+                    //Obtem 1º Tabuleiro ativo do usuario
+                    tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
+                }
+
+                if (tabuleiroUsuario != null)
+                {
+                    idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
+                    ViewBag.tabuleiroAtivo = tabuleiroUsuario;
+                }
+                else
+                {
+                    idTabuleiro = 0;
                 }
 
                 if (idTabuleiro != 0)
                 {
-                    ViewBag.Timer = null;
+                    ViewBag.idTabuleiro = idTabuleiro;
+
+                    //Timer
                     if (tabuleiroUsuario != null)
                     {
-                        int tempoMin = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_PAGAMENTO");
-                        int tempoMax = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_MAX_PAGAMENTO");
-
-                        if (tempoMin == 0)
-                        {
-                            tempoMin = 15;
-                        }
-                        if (tempoMax == 0)
-                        {
-                            tempoMax = 60;
-                        }
-
                         if (!tabuleiroUsuario.InformePag)
                         {
+                            int tempoMin = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_PAGAMENTO");
+                            int tempoMax = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_MAX_PAGAMENTO");
+
+                            if (tempoMin == 0)
+                            {
+                                tempoMin = 15;
+                            }
+                            if (tempoMax == 0)
+                            {
+                                tempoMax = 60;
+                            }
+
                             DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
 
                             if (timePagamentoMin > DateTime.Now)
@@ -526,42 +517,61 @@ namespace Sistema.Controllers
                         }
                     }
 
-                    ViewBag.idTabuleiro = idTabuleiro;
-                    ViewBag.tabuleiroAtivo = null;
+                    //Obtem o tabuleiro que será exibido quando a pag for carregada
+                    tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
+                    ViewBag.tabuleiro = tabuleiro;
 
-                    if (tabuleirosNivelAtivos.Count() > 0)
+                    //Obtem Nome do Tabuleiro para exibir na tela
+                    if (!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
                     {
-                        Core.Models.TabuleiroNivelModel tabuleiroAtivo = tabuleirosNivelAtivos.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
-                        if (tabuleiroAtivo == null)
+                        ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                    }
+                    //Verifica se usuario tem que pagar ou não o sistema
+                    if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
+                    {
+                        ViewBag.Pagar = true;
+                    }
+                    else
+                    {
+                        ViewBag.Pagar = false;
+                    }
+                } else
+                {
+                    //Novo usuario, pega tabuleiro do seu pai
+                    int idPai = usuario.PatrocinadorDiretoID ?? 0;
+                    if (idPai > 0)
+                    {
+                        tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(idPai);
+                        tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
+                        //Verifica se pai ainda esta no Mercurio
+                        if (tabuleiroUsuario.BoardID == 1)
                         {
-                            tabuleiroAtivo = tabuleirosNivelAtivos.FirstOrDefault();
-                        }
-
-                        //Obtem o tabuleiro que será exibido quando a pag for carregada
-                        int idTabuleiroAtivo = tabuleiroAtivo.TabuleiroID;
-                        ViewBag.tabuleiroAtivo = tabuleiroAtivo;
-                        if (idTabuleiroAtivo > 0)
-                        {
-                            tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
-                            ViewBag.tabuleiro = tabuleiro;
-                            if (!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
+                            idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
+                            //Ok carrega tabuleiro
+                            if (idTabuleiro > 0)
                             {
+                                tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, idPai);
+                                ViewBag.idTabuleiro = idTabuleiro;
+                                ViewBag.tabuleiro = tabuleiro;
+                                ViewBag.tabuleiroAtivo = tabuleiroUsuario;
+                                ViewBag.NovoUsuario = true;
                                 ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
                             }
-                            if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
-                            {
-                                ViewBag.Pagar = true;
-                            }
-                            else
-                            {
-                                ViewBag.Pagar = false;
-                            }
+                        }
+                        else {
+                            //Obtem tabuleiro com primeira posição disponivel
+                            //ToDo
+                            ViewBag.idTabuleiro = null;
+                            ViewBag.tabuleiro = null;
+                            ViewBag.tabuleiroAtivo = null;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["ERRO"], ex.Message };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return RedirectToAction("Index", "Home", new { strPopupTitle = "Erro", strPopupMessage = ex.Message, Sair = "true" });
             }
 
@@ -607,8 +617,10 @@ namespace Sistema.Controllers
 
                 if (idUsuario == usuario.ID)
                 {
+                    int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+
                     //Obtem usuario target
-                    Core.Models.TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idTabuleiro);
+                    TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idTabuleiro);
 
                     if (obtemInfoUsuario != null)
                     {
@@ -630,7 +642,7 @@ namespace Sistema.Controllers
                     }
 
                     //Obtem os dados do tabuleiro do usuario que se quer informações
-                    Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idTarget, idTabuleiro);
+                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idTarget, idBoard);
 
                     //Se o UsuarioLogado é o Master,
                     //caso o master não tenha recebido (PagoMaster = false)
@@ -677,7 +689,7 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
@@ -929,6 +941,69 @@ namespace Sistema.Controllers
         }
 
         [HttpPost]
+        public ActionResult GetInviteNew(string usuarioID, string token)
+        {
+            if (usuarioID.IsNullOrEmpty())
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                
+                if (idUsuario <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                if (token != tokenLocal)
+                {
+                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                    //Devolve que tokem é invalido
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                }
+
+                if (idUsuario != usuario.ID)
+                {
+                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                //Caso não exista o patrocionador usa o usuario 2580 que é o primeiro alvo Veja a tabela usuario.usuario
+                int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
+
+                //Inclui usuario no novo tabuleiro
+                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiroNew(usuario.ID, patrocinadoID);
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = traducaoHelper[tabuleiroIncluir],
+                    RecursionLimit = 1000
+                };
+                
+                return jsonResult;
+            }
+            catch (Exception ex)
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01");
+            }
+        }
+
+        [HttpPost]
         public ActionResult ReportPayment(string usuarioID, string tabuleiroID, string usuarioIDPag, string token)
         {
             if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || usuarioIDPag.IsNullOrEmpty())
@@ -971,8 +1046,10 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
+                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+
                 //Informar Pagamento
-                string retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idTabuleiro, idUsuarioPag);
+                string retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idBoard, idUsuarioPag);
                 switch (retorno)
                 {
                     case "OK":
@@ -1050,15 +1127,22 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
+                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
                 //Informar Recebimento
-                string retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuario, idTabuleiro);
+                string retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuario, idBoard);
                 switch (retorno)
                 {
                     case "OK":
 
                         TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
-
                         Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
+                        TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
+
+                        //Pega quem recebeu o MAster ou o Siustema
+                        if (tabuleiroUsuario != null)
+                        {
+                            idUsuario = tabuleiroUsuario.UsuarioIDPag ?? idUsuario;
+                        }
 
                         //Efetuar Credito no Master
                         var lancamento = new Lancamento();
@@ -1174,8 +1258,9 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
+                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
                 //Informar Recebimento
-                string retorno = tabuleiroRepository.RemoverUsuario(idUsuarioConvidado, idUsuario, idTabuleiro);
+                string retorno = tabuleiroRepository.RemoverUsuario(idUsuarioConvidado, idUsuario, idBoard);
                 switch (retorno)
                 {
                     case "OK":

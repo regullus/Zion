@@ -76,40 +76,14 @@ BEGIN
         Set @tempo = DATEADD(mi, @dadosTempoPagto, @DataInicio);
         IF(@tempo < GetDate())
         Begin
-             --Inclui excluido na tabela TabuleiroUsuarioExcluidos
-            Insert Into
-                Rede.TabuleiroUsuarioExcluidos
-            SELECT 
-                ID,
-                UsuarioID,
-                TabuleiroID,
-                BoardID,
-                StatusID,
-                MasterID,
-                InformePag,
-                Ciclo,
-                Posicao,
-                PagoMaster,
-                PagoSistema,
-                DataInicio,
-                DataFim
-            FROM 
-                Rede.TabuleiroUsuario
-            Where
-               ID = @ID
 
-            --Remove usuario que nao pagou no tabuleiroUsuario
-            Delete
-                Rede.TabuleiroUsuario
-            Where
-               ID = @ID
-
-            Delete
-                Rede.TabuleiroNivel
-            Where
-                UsuarioID = @UsuarioID and
-                BoardID = @BoardID and
-				TabuleiroID = @TabuleiroID
+			--Zera statusID do usuario 
+			Update
+				Rede.TabuleiroUsuario
+			Set
+				StatusID = 0 -- Esta disponivel para entrar em um tabuleiro
+			Where
+				ID = @ID
 
             --Remove usuario que nao pagou no tabuleiro
 			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID) 
@@ -242,6 +216,7 @@ BEGIN
     -- ******* Fim Cursor *******
     Select @Retorno Retorno
 End -- Sp
+
 
 go
 Grant Exec on spD_TabuleiroJob To public

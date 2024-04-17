@@ -14,22 +14,11 @@
     #region ViewBags
 
     int idUsuario = ViewBag.idUsuario;
-
-    var usuarioAtual = (Core.Entities.Usuario)ViewBag.Nivel1;
-
-    ViewBag.MascaraData = traducaoHelper["MASCARA_DATA"];
-    if (ViewBag.MascaraData == null)
-    {
-        ViewBag.MascaraData = "dd/MM/yyyy";
-    }
-
-    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroNivelConvites = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosNivelConvite;
-    IEnumerable<Core.Models.TabuleiroNivelModel> tabuleiroNivelAtivos = (IEnumerable<Core.Models.TabuleiroNivelModel>)ViewBag.TabuleirosNivelAtivos;
-    Core.Models.TabuleiroNivelModel tabuleiroAtivo = (Core.Models.TabuleiroNivelModel)ViewBag.tabuleiroAtivo;
-
-    int totalTabuleiro = tabuleiroNivelAtivos.Count();
-
     string planetaCor = "";
+
+    //Tabuleiros
+    IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = (IEnumerable<Core.Models.TabuleiroUsuarioModel>)ViewBag.tabuleirosUsuario;
+    Core.Models.TabuleiroUsuarioModel tabuleiroAtivo = (Core.Models.TabuleiroUsuarioModel)ViewBag.tabuleiroAtivo;
 
     int idTabuleiro = ViewBag.idTabuleiro;
     Core.Models.TabuleiroModel tabuleiro = (Core.Models.TabuleiroModel)ViewBag.tabuleiro;
@@ -47,8 +36,19 @@
         showReportPayment = ViewBag.ShowReportPayment;
     }
 
-    #endregion
+    string msgConvite = "";
 
+    bool blnNovoUsuario = false;
+
+    if (ViewBag.NovoUsuario != null)
+    {
+        blnNovoUsuario = ViewBag.NovoUsuario;
+        msgConvite = "<h3>" + traducaoHelper["TABULEIRO_NAO_INICIADO_1"] + @"</h3><br />";
+        msgConvite += "<h4>" + traducaoHelper["TABULEIRO_NAO_INICIADO_2"] + @"</h4><br />";
+        msgConvite += "<h4>" + traducaoHelper["TABULEIRO_NAO_INICIADO_3"] + @"</h4><br />";
+    }
+
+    #endregion
 }
 
 @section pageStyles {
@@ -106,6 +106,7 @@
     <script>
         var width = 0;
         var posWidth = 10;
+        var showInfo = false;
 
         $(function () {
             startPage();
@@ -157,6 +158,26 @@
         addEventListener('DOMContentLoaded', loadbar, false);
     </script>
 
+    @if (blnNovoUsuario)
+    {
+        <script>
+            Swal.fire({
+                title: '@traducaoHelper["CONVITE"]',
+                html: `
+                <div>
+                    <h3>@traducaoHelper["TABULEIRO_NAO_INICIADO_1"]</h3><br />
+                    <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_2"]</h4><br />
+                    <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4><br />
+                    <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_4"]</h4><br />
+                </div>
+                    `,
+                icon: 'message',
+                confirmButtonText: 'OK',
+                width: '500px',
+            });
+        </script>
+    }
+
     @if (ViewBag.Timer != null)
     {
         <script>
@@ -198,11 +219,7 @@
         <script>
             function startPage()
             {
-                $("#tab_select").addClass('@tabuleiroAtivo.BoardCor');
-                $("#tab_select_name").html('@(traducaoHelper[tabuleiroAtivo.BoardNome])');
-                $("#tab_select_position").html('@(traducaoHelper[tabuleiroAtivo.Posicao].ToUpper())');
-                $("#tab_select_img").attr("src", '@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)');
-                $(".divReloadPage").show();
+              $(".divReloadPage").show();
             }
 
             function position() {
@@ -640,7 +657,12 @@
                         error: function (xhr, ajaxOptions, thrownError) {
                             if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                                 //Reload page
-                                location.reload();
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -675,7 +697,12 @@
                     success: function (data) {
                         if (data != null) {
                             if (data.toString() == "OK") {
-                                location.reload();
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
@@ -696,7 +723,12 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                             //Reload page
-                            location.reload();
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -729,7 +761,12 @@
                                     var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
                                     window.location.href = url;
                                 } else {
-                                    location.reload();
+                                    if (idTabuleiro != null && idTabuleiro > 0) {
+                                        var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                        window.location.href = url;
+                                    } else {
+                                        location.reload();
+                                    }
                                 }
                             } else {
                                 Swal.fire({
@@ -751,7 +788,12 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                             //Reload page
-                            location.reload();
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -822,7 +864,12 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                             //Reload page
-                            location.reload();
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -849,7 +896,12 @@
                     success: function (data) {
                         if (data != null) {
                             if (data.toString() == "OK") {
-                                location.reload();
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
@@ -870,7 +922,12 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                             //Reload page
-                            location.reload();
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -896,7 +953,12 @@
                     success: function (data) {
                         if (data != null) {
                             if (data.toString() == "OK") {
-                                location.reload();
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
@@ -917,7 +979,12 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                             //Reload page
-                            location.reload();
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -930,7 +997,7 @@
                 });
             });
 
-            $('.inviteNew').on('click', function () {
+            $('.invite').on('click', function () {
                 var idBoard = $(this).attr("data-id");
                 $.ajax({
                     url: "@Url.Action("GetInvite")",
@@ -943,7 +1010,12 @@
                     success: function (data) {
                         if (data != null) {
                             if (data == "OK") {
-                                location.reload();
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
@@ -951,7 +1023,6 @@
                                     icon: 'warning',
                                     confirmButtonText: 'OK'
                                 });
-                                location.reload();
                             }
                         } else {
                             Swal.fire({
@@ -965,7 +1036,62 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                             //Reload page
-                            location.reload();
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
+            });
+
+            $('.inviteNew').on('click', function () {
+                $.ajax({
+                    url: "@Url.Action("GetInviteNew")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data == "OK") {
+                               location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data,
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -1039,7 +1165,12 @@
                          error: function (xhr, ajaxOptions, thrownError) {
                              if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
                                  //Reload page
-                                 location.reload();
+                                 if (idTabuleiro != null && idTabuleiro > 0) {
+                                     var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
+                                     window.location.href = url;
+                                 } else {
+                                     location.reload();
+                                 }
                              } else {
                                  Swal.fire({
                                      title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
@@ -1062,58 +1193,21 @@
 
         </script>
     }
-    else
+
+    @if (blnNovoUsuario)
     {
         <script>
             function startPage() {
                 $(".divReloadPage").hide();
             }
-
-            $('.invite').on('click', function () {
-                $.ajax({
-                    url: "@Url.Action("GetInvite")",
-                    type: "POST",
-                    data: {
-                        'usuarioID': '@(idUsuario)',
-                        'boardID': '0',
-                        'token': '@(ViewBag.Token)'
-                    },
-                    success: function (data) {
-                        if (data != null) {
-                            if (data == "OK") {
-                                location.reload();
-                            } else {
-                                Swal.fire({
-                                    title: '@traducaoHelper["ALERTA"]',
-                                    text: data,
-                                    icon: 'warning',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
-                                text: '@traducaoHelper["SEM_DADOS"]',
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
-                            //Reload page
-                            location.reload();
-                        } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
-                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                });
-            });
+        </script>
+    }
+    else
+    {
+        <script>
+            function startPage() {
+                $(".divReloadPage").show();
+            }
         </script>
     }
 }
@@ -1187,23 +1281,55 @@
 </div>
 
 <!-- Tabuleiro -->
+@if (blnNovoUsuario)
+{
+    <div class="portlet aba box backWrite grey-gallery">
+
+        <div class="portlet-title">
+            <div class="caption">@ViewBag.tabuleiroName - @traducaoHelper["CONVITE"]</div>
+            <div class="tools">
+                <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
+            </div>
+            <div class="actions">
+                <a href='#'>&nbsp;</a>
+                <label>&nbsp;</label>
+            </div>
+        </div>
+
+        <div class="portlet-body">
+            <div class="row" style="">
+                    <div class="tiles" style="padding-left: 15px;">
+                        <div class="tile double grey-card inviteNew" style="max-height: 80px; max-width: 200px;">
+                            <div class="tile-body" style="padding:5px;">
+                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                <h3>@(traducaoHelper["MERCURIO"])</h3>
+                                <p>@traducaoHelper["CONVITE"]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 style="padding-right:10px; padding-left: 10px;">*@traducaoHelper["SUGEITO_DISPONIBILIDADE"]</h5>
+            </div>
+        </div>
+    </div>
+}
+
 @if (tabuleiro != null)
 {
-    <div id="porTabuleiro" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; overflow: auto !important; overflow-y: hidden !important">
+    <div id="porTabuleiro" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; overflow: auto !important; overflow-y: hidden !important; @(blnNovoUsuario ? "opacity: 0.7" : "")">
         <div class="portlet-body">
             <div class="row galaxy" style="background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
                 <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
-
+                
                 <div class="tiles" style="padding-left: 15px;">
-                    <div id="tab_select" class="tile double" style="max-height: 80px; max-width: 200px;">
+                    <div id="tab_select" class="tile double @tabuleiroAtivo.BoardCor" style="max-height: 80px; max-width: 200px;">
                         <div class="tile-body" style="padding:5px;">
-                            <img id="tab_select_img" src='' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                            <h3 id="tab_select_name"></h3>
-                            <p id="tab_select_position"></p>
+                            <img id="tab_select_img" src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                            <h3 id="tab_select_name">@(traducaoHelper[tabuleiroAtivo.BoardNome])</h3>
+                            <p id="tab_select_position">@(traducaoHelper[tabuleiroAtivo.Posicao].ToUpper())</p>
                         </div>
                     </div>
                 </div>
-
+                
                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1 @(tabuleiro.pulseDonatorEsqSup1 ? "blob" : "")">
                 <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
 
@@ -1253,69 +1379,11 @@
         </div>
     </div>
 }
-else
-{
-    <div class="portlet aba box backWrite grey-gallery">
-
-        <div class="portlet-title">
-            <div class="caption"></div>
-            <div class="tools">
-                <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
-            </div>
-            <div class="actions">
-                <a href='#'>&nbsp;</a>
-                <label>&nbsp;</label>
-            </div>
-        </div>
-
-        <div class="portlet-body">
-
-            <h3>@traducaoHelper["TABULEIRO_NAO_INICIADO_1"]</h3>
-            <br />
-            <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_2"]</h4>
-            <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4>
-
-            <div class="tiles" style="padding-left: 15px;">
-                <div class="tile double grey-card invite" style="max-height: 80px; max-width: 200px;">
-                    <div class="tile-body" style="padding:5px;">
-                        <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                        <h3>@(traducaoHelper["MERCURIO"])</h3>
-                        <p>@traducaoHelper["CONVITE"]</p>
-                    </div>
-                </div>
-            </div>
-
-            <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_4"]</h4>
-        </div>
-    </div>
-}
 
 @section sideBarExtra {
-
-    @if (tabuleiroNivelConvites != null)
+    @if (tabuleirosUsuario != null)
     {
-        foreach (var item in tabuleiroNivelConvites)
-        {
-            <!-- Invite -->
-            <li class="nav-item start">
-                <a href="javascript:;" id="invite_@item.ID" data-id="@item.ID" class="invite" style="margin: 0; padding: 0;">
-                    <div class="tiles title" style="padding-left: 15px;">
-                        <div class="tile double springgreen-card inviteNew" data-id="@(item.BoardID)" id="cardGrid@(item.ID)" style="max-height: 76px; max-width: 200px;">
-                            <div class="tile-body" style="padding:5px;">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                                <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
-                                <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </li>
-        }
-    }
-
-    @if (tabuleiroNivelAtivos != null && totalTabuleiro > 1)
-    {
-        foreach (var item in tabuleiroNivelAtivos)
+        foreach (var item in tabuleirosUsuario)
         {
             switch (item.BoardNome.Substring(0, 3).ToLower())
             {
@@ -1349,12 +1417,12 @@ else
             }
             <li class="nav-item start">
                 <a href="javascript:;" style="margin: 0; padding: 0;">
-                    <div class="tiles title" style="padding-left: 15px;">
-                        <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px;">
-                            <div class="tile-body" style="padding:5px;">
+                    <div class="tiles title" style="padding-left: 15px; @(item.StatusID == 0 ? "cursor: default;" : "") ">
+                        <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px; @(item.StatusID == 0 ? "cursor: default; opacity: 0.5;" : "")">
+                            <div class="tile-body" style="padding: 5px;">
                                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
                                 <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
-                                <p class="card-content2-txt">@(traducaoHelper[item.Posicao])</p>
+                                <p class="card-content2-txt">@(item.StatusID == 0 ? "" : traducaoHelper[item.Posicao])</p>
                             </div>
                         </div>
                     </div>
