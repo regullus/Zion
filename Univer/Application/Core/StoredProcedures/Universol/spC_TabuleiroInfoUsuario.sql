@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInfoUsuario'))
    Drop Procedure spC_TabuleiroInfoUsuario
@@ -47,7 +47,7 @@ BEGIN
             Celular,
             '',
             '',
-            0
+            'false'
         from
             Usuario.Usuario
         Where 
@@ -56,13 +56,13 @@ BEGIN
         Update
             temp
         Set
-            ConfirmarRecebimento = 1
+            ConfirmarRecebimento = 'true'
         From
             #temp temp,
             Rede.TabuleiroUsuario usu
         Where
             temp.UsuarioID = usu.UsuarioID and
-            usu.PagoMaster = 0
+            usu.PagoMaster = 'true'
 
     End
 
@@ -75,7 +75,7 @@ BEGIN
             Celular,
             '',
             '',
-            0
+            'false'
         from
             Usuario.Usuario
         Where 

@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInfoSystem'))
    Drop Procedure spC_TabuleiroInfoSystem
@@ -29,7 +29,7 @@ BEGIN
     )
     Declare @idTarget int
 
-    set @idTarget = 2000 --Usuario para do systema ~e o 2000
+    set @idTarget = 2000 --Usuario para do systema e o 2000
 
     insert into #temp
     Select
@@ -38,7 +38,7 @@ BEGIN
         Celular,
         '',
         '',
-        0
+        'false'
     from
         Usuario.Usuario
     Where 

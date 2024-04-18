@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInformarPagtoSistema'))
    Drop Procedure spC_TabuleiroInformarPagtoSistema
@@ -6,7 +6,7 @@ go
 
 Create  Proc [dbo].[spC_TabuleiroInformarPagtoSistema]
    @UsuarioID int,
-   @TabuleiroID int
+   @BoardID int
 
 As
 -- =============================================================================================
@@ -25,7 +25,7 @@ BEGIN
         PagoSistema = 1
     where 
         UsuarioID = @UsuarioID and 
-        TabuleiroID  = @TabuleiroID
+        TabuleiroID  = @BoardID
 
     Select 'OK'
 
@@ -35,6 +35,6 @@ go
 Grant Exec on spC_TabuleiroInformarPagtoSistema To public
 go
 
---Exec spC_TabuleiroInformarPagtoSistema @UsuarioID = 2580, @TabuleiroID = 1
+--Exec spC_TabuleiroInformarPagtoSistema @UsuarioID = 2580, @BoardID = 1
 
 

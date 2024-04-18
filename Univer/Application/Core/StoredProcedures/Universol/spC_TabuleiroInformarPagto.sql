@@ -33,7 +33,7 @@ BEGIN
         rede.TabuleiroUsuario
     where 
         UsuarioID = @UsuarioID and 
-        TabuleiroID  = @BoardID 
+        BoardID  = @BoardID 
 
     if(@tempoFim > @tempoIni)
     Begin
@@ -44,7 +44,8 @@ BEGIN
             UsuarioIDPag = @UsuarioIDPag
         where 
             UsuarioID = @UsuarioID and 
-            TabuleiroID  = @BoardID 
+            BoardID  = @BoardID 
+            
         Select 'OK'
     End
     Else

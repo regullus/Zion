@@ -582,7 +582,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["ERRO"], ex.Message };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["ERRO"], "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return RedirectToAction("Index", "Home", new { strPopupTitle = "Erro", strPopupMessage = ex.Message, Sair = "true" });
             }
@@ -703,7 +703,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01 [" + ex.Message + "]" };
+                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
             }
@@ -753,9 +753,9 @@ namespace Sistema.Controllers
                 return jsonResult;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01" };
+                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01");
             }
@@ -805,9 +805,9 @@ namespace Sistema.Controllers
                 return jsonResult;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01" };
+                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01");
             }
@@ -875,9 +875,9 @@ namespace Sistema.Controllers
                 return jsonResult;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" };
+                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01");
             }
@@ -944,9 +944,9 @@ namespace Sistema.Controllers
                 };
                 return jsonResult;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01");
             }
@@ -1009,7 +1009,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01 [" + ex.Message + "]"};
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01");
             }

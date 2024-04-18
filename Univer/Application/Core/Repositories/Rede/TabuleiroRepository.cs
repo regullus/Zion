@@ -65,8 +65,30 @@ namespace Core.Repositories.Rede
         {
             string sql = "Exec spC_Tabuleiro @id=" + id + ", @UsuarioID = " + usuarioID;
 
-            var retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).FirstOrDefault();;
+            TabuleiroModel retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).FirstOrDefault();;
+            if (retorno != null)
+            {
+                retorno.ApelidoMaster = retorno.ApelidoMaster.ToLower();
 
+                retorno.ApelidoCoordinatorDir = retorno.ApelidoCoordinatorDir.ToLower();
+                retorno.ApelidoCoordinatorEsq = retorno.ApelidoCoordinatorEsq.ToLower();
+
+                retorno.ApelidoIndicatorDirSup = retorno.ApelidoIndicatorDirSup.ToLower();
+                retorno.ApelidoIndicatorDirInf = retorno.ApelidoIndicatorDirInf.ToLower();
+                retorno.ApelidoIndicatorEsqSup = retorno.ApelidoIndicatorEsqSup.ToLower();
+                retorno.ApelidoIndicatorEsqInf = retorno.ApelidoIndicatorEsqInf.ToLower();
+
+                retorno.ApelidoDonatorDirSup1 = retorno.ApelidoDonatorDirSup1.ToLower();
+                retorno.ApelidoDonatorDirInf1 = retorno.ApelidoDonatorDirInf1.ToLower();
+                retorno.ApelidoDonatorDirSup2 = retorno.ApelidoDonatorDirSup2.ToLower();
+                retorno.ApelidoDonatorDirInf2 = retorno.ApelidoDonatorDirInf2.ToLower();
+
+                retorno.ApelidoDonatorEsqSup1 = retorno.ApelidoDonatorEsqSup1.ToLower();
+                retorno.ApelidoDonatorEsqInf1 = retorno.ApelidoDonatorEsqInf1.ToLower();
+                retorno.ApelidoDonatorEsqSup2 = retorno.ApelidoDonatorEsqSup2.ToLower();
+                retorno.ApelidoDonatorEsqInf2 = retorno.ApelidoDonatorEsqInf2.ToLower();
+
+            }
             return retorno;
         }
 
@@ -82,7 +104,6 @@ namespace Core.Repositories.Rede
             }
 
             string sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
-
             TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
 
             string ret = "OK";
@@ -120,6 +141,10 @@ namespace Core.Repositories.Rede
                             //Retorno para tipo de chamda = "COMPLETA"
                             //08 indica que o Tabuleiro esta completo
                             ret = "COMPLETO";
+                            break;
+                        case "09":
+                            //Recursiva
+                            ret = "OK";
                             break;
                         default:
                             ret = "OK";
@@ -192,6 +217,10 @@ namespace Core.Repositories.Rede
                                 //08 indica que o Tabuleiro esta completo
                                 ret = "COMPLETO";
                                 break;
+                            case "09":
+                                //Recursiva
+                                ret = "OK";
+                                break;
                             default:
                                 ret = "OK";
                                 break;
@@ -218,9 +247,9 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public string InformarPagtoSistema(int idUsuario, int idTabuleiro)
+        public string InformarPagtoSistema(int idUsuario, int idBoard)
         {
-            string sql = "Exec spC_TabuleiroInformarPagtoSistema @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+            string sql = "Exec spC_TabuleiroInformarPagtoSistema @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
 
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 
@@ -276,10 +305,10 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public bool MasterRuleOK(int idUsuario, int idTabuleiro)
+        public bool MasterRuleOK(int idUsuario, int idBoard)
         {
             bool retorno = true;
-            string sql = "Exec spC_TabuleiroMasterRule @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+            string sql = "Exec spC_TabuleiroMasterRule @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
             string retornoSP = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
             if (retornoSP != "OK")
             {
@@ -296,9 +325,10 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public string TabuleiroSair(int idUsuario, int idTabuleiro)
+        public string TabuleiroSair(int idUsuario, int idBoard)
         {
-            string sql = "Exec spG_TabuleiroSair @UsuarioID=" + idUsuario + ", @TabuleiroID=" + idTabuleiro;
+
+            string sql = "Exec spG_TabuleiroSair @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
 
             var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
 

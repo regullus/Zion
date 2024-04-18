@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroMasterRule'))
    Drop Procedure spC_TabuleiroMasterRule
@@ -6,12 +6,12 @@ go
 
 Create  Proc [dbo].[spC_TabuleiroMasterRule]
     @UsuarioID int,
-    @TabuleiroID int
+    @BoardID int
 As
 -- =============================================================================================
 -- Author.....: 
 -- Create date: 
--- Description: Verifica se o MAster do tabuleiro já possui mais que 4 pagamentos e ainda não pagou o sistema
+-- Description: Verifica se o Master do tabuleiro jÃ¡ possui mais que 4 pagamentos e ainda nao pagou o sistema
 -- =============================================================================================
 
 BEGIN
@@ -32,16 +32,16 @@ BEGIN
         Rede.TabuleiroUsuario 
     Where
         UsuarioID = @UsuarioID and
-        TabuleiroID = @TabuleiroID 
+        BoardID = @BoardID 
 
-    --Verifica se master não pagou o sistema
+    --Verifica se master nao pagou o sistema
     Select
         @PagoSistema = PagoSistema
     From
         Rede.TabuleiroUsuario 
     Where
         UsuarioID = @MasterID and
-        TabuleiroID = @TabuleiroID 
+        BoardID = @BoardID 
     
 	--Verifica total de pagamentos que master recebeu sem pagar o sistema
 	Select 
@@ -50,13 +50,13 @@ BEGIN
 		Rede.TabuleiroUsuario 
 	Where
 		MasterID = @MasterID and
-		TabuleiroID = @TabuleiroID and
-		PagoMaster = 1 
+		BoardID = @BoardID and
+		PagoMaster = 'true'
 
     if(@PagoSistema = 0)
     Begin
         -- Se total for maior que 4, informa 'NOOK'
-        --pois o Master deve pagar o sistema até os 4 primeiros pagamentos
+        --pois o Master deve pagar o sistema ate os 4 primeiros pagamentos
         if(@Total > 3)
         Begin 
             Select @retorno = 'NOOK'
@@ -68,17 +68,17 @@ BEGIN
     End
     Else
     Begin
-        --Já pagou o sistema
+        --Jï¿½ pagou o sistema
         Select @retorno = 'OK'
     End
 
-	--Fevifica se master já teve alguma indicacao
+	--Fevifica se master ja teve alguma indicacao
 	if(@retorno = 'OK')
 	Begin
-	    --Não considera os 7 principais usuarios
+	    --Nao considera os 7 principais usuarios
 		if(@UsuarioID > 2586)
 		Begin
-		    --Faz a verificação somente se recebeu mais que 4 pag
+		    --Faz a verificacao somente se recebeu mais que 4 pag
 			if(@Total > 4)
 			Begin 
 				Declare
@@ -108,7 +108,7 @@ BEGIN
 	
 				if(@totalBoard > @totalIndicados)
 				Begin
-					--Usuario não tem indicações maior ou igual ao numero de tabuleiros que ele pertence
+					--Usuario nao tem indicacoes maior ou igual ao numero de tabuleiros que ele pertence
 					Select @retorno = 'NOOK'
 				End
 			End
@@ -122,7 +122,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID = 2580, @TabuleiroID = 1
+--Exec spC_TabuleiroMasterRule @UsuarioID = 2580, @BoardID = 1
 
 
 

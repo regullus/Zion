@@ -11,7 +11,7 @@ As
 -- =============================================================================================
 -- Author.....: 
 -- Create date: 
--- Description: Verifica se o MAster do tabuleiro já possui mais que 4 pagamentos e ainda não pagou o sistema
+-- Description: Obtem BoardID de um usuario em um tabuleiro
 -- =============================================================================================
 
 BEGIN
@@ -36,7 +36,7 @@ go
 Grant Exec on spC_TabuleiroObtemBoardIDByTabuleiroID To public
 go
 
-Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID = 2580, @TabuleiroID = 1
+--Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID = 2580, @TabuleiroID = 1
 
 
 

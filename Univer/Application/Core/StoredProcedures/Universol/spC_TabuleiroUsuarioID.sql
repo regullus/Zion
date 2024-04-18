@@ -21,7 +21,6 @@ BEGIN
 
     --Obtem para um dado tabuleiro
 	Select 
-		tab.ID,
 		tab.UsuarioID,
 		tab.TabuleiroID,
 		tab.BoardID,
@@ -53,7 +52,7 @@ go
 Grant Exec on spC_TabuleiroUsuarioID To public
 go
 
-Exec spC_TabuleiroUsuarioID @UsuarioID=2587, @BoardID=1
+--Exec spC_TabuleiroUsuarioID @UsuarioID=2587, @BoardID=1
 
 
 

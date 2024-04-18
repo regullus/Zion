@@ -29,15 +29,14 @@ BEGIN
         From
             rede.TabuleiroUsuario 
         where 
-            InformePag = 1 and
             UsuarioID = @UsuarioID and 
-            BoardID  = @BoardID 
+            BoardID  = @BoardID and
+            InformePag = 'true' 
     )
     Begin
         Update
             rede.TabuleiroUsuario 
         Set
-            InformePag = 1,
             UsuarioIDPag = @UsuarioPaiID
         where 
             UsuarioID = @UsuarioID and 
@@ -47,12 +46,12 @@ BEGIN
     Update
         rede.TabuleiroUsuario 
     Set
-        PagoMaster = 1
+        PagoMaster = 'true'
     where 
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 
 
-    --Verifica se já é o 4 recebimento do master
+    --Verifica se ja e o 4 recebimento do master
     Select
         @MasterID = MasterID
     From
@@ -69,8 +68,8 @@ BEGIN
 		Where 
 			UsuarioID = @MasterID and 
 			BoardID  = @BoardID and 
-			PagoSistema = 1 and 
-			ConviteProximoNivel = 0
+			PagoSistema = 'true' and 
+			ConviteProximoNivel = 'false'
 		)
     Begin
         Select 
@@ -80,12 +79,12 @@ BEGIN
         Where
             MasterID = @MasterID and 
             BoardID  = @BoardID and
-            PagoMaster = 1 and
+            PagoMaster = 'true' and
             Posicao in ('DonatorDirSup1','DonatorDirSup2','DonatorDirInf1','DonatorDirInf2','DonatorEsqSup1','DonatorEsqSup2','DonatorEsqInf1','DonatorEsqInf2')
 
         if(@count>=4)
         Begin
-            --Verifica se já não esta no proximo nivel
+            --Verifica se ja nao esta no proximo nivel
             if not Exists (
 				Select 
 					'OK' 
@@ -100,7 +99,7 @@ BEGIN
                 Update
                     rede.TabuleiroUsuario
                 Set 
-                    ConviteProximoNivel = 1
+                    ConviteProximoNivel = 'true'
                 Where
                     UsuarioID = @MasterID and 
                     BoardID  = @BoardID 

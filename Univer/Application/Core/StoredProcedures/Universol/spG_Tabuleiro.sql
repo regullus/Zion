@@ -17,10 +17,10 @@ Begin
 
     /*
     Chamada pode ser:
-    'Principal, para incluir um novo usuário'
-    'Donator', quando um UsuariiPaiID passado é um Donator que não pode ser pai de ninguem, Daí seleciona um pai valido, NÃO USAR EXTERNAMENTE é uma chamada recurssiva desta sp
-    'Convite' quando um usuario já é veterano e é convidado para entrar novamente nos tabuleiros, NÃO USAR EXTERNAMENTE é uma chamada  recurssiva desta sp
-    'PaiValido' chama novamente a essa sp com um pai valido, ocorre quando não é passado um pai valido no sistema, NÃO USAR EXTERNAMENTE é uma chamada  recurssiva desta sp
+    'Principal, para incluir um novo usuario'
+    'Donator', quando um UsuariiPaiID passado eh um Donator que nao pode ser pai de ninguem, dai seleciona um pai valido, nao USAR EXTERNAMENTE eh uma chamada recurssiva desta sp
+    'Convite' quando um usuario jah eh veterano e eh convidado para entrar novamente nos tabuleiros, nao USAR EXTERNAMENTE eh uma chamada  recurssiva desta sp
+    'PaiValido' chama novamente a essa sp com um pai valido, ocorre quando nao eh passado um pai valido no sistema, nao USAR EXTERNAMENTE eh uma chamada  recurssiva desta sp
     'Completa' Para quando o tabuleiro foi finalizado
     */
    
@@ -63,6 +63,7 @@ Begin
             @DonatorEsqInf2 int,
             @PagoMasterDireita bit,
             @PagoMasterEsquerda bit,
+			@PagoMaster bit,
             @log nvarchar(max),
             @count int,
             @direitaFechada bit,
@@ -83,6 +84,7 @@ Begin
     Set @Continua = 'true'
     Set @PagoMasterDireita = 'false'
     Set @PagoMasterEsquerda = 'false'
+	Set @PagoMaster = 'false'
     Set @log = 'Inicio |'
     Set @Historico = ''
     Set @direitaFechada = 'false'
@@ -121,7 +123,7 @@ Begin
 
     Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID))
 
-    --Ferifica se novo usuário já se encontra em algum tabuleiro
+    --Ferifica se novo usuario jah se encontra em algum tabuleiro
     if Exists (
     Select 
         'Existe'   
@@ -150,9 +152,9 @@ Begin
         @Chamada <> 'Completa'
     )
     Begin
-        --Regra: Caso usuário já exista no tabuleiro, não se pode incluí-lo novamente
-        Set @Historico = '01 Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (0). Chamada: ' + @Chamada
-        Set @log = @log + '|01 Já se encontra no tabuleiro'
+        --Regra: Caso usuario jah exista no tabuleiro, nao se pode inclui-lo novamente
+        Set @Historico = '01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @Chamada
+        Set @log = @log + '|01 jah se encontra no tabuleiro'
     End
     Else
     Begin
@@ -173,10 +175,10 @@ Begin
             --Procura pai na rede board indicada
             if (@UsuarioPaiID is null)
             Begin
-                Set @log = @log + '| 03 UsuarioPaiID é null - #temp Criada'
+                Set @log = @log + '| 03 UsuarioPaiID eh null - #temp Criada'
                 --Caso @UsuarioPaiID seja null, obtem primeiro tabuleiro disponivel no board passado como paramentro
                 Insert Into #temp
-                Select 
+                Select top(1)
                     tab.ID as ID,
                     tab.BoardID as BoardID,
                     tab.StatusID as StatusID,
@@ -205,7 +207,7 @@ Begin
                 End
             Else
             Begin
-                Set @log = @log + '| 04 UsuarioPaiID não é null: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID='+ TRIM(STR(@BoardID))
+                Set @log = @log + '| 04 UsuarioPaiID nao eh null: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID='+ TRIM(STR(@BoardID))
                 Insert Into #temp
                 Select 
                     tab.ID as ID,
@@ -261,7 +263,7 @@ Begin
             --Caso esteja ativo no board
             Begin
                 Set @log = @log + '| 05 Temp tem conteudo'
-                --Determina qual a posiçao do pai no board
+                --Determina qual a posicao do pai no board
                 Select 
                     @ID = ID,
                     @Master = Master,
@@ -287,7 +289,8 @@ Begin
                 Begin
                     Set @DireitaFinalizada = 'True'
                 End
-                    --Verifica se indicador direito superior esta completo
+                
+				--Verifica se indicador direito superior esta completo
                 if(@IndicatorDirSup is not Null and @DonatorDirSup1 is not Null and @DonatorDirSup2 is not Null)
                 Begin
                     Set @IndicadorDireitaSuperiorFinalizado = 'True'
@@ -314,7 +317,7 @@ Begin
                     Set @IndicadorEsquerdaInferiorFinalizado = 'True'
                 End
       
-                --Regra: Caso ele seja um donator não pode incluir um novo usuario
+                --Regra: Caso ele seja um donator nao pode incluir um novo usuario
                 If(@DonatorEsqSup1 = @UsuarioPaiID OR @DonatorEsqSup2 = @UsuarioPaiID OR @DonatorEsqInf1 = @UsuarioPaiID  OR @DonatorEsqInf2 = @UsuarioPaiID)
                 Begin
                     Set @PosicaoPai = 'Donator'
@@ -327,44 +330,45 @@ Begin
                 --*********** DONATOR **************
                 if(@PosicaoPai = 'Donator')
                 Begin
-				    --***Donator não pode incluir um usuario, daí busca um pai valido, se possível, para usar na inclussão do novo usuario***
+				    --***Donator nao pode incluir um usuario, dai busca um pai valido, se possivel, para usar na inclussao do novo usuario***
 
-                    --Não continua o processo se for um donator
+                    --nao continua o processo se for um donator
                     Set @log = @log + '| 07 DONATOR'
                     Set @Continua = 'false'
+
                     --Obtem Master do usuario pai passado como parametro e usa este master como pai
                     Select Top(1)
                         @MasterTabuleiro = MasterID
                     From 
                         Rede.TabuleiroUsuario
                     Where
-                        StatusID = 1 and
                         UsuarioID = @UsuarioPaiID and
                         BoardID = @BoardID
 
-                    --Caso não encontre um master com o usuario pai informado, obtem o primeiro master valido e usa este como pai
+                    --Caso nao encontre um master com o usuario pai informado, obtem o primeiro master valido e usa este como pai
                     if (@MasterTabuleiro is null Or @MasterTabuleiro = 0)
                     Begin
                         Set @log = @log + '| 08 obtem o primeiro master valido'
-                        --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
+                        
+						--Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuario nesse tabuleiro
                         Select Top(1)
                             @MasterTabuleiro = UsuarioID 
                         From 
                             Rede.TabuleiroUsuario
                         Where
-                            StatusID = 1 and
-                            BoardID = @BoardID
+                            BoardID = @BoardID and
+							StatusID = 1 --Ativo
 
                         if(@MasterTabuleiro is null Or @MasterTabuleiro = 0)
                         Begin
-                            Set @log = @log + '| 09 é um donator'
+                            Set @log = @log + '| 09 eh um donator'
                             --Problemas nenhum pai foi encontrado!
-                            Set @Historico = '02 Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') é um Donator, não é possível adicionar um novo usuário. Chamada: ' + @Chamada
-                            Set @PosicaoFilho = 'Quando o Pai é um Donator, não é possível adicionar um novo usuário'
+                            Set @Historico = '02 Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') eh um Donator, nao eh possivel adicionar um novo usuario. Chamada: ' + @Chamada
+                            Set @PosicaoFilho = 'Quando o Pai eh um Donator, nao eh possivel adicionar um novo usuario'
                         End
                         Else 
                         Begin
-                            Set @log = @log + '| 10 não é um donator'
+                            Set @log = @log + '| 10 nao eh um donator'
                             Set @UsuarioPaiID = @MasterTabuleiro
                         End
                     End
@@ -376,7 +380,8 @@ Begin
 
                     if(@MasterTabuleiro is not Null)
                     Begin
-                        Set @log = @log + '| 12 Chama a sp novamente recursivo, agora com um pai valido Já que o antigo era um donator'
+                        Set @log = @log + '| 12 Chama a sp novamente recursivo, agora com um pai valido jah que o antigo era um donator'
+                        Set @Historico = '09.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
                         Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
                     End
                 End
@@ -420,22 +425,22 @@ Begin
                         Set @PosicaoPai = 'Master'
                     End
 
-                    --Verifica se novo usuario já esta no tabuleiro do pai
+                    --Verifica se novo usuario jah esta no tabuleiro do pai
                     If(@DonatorEsqSup1 = @UsuarioID OR @DonatorEsqSup2 = @UsuarioID OR @DonatorEsqInf1 = @UsuarioID  OR @DonatorEsqInf2 = @UsuarioID)
                     Begin
-                        Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (1)'
+                        Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (1)'
                     End
                     If(@DonatorDirSup1 = @UsuarioID OR @DonatorDirSup2 = @UsuarioID OR @DonatorDirInf1 = @UsuarioID  OR @DonatorDirInf2 = @UsuarioID)
                     Begin
-                        Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (2)'
+                        Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (2)'
                     End
                     If(@IndicatorDirSup = @UsuarioID OR @IndicatorDirInf = @UsuarioID OR @IndicatorEsqSup = @UsuarioID  OR @IndicatorEsqInf = @UsuarioID)
                     Begin
-                        Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (3)'
+                        Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (3)'
                     End
                     If(@CoordinatorDir = @UsuarioID OR @CoordinatorEsq = @UsuarioID)
                     Begin
-                        Set @PosicaoPai = 'Usuário (' + TRIM(STR(@UsuarioID)) + ') já se encontra no tabuleiro (4)'
+                        Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (4)'
                     End
                
                     Set @log = @log + '| 13.1 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@Master))
@@ -447,7 +452,8 @@ Begin
                         From 
                             Rede.TabuleiroUsuario 
                         Where 
-                            TabuleiroId = @ID And 
+                            BoardID = @BoardID and
+							MasterID = @Master and
                             PagoMaster = 0 and 
                             (
                                 Posicao = 'DonatorDirSup1' or
@@ -463,14 +469,16 @@ Begin
                     End
                     Else 
                     Begin
-                        --Verifica se as 4 posiçoes de donators da direita estão ocupadas
+                        --Verifica se as 4 posicoes de donators da direita estao ocupadas
                         Set @count = 0
                         Select 
                             @count = count(*) 
                         From 
                             Rede.TabuleiroUsuario 
                         Where 
-                            TabuleiroId = @ID and (
+                            BoardID = @BoardID And 
+							MasterID = @Master and
+							(
                                 Posicao = 'DonatorDirSup1' or
                                 Posicao = 'DonatorDirSup2' or
                                 Posicao = 'DonatorDirInf1' or
@@ -496,7 +504,8 @@ Begin
                         From 
                             Rede.TabuleiroUsuario 
                         Where 
-                            TabuleiroId = @ID And 
+                            BoardID = @BoardID and
+							MasterID = @Master and
                             PagoMaster = 0 and 
                             (
                                 Posicao = 'DonatorEsqSup1' or
@@ -511,14 +520,16 @@ Begin
                     End
                     Else 
                     Begin
-                        --Verifica se as 4 posiçoes de donators da  esquerda estão ocupadas
+                        --Verifica se as 4 posicoes de donators da  esquerda estao ocupadas
                         Set @count = 0
                         Select 
                             @count = count(*) 
                         From 
                             Rede.TabuleiroUsuario 
                         Where 
-                            TabuleiroId = @ID and (
+                            BoardID = @BoardID and
+							MasterID = @Master and
+							(
                                 Posicao = 'DonatorEsqSup1' or
                                 Posicao = 'DonatorEsqSup2' or
                                 Posicao = 'DonatorEsqInf1' or
@@ -545,9 +556,7 @@ Begin
                         Rede.TabuleiroUsuario
                     Where
                         UsuarioID = @Master and
-                        TabuleiroID = @ID and 
-                        BoardID = @BoardID and
-                        StatusID = 1
+                        BoardID = @BoardID
                     
                     --**************** Verifica se o tabuleiro esta completo na Direita **************** 
                     if(
@@ -571,6 +580,14 @@ Begin
                         if (@direitaFechada = 'false')
                         Begin
                             Set @log = @log + '| 23.2.1 Update TABULEIRO DIREITA'
+
+							Update 
+								Rede.TabuleiroUsuario 
+							Set
+								DireitaFechada = 'true'
+							Where
+								UsuarioID = @Master and
+								BoardID = @BoardID 
 
                             --Cria Tabuleiro da Direita
                             Insert into Rede.Tabuleiro
@@ -598,7 +615,7 @@ Begin
                             Values
                             (
                                 @BoardID,
-                                1, --StatusId = 1 é ativo
+                                1, --StatusId = 1 eh ativo
                                 @CoordinatorDir, --Master
                                 @IndicatorDirSup, --CoordinatorDir
                                 @IndicatorDirInf, --CoordinatorEsq
@@ -813,6 +830,15 @@ Begin
                             --Seta true para todos os usuarios do tabuleiro, informando que o lado direito esta finalizado
                             
                             Set @log = @log + '| 23.2.3 Cria novo tabuleiro'
+
+							Update 
+								Rede.TabuleiroUsuario 
+							Set
+								EsquerdaFechada = 'true'
+							Where
+								UsuarioID = @Master and
+								BoardID = @BoardID 		
+
                             --Cria Tabuleiro da Esquerda
                             Insert into Rede.Tabuleiro
                             (
@@ -839,7 +865,7 @@ Begin
                             Values
                             (
                                 @BoardID,
-                                1, --StatusId = 1 é ativo
+                                1, --StatusId = 1 eh ativo
                                 @CoordinatorEsq, --Master
                                 @IndicatorEsqSup, --CoordinatorDir
                                 @IndicatorEsqInf, --CoordinatorEsq
@@ -1032,7 +1058,7 @@ Begin
                     if (@direitaFechada = 'true' and @esquerdaFechada = 'true')
                     Begin
                         --*************** Encerra tabuleiro Inicio ****************    
-                        --Verifica se tabuleiro já esta fechado
+                        --Verifica se tabuleiro jah esta fechado
                         Set @log = @log + '| 40.1 Modo Encerra tabuleiro'
 
                         Set @tabuleiroFechado = 'false'
@@ -1046,7 +1072,7 @@ Begin
                             ID = @ID and
                             StatusID = 2 --Finalizado
                         
-                        Set @log = @log + '| 41.0 Verifica se tabuleiro já esta fechado: ' + TRIM(STR(@tabuleiroFechado))
+                        Set @log = @log + '| 41.0 Verifica se tabuleiro jah esta fechado: ' + TRIM(STR(@tabuleiroFechado))
                         
 						if(@tabuleiroFechado = 'false')
                         Begin
@@ -1059,8 +1085,18 @@ Begin
                                 DataFim = CONVERT(VARCHAR(8),GETDATE(),112)
                             Where
                                 ID = @ID
+
+							--Zera Inf de fechamento, pois usuarios jah estao em outro tabuleiro
+							Update
+								Rede.TabuleiroUsuario
+							Set
+								DireitaFechada = 'false',
+								EsquerdaFechada = 'false'
+							Where
+								UsuarioID = @Master and
+								BoardID = @BoardID
 							
-                            --Usuario finalizou o Board 1, este é um convite para ele entrar no sistema no board 1 novamente
+                            --Usuario finalizou o Board 1, este eh um convite para ele entrar no sistema no board 1 novamente
                             If (@BoardID = 1)
                             Begin
                                 Set @log = @log + '| 27 Convite para: Master: ' + TRIM(STR(@UsuarioPaiID))
@@ -1075,9 +1111,7 @@ Begin
 									UsuarioID = @Master and --Ele vira o Master
 									BoardID = @BoardID
                             End
-
 						End
-					
 					   --*************** Encerra tabuleiro Fim ****************
                     End
                     Else
@@ -1086,7 +1120,7 @@ Begin
                         if(@Chamada <> 'Completa')
                         Begin
                             Set @log = @log + '| 34 TABULEIRO INCOMPLETO'
-                            --Verifica se tabuleiro possui possições livres
+                            --Verifica se tabuleiro possui posicoes livres
                              if(
                                 @Master is not null And 
                                 @CoordinatorDir is not null And 
@@ -1105,21 +1139,21 @@ Begin
                                 @DonatorEsqInf2 is not null 
                             ) 
                             Begin
-                                Set @log = @log + '| 34.1 Posicões estão ocupadas'
-                                Set @Historico = '04 Não há posições livres no momento para o usuario: ' + TRIM(STR(@UsuarioID)) + ' no Tabuleiro: ' +TRIM(STR(@ID)) + ' no BoardID: ' + TRIM(STR(@BoardID))
+                                Set @log = @log + '| 34.1 Posicoes estao ocupadas'
+                                Set @Historico = '04 nao ha Posicoes livres no momento para o usuario: ' + TRIM(STR(@UsuarioID)) + ' no Tabuleiro: ' +TRIM(STR(@ID)) + ' no BoardID: ' + TRIM(STR(@BoardID))
                             End
                             Else
                             Begin
-                                Set @log = @log + '| 34.2 Há posições livres para o TabuleiroID=' + TRIM(STR(@ID))
+                                Set @log = @log + '| 34.2 ha Posicoes livres para o TabuleiroID=' + TRIM(STR(@ID))
                             
                                 --*********INICIO UPDATES***********
 
                                 --*********** MASTER **************
                                 if(@PosicaoPai = 'Master')
                                 Begin
-                                    Set @log = @log + '| 34.3.1 Pai é master:' + @PosicaoPai
+                                    Set @log = @log + '| 34.3.1 Pai eh master:' + @PosicaoPai
                                     --*********** COORDINATOR **************
-                                    --Verifica se há coordinator, caso não inclui usuario como coordinator na direita
+                                    --Verifica se ha coordinator, caso nao inclui usuario como coordinator na direita
                                     if (@CoordinatorDir is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 14.1 COORDINATOR DIREITA'
@@ -1134,7 +1168,7 @@ Begin
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'CoordinatorDir'
                                         End
-                                    --Verifica se há coordinator, caso não inclui usuario como coordinator na esquerda
+                                    --Verifica se ha coordinator, caso nao inclui usuario como coordinator na esquerda
                                     if (@CoordinatorEsq is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 14.1 COORDINATOR ESQUERDA'
@@ -1154,8 +1188,8 @@ Begin
                                 --*********** COORDINATOR DIREITA **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir'))
                                 Begin
-                                    Set @log = @log + '| 34.3.2 Pai é master ou CoordinatorDir:' + @PosicaoPai
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator superior direita
+                                    Set @log = @log + '| 34.3.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
                                     if (@IndicatorDirSup is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
@@ -1169,8 +1203,9 @@ Begin
                                             Set @IndicatorDirSup = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorDirSup'
+											Set @PagoMaster = 'true'
                                         End
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator inferior direita
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
                                     if (@IndicatorDirInf is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
@@ -1184,14 +1219,15 @@ Begin
                                             Set @IndicatorDirInf = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorDirInf'
+											Set @PagoMaster = 'true'
                                         End
                                 End
             
                                 --*********** COORDINATOR ESQUERDA **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq'))
                                 Begin
-                                    Set @log = @log + '| 34.3.3 Pai é master ou CoordinatorEsq:' + @PosicaoPai
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator superior esquerda
+                                    Set @log = @log + '| 34.3.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
                                     if (@IndicatorEsqSup is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
@@ -1205,8 +1241,9 @@ Begin
                                             Set @IndicatorEsqSup = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorEsqSup'
+											Set @PagoMaster = 'true'
                                         End
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator inferior esquerda
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
                                     if (@IndicatorEsqInf is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
@@ -1220,13 +1257,14 @@ Begin
                                             Set @IndicatorEsqInf = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorEsqInf'
+											Set @PagoMaster = 'true'
                                         End
                                 End
             
                                 --*********** INDICATOR DIREITA Superior ************** 
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup'))
                                 Begin
-                                    Set @log = @log + '| 34.3.4 Pai é master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+                                    Set @log = @log + '| 34.3.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
                                     if (@DonatorDirSup1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
@@ -1240,6 +1278,7 @@ Begin
                                             Set @DonatorDirSup1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirSup1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorDirSup2 is null and @Incluido = 'false')
                                         Begin
@@ -1254,13 +1293,14 @@ Begin
                                             Set @DonatorDirSup2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirSup2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
             
                                 --*********** INDICATOR DIREITA Inferior ************** 
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf'))
                                 Begin
-                                    Set @log = @log + '| 34.3.5 Pai é master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+                                    Set @log = @log + '| 34.3.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
                                     if (@DonatorDirInf1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
@@ -1274,6 +1314,7 @@ Begin
                                             Set @DonatorDirInf1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirInf1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorDirInf2 is null and @Incluido = 'false')
                                         Begin
@@ -1288,13 +1329,14 @@ Begin
                                             Set @DonatorDirInf2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirInf2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
             
                                 --*********** INDICATOR ESQUERDA Superior **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup'))
                                 Begin
-                                    Set @log = @log + '| 34.3.6 Pai é master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+                                    Set @log = @log + '| 34.3.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
                                     if (@DonatorEsqSup1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
@@ -1308,6 +1350,7 @@ Begin
                                             Set @DonatorEsqSup1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqSup1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorEsqSup2 is null and @Incluido = 'false')
                                         Begin
@@ -1322,13 +1365,14 @@ Begin
                                             Set @DonatorEsqSup2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqSup2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
 
                                 --*********** INDICATOR ESQUERDA Inferior **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf'))
                                 Begin
-                                    Set @log = @log + '| 34.3.7 Pai é master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+                                    Set @log = @log + '| 34.3.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
                                     if (@DonatorEsqInf1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
@@ -1342,6 +1386,7 @@ Begin
                                             Set @DonatorEsqInf1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqInf1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorEsqInf2 is null and @Incluido = 'false')
                                         Begin
@@ -1356,15 +1401,16 @@ Begin
                                             Set @DonatorEsqInf2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqInf2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
 
-                                --**********************Segunda Passagem Caso não seja incluido acima *******************************
+                                --**********************Segunda Passagem Caso nao seja incluido acima *******************************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.1 Pai é master:' + @PosicaoPai
+                                    Set @log = @log + '| 34.4.1 Pai eh master:' + @PosicaoPai
                                     --*********** COORDINATOR **************
-                                    --Verifica se há coordinator, caso não inclui usuario como coordinator na direita
+                                    --Verifica se ha coordinator, caso nao inclui usuario como coordinator na direita
                                     if (@CoordinatorDir is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 14.2 COORDINATOR DIREITA'
@@ -1378,8 +1424,9 @@ Begin
                                             Set @CoordinatorDir = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'CoordinatorDir'
+											Set @PagoMaster = 'true'
                                         End
-                                    --Verifica se há coordinator, caso não inclui usuario como coordinator na esquerda
+                                    --Verifica se ha coordinator, caso nao inclui usuario como coordinator na esquerda
                                     if (@CoordinatorEsq is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 14.2 COORDINATOR ESQUERDA'
@@ -1393,14 +1440,15 @@ Begin
                                             Set @CoordinatorEsq = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'CoordinatorEsq'
+											Set @PagoMaster = 'true'
                                         End
                                 End --Master
            
                                 --*********** COORDINATOR DIREITA 2 **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.2 Pai é master ou CoordinatorDir:' + @PosicaoPai
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator superior direita
+                                    Set @log = @log + '| 34.4.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
                                     if (@IndicatorDirSup is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 15.2 INDICATOR DIREITA SUP'
@@ -1414,8 +1462,9 @@ Begin
                                             Set @IndicatorDirSup = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorDirSup'
+											Set @PagoMaster = 'true'
                                         End
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator inferior direita
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
                                     if (@IndicatorDirInf is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 15.2 INDICATOR DIREITA Inf'
@@ -1429,14 +1478,15 @@ Begin
                                             Set @IndicatorDirInf = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorDirInf'
+											Set @PagoMaster = 'true'
                                         End
                                 End
             
                                 --*********** COORDINATOR ESQUERDA 2 **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.3 Pai é master ou CoordinatorEsq:' + @PosicaoPai
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator superior esquerda
+                                    Set @log = @log + '| 34.4.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
                                     if (@IndicatorEsqSup is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 16.2 INDICATOR ESQUERDA Sup'
@@ -1450,8 +1500,9 @@ Begin
                                             Set @IndicatorEsqSup = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorEsqSup'
+											Set @PagoMaster = 'true'
                                         End
-                                    --Verifica se há Indicator, caso não inclui usuario como indicator inferior esquerda
+                                    --Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
                                     if (@IndicatorEsqInf is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 16.2 INDICATOR ESQUERDA Inf'
@@ -1465,13 +1516,14 @@ Begin
                                             Set @IndicatorEsqInf = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'IndicatorEsqInf'
+											Set @PagoMaster = 'true'
                                         End
                                 End
             
                                 --*********** INDICATOR DIREITA Superior 2 ************** 
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.4 Pai é master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+                                    Set @log = @log + '| 34.4.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
                                     if (@DonatorDirSup1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 17.2 DONATOR DIREITA Sup 1'
@@ -1485,6 +1537,7 @@ Begin
                                             Set @DonatorDirSup1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirSup1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorDirSup2 is null and @Incluido = 'false')
                                         Begin
@@ -1499,13 +1552,14 @@ Begin
                                             Set @DonatorDirSup2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirSup2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
             
                                 --*********** INDICATOR DIREITA Inferior 2 ************** 
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.5 Pai é master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+                                    Set @log = @log + '| 34.4.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
                                     if (@DonatorDirInf1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 18.2 DONATOR DIREITA Inf 1'
@@ -1519,6 +1573,7 @@ Begin
                                             Set @DonatorDirInf1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirInf1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorDirInf2 is null and @Incluido = 'false')
                                         Begin
@@ -1533,13 +1588,14 @@ Begin
                                             Set @DonatorDirInf2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorDirInf2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
             
                                 --*********** INDICATOR ESQUERDA Superior 2 **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.6 Pai é master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+                                    Set @log = @log + '| 34.4.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
                                     if (@DonatorEsqSup1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 19.2 DONATOR ESQUERDA Sup 1'
@@ -1553,6 +1609,7 @@ Begin
                                             Set @DonatorEsqSup1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqSup1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorEsqSup2 is null and @Incluido = 'false')
                                         Begin
@@ -1567,13 +1624,14 @@ Begin
                                             Set @DonatorEsqSup2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqSup2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
             
                                 --*********** INDICATOR ESQUERDA Inferior 2 **************
                                 if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
                                 Begin
-                                    Set @log = @log + '| 34.4.7 Pai é master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+                                    Set @log = @log + '| 34.4.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
                                     if (@DonatorEsqInf1 is null and @Incluido = 'false')
                                         Begin
                                             Set @log = @log + '| 20.2 DONATOR ESQUERDA inf 1'
@@ -1587,6 +1645,7 @@ Begin
                                             Set @DonatorEsqInf1 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqInf1'
+											Set @PagoMaster = 'false'
                                         End
                                     if (@DonatorEsqInf2 is null and @Incluido = 'false')
                                         Begin
@@ -1601,6 +1660,7 @@ Begin
                                             Set @DonatorEsqInf2 = @UsuarioID
                                             Set @Incluido = 'true'
                                             Set @PosicaoFilho = 'DonatorEsqInf2'
+											Set @PagoMaster = 'false'
                                         End
                                 End
 
@@ -1612,27 +1672,28 @@ Begin
 									TabuleiroID = @ID,
 									MasterID = @Master,
 									InformePag = 'false',
+									PagoMaster = @PagoMaster,
+									PagoSistema = 'false',
 									Ciclo = 1,
 									Posicao = @PosicaoFilho,
 									DataInicio = GetDate(),
-									Debug = 'Update: Posições livres'
+									Debug = 'Update: Posicoes livres'
 								Where
 									UsuarioId = @UsuarioID and
 									BoardID = @BoardID
-
 
                                 --*********FIM UPDATES***********
                             End
                         End
                         Else 
                         Begin
-							Set @log = @log + '|100 Não completou o tauleiro ainda'
+							Set @log = @log + '|100 nao completou o tabuleiro ainda'
                             Set @Historico = '07 - Check Completa false: chamada:' + @Chamada
                         End
                     End
 
-                    --Verifica se Master já teve 4 pagamentos se sim cria convite para entrar em nivel superior
-                    Set @log = @log + '|50 Verifica se Master já teve 4 pagamentos para gerar convite'
+                    --Verifica se Master jah teve 4 pagamentos se sim cria convite para entrar em nivel superior
+                    Set @log = @log + '|50 Verifica se Master jah teve 4 pagamentos para gerar convite'
 
                     Select 
                         @count = count(*) 
@@ -1652,23 +1713,23 @@ Begin
                             Posicao = 'DonatorEsqInf2' 
                         )
 
-                    --Envia convite para o master para um nivel superior se já teve 4 agamentos
+                    --Envia convite para o master para um nivel superior se jah teve 4 agamentos
                     If(@count >= 4)
                     Begin
-                        Set @log = @log + '|50.1 Já teve 4 pagamentos, verifica se ja esta em nivel superior'
+                        Set @log = @log + '|50.1 jah teve 4 pagamentos, verifica se ja esta em nivel superior'
                         
                             --*********** Promove Usuario Master para novo Board ***********
                             --Sobe para proximo Board
                             Set @BoardID = @BoardID + 1
-                            --Verifica se ainda há board acima do master
+                            --Verifica se ainda ha board acima do master
                             IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID)
                             Begin
                                 Set @log = @log + '| 29 Sem board Superior'
-                                --Caso não haja mais board superiores volta ao inicio
+                                --Caso nao haja mais board superiores volta ao inicio
                                 Set @BoardID = 1
                             End
                             
-                            --Verifica se ele esta ou não no Board superior
+                            --Verifica se ele esta ou nao no Board superior
 							if Exists (
 								Select 
 									'OK' 
@@ -1677,40 +1738,40 @@ Begin
 								Where 
 									UsuarioID = @Master and 
 									BoardID = @BoardID and
-									StatusID = 0 --Não esta no board superior, se estivesse seria = 1 e 2 já foi convidado
+									StatusID = 0 --nao esta no board superior, se estivesse seria = 1 e 2 jah foi convidado
 								)	
 							Begin
-								--Não estando no BoardSuperior, envia um convite para sua entrada nele
-								Set @log = @log + '| 101.0 Não deveria entrar aqui!!!'
+								--nao estando no BoardSuperior, envia um convite para sua entrada nele
+								Set @log = @log + '| 101.0 nao deveria entrar aqui!!!'
 								Update
 									Rede.TabuleiroUsuario 
 								Set 
-									StatusID = 2 --StatusID 2 é um convite para entrar no proximo board
+									StatusID = 2 --StatusID 2 eh um convite para entrar no proximo board
 								Where 
 									UsuarioID = @Master and 
 									BoardID = @BoardID and
-									StatusID = 0 --Não esta no boardSuperior
+									StatusID = 0 --nao esta no boardSuperior
 							End
                     End
 					Else
 					Begin
-						Set @log = @log + '|50.2 não teve 4 pagamentos'
+						Set @log = @log + '|50.2 nao teve 4 pagamentos'
 					End
                 End
             End
             Else 
             Begin
 			    --PANDA VERIFICAR
-                Set @log = @log + '| 05.1 #temp não tem conteudo'
+                Set @log = @log + '| 05.1 #temp nao tem conteudo'
                 if(@Chamada <> 'Completa')
                 Begin
-                    --Caso NÃO exista o tabuleiro com o board informado
-                    Set @log = @log + '| 37 Caso NÃO exista o tabuleiro com o board informado'
-                    --Verifica se há usuario ativo no board corrente
+                    --Caso nao exista o tabuleiro com o board informado
+                    Set @log = @log + '| 37 Caso nao exista o tabuleiro com o board informado'
+                    --Verifica se ha usuario ativo no board corrente
                     if Exists(Select 'Existe' From Rede.TabuleiroUsuario Where StatusID = 1 and BoardID = @BoardID)
                     Begin
                         Set @log = @log + '| 38 Obtem primeiro Master ativo '
-                        --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuário nesse tabuleiro
+                        --Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuario nesse tabuleiro
                         Select Top(1)
                             @MasterTabuleiro = UsuarioID 
                         From 
@@ -1721,28 +1782,29 @@ Begin
             
                         if(@MasterTabuleiro is null)
                         Begin
-                            Set @log = @log + '| 39 Master é null'
-                            Set @Historico = '05 Usuário pai (' + TRIM(STR(@MasterTabuleiro)) + ') não existe! Chamada: ' + @Chamada
+                            Set @log = @log + '| 39 Master eh null'
+                            Set @Historico = '05 usuario pai (' + TRIM(STR(@MasterTabuleiro)) + ') nao existe! Chamada: ' + @Chamada
                         End
                         Else
                         Begin
                             Set @log = @log + '| 40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
                             --Chama novamente essa sp, agora com um pai valido
+                            Set @Historico = '09.1 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
                             Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
                         End
                     End
                     Else
                     Begin
-					    --Não deve entrar aqui, mas por precausão, cria o log
-                        Set @log = @log + '| 41 Não existe usuario no board informado UsuarioID: '  + TRIM(STR(@tabuleiroFechado)) + ' BoardID: '  + TRIM(STR(@tabuleiroFechado))
+					    --nao deve entrar aqui, mas por precausao, cria o log
+                        Set @log = @log + '| 41 nao existe usuario no board informado UsuarioID: '  + TRIM(STR(@tabuleiroFechado)) + ' BoardID: '  + TRIM(STR(@tabuleiroFechado))
                     End
                 End
             End
         End
         Else
         Begin
-            Set @log = @log + '| 43 Usuario não cadastrado'
-            Set @Historico = '06 Novo usuário ' + TRIM(STR(@UsuarioID)) + ' não está cadastrado! Chamada: ' + @Chamada
+            Set @log = @log + '| 43 Usuario nao cadastrado'
+            Set @Historico = '06 Novo usuario ' + TRIM(STR(@UsuarioID)) + ' nao esta cadastrado! Chamada: ' + @Chamada
         End
     End
     

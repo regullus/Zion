@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spG_TabuleiroSair'))
    Drop Procedure spG_TabuleiroSair
@@ -31,20 +31,24 @@ BEGIN
     Where
         UsuarioID = @UsuarioID and
         BoardID = @BoardID and
-        PagoMaster = 0 and --Não pagou o Master
-        StatusID = 1       --Não se ativou
-
+        PagoMaster = 'false' and --Nao pagou o Master
+        StatusID = 1       --Nao se ativou
 		
 	--Zera statusID do usuario 
 	Update
 		Rede.TabuleiroUsuario
 	Set
-		StatusID = 0 -- Esta disponivel para entrar em um tabuleiro
+        StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
+        Posicao = '',
+        TabuleiroID = null,
+        InformePag = 'false',
+        UsuarioIDPag = null,
+        Debug = 'Usuario saiu'
 	Where
 		UsuarioID = @UsuarioID and
 		BoardID = @BoardID and
-		PagoMaster = 0 and --Não pagou o Master
-        StatusID = 1       --Não se ativou
+		PagoMaster = 'false' and --Nao pagou o Master
+        StatusID = 1       --Nao se ativou
 
     --Remove usuario que nao pagou no tabuleiro
     if(@Posicao = 'DonatorDirSup1') Update Rede.Tabuleiro Set DonatorDirSup1 = null Where ID = @TabuleiroID 
@@ -67,5 +71,5 @@ go
 Grant Exec on spG_TabuleiroSair To public
 go
 
---Exec spG_TabuleiroSair @UsuarioID = 2596, @TabuleiroID = 9
+--Exec spG_TabuleiroSair @UsuarioID = 2580, @BoardID = 1
 

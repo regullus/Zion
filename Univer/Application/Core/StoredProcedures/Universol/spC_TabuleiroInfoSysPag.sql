@@ -1,4 +1,4 @@
-use Univer
+use UniverDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInfoSysPag'))
    Drop Procedure spC_TabuleiroInfoSysPag
@@ -29,7 +29,7 @@ BEGIN
     )
     Declare @idTarget int
 
-    set @idTarget = 2001 --Usuario para pagamento é o com id 2001
+    set @idTarget = 2001 --Usuario para pagamento eh o com id 2001
 
     insert into #temp
     Select
@@ -38,7 +38,7 @@ BEGIN
         Celular,
         '',
         '',
-        1
+        'true'
     from
         Usuario.Usuario
     Where 

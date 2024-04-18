@@ -532,7 +532,7 @@ BEGIN
         if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqInf2 = 1
     End
 
-    --Alerta Vermelho - Donator não informou o pagamento ao Master
+    --Alerta Vermelho - Donator nao informou o pagamento ao Master
     Update temp Set corTextoDonatorDirSup1 = '#fff', corDonatorDirSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
     Update temp Set corTextoDonatorDirSup2 = '#fff', corDonatorDirSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
     Update temp Set corTextoDonatorDirInf1 = '#fff', corDonatorDirInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
@@ -542,7 +542,7 @@ BEGIN
     Update temp Set corTextoDonatorEsqInf1 = '#fff', corDonatorEsqInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
     Update temp Set corTextoDonatorEsqInf2 = '#fff', corDonatorEsqInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
 
-    --Alerta Amarelo - Master ainda não validou pagamento do Convidado
+    --Alerta Amarelo - Master ainda nao validou pagamento do Convidado
     Update temp Set corTextoDonatorDirSup1 = '#333', corDonatorDirSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
     Update temp Set corTextoDonatorDirSup2 = '#333', corDonatorDirSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
     Update temp Set corTextoDonatorDirInf1 = '#333', corDonatorDirInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
@@ -674,6 +674,6 @@ go
 Grant Exec on spC_Tabuleiro To public
 go
 
-Exec spC_Tabuleiro @id=1, @UsuarioID = 2589
+--Exec spC_Tabuleiro @id=1, @UsuarioID = 2589
 
 

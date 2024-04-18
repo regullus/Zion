@@ -12,7 +12,7 @@ As
 -- =============================================================================================
 -- Author.....: 
 -- Create date: 
--- Description: Obtem niveis no tabuleito de um usuario
+-- Description: Obtem Bdados do tabuleiro de um usuario
 -- =============================================================================================
 BEGIN
     --Necessario para o entity reconhecer retorno de select com tabela temporaria
@@ -23,7 +23,6 @@ BEGIN
 	Begin
 	    --Obtem todos os Boards (niveis)
 		Select 
-			tab.ID,
 			tab.UsuarioID,
 			tab.TabuleiroID,
 			tab.BoardID,
@@ -43,17 +42,14 @@ BEGIN
 			Rede.TabuleiroBoard tb
 		Where
 			tab.UsuarioID = @UsuarioID and
-			tab.StatusID = 1 and
 			tab.BoardID = tb.ID
-
 		Order By
-			TabuleiroID
+			BoardID
 	End
 	Else
 	Begin
 	    --Obtem para um dado tabuleiro
 		Select 
-			tab.ID,
 			tab.UsuarioID,
 			tab.TabuleiroID,
 			tab.BoardID,
@@ -74,10 +70,9 @@ BEGIN
 		Where
 			tab.UsuarioID = @UsuarioID and
 			tab.BoardID = @BoardID and
-			tab.StatusID = 1 and
 			tab.BoardID = tb.ID
 		Order By
-			TabuleiroID
+			BoardID
 	End
 
 End -- Sp
@@ -85,8 +80,8 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroUsuario To public
 go
-Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=1
-Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=null
+--Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=1
+--Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=null
 
 
 

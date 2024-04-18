@@ -27,7 +27,7 @@ BEGIN
 
 	Set @Retorno = 'NOOK'
 	
-	--Verifica se usuario não esta ativo no tabuleiro, se sim pode excluí-lo
+	--Verifica se usuario nao esta ativo no tabuleiro, se sim pode exclui-lo
 	if Exists (
 	Select 
 		'OK'
@@ -36,7 +36,7 @@ BEGIN
 	Where
 	    UsuarioID = @UsuarioID and
 		BoardID = @BoardID and
-		PagoMaster = 0 and
+		PagoMaster = 'false' and
 		StatusID = 1 --Ativo
 	)
 	Begin
@@ -59,7 +59,7 @@ BEGIN
 			TabuleiroID = null,
 			InformePag = 'false',
 			UsuarioIDPag = null,
-			Debug = 'Removeido pelo master:' + TRIM(STR(@MasterID))
+			Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
 		Where
 			UsuarioID = @UsuarioID and
 			BoardID = @BoardID
@@ -109,7 +109,7 @@ BEGIN
 	End
 	Else 
 	Begin
-		Set @Retorno = 'Convidado não esta ativo no tabuleiro'
+		Set @Retorno = 'Convidado nao esta ativo no tabuleiro'
 	End
     Select @Retorno
 

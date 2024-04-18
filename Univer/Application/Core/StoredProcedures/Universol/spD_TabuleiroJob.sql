@@ -40,7 +40,6 @@ BEGIN
    --Loop em todos os Tabuleiros Usuarios
    -- ******* Inicio Cursor *******
     Declare
-        @ID int,
         @UsuarioID int,
         @TabuleiroID int,
         @BoardID int,
@@ -53,7 +52,6 @@ BEGIN
         curRegistro 
     Cursor Local For
         Select 
-            ID,
             UsuarioID,
             TabuleiroID,
             BoardID,
@@ -62,14 +60,14 @@ BEGIN
         FROM 
             Rede.TabuleiroUsuario
         Where
-            InformePag = 0 and
-            PagoMaster = 0 and
+            InformePag = 'false' and
+            PagoMaster = 'false' and
             StatusID = 1 --Ativo
         Order By 
-            ID
+            UsuarioID, BoardID
 
     Open curRegistro
-    Fetch Next From curRegistro Into  @ID, @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
+    Fetch Next From curRegistro Into  @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
     Select @AntFetch = @@fetch_status
     While @AntFetch = 0
     Begin
@@ -81,9 +79,15 @@ BEGIN
 			Update
 				Rede.TabuleiroUsuario
 			Set
-				StatusID = 0 -- Esta disponivel para entrar em um tabuleiro
+                StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+                Posicao = '',
+                TabuleiroID = null,
+                InformePag = 'false',
+                UsuarioIDPag = null,
+                Debug = 'Removido pelo job 1'
 			Where
-				ID = @ID
+				UsuarioID = @UsuarioID and
+                BoardID = @BoardID
 
             --Remove usuario que nao pagou no tabuleiro
 			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID) 
@@ -123,7 +127,7 @@ BEGIN
         End
 
         --Proxima linha do cursor
-        Fetch Next From curRegistro Into @ID, @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
+        Fetch Next From curRegistro Into @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
         Select @AntFetch = @@fetch_status       
     End -- While
       
@@ -135,7 +139,6 @@ BEGIN
         curRegistro 
     Cursor Local For
         Select 
-            ID,
             UsuarioID,
             TabuleiroID,
             BoardID,
@@ -144,52 +147,32 @@ BEGIN
         FROM 
             Rede.TabuleiroUsuario
         Where
-            InformePag = 1 and
-            PagoMaster = 0 and
+            InformePag = 'true' and
+            PagoMaster = 'false' and
             StatusID = 1 --Ativo
         Order By 
-            ID
+            UsuarioID, BoardID
 
     Open curRegistro
-    Fetch Next From curRegistro Into  @ID, @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
+    Fetch Next From curRegistro Into  @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
     Select @AntFetch = @@fetch_status
     While @AntFetch = 0
     Begin
         Set @tempo = DATEADD(mi, @dadosTempoMaxPagto, @DataInicio);
         IF(@tempo < GetDate())
         Begin
-             --Inclui excluido na tabela TabuleiroUsuarioExcluidos
-            Insert Into
-                Rede.TabuleiroUsuarioExcluidos
-            SELECT 
-                ID,
-                UsuarioID,
-                TabuleiroID,
-                BoardID,
-                StatusID,
-                MasterID,
-                InformePag,
-                Ciclo,
-                Posicao,
-                PagoMaster,
-                PagoSistema,
-                DataInicio,
-                DataFim
-            FROM 
-                Rede.TabuleiroUsuario
-            Where
-               ID = @ID
-
-            --Remove usuario que nao pagou no tabuleiroUsuario
-            Delete
-                Rede.TabuleiroUsuario
-            Where
-               ID = @ID
-
-            Delete
-                Rede.TabuleiroNivel
-            Where
-                UsuarioID = @UsuarioID and
+            --Zera statusID do usuario 
+			Update
+				Rede.TabuleiroUsuario
+			Set
+                StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+                Posicao = '',
+                TabuleiroID = null,
+                InformePag = 'false',
+                UsuarioIDPag = null,
+                Debug = 'Removido pelo job 2'
+			Where
+				UsuarioID = @UsuarioID and
                 BoardID = @BoardID
 
             --Remove usuario que nao pagou no tabuleiro
@@ -202,11 +185,12 @@ BEGIN
             if(@Posicao = 'DonatorEsqSup2') Update Rede.Tabuleiro Set DonatorEsqSup2 = null Where ID = @TabuleiroID 
             if(@Posicao = 'DonatorEsqInf1') Update Rede.Tabuleiro Set DonatorEsqInf1 = null Where ID = @TabuleiroID 
             if(@Posicao = 'DonatorEsqInf2') Update Rede.Tabuleiro Set DonatorEsqInf2 = null Where ID = @TabuleiroID 
+
             Set @retorno = 'OK'
         End
 
         --Proxima linha do cursor
-        Fetch Next From curRegistro Into @ID, @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
+        Fetch Next From curRegistro Into @UsuarioID, @TabuleiroID, @BoardID, @Posicao, @DataInicio
         Select @AntFetch = @@fetch_status       
     End -- While
       
