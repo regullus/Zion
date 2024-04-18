@@ -467,6 +467,11 @@ namespace Sistema.Controllers
                     //Obtem 1º Tabuleiro ativo do usuario
                     tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
                 }
+                //Caso seja um convite StatusID =2 - Obtem o 1º Ativo
+                if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2)
+                {
+                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID == 1).OrderBy(x => x.BoardID).FirstOrDefault();
+                }
 
                 if (tabuleiroUsuario != null)
                 {
@@ -524,7 +529,14 @@ namespace Sistema.Controllers
                     //Obtem Nome do Tabuleiro para exibir na tela
                     if (!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
                     {
-                        ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                        String nome = tabuleiro.ApelidoMaster.Replace(" ", "").Replace("_", "").Replace("-", "").Replace("@", "").Replace("#", "").Replace("!", "").Replace("=", "").Replace(".", "");
+                        if(nome.Length >=3)
+                        { 
+                            ViewBag.tabuleiroName = nome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                        } else
+                        {
+                            ViewBag.tabuleiroName = "GAL";
+                        }
                     }
                     //Verifica se usuario tem que pagar ou não o sistema
                     if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
@@ -625,7 +637,7 @@ namespace Sistema.Controllers
                     if (obtemInfoUsuario != null)
                     {
                         //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
-                        if (!tabuleiroRepository.MasterRuleOK(idUsuario, idTabuleiro))
+                        if (!tabuleiroRepository.MasterRuleOK(idUsuario, idBoard))
                         {
                             //Não estando ok, a conta do sistema é exibida para pagamento
                             obtemInfoUsuario = tabuleiroRepository.ObtemInfoSystem();
@@ -691,7 +703,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01" };
+                string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
             }
@@ -997,7 +1009,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01 [" + ex.Message + "]"};
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01");
             }
@@ -1078,7 +1090,7 @@ namespace Sistema.Controllers
             catch (Exception ex)
             {
                 string erro = ex.Message;
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
             }
@@ -1208,8 +1220,9 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
+                
                 string erro = ex.Message;
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]"};
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
             }
@@ -1285,7 +1298,7 @@ namespace Sistema.Controllers
             catch (Exception ex)
             {
                 string erro = ex.Message;
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
             }
@@ -1333,8 +1346,10 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
+                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+
                 //Obtem os dados do tabuleiro do usuario que se quer informações
-                Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idTabuleiro);
+                Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
 
                 string retorno = "";
                 //Se o UsuarioLogado é o Master,
@@ -1342,7 +1357,7 @@ namespace Sistema.Controllers
                 if (tabuleiroUsuario.MasterID == usuario.ID)
                 {
                     //Informar Pagamento ao sistema
-                    retorno = tabuleiroRepository.InformarPagtoSistema(usuario.ID, idTabuleiro);
+                    retorno = tabuleiroRepository.InformarPagtoSistema(usuario.ID, idBoard);
                     switch (retorno)
                     {
                         case "OK":
@@ -1395,7 +1410,7 @@ namespace Sistema.Controllers
             catch (Exception ex)
             {
                 string erro = ex.Message;
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01");
             }
@@ -1442,9 +1457,10 @@ namespace Sistema.Controllers
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
-
+                
+                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
                 //Remove usuario do tabuleiro informado
-                String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idTabuleiro);
+                String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idBoard);
 
                 switch (retorno)
                 {
@@ -1474,7 +1490,7 @@ namespace Sistema.Controllers
             catch (Exception ex)
             {
                 string erro = ex.Message;
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01");
             }

@@ -175,6 +175,19 @@
                 confirmButtonText: 'OK',
                 width: '500px',
             });
+            function startPage() {
+                $(".divReloadPage").show();
+                $('#planetBody').hide();
+            }
+        </script>
+    }
+    else
+    {
+        <script>
+            function startPage() {
+                $(".divReloadPage").show();
+                $('#planetBody').show();
+            }
         </script>
     }
 
@@ -217,11 +230,6 @@
     @if (tabuleiro != null)
     {
         <script>
-            function startPage()
-            {
-              $(".divReloadPage").show();
-            }
-
             function position() {
                 width = window.innerWidth;
                 @*$('.titleSmall').html(@idTabuleiro);*@
@@ -953,12 +961,7 @@
                     success: function (data) {
                         if (data != null) {
                             if (data.toString() == "OK") {
-                                if (idTabuleiro != null && idTabuleiro > 0) {
-                                    var url = "/MinhaRede/Tabuleiro/?idTab=" + idTabuleiro;
-                                    window.location.href = url;
-                                } else {
-                                    location.reload();
-                                }
+                                location.reload();
                             } else {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
@@ -1017,12 +1020,19 @@
                                     location.reload();
                                 }
                             } else {
-                                Swal.fire({
-                                    title: '@traducaoHelper["ALERTA"]',
-                                    text: data,
-                                    icon: 'warning',
-                                    confirmButtonText: 'OK'
-                                });
+                                if (data = '@traducaoHelper["USUARIO_JA_POSICIONADO"]') {
+                                    location.reload();
+                                } else {
+                                    Swal.fire({
+                                        title: '@traducaoHelper["ALERTA"]',
+                                        text: data,
+                                        icon: 'warning',
+                                        confirmButtonText: 'OK'
+                                    });
+                                    setTimeout(function () {
+                                      location.reload();
+                                    }, 2000);
+                                }
                             }
                         } else {
                             Swal.fire({
@@ -1193,23 +1203,6 @@
 
         </script>
     }
-
-    @if (blnNovoUsuario)
-    {
-        <script>
-            function startPage() {
-                $(".divReloadPage").hide();
-            }
-        </script>
-    }
-    else
-    {
-        <script>
-            function startPage() {
-                $(".divReloadPage").show();
-            }
-        </script>
-    }
 }
 
 @section PageLevelScripts{
@@ -1298,16 +1291,16 @@
 
         <div class="portlet-body">
             <div class="row" style="">
-                    <div class="tiles" style="padding-left: 15px;">
-                        <div class="tile double grey-card inviteNew" style="max-height: 80px; max-width: 200px;">
-                            <div class="tile-body" style="padding:5px;">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                                <h3>@(traducaoHelper["MERCURIO"])</h3>
-                                <p>@traducaoHelper["CONVITE"]</p>
-                            </div>
+                <div class="tiles" style="padding-left: 15px;">
+                    <div class="tile double grey-card inviteNew" style="max-height: 80px; max-width: 200px;">
+                        <div class="tile-body" style="padding:5px;">
+                            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                            <h3>@(traducaoHelper["MERCURIO"])</h3>
+                            <p>@traducaoHelper["CONVITE"]</p>
                         </div>
                     </div>
-                    <h5 style="padding-right:10px; padding-left: 10px;">*@traducaoHelper["SUGEITO_DISPONIBILIDADE"]</h5>
+                </div>
+                <h5 style="padding-right:10px; padding-left: 10px;">*@traducaoHelper["SUGEITO_DISPONIBILIDADE"]</h5>
             </div>
         </div>
     </div>
@@ -1319,8 +1312,8 @@
         <div class="portlet-body">
             <div class="row galaxy" style="background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
                 <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
-                
-                <div class="tiles" style="padding-left: 15px;">
+
+                <div class="tiles" id="planetBody" style="padding-left: 15px;">
                     <div id="tab_select" class="tile double @tabuleiroAtivo.BoardCor" style="max-height: 80px; max-width: 200px;">
                         <div class="tile-body" style="padding:5px;">
                             <img id="tab_select_img" src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
@@ -1329,7 +1322,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1 @(tabuleiro.pulseDonatorEsqSup1 ? "blob" : "")">
                 <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
 
@@ -1381,7 +1374,7 @@
 }
 
 @section sideBarExtra {
-    @if (tabuleirosUsuario != null)
+    @if (tabuleirosUsuario != null && !blnNovoUsuario)
     {
         foreach (var item in tabuleirosUsuario)
         {
@@ -1415,19 +1408,39 @@
                     planetaCor = "orange-card";
                     break;
             }
-            <li class="nav-item start">
-                <a href="javascript:;" style="margin: 0; padding: 0;">
-                    <div class="tiles title" style="padding-left: 15px; @(item.StatusID == 0 ? "cursor: default;" : "") ">
-                        <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px; @(item.StatusID == 0 ? "cursor: default; opacity: 0.5;" : "")">
-                            <div class="tile-body" style="padding: 5px;">
-                                <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                                <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
-                                <p class="card-content2-txt">@(item.StatusID == 0 ? "" : traducaoHelper[item.Posicao])</p>
+            if (item.StatusID == 2) //Convite
+            {
+                <!-- Invite -->
+                <li class="nav-item start">
+                    <a href="javascript:;" id="invite_@(item.BoardID)" data-id="@(item.BoardID)" class="invite" style="margin: 0; padding: 0;">
+                        <div class="tiles title blob" style="padding-left: 15px;">
+                            <div class="tile double invite-card invite" data-id="@(item.BoardID)" id="cardGrid@(item.BoardID)" style="max-height: 76px; max-width: 200px;">
+                                <div class="tile-body" style="padding:5px;">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                    <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                    <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-            </li>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item start">
+                    <a href="javascript:;" style="margin: 0; padding: 0;">
+                        <div class="tiles title" style="padding-left: 15px; @(item.StatusID == 0 ? "cursor: default;" : "")">
+                            <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px; @(item.StatusID == 0 ? "cursor: default; opacity: 0.5;" : "")">
+                                <div class="tile-body" style="padding: 5px;">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                    <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                    <p class="card-content2-txt">@(item.StatusID == 0 ? "" : traducaoHelper[item.Posicao])</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            }
         }
     }
 }

@@ -152,6 +152,18 @@ top-bottom-margin {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d21fb9', endColorstr='#ad1a99', GradientType=0 );
 }
 
+.invite-card {
+    height: 70px;
+    background: #02b793;
+    background: -moz-linear-gradient(top, #07e810 0%, #086674 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, #07e810), color-stop(100%, #086674));
+    background: -webkit-linear-gradient(top, #07e810 0%, #086674 100%);
+    background: -o-linear-gradient(top, #02b793 0%, #086674 100%);
+    background: -ms-linear-gradient(top, #02b793 0%, #086674 100%);
+    background: linear-gradient(to bottom, #02b793 0%, #086674 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#02b793', endColorstr='#086674', GradientType=0 );
+}
+
 .card-title-div {
     font-weight: bold;
     color: rgb(255,255,255);
