@@ -5,9 +5,9 @@ If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroInfoUs
 go
 
 Create  Proc [dbo].[spC_TabuleiroInfoUsuario]
-   @idTarget int,
-   @idUsuario int,
-   @idTabuleiro int
+   @TargetID int,
+   @UsuarioID int,
+   @BoardID int
 
 As
 -- =============================================================================================
@@ -19,31 +19,44 @@ BEGIN
    --Necessario para o entity reconhecer retorno de select com tabela temporaria
     Set FMTONLY OFF
     Set nocount on
-    Declare @master int
+
+    Declare 
+		@MasterID int,
+		@TabuleiroID int
 
     Create table #temp 
     (
         UsuarioID int,
         Nome nvarchar(255),
+		Apelido nvarchar(255),
         Celular nvarchar(100),
         Pix nvarchar(255),
         Carteira nvarchar(255),
         ConfirmarRecebimento bit
     )
 
+	Select
+		@TabuleiroID = TabuleiroID
+	From
+		Rede.TabuleiroUsuario
+	Where
+		UsuarioID = @UsuarioID And
+		BoardID = @BoardID
+
     Select 
-        @master = Master 
+        @MasterID = Master 
     from
         Rede.Tabuleiro
     Where
-        id = @idTabuleiro
+        id = @TabuleiroID
 
-    If(@master = @idUsuario)
+    If(@MasterID = @UsuarioID)
     Begin
         insert into #temp
         Select
-            @idTarget,
+            @TargetID,
             Nome,
+			Lower(Apelido),
             Celular,
             '',
             '',
@@ -51,8 +64,8 @@ BEGIN
         from
             Usuario.Usuario
         Where 
-            id = @idTarget
-
+            id = @TargetID
+		
         Update
             temp
         Set
@@ -62,16 +75,17 @@ BEGIN
             Rede.TabuleiroUsuario usu
         Where
             temp.UsuarioID = usu.UsuarioID and
-            usu.PagoMaster = 'true'
-
+			BoardID = @BoardID and
+            usu.PagoMaster = 'false'
     End
-
-    If(@master = @idTarget)
+	
+    If(@MasterID = @TargetID)
     Begin
         insert into #temp
         Select
-            @idTarget,
+            @TargetID,
             Nome,
+			lower(Apelido),
             Celular,
             '',
             '',
@@ -79,7 +93,7 @@ BEGIN
         from
             Usuario.Usuario
         Where 
-            id = @idTarget
+            id = @TargetID
     
         Update 
             temp
@@ -96,6 +110,7 @@ BEGIN
     Select
         UsuarioID,
         Nome,
+		Apelido,
         Celular,
         Pix,
         Carteira,
@@ -109,8 +124,8 @@ go
 Grant Exec on spC_TabuleiroInfoUsuario To public
 go
 
---Exec spC_TabuleiroInfoUsuario @idTarget = 2588, @idUsuario = 2580, @idTabuleiro = 1
---Exec spC_TabuleiroInfoUsuario @idTarget = 2587, @idUsuario = 2580, @idTabuleiro = 1
---Exec spC_TabuleiroInfoUsuario @idTarget = 2590, @idUsuario = 2580, @idTabuleiro = 1
---Exec spC_TabuleiroInfoUsuario @idTarget = 2581, @idUsuario = 2580, @idTabuleiro = 1
---Exec spC_TabuleiroInfoUsuario @idTarget = 2581, @idUsuario = 2582, @idTabuleiro = 1
+--Exec spC_TabuleiroInfoUsuario @TargetID=2580, @UsuarioID=2581, @BoardID=1
+--Exec spC_TabuleiroInfoUsuario @TargetID=2589, @UsuarioID=2581, @BoardID=1
+
+
+

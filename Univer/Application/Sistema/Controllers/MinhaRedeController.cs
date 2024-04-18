@@ -480,7 +480,17 @@ namespace Sistema.Controllers
                 }
                 else
                 {
-                    idTabuleiro = 0;
+                    //Obtem 1º tabuleiro ativo do usuario
+                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID == 1).OrderBy(x => x.BoardID).FirstOrDefault();
+                    if (tabuleiroUsuario != null)
+                    {
+                        idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
+                        ViewBag.tabuleiroAtivo = tabuleiroUsuario;
+                    }
+                    else
+                    {
+                        idTabuleiro = 0;
+                    }
                 }
 
                 if (idTabuleiro != 0)
@@ -530,10 +540,11 @@ namespace Sistema.Controllers
                     if (!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
                     {
                         String nome = tabuleiro.ApelidoMaster.Replace(" ", "").Replace("_", "").Replace("-", "").Replace("@", "").Replace("#", "").Replace("!", "").Replace("=", "").Replace(".", "");
-                        if(nome.Length >=3)
-                        { 
+                        if (nome.Length >= 3)
+                        {
                             ViewBag.tabuleiroName = nome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
-                        } else
+                        }
+                        else
                         {
                             ViewBag.tabuleiroName = "GAL";
                         }
@@ -547,7 +558,8 @@ namespace Sistema.Controllers
                     {
                         ViewBag.Pagar = false;
                     }
-                } else
+                }
+                else
                 {
                     //Novo usuario, pega tabuleiro do seu pai
                     int idPai = usuario.PatrocinadorDiretoID ?? 0;
@@ -556,7 +568,7 @@ namespace Sistema.Controllers
                         tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(idPai);
                         tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
                         //Verifica se pai ainda esta no Mercurio
-                        if (tabuleiroUsuario.BoardID == 1)
+                        if (tabuleiroUsuario != null && tabuleiroUsuario.BoardID == 1)
                         {
                             idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
                             //Ok carrega tabuleiro
@@ -570,12 +582,34 @@ namespace Sistema.Controllers
                                 ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
                             }
                         }
-                        else {
-                            //Obtem tabuleiro com primeira posição disponivel
-                            //ToDo
-                            ViewBag.idTabuleiro = null;
-                            ViewBag.tabuleiro = null;
-                            ViewBag.tabuleiroAtivo = null;
+                        else
+                        {
+                            //Obtem os 10 primeiros tabuleiros ativos
+                            tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(null);
+                            tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
+                            //Verifica se ainda esta no Mercurio
+                            if (tabuleiroUsuario != null && tabuleiroUsuario.BoardID == 1)
+                            {
+                                idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
+                                //Ok carrega tabuleiro
+                                if (idTabuleiro > 0)
+                                {
+                                    tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, idPai);
+                                    ViewBag.idTabuleiro = idTabuleiro;
+                                    ViewBag.tabuleiro = tabuleiro;
+                                    ViewBag.tabuleiroAtivo = tabuleiroUsuario;
+                                    ViewBag.NovoUsuario = true;
+                                    ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                                }
+                            }
+                            else
+                            {
+                                //Obtem tabuleiro com primeira posição disponivel
+                                //ToDo
+                                ViewBag.idTabuleiro = null;
+                                ViewBag.tabuleiro = null;
+                                ViewBag.tabuleiroAtivo = null;
+                            }
                         }
                     }
                 }
@@ -632,7 +666,7 @@ namespace Sistema.Controllers
                     int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
 
                     //Obtem usuario target
-                    TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idTabuleiro);
+                    TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idBoard);
 
                     if (obtemInfoUsuario != null)
                     {
@@ -965,7 +999,7 @@ namespace Sistema.Controllers
             try
             {
                 int idUsuario = int.Parse(usuarioID);
-                
+
                 if (idUsuario <= 0)
                 {
                     string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
@@ -1004,7 +1038,7 @@ namespace Sistema.Controllers
                     Data = traducaoHelper[tabuleiroIncluir],
                     RecursionLimit = 1000
                 };
-                
+
                 return jsonResult;
             }
             catch (Exception ex)
@@ -1220,9 +1254,9 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                
+
                 string erro = ex.Message;
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]"};
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
             }
@@ -1457,7 +1491,7 @@ namespace Sistema.Controllers
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
-                
+
                 int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
                 //Remove usuario do tabuleiro informado
                 String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idBoard);

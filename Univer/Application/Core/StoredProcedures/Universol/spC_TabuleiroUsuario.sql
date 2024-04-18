@@ -21,30 +21,61 @@ BEGIN
 
 	if (@BoardID is null or @BoardID = 0)
 	Begin
-	    --Obtem todos os Boards (niveis)
-		Select 
-			tab.UsuarioID,
-			tab.TabuleiroID,
-			tab.BoardID,
-			tb.Nome as BoardNome,
-			tb.Cor as BoardCor,
-			tab.StatusID,
-			tab.MasterID,
-			tab.InformePag,
-			tab.Ciclo,
-			tab.Posicao,
-			tab.PagoMaster,
-			tab.PagoSistema,
-			tab.DataInicio,
-			tab.DataFim
-		From 
-			Rede.TabuleiroUsuario tab,
-			Rede.TabuleiroBoard tb
-		Where
-			tab.UsuarioID = @UsuarioID and
-			tab.BoardID = tb.ID
-		Order By
-			BoardID
+		if(@UsuarioID is null or @UsuarioID = 0)
+		Begin
+			--Obtem os 10 primeiros ativos no Board 1
+			Select top(10)
+				tab.UsuarioID,
+				tab.TabuleiroID,
+				tab.BoardID,
+				tb.Nome as BoardNome,
+				tb.Cor as BoardCor,
+				tab.StatusID,
+				tab.MasterID,
+				tab.InformePag,
+				tab.Ciclo,
+				tab.Posicao,
+				tab.PagoMaster,
+				tab.PagoSistema,
+				tab.DataInicio,
+				tab.DataFim
+			From 
+				Rede.TabuleiroUsuario tab,
+				Rede.TabuleiroBoard tb
+			Where
+				tab.BoardID = tb.ID And
+				tab.StatusID = 1 And
+				tab.BoardID = 1
+			Order By
+				BoardID
+		End
+		Else 
+		Begin
+			--Obtem todos os Boards (niveis)
+			Select 
+				tab.UsuarioID,
+				tab.TabuleiroID,
+				tab.BoardID,
+				tb.Nome as BoardNome,
+				tb.Cor as BoardCor,
+				tab.StatusID,
+				tab.MasterID,
+				tab.InformePag,
+				tab.Ciclo,
+				tab.Posicao,
+				tab.PagoMaster,
+				tab.PagoSistema,
+				tab.DataInicio,
+				tab.DataFim
+			From 
+				Rede.TabuleiroUsuario tab,
+				Rede.TabuleiroBoard tb
+			Where
+				tab.UsuarioID = @UsuarioID and
+				tab.BoardID = tb.ID
+			Order By
+				BoardID
+		End
 	End
 	Else
 	Begin
@@ -82,6 +113,7 @@ Grant Exec on spC_TabuleiroUsuario To public
 go
 --Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=1
 --Exec spC_TabuleiroUsuario @UsuarioID=2580, @BoardID=null
+--Exec spC_TabuleiroUsuario @UsuarioID=null, @BoardID=null
 
 
 

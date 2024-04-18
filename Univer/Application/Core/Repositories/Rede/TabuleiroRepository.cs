@@ -42,17 +42,23 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public IEnumerable<TabuleiroUsuarioModel> ObtemTabuleirosUsuario(int idUsuario)
+        public IEnumerable<TabuleiroUsuarioModel> ObtemTabuleirosUsuario(int? idUsuario)
         {
             string sql = "";
-            
-            sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @BoardID=null";
+
+            if (idUsuario == null)
+            {
+                sql = "Exec spC_TabuleiroUsuario @UsuarioID=null, @BoardID=null";
+            } else
+            {
+                sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @BoardID=null";
+            }
 
             var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).ToList();
 
             return retorno;
         }
-       
+
         public TabuleiroUsuarioModel ObtemTabuleiroUsuario(int idUsuario, int idBoard)
         {
             string sql = "Exec spC_TabuleiroUsuarioID @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
@@ -152,12 +158,7 @@ namespace Core.Repositories.Rede
                     }
                 } else
                 {
-                    if (Chamada == "Convite")
-                    {
-                        //Remove Convite
-                        sql = "Exec spD_TabuleiroNivel @UsuarioID=" + idUsuario + ",@BoardID=" + idBoard;
-                        String retornoDelNivel = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
-                    }
+                    ret = retorno.Retorno;
                 }
             } else
             {
@@ -274,9 +275,9 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public TabuleiroInfoUsuarioModel ObtemInfoUsuario(int idTarget, int idUsuario, int idTabuleiro)
+        public TabuleiroInfoUsuarioModel ObtemInfoUsuario(int idTarget, int idUsuario, int idBoard)
         {
-            string sql = "Exec spC_TabuleiroInfoUsuario @idTarget=" + idTarget + ", @idUsuario=" + idUsuario + ", @idTabuleiro=" + idTabuleiro;
+            string sql = "Exec spC_TabuleiroInfoUsuario @TargetID=" + idTarget + ", @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
             var retorno = _context.Database.SqlQuery<TabuleiroInfoUsuarioModel>(sql).FirstOrDefault(); 
 
             return retorno;

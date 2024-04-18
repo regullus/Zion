@@ -510,9 +510,18 @@ namespace Sistema.Controllers
                             enderecoPrincipal.Observacoes = "";
                             enderecoPrincipal.Nome = "Home";
                         }
-
-                        enderecoPrincipal.EstadoID = int.Parse(form["EstadoID"]);
-                        enderecoPrincipal.CidadeID = int.Parse(form["CidadeID"]);
+                        string estado = form["EstadoID"];
+                        if(String.IsNullOrEmpty(estado))
+                        {
+                            estado = "1";
+                        }
+                        string cidade = form["CidadeID"];
+                        if (String.IsNullOrEmpty(cidade))
+                        {
+                            cidade = "1";
+                        }
+                        enderecoPrincipal.EstadoID = int.Parse(estado);
+                        enderecoPrincipal.CidadeID = int.Parse(cidade);
                         enderecoPrincipal.CodigoPostal = form["CodigoPostal"];
                         enderecoPrincipal.Logradouro = form["Logradouro"];
                         enderecoPrincipal.Numero = form["Numero"];
@@ -553,8 +562,8 @@ namespace Sistema.Controllers
                         }
 
 
-                        usuario.Telefone = Regex.Replace(form["Telefone"], @"[^\d]", ""); // == so numeros
-                        usuario.Celular = Regex.Replace(form["Celular"], @"[^\d]", "");  // == so numeros
+                        usuario.Telefone = ""; //Regex.Replace(form["Telefone"], @"[^\d]", ""); // == so numeros
+                        usuario.Celular = form["Celular"]; //Regex.Replace(form["Celular"], @"[^\d]", "");  // == so numeros
                         repository.Save(usuario);
 
                         await SendEmailEdicaoCadastro("ENDERECO_CONTATO");

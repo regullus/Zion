@@ -47,7 +47,6 @@ BEGIN
 				Posicao,
 				PagoMaster,
 				PagoSistema,
-				ConviteProximoNivel,
 				DireitaFechada,
 				EsquerdaFechada,
 				DataInicio,
@@ -66,7 +65,6 @@ BEGIN
 				1, --1o ciclo dele, ele acabou de entrar no sistema
 				'', --Sem posi�ao ainda
 				'false', 
-				'false',
 				'false',
 				'false',
 				'false',
@@ -90,7 +88,6 @@ BEGIN
 				Posicao,
 				PagoMaster,
 				PagoSistema,
-				ConviteProximoNivel,
 				DireitaFechada,
 				EsquerdaFechada,
 				DataInicio,
@@ -109,7 +106,6 @@ BEGIN
 				1, --1o ciclo dele, ele acabou de entrar no sistema
 				'', --Sem posi�ao ainda
 				'false', 
-				'false',
 				'false',
 				'false',
 				'false',
@@ -133,7 +129,6 @@ BEGIN
 					Posicao,
 					PagoMaster,
 					PagoSistema,
-					ConviteProximoNivel,
 					DireitaFechada,
 					EsquerdaFechada,
 					DataInicio,
@@ -152,7 +147,6 @@ BEGIN
 					1, --1o ciclo dele, ele acabou de entrar no sistema
 					'', --Sem posi�ao ainda
 					'false', 
-					'false',
 					'false',
 					'false',
 					'false',
@@ -176,7 +170,6 @@ BEGIN
 				Posicao,
 				PagoMaster,
 				PagoSistema,
-				ConviteProximoNivel,
 				DireitaFechada,
 				EsquerdaFechada,
 				DataInicio,
@@ -195,7 +188,6 @@ BEGIN
 				1, --1o ciclo dele, ele acabou de entrar no sistema
 				'', --Sem posi�ao ainda
 				'false', 
-				'false',
 				'false',
 				'false',
 				'false',
@@ -219,7 +211,6 @@ BEGIN
 			Posicao,
 			PagoMaster,
 			PagoSistema,
-			ConviteProximoNivel,
 			DireitaFechada,
 			EsquerdaFechada,
 			DataInicio,
@@ -238,7 +229,6 @@ BEGIN
 			1, --1o ciclo dele, ele acabou de entrar no sistema
 			'', --Sem posi�ao ainda
 			'false', 
-			'false',
 			'false',
 			'false',
 			'false',
@@ -263,7 +253,6 @@ BEGIN
 			Posicao,
 			PagoMaster,
 			PagoSistema,
-			ConviteProximoNivel,
 			DireitaFechada,
 			EsquerdaFechada,
 			DataInicio,
@@ -282,7 +271,6 @@ BEGIN
 			1, --1o ciclo dele, ele acabou de entrar no sistema
 			'', --Sem posi�ao ainda
 			'false', 
-			'false',
 			'false',
 			'false',
 			'false',
@@ -306,7 +294,6 @@ BEGIN
 			Posicao,
 			PagoMaster,
 			PagoSistema,
-			ConviteProximoNivel,
 			DireitaFechada,
 			EsquerdaFechada,
 			DataInicio,
@@ -325,7 +312,6 @@ BEGIN
 			1, --1o ciclo dele, ele acabou de entrar no sistema
 			'', --Sem posi�ao ainda
 			'false', 
-			'false',
 			'false',
 			'false',
 			'false',
@@ -349,7 +335,6 @@ BEGIN
 			Posicao,
 			PagoMaster,
 			PagoSistema,
-			ConviteProximoNivel,
 			DireitaFechada,
 			EsquerdaFechada,
 			DataInicio,
@@ -368,7 +353,6 @@ BEGIN
 			1, --1o ciclo dele, ele acabou de entrar no sistema
 			'', --Sem posi�ao ainda
 			'false', 
-			'false',
 			'false',
 			'false',
 			'false',

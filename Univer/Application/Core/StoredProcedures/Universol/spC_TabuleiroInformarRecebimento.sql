@@ -69,7 +69,7 @@ BEGIN
 			UsuarioID = @MasterID and 
 			BoardID  = @BoardID and 
 			PagoSistema = 'true' and 
-			ConviteProximoNivel = 'false'
+			StatusID = 1
 		)
     Begin
         Select 
@@ -99,7 +99,7 @@ BEGIN
                 Update
                     rede.TabuleiroUsuario
                 Set 
-                    ConviteProximoNivel = 'true'
+                    StatusID = 2 --Convite Proximo Nivel
                 Where
                     UsuarioID = @MasterID and 
                     BoardID  = @BoardID 
