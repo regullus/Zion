@@ -183,7 +183,7 @@ namespace Core.Repositories.Rede
 
                 TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
 
-                if (retorno != null)
+                if (retorno != null && retorno.Retorno != null)
                 {
                     ret = "OK";
                     if (retorno.Retorno != "OK")
@@ -298,6 +298,7 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+        
         public int ObtemBoardIDByTabuleiroID(int idUsuario, int idTabuleiro)
         {
             string sql = "Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID=" + idUsuario + ",@TabuleiroId=" + idTabuleiro;

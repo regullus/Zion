@@ -693,6 +693,12 @@
                                 $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
 
+                                if (data.Nome == 'System') {
+                                    $('#infoObs').html('@traducaoHelper["SISTEM_INFO_PAG"]')
+                                } else {
+                                    $('#infoObs').html('')
+                                }
+
                                 if (data.Pix) {
                                     $("#PixCode").html(data.Pix);
                                     $("#PixHeader").show();
@@ -903,6 +909,11 @@
                             $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
                             $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
 
+                            if (data.Nome == 'Syspag') {
+                                $('#infoObs').html('@traducaoHelper["SISTEM_PAGAMENTO"]')
+                            } else {
+                                $('#infoObs').html('')
+                            }
                             if (data.Pix) {
                                 $("#PixCode").html(data.Pix);
                                 $("#PixHeader").show();
@@ -934,6 +945,8 @@
                             $(".reportReceipt").hide();
 
                             $('#modDados').modal('show');
+
+                            $(".deleteUser").hide();
                         } else {
                             Swal.fire({
                                 title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
@@ -1544,6 +1557,7 @@
                         <h3 style="font-weight: 500; padding: 20px 20px;" class="pull-right" id="infoApelido"></h3>
                         <h3 style="font-weight: 500;" id="infoNome"></h3>
                         <h4 style="font-weight: 500;" id="infoCelular"></h4>
+                        <h5 style="font-weight: 500; color: darkred;" id="infoObs"></h5>
                         <input type="hidden" id="infoID" />
                         <div class="panel-group accordion" id="accordion1" style="padding-top: 20px;">
                             <div class="panel panel-default panelPix">
@@ -1590,3 +1604,4 @@
         </div>
     </div>
 </div>
+

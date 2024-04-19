@@ -289,54 +289,38 @@ BEGIN
         Id = @id
 
     --User
-    Update tmp Set tmp.NomeMaster = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.Master = usu.id 
-    Update tmp Set tmp.NomeCoordinatorDir = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.CoordinatorDir = usu.id 
-    Update tmp Set tmp.NomeIndicatorDirSup = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.IndicatorDirSup = usu.id 
-    Update tmp Set tmp.NomeIndicatorDirInf = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.IndicatorDirInf = usu.id 
-    Update tmp Set tmp.NomeDonatorDirSup1 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorDirSup1 = usu.id 
-    Update tmp Set tmp.NomeDonatorDirSup2 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorDirSup2 = usu.id 
-    Update tmp Set tmp.NomeDonatorDirInf1 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorDirInf1 = usu.id 
-    Update tmp Set tmp.NomeDonatorDirInf2 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorDirInf2 = usu.id 
-    Update tmp Set tmp.NomeCoordinatorEsq = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.CoordinatorEsq = usu.id 
-    Update tmp Set tmp.NomeIndicatorEsqSup = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.IndicatorEsqSup = usu.id 
-    Update tmp Set tmp.NomeIndicatorEsqInf = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.IndicatorEsqInf = usu.id 
-    Update tmp Set tmp.NomeDonatorEsqSup1 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqSup1 = usu.id 
-    Update tmp Set tmp.NomeDonatorEsqSup2 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqSup2 = usu.id 
-    Update tmp Set tmp.NomeDonatorEsqInf1 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf1 = usu.id 
-    Update tmp Set tmp.NomeDonatorEsqInf2 = usu.Nome From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf2 = usu.id 
-
-    Update tmp Set tmp.ApelidoMaster = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.Master = usu.id 
-    Update tmp Set tmp.ApelidoCoordinatorDir = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.CoordinatorDir = usu.id 
-    Update tmp Set tmp.ApelidoIndicatorDirSup = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorDirSup = usu.id 
-    Update tmp Set tmp.ApelidoIndicatorDirInf = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorDirInf = usu.id 
-    Update tmp Set tmp.ApelidoDonatorDirSup1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirSup1 = usu.id 
-    Update tmp Set tmp.ApelidoDonatorDirSup2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirSup2 = usu.id 
-    Update tmp Set tmp.ApelidoDonatorDirInf1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirInf1 = usu.id 
-    Update tmp Set tmp.ApelidoDonatorDirInf2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirInf2 = usu.id 
-    Update tmp Set tmp.ApelidoCoordinatorEsq = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.CoordinatorEsq = usu.id 
-    Update tmp Set tmp.ApelidoIndicatorEsqSup = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorEsqSup = usu.id 
-    Update tmp Set tmp.ApelidoIndicatorEsqInf = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorEsqInf = usu.id 
-    Update tmp Set tmp.ApelidoDonatorEsqSup1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqSup1 = usu.id 
-    Update tmp Set tmp.ApelidoDonatorEsqSup2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqSup2 = usu.id 
-    Update tmp Set tmp.ApelidoDonatorEsqInf1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf1 = usu.id 
-    Update tmp Set tmp.ApelidoDonatorEsqInf2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf2 = usu.id 
+    Update tmp Set tmp.NomeMaster = usu.Nome,tmp.ApelidoMaster = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.Master = usu.id 
+    Update tmp Set tmp.NomeCoordinatorDir = usu.Nome, tmp.ApelidoCoordinatorDir = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.CoordinatorDir = usu.id 
+    Update tmp Set tmp.NomeIndicatorDirSup = usu.Nome, tmp.ApelidoIndicatorDirSup = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorDirSup = usu.id 
+    Update tmp Set tmp.NomeIndicatorDirInf = usu.Nome, tmp.ApelidoIndicatorDirInf = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorDirInf = usu.id 
+    Update tmp Set tmp.NomeDonatorDirSup1 = usu.Nome, tmp.ApelidoDonatorDirSup1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirSup1 = usu.id 
+    Update tmp Set tmp.NomeDonatorDirSup2 = usu.Nome, tmp.ApelidoDonatorDirSup2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirSup2 = usu.id 
+    Update tmp Set tmp.NomeDonatorDirInf1 = usu.Nome, tmp.ApelidoDonatorDirInf1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirInf1 = usu.id 
+    Update tmp Set tmp.NomeDonatorDirInf2 = usu.Nome, tmp.ApelidoDonatorDirInf2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorDirInf2 = usu.id 
+    Update tmp Set tmp.NomeCoordinatorEsq = usu.Nome, tmp.ApelidoCoordinatorEsq = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.CoordinatorEsq = usu.id 
+    Update tmp Set tmp.NomeIndicatorEsqSup = usu.Nome, tmp.ApelidoIndicatorEsqSup = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorEsqSup = usu.id 
+    Update tmp Set tmp.NomeIndicatorEsqInf = usu.Nome, tmp.ApelidoIndicatorEsqInf = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.IndicatorEsqInf = usu.id 
+    Update tmp Set tmp.NomeDonatorEsqSup1 = usu.Nome, tmp.ApelidoDonatorEsqSup1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqSup1 = usu.id 
+    Update tmp Set tmp.NomeDonatorEsqSup2 = usu.Nome, tmp.ApelidoDonatorEsqSup2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqSup2 = usu.id 
+    Update tmp Set tmp.NomeDonatorEsqInf1 = usu.Nome, tmp.ApelidoDonatorEsqInf1 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf1 = usu.id 
+    Update tmp Set tmp.NomeDonatorEsqInf2 = usu.Nome, tmp.ApelidoDonatorEsqInf2 = usu.Apelido From #temp tmp, usuario.usuario usu Where tmp.DonatorEsqInf2 = usu.id 
 
     --Pin
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select master from #temp) and StatusID=1 Update #temp Set pinmaster = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorDir from #temp) and StatusID=1 Update #temp Set pinCoordinatorDir = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirSup from #temp) and StatusID=1 Update #temp Set pinIndicatorDirSup = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirInf from #temp) and StatusID=1 Update #temp Set pinIndicatorDirInf = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup1 from #temp) and StatusID=1 Update #temp Set pinDonatorDirSup1 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup2 from #temp) and StatusID=1 Update #temp Set pinDonatorDirSup2 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf1 from #temp) and StatusID=1 Update #temp Set pinDonatorDirInf1 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf2 from #temp) and StatusID=1 Update #temp Set pinDonatorDirInf2 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorEsq from #temp) and StatusID=1 Update #temp Set pinCoordinatorEsq = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqSup from #temp) and StatusID=1 Update #temp Set pinIndicatorEsqSup = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqInf from #temp) and StatusID=1 Update #temp Set pinIndicatorEsqInf = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup1 from #temp) and StatusID=1 Update #temp Set pinDonatorEsqSup1 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup2 from #temp) and StatusID=1 Update #temp Set pinDonatorEsqSup2 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf1 from #temp) and StatusID=1 Update #temp Set pinDonatorEsqInf1 = @Pin 
-    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf2 from #temp) and StatusID=1 Update #temp Set pinDonatorEsqInf2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select master from #temp) Update #temp Set pinmaster = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorDir from #temp) Update #temp Set pinCoordinatorDir = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirSup from #temp) Update #temp Set pinIndicatorDirSup = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorDirInf from #temp) Update #temp Set pinIndicatorDirInf = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup1 from #temp) Update #temp Set pinDonatorDirSup1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirSup2 from #temp) Update #temp Set pinDonatorDirSup2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf1 from #temp) Update #temp Set pinDonatorDirInf1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorDirInf2 from #temp) Update #temp Set pinDonatorDirInf2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select CoordinatorEsq from #temp) Update #temp Set pinCoordinatorEsq = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqSup from #temp) Update #temp Set pinIndicatorEsqSup = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select IndicatorEsqInf from #temp) Update #temp Set pinIndicatorEsqInf = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup1 from #temp) Update #temp Set pinDonatorEsqSup1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqSup2 from #temp) Update #temp Set pinDonatorEsqSup2 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf1 from #temp) Update #temp Set pinDonatorEsqInf1 = @Pin 
+    Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = (select DonatorEsqInf2 from #temp) Update #temp Set pinDonatorEsqInf2 = @Pin 
    
     Update #temp Set pinMaster=0 Where pinMaster is null
     Update #temp Set pinCoordinatorDir=0 Where pinCoordinatorDir is null

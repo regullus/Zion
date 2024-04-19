@@ -22,7 +22,7 @@ BEGIN
     Update
         rede.TabuleiroUsuario 
     Set
-        PagoSistema = 1
+        InformePagSistema = 'true'
     where 
         UsuarioID = @UsuarioID and 
         TabuleiroID  = @BoardID

@@ -23,6 +23,7 @@ using Core.Repositories.Financeiro;
 using static Core.Entities.Classificacao;
 using static Core.Entities.Conta;
 using Core.Models;
+using Microsoft.Ajax.Utilities;
 
 
 #endregion
@@ -470,7 +471,7 @@ namespace Sistema.Controllers
                 //Caso seja um convite StatusID =2 - Obtem o 1º Ativo
                 if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2)
                 {
-                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID == 1).OrderBy(x => x.BoardID).FirstOrDefault();
+                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID == 0).OrderBy(x => x.BoardID).FirstOrDefault();
                 }
 
                 if (tabuleiroUsuario != null)
@@ -563,6 +564,7 @@ namespace Sistema.Controllers
                 {
                     //Novo usuario, pega tabuleiro do seu pai
                     int idPai = usuario.PatrocinadorDiretoID ?? 0;
+                    bool tab10Disponiveis = false;
                     if (idPai > 0)
                     {
                         tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(idPai);
@@ -575,14 +577,41 @@ namespace Sistema.Controllers
                             if (idTabuleiro > 0)
                             {
                                 tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, idPai);
-                                ViewBag.idTabuleiro = idTabuleiro;
-                                ViewBag.tabuleiro = tabuleiro;
-                                ViewBag.tabuleiroAtivo = tabuleiroUsuario;
-                                ViewBag.NovoUsuario = true;
-                                ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                                //Verifica se usuario já esta no tabuleiro selecionado
+                                if (tabuleiro.Master == usuario.ID ||
+                                    tabuleiro.CoordinatorDir == usuario.ID ||
+                                    tabuleiro.CoordinatorEsq == usuario.ID ||
+                                    tabuleiro.IndicatorDirSup == usuario.ID ||
+                                    tabuleiro.IndicatorDirInf == usuario.ID ||
+                                    tabuleiro.IndicatorEsqSup == usuario.ID ||
+                                    tabuleiro.IndicatorEsqInf == usuario.ID ||
+                                    tabuleiro.DonatorDirSup1 == usuario.ID ||
+                                    tabuleiro.DonatorDirInf1 == usuario.ID ||
+                                    tabuleiro.DonatorDirSup2 == usuario.ID ||
+                                    tabuleiro.DonatorDirInf2 == usuario.ID ||
+                                    tabuleiro.DonatorEsqSup1 == usuario.ID ||
+                                    tabuleiro.DonatorEsqInf1 == usuario.ID ||
+                                    tabuleiro.DonatorEsqSup2 == usuario.ID ||
+                                    tabuleiro.DonatorEsqInf2 == usuario.ID 
+                                   )
+                                {
+                                    //Já estando no tabuleiro escolhido pega o proximo disponivel
+                                    tab10Disponiveis = true;
+                                } else
+                                {
+                                    ViewBag.idTabuleiro = idTabuleiro;
+                                    ViewBag.tabuleiro = tabuleiro;
+                                    ViewBag.tabuleiroAtivo = tabuleiroUsuario;
+                                    ViewBag.NovoUsuario = true;
+                                    ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                                }
                             }
                         }
                         else
+                        {
+                            tab10Disponiveis = true;
+                        }
+                        if(tab10Disponiveis)
                         {
                             //Obtem os 10 primeiros tabuleiros ativos
                             tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(null);
