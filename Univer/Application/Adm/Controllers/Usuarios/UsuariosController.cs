@@ -365,6 +365,26 @@ namespace Sistema.Controllers
             lista = db.Usuarios.Include(u => u.Pais).Include(u => u.PatrocinadorDireto).Include(u => u.PatrocinadorPosicao).Include(u => u.UltimoDireita).Include(u => u.UltimoEsquerda).Include(u => u.Filial).Include(u => u.Autenticacao);
             lista = lista.Where(x => x.ID > 2500); //Anteriores são admins ou logins do Sistema que não podem ser alterados
 
+            //Obtem lista de usuarioID que não efetuaram pagamento
+            IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosNaoPagaramSistema();
+
+            //Remove da lista os usuarios que não informaram um pagamento
+            foreach (var item in lista)
+            {
+                //Verifica se o usuario informou um pagamento ao sistema
+                var usuario = tabuleirosUsuario.Where(x => x.UsuarioID == item.ID).FirstOrDefault();
+                if (usuario != null)
+                {
+                    item.Documento = usuario.Posicao; //Usando o campo Documento para exibir a posição do usuario   
+                    item.SenhaLegado = usuario.BoardNome; //Usando o campo SenhaLegado para exibir o nome da galaxia que o usuario está
+                    item.TipoID = usuario.BoardID; //Usado o campo TipoID como BoardID
+                    item.Oculto = true; //Usado para exibir icone de confirmação de pagamento
+                } else
+                {
+                    item.Oculto = false; //Usado para exibir icone de confirmação de pagamento
+                }
+            }
+
             if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
             {
                 lista = lista.Where(x => x.PatrocinadorDireto.Login.Contains(ProcuraPatrocinador) &&
@@ -857,8 +877,6 @@ namespace Sistema.Controllers
             lista = db.Usuarios.Include(u => u.Pais).Include(u => u.PatrocinadorDireto).Include(u => u.PatrocinadorPosicao).Include(u => u.UltimoDireita).Include(u => u.UltimoEsquerda).Include(u => u.Filial).Include(u => u.Autenticacao);
             lista = lista.Where(x => x.ID > 2500); //Anteriores são admins ou logins do Sistema que não podem ser alterados
 
-            //var listaCopia = lista;
-
             //Obtem lista de usuarioID que informaram o pagamento
             IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosInformaramPgto();
 
@@ -1078,6 +1096,16 @@ namespace Sistema.Controllers
             }
         }
 
+        public ActionResult ReloadInformePgto()
+        {
+            Localizacao();
+
+            //Persistencia dos paramentros da tela
+            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
+            objFuncoes.LimparPersistencia();
+            objFuncoes = null;
+            return RedirectToAction("InformePagamento");
+        }
 
         //*************FIM Tabuleiro***************
 

@@ -64,6 +64,16 @@
 
 @*USUARIOS*@
 <li>
+    <a href="@Url.Action("Index", "Usuarios", new { area = "" })">
+        <i class="fa fa-users"></i>
+        <span class="title">
+            @traducaoHelper["USUARIOS"]
+        </span>
+    </a>
+</li>
+
+
+@*<li>
     <a href="javascript:;">
         <i class="fa fa-users"></i>
         <span class="title">
@@ -72,7 +82,7 @@
         <span class="arrow " />
     </a>
     <ul class="sub-menu">
-        <li>
+        <li>1
             <a href="@Url.Action("Index", "Usuarios", new { area = "" })">
                 <i class="fa fa-user"></i>
                 <span class="title">
@@ -93,7 +103,7 @@
             </li>
         }
     </ul>
-</li>
+</li>*@
 
 <li>
     <a href="@Url.Action("GoogleAuthenticator", "Seguranca")">

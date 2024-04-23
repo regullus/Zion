@@ -121,3 +121,7 @@ go
 --Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID = 2580, @BoardID = 1
 
 --Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2587, @BoardID=1
+
+Select * from Rede.TabuleiroUsuario
+where InformePagSistema = 1 and
+PagoSistema = 0

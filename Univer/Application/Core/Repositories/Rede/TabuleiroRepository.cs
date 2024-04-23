@@ -345,6 +345,16 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+
+        public IEnumerable<TabuleiroUsuarioModel> ObtemTabuleirosNaoPagaramSistema()
+        {
+            string sql = "Exec spC_TabuleiroNaoPagaramSistema";
+
+            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).ToList();
+
+            return retorno;
+        }
+
         public string ConfirmarPagtoSistema(int idUsuario, int idBoard, bool confirmar)
         {
             string sql = "";
