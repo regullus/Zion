@@ -41,6 +41,7 @@ BEGIN
         StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
         Posicao = '',
         TabuleiroID = null,
+		Ciclo = Ciclo - 1,
         InformePag = 'false',
         UsuarioIDPag = null,
         Debug = 'Usuario saiu'

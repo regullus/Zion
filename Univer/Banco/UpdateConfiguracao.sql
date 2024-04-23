@@ -22,10 +22,10 @@ insert into  Globalizacao.Traducao values (3,1,@chave,@TextoI,'',getdate())
 Select * from Globalizacao.Traducao where chave = @chave
 
 -----------CONFIGURACAO------------
-use Univer
+use UniverDev
 go
 declare @chaveC nvarchar(255), @dados nvarchar(255)
-select @chaveC = 'PRODUTO_VALOR_VARIAVEL'
+select @chaveC = 'ADM_HOME_DASHBOARD_USUARIOS_ASSOCIACAO'
 select @dados = 'false'
 --delete Sistema.Configuracao where chave = @chaveC 
 select * from Sistema.Configuracao where chave like '%' + @chaveC + '%'

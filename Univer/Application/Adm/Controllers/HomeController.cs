@@ -197,8 +197,8 @@
 
             if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_USUARIOS_ASSOCIACAO"))
             {
-                var usuariosNivel = usuarioAssociacaoRepository.ObtemListaTotalUsuarioAssociacao();
-                ViewBag.UsuariosNivel = Json(usuariosNivel);
+                //var usuariosNivel = usuarioAssociacaoRepository.ObtemListaTotalUsuarioAssociacao();
+                ViewBag.UsuariosNivel = null; // Json(usuariosNivel);
             }
             if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_EVOLUCAO_USUARIOS_ASSOCIADOS"))
             {

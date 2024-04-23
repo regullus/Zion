@@ -70,35 +70,6 @@
 @section pageScripts {
     <script type="text/javascript">
 
-      @*function AlterarPlanoHandler() {
-         $('#divLoadingAlterarPlano').show();
-         $('#btnAlterarPlanoSim').hide();
-         $('#btnAlterarPlanoNao').hide();
-
-         var cod = '@Model.ID';
-         var perfil = $('#ddlPerfilAlterarPlano').val();
-
-         $.ajax({
-            url: '@Url.Action("AlterarPlano")',
-            type: 'POST',
-            data: { 'cf': cod, 'perfil': perfil },
-            success: function (data) { SuccessAlterarPlanoHandler(data); },
-            error: function (data) { OnFailAlterarPlanoHandler(data); }
-         });
-         return false;
-      }
-      function SuccessAlterarPlanoHandler(data) {
-         $('#divLoadingAlterarPlano').hide();
-         $('#btnAlterarPlanoHideModal').click();
-         alert('Plano alterado com sucesso');
-         document.location.reload();
-      }
-      function OnFailAlterarPlanoHandler(data) {
-         $('#divLoadingAlterarPlano').hide();
-         $('#btnAlterarPlanoHideModal').click();
-         alert('erro ao alterar plano do usuario: ' + data);
-      }*@
-
       function Bloquear() {
          swal({
             title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
@@ -323,22 +294,6 @@
         </div>
         <div class="actions">
             <input type="button" value="@(Model.Bloqueado ? traducaoHelper["DESBLOQUEAR"] : traducaoHelper["BLOQUEAR"])" class="btn green-haze" onclick="return Bloquear();" />
-
-            @if (Model.Status != Core.Entities.Usuario.TodosStatus.Associado && Model.Status != Core.Entities.Usuario.TodosStatus.Bloqueado)
-            {
-                <input type="button" value="@(traducaoHelper["EXCLUIR"])" class="btn green-haze" onclick="return Excluir();" />
-                <input type="button" value="@(traducaoHelper["ENVIAR_EMAIL_ATIVACAO"])" class="btn green-haze" onclick="return Email();" />
-            }
-
-            @if (Model.Status == Core.Entities.Usuario.TodosStatus.Associado)
-            {
-                <input type="button" value="@(traducaoHelper["INSERIR_MOVIMENTACAO_FINANCEIRA"])" class="btn green-haze" onclick="return Movimento();" />
-            }
-
-            @if (Model.DataValidade != DateTime.Parse("2100-01-01 00:00:00"))
-            {
-                <input type="button" value="@(traducaoHelper["CONTA_ADMINISTRATIVA"])" class="btn green-haze" onclick="return ContaAdminstrativa();" />
-            }
             <label>&nbsp;</label>
         </div>
     </div>
@@ -383,10 +338,6 @@
                 <dd>
                     @Html.DisplayFor(model => model.Celular)
                 </dd>
-                <dt>@traducaoHelper["TELEFONE"]</dt>
-                <dd>
-                    @Html.DisplayFor(model => model.Telefone)
-                </dd>
                 <dt>@traducaoHelper["ENDERECO_COMPLETO"]</dt>
                 <dd>
                     @enderecoCompleto
@@ -395,72 +346,15 @@
                 <dd>
                     @Model.DataNascimento.ToString("dd/MM/yyyy")
                 </dd>
-                <dt>@traducaoHelper["ASSOCIACAO"]</dt>
-                <dd>
-                    @(associacao != null ? associacao.Nome : "-")
-                </dd>
-                <dt>@traducaoHelper["GERA_BONUS"]</dt>
-                <dd>
-                    @(Model.GeraBonus ? "Sim" : "Não")
-                </dd>
-                <dt>@traducaoHelper["RECEBE_BONUS"]</dt>
-                <dd>
-                    @(Model.RecebeBonus ? "Sim" : "Não")
-                </dd>
-                <dt>@traducaoHelper["FILIAL"]</dt>
-                <dd>
-                    @Html.DisplayFor(model => model.Filial.Nome)
-                </dd>
                 <dt>@traducaoHelper["DATA_CRIACAO"]</dt>
                 <dd>
                     @Html.DisplayFor(model => model.DataCriacao)
-                </dd>
-                <dt>@traducaoHelper["STATUS"]</dt>
-                <dd>
-                    @Html.DisplayFor(model => model.Status)
                 </dd>
                 <dt>@traducaoHelper["BLOQUEADO"]</dt>
                 <dd>
                     @(Model.Bloqueado ? "Sim" : "Não")
                 </dd>
-                <dt>@traducaoHelper["SOLICITA_SAQUE"]</dt>
-                <dd>
-                    @(Model.ExibeSaque != 0 ? "Sim" : "Não")
-                </dd>
-                <dt>@traducaoHelper["CONTA_ADMINISTRATIVA"]</dt>
-                <dd>
-                    @(Model.DataValidade == DateTime.Parse("2100-01-01 00:00:00") ? "Sim" : "Não")
-                </dd>
             </dl>
-
-            @*<br />
-
-                <div class="row">
-                   <div style="float:left; position: relative; margin-left: 10px;">
-                      <button type="button" class="btn btn-default" onclick="return Confirmar(1);">@(Model.Bloqueado ? "Desbloquear" : "Bloquear")</button>
-                   </div>
-                   @if (Model.Status != Core.Entities.Usuario.TodosStatus.Associado && Model.Status != Core.Entities.Usuario.TodosStatus.Bloqueado)
-                   {
-                      <div style="float:left; position: relative; margin-left: 10px;">
-                         <button type="button" class="btn btn-default" style="background-color:rgb(255, 110, 110);" onclick="return Confirmar(2);">Excluir</button>
-                      </div>
-                      <div style="float:left; position: relative; margin-left: 10px;">
-                         <button type="button" class="btn btn-default" style="background-color:#d4d0c5;" onclick="return Confirmar(4);">Reenviar e-mail ativação</button>
-                      </div>
-                   }
-
-                   @if (Model.Status == Core.Entities.Usuario.TodosStatus.Associado)
-                   {
-                      <div style="float:left; position: relative; margin-left: 10px; ">
-                         <button type="button" class="btn btn-default" ; style="background-color:rgb(126, 230, 126)" onclick="return Confirmar(5);">Inserir Movimentação Financeira</button>
-                      </div>*@
-
-
-            @*<div style="float:left; position: relative; margin-left: 10px; ">
-                   <button type="button" class="btn btn-default" ; style="background-color:grey" onclick="return Confirmar(6);">Alterar Plano</button>
-                </div>*@
-            @*}
-                </div>*@
         </div>
     </div>
 
@@ -481,13 +375,6 @@
                                 //var valorMinimo = produto.ValorMinimo(Model);
                                 <option value="@produto.SKU">@produto.Nome</option>
                             }
-
-                            <!--option value="1">Member</option>
-                            <option value="2">Start</option>
-                            <option value="3">Partner</option>
-                            <option value="4">Executive</option>
-                            <option value="5">Elite</option>
-                            <option value="6">Pro</option-->
                         </select>
                     </p>
                     <br />
@@ -541,12 +428,6 @@
                                 <option value="@a.Nivel">@a.Nome</option>
                             }
 
-                            <!--option value="1">Member</option>
-                            <option value="2">Start</option>
-                            <option value="3">Partner</option>
-                            <option value="4">Executive</option>
-                            <option value="5">Elite</option>
-                            <option value="6">Pro</option-->
                         </select>
                     </p>
                     <br />
@@ -561,7 +442,6 @@
                         Aguarde...
                         <img src="@Url.Content("~/Content/admin/layout/img/loading.gif")" />
                     </div>
-
                 </div>
             </div>
         </div>

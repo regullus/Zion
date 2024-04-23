@@ -25,7 +25,7 @@ BEGIN
         InformePagSistema = 'true'
     where 
         UsuarioID = @UsuarioID and 
-        TabuleiroID  = @BoardID
+        BoardID  = @BoardID
 
     Select 'OK'
 
@@ -37,4 +37,4 @@ go
 
 --Exec spC_TabuleiroInformarPagtoSistema @UsuarioID = 2580, @BoardID = 1
 
-
+--Exec spC_TabuleiroInformarPagtoSistema @UsuarioID=2587, @BoardID=1

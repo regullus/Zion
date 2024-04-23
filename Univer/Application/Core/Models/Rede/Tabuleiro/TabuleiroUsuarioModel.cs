@@ -22,6 +22,7 @@ namespace Core.Models
         public string Posicao { get; set; }
         public bool PagoMaster { get; set; }
         public bool PagoSistema { get; set;}
+        public bool InformePagSistema { get; set; }
         public bool ConviteProximoNivel { get; set; }
         public DateTime DataInicio { get; set; }
         public int? DataFim {  get; set; }

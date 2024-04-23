@@ -33,6 +33,7 @@ BEGIN
 		tab.Ciclo,
 		tab.Posicao,
 		tab.PagoMaster,
+		tab.InformePagSistema,
 		tab.PagoSistema,
 		tab.DataInicio,
 		tab.DataFim

@@ -25,8 +25,6 @@
 
     ViewBag.Title = traducaoHelper["MINHA_REDE"].ToLower();
 
-    var porTabuleiroWidth = "200px";
-    var porTabuleiroHeight = "200px";
     var porTabuleiroMaxWidth = "96px";
 
     bool showReportPayment = false;
@@ -240,8 +238,16 @@
         <script>
             function position() {
                 width = window.innerWidth;
-                @*$('.titleSmall').html(@idTabuleiro);*@
+
+                //$('.titleSmall').html(width);
+
                 var masterID = $('#Master').attr("data-id");
+
+                var porTabuleiroHeight = 200;
+                var porTabuleiroWidth = 200;
+
+                var ajustImgTabuleiroTop = 0;
+                var ajustImgTabuleiroLeft = 0;
 
                 $('#porTabuleiro').css({
                     "width": "980px",
@@ -428,6 +434,13 @@
                         "width": "450px",
                         "height": "1000px",
                     });
+
+                    porTabuleiroHeight = 160;
+                    porTabuleiroWidth = 160;
+
+                    ajustImgTabuleiroTop = 20;
+                    ajustImgTabuleiroLeft = 20;
+
                     ajustTop = 168;
                     ajustLeft = -266;
 
@@ -484,6 +497,13 @@
                         "width": "375px",
                         "height": "1100px",
                     });
+
+                    porTabuleiroHeight = 160;
+                    porTabuleiroWidth = 160;
+
+                    ajustImgTabuleiroTop = 20;
+                    ajustImgTabuleiroLeft = 20;
+
                     ajustTop = 220;
                     ajustLeft = -300;
 
@@ -605,64 +625,65 @@
                 var posMasterLeft = ajustLeft + yMasterLeft;
                 var posTxtMasterTop = posMasterTop + alinhaTxtTop;
                 var posTxtMasterLeft = posMasterLeft + alinhaTxtLeft;
+                                
 
-                $('.DonatorEsqSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup1Top + 'px; left: ' + posDonatorEsqSup1Left + 'px;');
+                $('.DonatorEsqSup1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqSup1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqSup1Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorEsqSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqSup1;');
                 $('#DonatorEsqSup1').addClass('@tabuleiro.corDonatorEsqSup1');
 
-                $('.DonatorEsqSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqSup2Top + 'px; left: ' + posDonatorEsqSup2Left + 'px;');
+                $('.DonatorEsqSup2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqSup2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqSup2Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorEsqSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup2Top + 'px; left: ' + posTxtDonatorEsqSup2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqSup2;');
                 $('#DonatorEsqSup2').addClass('@tabuleiro.corDonatorEsqSup2');
 
-                $('.DonatorEsqInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf1Top + 'px; left: ' + posDonatorEsqInf1Left + 'px;');
+                $('.DonatorEsqInf1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqInf1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqInf1Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorEsqInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf1Top + 'px; left: ' + posTxtDonatorEsqInf1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqInf1;');
                 $('#DonatorEsqInf1').addClass('@tabuleiro.corDonatorEsqInf1');
 
-                $('.DonatorEsqInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorEsqInf2Top + 'px; left: ' + posDonatorEsqInf2Left + 'px;');
+                $('.DonatorEsqInf2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqInf2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqInf2Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorEsqInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf2Top + 'px; left: ' + posTxtDonatorEsqInf2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqInf2;');
                 $('#DonatorEsqInf2').addClass('@tabuleiro.corDonatorEsqInf2');
 
-                $('.DonatorDirSup1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup1Top + 'px; left: ' + posDonatorDirSup1Left + 'px;');
+                $('.DonatorDirSup1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirSup1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirSup1Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorDirSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup1Top + 'px; left: ' + posTxtDonatorDirSup1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirSup1;');
                 $('#DonatorDirSup1').addClass('@tabuleiro.corDonatorDirSup1');
 
-                $('.DonatorDirSup2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirSup2Top + 'px; left: ' + posDonatorDirSup2Left + 'px;');
+                $('.DonatorDirSup2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirSup2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirSup2Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorDirSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup2Top + 'px; left: ' + posTxtDonatorDirSup2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirSup2;');
                 $('#DonatorDirSup2').addClass('@tabuleiro.corDonatorDirSup2');
 
-                $('.DonatorDirInf1').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf1Top + 'px; left: ' + posDonatorDirInf1Left + 'px;');
+                $('.DonatorDirInf1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirInf1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirInf1Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorDirInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf1Top + 'px; left: ' + posTxtDonatorDirInf1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirInf1;');
                 $('#DonatorDirInf1').addClass('@tabuleiro.corDonatorDirInf1');
 
-                $('.DonatorDirInf2').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posDonatorDirInf2Top + 'px; left: ' + posDonatorDirInf2Left + 'px;');
+                $('.DonatorDirInf2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirInf2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirInf2Left + ajustImgTabuleiroLeft) + 'px;');
                 $('#DonatorDirInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf2Top + 'px; left: ' + posTxtDonatorDirInf2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirInf2;');
                 $('#DonatorDirInf2').addClass('@tabuleiro.corDonatorDirInf2');
 
-                $('.IndicatorEsqSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqSupTop + 'px; left: ' + posIndicatorEsqSupLeft + 'px;');
+                $('.IndicatorEsqSup').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorEsqSupTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorEsqSupLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#IndicatorEsqSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqSupTop + 'px; left: ' + posTxtIndicatorEsqSupLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorEsqSup;');
                 $('#IndicatorEsqSup').addClass('@tabuleiro.corIndicatorEsqSup');
 
-                $('.IndicatorEsqInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorEsqInfTop + 'px; left: ' + posIndicatorEsqInfLeft + 'px;');
+                $('.IndicatorEsqInf').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorEsqInfTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorEsqInfLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#IndicatorEsqInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqInfTop + 'px; left: ' + posTxtIndicatorEsqInfLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorEsqInf;');
                 $('#IndicatorEsqInf').addClass('@tabuleiro.corIndicatorEsqInf');
 
-                $('.IndicatorDirSup').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirSupTop + 'px; left: ' + posIndicatorDirSupLeft + 'px;');
+                $('.IndicatorDirSup').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorDirSupTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorDirSupLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#IndicatorDirSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirSupTop + 'px; left: ' + posTxtIndicatorDirSupLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorDirSup;');
                 $('#IndicatorDirSup').addClass('@tabuleiro.corIndicatorDirSup');
 
-                $('.IndicatorDirInf').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posIndicatorDirInfTop + 'px; left: ' + posIndicatorDirInfLeft + 'px;');
+                $('.IndicatorDirInf').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorDirInfTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorDirInfLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#IndicatorDirInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirInfTop + 'px; left: ' + posTxtIndicatorDirInfLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorDirInf;');
                 $('#IndicatorDirInf').addClass('@tabuleiro.corIndicatorDirInf');
 
-                $('.CoordinatorEsq').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorEsqTop + 'px; left: ' + posCoordinatorEsqLeft + 'px;');
+                $('.CoordinatorEsq').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posCoordinatorEsqTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posCoordinatorEsqLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#CoordinatorEsq').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorEsqTop + 'px; left: ' + posTxtCoordinatorEsqLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoCoordinatorEsq;');
                 $('#CoordinatorEsq').addClass('@tabuleiro.corCoordinatorEsq');
 
-                $('.CoordinatorDir').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posCoordinatorDirTop + 'px; left: ' + posCoordinatorDirLeft + 'px;');
+                $('.CoordinatorDir').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posCoordinatorDirTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posCoordinatorDirLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#CoordinatorDir').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorDirTop + 'px; left: ' + posTxtCoordinatorDirLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoCoordinatorDir;');
                 $('#CoordinatorDir').addClass('@tabuleiro.corCoordinatorDir');
 
-                $('.Master').attr('style', 'height: @(porTabuleiroHeight); width: @(porTabuleiroWidth); position: absolute; top: ' + posMasterTop + 'px; left: ' + posMasterLeft + 'px;');
+                $('.Master').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posMasterTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posMasterLeft + ajustImgTabuleiroLeft) + 'px;');
                 $('#Master').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoMaster;');
                 $('#Master').addClass('@tabuleiro.corMaster');
                 $('.Master').addClass('@(showReportPayment ? "blob" : "")');
@@ -1352,6 +1373,13 @@
                             </button>
                         </div>
                     }
+                    @if (ViewBag.ShowMsgFaltaPag != null && ViewBag.ShowMsgFaltaPag != "")
+                    {
+                        <div class="page-title pull-right" style="padding-right: 10px; color: red;">
+                             @ViewBag.ShowMsgFaltaPag
+                        </div>
+                    }
+
                 </div>
             </div>
             <!-- END PAGE TITLE -->

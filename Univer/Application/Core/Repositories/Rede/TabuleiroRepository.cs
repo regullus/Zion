@@ -114,7 +114,7 @@ namespace Core.Repositories.Rede
 
             string ret = "OK";
             
-            if (retorno !=  null )
+            if (retorno !=  null && retorno.Retorno != null)
             {
                 if (retorno.Retorno != "OK")
                 {
@@ -179,7 +179,7 @@ namespace Core.Repositories.Rede
             
             if (ret == "OK")
             {
-                sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=1,@Chamada='Convite'";
+                sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=1,@Chamada='ConviteNew'";
 
                 TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
 
@@ -307,15 +307,10 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
-        public bool MasterRuleOK(int idUsuario, int idBoard)
+        public string MasterRuleOK(int idUsuario, int idBoard)
         {
-            bool retorno = true;
             string sql = "Exec spC_TabuleiroMasterRule @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
-            string retornoSP = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
-            if (retornoSP != "OK")
-            {
-                retorno = false;
-            }
+            string retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
             return retorno;
         }
               
@@ -326,7 +321,7 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
-
+        
         public string TabuleiroSair(int idUsuario, int idBoard)
         {
 
@@ -337,5 +332,36 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        /// <summary>
+        /// Lista dos que informaram o pagamento ao sistema
+        /// Usado no Admin
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TabuleiroUsuarioModel> ObtemTabuleirosInformaramPgto()
+        {
+            string sql = "Exec spC_TabuleiroInformaramPagto";
+
+            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).ToList();
+
+            return retorno;
+        }
+        public string ConfirmarPagtoSistema(int idUsuario, int idBoard, bool confirmar)
+        {
+            string sql = "";
+            if (confirmar) 
+            {
+                sql = "Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard +  ", @confirmar='true'";
+            }
+            else
+            {
+                sql = "Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard + ", @confirmar='false'";
+            }
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+
+            return retorno;
+        }
+
+        
     }
 }

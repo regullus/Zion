@@ -24,33 +24,16 @@ BEGIN
         @Count int,
         @MasterID int
     
-    if not Exists (
-        Select 'OK'
-        From
-            rede.TabuleiroUsuario 
-        where 
-            UsuarioID = @UsuarioID and 
-            BoardID  = @BoardID and
-            InformePag = 'true' 
-    )
-    Begin
-        Update
-            rede.TabuleiroUsuario 
-        Set
-            UsuarioIDPag = @UsuarioPaiID
-        where 
-            UsuarioID = @UsuarioID and 
-            BoardID  = @BoardID 
-    End
-
     Update
         rede.TabuleiroUsuario 
     Set
-        PagoMaster = 'true'
+		PagoMaster = 'true',
+		InformePag = 'true',
+        UsuarioIDPag = @UsuarioPaiID
     where 
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 
-
+    
     --Verifica se ja e o 4 recebimento do master
     Select
         @MasterID = MasterID
@@ -115,4 +98,4 @@ go
 Grant Exec on spC_TabuleiroInformarRecebimento To public
 go
 
---Exec spC_TabuleiroInformarRecebimento @UsuarioID = 2590, @BoardID = 1
+--Exec spC_TabuleiroInformarRecebimento @UsuarioID=2591,@UsuarioPaiID=2580,@BoardID =1

@@ -16,11 +16,6 @@
 @section head {}
 @section pageScripts {
     <script>
-      //$(document).on("click", ".openAtivar", function () {
-      //   var persistIDUsusario = $(this).data('id');
-      //   $('#impIDUsuario').attr('value', persistIDUsusario);
-      //});
-
       $(".openAtivar").on("click", function () {
          var persistIDUsusario = $(this).data('id');
          $('#impIDUsuario').attr('value', persistIDUsusario);
@@ -154,6 +149,9 @@
             <a href='@Url.Action("Excel", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm yellow-casablanca">
                 <i class="fa fa-file-excel-o"></i> Excel
             </a>
+            <a href='@Url.Action("InformePagamento", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm purple-soft">
+                <i class="fa fa-money"></i> @traducaoHelper["INFORME_PGTO"]
+            </a>
             <label>&nbsp;</label>
         </div>
     </div>
@@ -226,8 +224,6 @@
                                     break;
                             }
                         </th>
-                        <th scope="col">@traducaoHelper["ASSOCIACAO"]</th>
-                        <th scope="col">@traducaoHelper["CLASSIFICACAO"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
                     </tr>
                 </thead>
@@ -260,8 +256,6 @@
                                     break;
                             }
                         </th>
-                        <th scope="col">@traducaoHelper["ASSOCIACAO"]</th>
-                        <th scope="col">@traducaoHelper["CLASSIFICACAO"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
                     </tr>
                 </tfoot>
@@ -270,7 +264,6 @@
                     {
                         var associacao = associacoes.FirstOrDefault(a => a.Nivel == item.NivelAssociacao);
                         var classificacao = classificacoes.FirstOrDefault(c => c.Nivel == item.NivelClassificacao);
-
                         <tr>
                             <td>
                                 @Html.ActionLink("Edit", "Edit", new { id = item.ID }, new { @class = "gridEdit", title = traducaoHelper["EDITAR"] })
@@ -296,18 +289,11 @@
                                         <a class="gridLock openAlterarSenha" name="@item.ID" id="@item.ID" data-id="@item.ID" data-toggle="modal" title=@traducaoHelper["ALTERAR_SENHA"] href="#altearSenha">@traducaoHelper["ALTERAR_SENHA"] </a>
                                     }
                                 }
-
-
                                 @if (item.Autenticacao.TwoFactorEnabled) //Verifica se usuario possui autenticação dois fatores
                                 {
                                     @Html.ActionLink("DesabilitaAutenticacao", "DesabilitaAutenticacao", new { id = item.ID }, new { @class = "gridAutenticacao", title = traducaoHelper["DESABILITA_GOOGLE_AUTH"] })
                                 }
 
-                                @if (String.IsNullOrEmpty(item.Assinatura)) //Caso Usuario Não tenha sido atvado
-                                {
-                                    <a class="gridAtivar openAtivar" name="@item.ID" id="@item.ID" data-id="@item.ID" data-toggle="modal" title=@traducaoHelper["ATIVAR"] href="#ativar">@traducaoHelper["ATIVAR"] </a>
-                                    @*<a class="btn btn-circle btn-sm green-seagreen openAtivar" name="@item.ID" id="@item.ID" data-id="@item.ID" data-toggle="modal" href="#ativar">@traducaoHelper["ATIVAR"]</a>*@
-                                }
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Login)
@@ -320,12 +306,6 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.PatrocinadorDireto.Nome)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => associacao.Nome)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => classificacao.Nome)
                             </td>
                             <td>
                                 @if (item.Bloqueado)

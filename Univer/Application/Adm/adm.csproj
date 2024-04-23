@@ -8324,6 +8324,7 @@
     <Content Include="Views\Pedidos\Details.cshtml" />
     <Content Include="Views\Relatorios\PontosBinario.cshtml" />
     <Content Include="Views\Relatorios\VendasComposicao.cshtml" />
+    <Content Include="Views\Usuarios\InformePagamento.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

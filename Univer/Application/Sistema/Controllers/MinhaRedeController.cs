@@ -24,6 +24,7 @@ using static Core.Entities.Classificacao;
 using static Core.Entities.Conta;
 using Core.Models;
 using Microsoft.Ajax.Utilities;
+using ZendeskApi_v2.Models.Brands;
 
 
 #endregion
@@ -452,6 +453,7 @@ namespace Sistema.Controllers
                 ViewBag.tabuleiroAtivo = null;
                 ViewBag.Timer = null;
                 ViewBag.NovoUsuario = false;
+                ViewBag.ShowMsgFaltaPag = "";
 
                 TabuleiroModel tabuleiro = null;
                 TabuleiroUsuarioModel tabuleiroUsuario = null;
@@ -533,6 +535,32 @@ namespace Sistema.Controllers
                         }
                     }
 
+                    //Verifica se usuario é o master do sistema
+                    if(tabuleiroUsuario.MasterID == usuario.ID)
+                    {
+                        //Sendo o master verifica se ele esta ok com as regras
+                        string check = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
+
+                        switch (check)
+                        {
+                            case "OK":
+                                ViewBag.ShowMsgFaltaPag = "";
+                                break;
+                            case "NOOK_PAGTO_SISTEMA":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"];
+                                break;
+                            case "NOOK_SEM_INDICACAO":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_SEM_INDICACAO"];
+                                break;
+                            case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                                break;
+                            default:
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper[check];
+                                break;
+                        }
+                    }
+
                     //Obtem o tabuleiro que será exibido quando a pag for carregada
                     tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
                     ViewBag.tabuleiro = tabuleiro;
@@ -551,7 +579,7 @@ namespace Sistema.Controllers
                         }
                     }
                     //Verifica se usuario tem que pagar ou não o sistema
-                    if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
+                    if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.InformePagSistema)
                     {
                         ViewBag.Pagar = true;
                     }
@@ -700,7 +728,7 @@ namespace Sistema.Controllers
                     if (obtemInfoUsuario != null)
                     {
                         //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
-                        if (!tabuleiroRepository.MasterRuleOK(idUsuario, idBoard))
+                        if (tabuleiroRepository.MasterRuleOK(idUsuario, idBoard) != "OK")
                         {
                             //Não estando ok, a conta do sistema é exibida para pagamento
                             obtemInfoUsuario = tabuleiroRepository.ObtemInfoSystem();
@@ -768,7 +796,7 @@ namespace Sistema.Controllers
             {
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01 " + "[" + ex.Message + "]");
             }
         }
 
@@ -820,7 +848,7 @@ namespace Sistema.Controllers
             {
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -872,7 +900,7 @@ namespace Sistema.Controllers
             {
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -942,7 +970,7 @@ namespace Sistema.Controllers
             {
                 string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1011,7 +1039,7 @@ namespace Sistema.Controllers
             {
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1072,9 +1100,9 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01", "[" + ex.Message + "]" };
+                string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GIN_01", "[" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GIN_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1155,7 +1183,7 @@ namespace Sistema.Controllers
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1287,7 +1315,7 @@ namespace Sistema.Controllers
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1363,7 +1391,7 @@ namespace Sistema.Controllers
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1475,7 +1503,7 @@ namespace Sistema.Controllers
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01" + "[" + ex.Message + "]");
             }
         }
 
@@ -1555,7 +1583,7 @@ namespace Sistema.Controllers
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01" + "[" + ex.Message + "]");
             }
         }
 

@@ -278,25 +278,29 @@ Begin
                     )  and
                     tab.StatusID = 1 --Tem que estar ativo no board
             End
+			
 			--*************FIM POPULA #temp***********
 
 			--Ferifica se usuario já se encontra no tabuleiro selecionado
 			Set @aux = 0
-			if exists (Select 'OK' From #temp where Master = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where CoordinatorDir = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where IndicatorDirSup = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where IndicatorDirInf = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorDirSup1 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorDirSup2 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorDirInf1 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorDirInf2 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where CoordinatorEsq = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where IndicatorEsqSup = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where IndicatorEsqInf = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorEsqSup1 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorEsqSup2 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorEsqInf1 = @UsuarioID) Set @aux = 1
-			if exists (Select 'OK' From #temp where DonatorEsqInf2 = @UsuarioID) Set @aux = 1
+			if(@Chamada = 'Convite')
+			Begin
+				if exists (Select 'OK' From #temp where Master = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where CoordinatorDir = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where IndicatorDirSup = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where IndicatorDirInf = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorDirSup1 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorDirSup2 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorDirInf1 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorDirInf2 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where CoordinatorEsq = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where IndicatorEsqSup = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where IndicatorEsqInf = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorEsqSup1 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorEsqSup2 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorEsqInf1 = @UsuarioID) Set @aux = 1
+				if exists (Select 'OK' From #temp where DonatorEsqInf2 = @UsuarioID) Set @aux = 1
+			End
 
 			if(@aux = 1)
 			Begin
@@ -317,8 +321,7 @@ Begin
                     Begin
                         Set @log = @log + '| 01.2 Chama a sp novamente recursivo, pois usuario já se encontra no tabuleiro'
                         Set @Historico = '01.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
-						Select @log
-                        Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
+                        Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Convite'
                     End
 			End
 			Else
@@ -529,7 +532,6 @@ Begin
 						)
 						Begin
 						   Set @log = @log + '| 21 PagoMaster false direita'
-						   --Select 'panda 04 [' + @log +']'
 						   Set @PagoMasterDireita = 'false'     
 						End
 						Else 
@@ -1234,12 +1236,7 @@ Begin
 												Set @Incluido = 'true'
 												Set @PosicaoFilho = 'CoordinatorEsq'
 											End
-									End --Master
-            
-									--*********** COORDINATOR DIREITA **************
-									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir'))
-									Begin
-										Set @log = @log + '| 34.3.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+										
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
@@ -1272,6 +1269,372 @@ Begin
 												Set @PosicaoFilho = 'IndicatorDirInf'
 												Set @PagoMaster = 'true'
 											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
+										if (@IndicatorEsqSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
+										if (@IndicatorEsqInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Direita Superior 1
+										if (@DonatorDirSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior s
+										if (@DonatorDirSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior 1
+										if (@DonatorDirInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior s
+										if (@DonatorDirInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf2'
+												Set @PagoMaster = 'false'
+											End
+										
+										--Verifica se ha Donator Esquerda Superior 1
+										if (@DonatorEsqSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 2
+										if (@DonatorEsqSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 1
+										if (@DonatorEsqInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 2
+										if (@DonatorEsqInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+									
+									End --Master
+            
+									--*********** COORDINATOR DIREITA **************
+									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir'))
+									Begin
+										Set @log = @log + '| 34.3.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+										
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
+										if (@IndicatorDirSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
+										if (@IndicatorDirInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Direita Superior 1
+										if (@DonatorDirSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior s
+										if (@DonatorDirSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior 1
+										if (@DonatorDirInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior s
+										if (@DonatorDirInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf2'
+												Set @PagoMaster = 'false'
+											End
+										
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
+										if (@IndicatorEsqSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
+										if (@IndicatorEsqInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Esquerda Superior 1
+										if (@DonatorEsqSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 2
+										if (@DonatorEsqSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 1
+										if (@DonatorEsqInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 2
+										if (@DonatorEsqInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+
 									End
             
 									--*********** COORDINATOR ESQUERDA **************
@@ -1310,12 +1673,106 @@ Begin
 												Set @PosicaoFilho = 'IndicatorEsqInf'
 												Set @PagoMaster = 'true'
 											End
-									End
-            
-									--*********** INDICATOR DIREITA Superior ************** 
-									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup'))
-									Begin
-										Set @log = @log + '| 34.3.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+
+										--Verifica se ha Donator Esquerda Superior 1
+										if (@DonatorEsqSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 2
+										if (@DonatorEsqSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 1
+										if (@DonatorEsqInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 2
+										if (@DonatorEsqInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
+										if (@IndicatorDirSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
+										if (@IndicatorDirInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
@@ -1331,6 +1788,7 @@ Begin
 												Set @PosicaoFilho = 'DonatorDirSup1'
 												Set @PagoMaster = 'false'
 											End
+										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
@@ -1346,12 +1804,7 @@ Begin
 												Set @PosicaoFilho = 'DonatorDirSup2'
 												Set @PagoMaster = 'false'
 											End
-									End
-            
-									--*********** INDICATOR DIREITA Inferior ************** 
-									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf'))
-									Begin
-										Set @log = @log + '| 34.3.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
@@ -1367,6 +1820,7 @@ Begin
 												Set @PosicaoFilho = 'DonatorDirInf1'
 												Set @PagoMaster = 'false'
 											End
+										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
@@ -1384,10 +1838,110 @@ Begin
 											End
 									End
             
-									--*********** INDICATOR ESQUERDA Superior **************
-									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup'))
+									--*********** INDICATOR DIREITA Superior ************** 
+									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup'))
 									Begin
-										Set @log = @log + '| 34.3.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+										Set @log = @log + '| 34.3.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+										
+										--Verifica se ha Donator Direita Superior 1
+										if (@DonatorDirSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior s
+										if (@DonatorDirSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior 1
+										if (@DonatorDirInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior s
+										if (@DonatorDirInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf2'
+												Set @PagoMaster = 'false'
+											End
+										
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
+										if (@IndicatorEsqSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
+										if (@IndicatorEsqInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
@@ -1403,6 +1957,7 @@ Begin
 												Set @PosicaoFilho = 'DonatorEsqSup1'
 												Set @PagoMaster = 'false'
 											End
+										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
@@ -1418,12 +1973,7 @@ Begin
 												Set @PosicaoFilho = 'DonatorEsqSup2'
 												Set @PagoMaster = 'false'
 											End
-									End
-
-									--*********** INDICATOR ESQUERDA Inferior **************
-									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf'))
-									Begin
-										Set @log = @log + '| 34.3.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
@@ -1439,6 +1989,7 @@ Begin
 												Set @PosicaoFilho = 'DonatorEsqInf1'
 												Set @PagoMaster = 'false'
 											End
+										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
 												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
@@ -1452,6 +2003,512 @@ Begin
 												Set @DonatorEsqInf2 = @UsuarioID
 												Set @Incluido = 'true'
 												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+										
+									End
+            
+									--*********** INDICATOR DIREITA Inferior ************** 
+									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf'))
+									Begin
+										Set @log = @log + '| 34.3.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+										--Verifica se ha Donator Direita Inferior 1
+										if (@DonatorDirInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior s
+										if (@DonatorDirInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior 1
+										if (@DonatorDirSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior s
+										if (@DonatorDirSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup2'
+												Set @PagoMaster = 'false'
+											End
+										
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
+										if (@IndicatorEsqSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
+										if (@IndicatorEsqInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorEsqInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorEsqInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorEsqInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Esquerda Superior 1
+										if (@DonatorEsqSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 2
+										if (@DonatorEsqSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 1
+										if (@DonatorEsqInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 2
+										if (@DonatorEsqInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+									End
+            
+									--*********** INDICATOR ESQUERDA Superior **************
+									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup'))
+									Begin
+										Set @log = @log + '| 34.3.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+										--Verifica se ha Donator Esquerda Superior 1
+										if (@DonatorEsqSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 2
+										if (@DonatorEsqSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 1
+										if (@DonatorEsqInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 2
+										if (@DonatorEsqInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
+										if (@IndicatorDirSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
+										if (@IndicatorDirInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Direita Superior 1
+										if (@DonatorDirSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior s
+										if (@DonatorDirSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior 1
+										if (@DonatorDirInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior s
+										if (@DonatorDirInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf2'
+												Set @PagoMaster = 'false'
+											End
+									
+									End
+
+									--*********** INDICATOR ESQUERDA Inferior **************
+									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf'))
+									Begin
+										Set @log = @log + '| 34.3.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+										--Verifica se ha Donator Esquerda Inferior 1
+										if (@DonatorEsqInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Inferior 2
+										if (@DonatorEsqInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqInf2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 1
+										if (@DonatorEsqSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Esquerda Superior 2
+										if (@DonatorEsqSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorEsqSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorEsqSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorEsqSup2'
+												Set @PagoMaster = 'false'
+											End
+
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
+										if (@IndicatorDirSup is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirSup = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirSup = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirSup'
+												Set @PagoMaster = 'true'
+											End
+										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
+										if (@IndicatorDirInf is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Update
+													Rede.Tabuleiro
+												Set
+													IndicatorDirInf = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @IndicatorDirInf = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'IndicatorDirInf'
+												Set @PagoMaster = 'true'
+											End
+										
+										--Verifica se ha Donator Direita Superior 1
+										if (@DonatorDirSup1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Superior s
+										if (@DonatorDirSup2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirSup2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirSup2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirSup2'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior 1
+										if (@DonatorDirInf1 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf1 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf1 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf1'
+												Set @PagoMaster = 'false'
+											End
+										--Verifica se ha Donator Direita Inferior s
+										if (@DonatorDirInf2 is null and @Incluido = 'false')
+											Begin
+												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Update
+													Rede.Tabuleiro
+												Set
+													DonatorDirInf2 = @UsuarioID
+												Where
+													ID = @ID
+               
+												Set @DonatorDirInf2 = @UsuarioID
+												Set @Incluido = 'true'
+												Set @PosicaoFilho = 'DonatorDirInf2'
 												Set @PagoMaster = 'false'
 											End
 									End
@@ -1719,16 +2776,18 @@ Begin
 									Update
 										Rede.TabuleiroUsuario
 									Set
-										StatusID = 1,
 										TabuleiroID = @ID,
+										StatusID = 1,
 										MasterID = @Master,
-										InformePag = 'false',
-										PagoMaster = @PagoMaster,
-										PagoSistema = 'false',
-										Ciclo = 1,
+										InformePag = 0, --false
+										UsuarioIDPag = null,
+										Ciclo = Ciclo + 1,
 										Posicao = @PosicaoFilho,
+										PagoMaster = @PagoMaster,
+										InformePagSistema = 0, --false
+										PagoSistema = 0, --false
 										DataInicio = GetDate(),
-										Debug = 'Update: Posicoes livres'
+										Debug = 'Update: Posicoes livres Pai: ' + TRIM(STR(@Master))
 									Where
 										UsuarioId = @UsuarioID and
 										BoardID = @BoardID
@@ -1764,7 +2823,7 @@ Begin
 								Posicao = 'DonatorEsqInf2' 
 							)
 
-						--Envia convite para o master para um nivel superior se jah teve 4 agamentos
+						--Envia convite para o master para um nivel superior se jah teve 4 pagamentos
 						If(@count >= 4)
 						Begin
 							Set @log = @log + '|50.1 jah teve 4 pagamentos, verifica se ja esta em nivel superior'
@@ -1823,17 +2882,20 @@ Begin
 							Set @log = @log + '| 38 Obtem primeiro Master ativo '
 							--Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuario nesse tabuleiro
 							Select Top(1)
-								@MasterTabuleiro = UsuarioID 
+								@MasterTabuleiro = MasterID 
 							From 
 								Rede.TabuleiroUsuario
 							Where
 								StatusID = 1 and
 								BoardID = @BoardID
+							Order by 
+								TabuleiroID,
+								MasterID
             
 							if(@MasterTabuleiro is null)
 							Begin
-								Set @log = @log + '| 39 Master eh null'
-								Set @Historico = '05 usuario pai (' + TRIM(STR(@MasterTabuleiro)) + ') nao existe! Chamada: ' + @Chamada
+								Set @log = @log + '| 39 Master eh null - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
+								Set @Historico = '05 usuario pai (' + TRIM(STR(@MasterTabuleiro)) + ') nao existe! Chamada: ' + @Chamada + ' - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
 							End
 							Else
 							Begin
@@ -1850,7 +2912,6 @@ Begin
 						End
 					End
 				End
-        
 			End
 		End
         Else
@@ -1917,9 +2978,8 @@ Begin
     Drop Table #temp
 
 End -- Sp
-
 go
 Grant Exec on spG_Tabuleiro To public
 go
 
---Exec spG_Tabuleiro @UsuarioID=2587,@UsuarioPaiID=2584,@BoardID=2,@Chamada='Convite'
+--Exec spG_Tabuleiro @UsuarioID=2584,@UsuarioPaiID=2580,@BoardID=1,@Chamada='Convite'

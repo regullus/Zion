@@ -20,7 +20,7 @@ BEGIN
     Set nocount on
     
     Declare 
-        @retorno nvarchar(4),
+        @retorno nvarchar(50),
         @total int,
         @MasterID int,
         @PagoSistema bit
@@ -51,15 +51,54 @@ BEGIN
 	Where
 		MasterID = @MasterID and
 		BoardID = @BoardID and
-		PagoMaster = 'true'
+		PagoMaster = 'true' and
+		Posicao in (
+			'DonatorDirSup1',
+			'DonatorDirSup2',
+			'DonatorDirInf1',
+			'DonatorDirInf2',
+			'DonatorEsqSup1',
+			'DonatorEsqSup2',
+			'DonatorEsqInf1',
+			'DonatorEsqInf2'
+		)
 
-    if(@PagoSistema = 0)
+	--Caso Tenha Fechado algum lado, este não entram no conunt do select acima
+	--Daí soma 4 no @total, pois já fechou um lado
+	if Exists (
+		Select 
+			'OK' 
+			From 
+				Rede.TabuleiroUsuario 
+			Where
+				MasterID = @MasterID and
+				BoardID = @BoardID and
+				DireitaFechada = 'true'
+		)
+	Begin
+		Set @total = @total + 4
+	End
+	if Exists (
+		Select 
+			'OK' 
+			From 
+				Rede.TabuleiroUsuario 
+			Where
+				MasterID = @MasterID and
+				BoardID = @BoardID and
+				EsquerdaFechada = 'true'
+		)
+	Begin
+		Set @total = @total + 4
+	End
+
+    if(@PagoSistema = 'false')
     Begin
         -- Se total for maior que 4, informa 'NOOK'
         --pois o Master deve pagar o sistema ate os 4 primeiros pagamentos
         if(@Total > 3)
         Begin 
-            Select @retorno = 'NOOK'
+            Select @retorno = 'NOOK_PAGTO_SISTEMA'
         End
         Else
         Begin
@@ -68,52 +107,58 @@ BEGIN
     End
     Else
     Begin
-        --J� pagou o sistema
+        --Jah pagou o sistema
         Select @retorno = 'OK'
     End
 
 	--Fevifica se master ja teve alguma indicacao
-	if(@retorno = 'OK')
+
+	--Nao considera os 7 principais usuarios
+	if(@UsuarioID > 2586)
 	Begin
-	    --Nao considera os 7 principais usuarios
-		if(@UsuarioID > 2586)
-		Begin
-		    --Faz a verificacao somente se recebeu mais que 4 pag
-			if(@Total > 4)
-			Begin 
-				Declare
-					@totalBoard int,
-					@totalIndicados int
+		--Faz a verificacao somente se recebeu mais que 1 pag
+		if(@Total > 1)
+		Begin 
+			Declare
+				@totalBoard int,
+				@totalIndicados int
 
-				Select 
-				  Distinct BoardID
-				Into
-					#tempBoard
-				from
-					Rede.TabuleiroUsuario
-				Where
-					UsuarioID = 2580 
+			Select 
+				Distinct BoardID
+			Into
+				#tempBoard
+			from
+				Rede.TabuleiroUsuario
+			Where
+				UsuarioID = @UsuarioID 
 
-				Select 
-					@totalBoard = Count(*)
-				From
-					#tempBoard
+			Select 
+				@totalBoard = Count(*)
+			From
+				#tempBoard
 
-				Select 
-				  @totalIndicados = count(*)
-				from
-					Usuario.Usuario
-				Where
-					PatrocinadorDiretoID = 2580
+			Select 
+				@totalIndicados = count(*)
+			from
+				Usuario.Usuario
+			Where
+				PatrocinadorDiretoID = @UsuarioID 
 	
-				if(@totalBoard > @totalIndicados)
+			if(@totalBoard > @totalIndicados)
+			Begin
+				--Usuario nao tem indicacoes maior ou igual ao numero de tabuleiros que ele pertence
+				if(@Retorno = 'NOOK_PAGTO_SISTEMA')
 				Begin
-					--Usuario nao tem indicacoes maior ou igual ao numero de tabuleiros que ele pertence
-					Select @retorno = 'NOOK'
+					Select @retorno = 'NOOK_PAGTO_SISTEMA_SEM_INDICACAO'
+				End
+				Else
+				Begin
+					Select @retorno = 'NOOK_SEM_INDICACAO'
 				End
 			End
 		End
 	End
+	
 
     Select @retorno as Retorno
 End -- Sp
@@ -122,7 +167,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID = 2580, @BoardID = 1
+--Exec spC_TabuleiroMasterRule @UsuarioID = 2588, @BoardID = 1
 
 
 

@@ -26,23 +26,16 @@
     var usuariosNivel = ViewBag.UsuariosNivel;
     var usuariosAssocDia = ViewBag.UsuariosAssocDia;
     var usuariosAssocDiaPer = ViewBag.UsuariosAssocDiaPer;
- 
-    ViewBag.Title = traducaoHelper["DOCUMENTOS"].ToString().ToLower();
 
     #endregion
 
 }
 
-@section pageStyles {
+@section pageStyles {}
 
+@section head {}
 
-}
-
-@section head {
-}
-
-@section pageScripts {
-}
+@section pageScripts {}
 
 @section PageLevelScripts{
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -110,48 +103,40 @@
     </script>
 }
 
-@section jQueryRead {
-}
+@section jQueryRead {}
 
-<div class="portlet light">
+<div class="portlet solid grey-cararra" style="max-width: 1600px;">
     <div class="portlet-body">
-
-        <div class="row">
-            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_USUARIOS_ASSOCIACAO"))
-            {
-                <div class="col-md-6">
-                    <div class="portlet light portlet-fit bordered">
-                        <div class="portlet-title">
-                            <div class="caption">
-                                <i class=" icon-layers font-green"></i>
-                                <span class="caption-subject font-green bold ">@traducaoHelper["DISTRIBUICAO_USUARIO_ASSOCIACAO"]</span>
-                            </div>
-                        </div>
-
-                        <div class="portlet-body">
-                            <div id="chartUsuarioNivel" style="height:300px;"></div>
-                        </div>
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="row">
+                <div class="column col-md-10">
+                    <div class="page-title">
+                        <h2>@ViewBag.Title</h2>
                     </div>
                 </div>
-            }
-
-            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_EVOLUCAO_USUARIOS_ASSOCIADOS"))
-            {
-                <div class="col-md-6">
-                    <div class="portlet light portlet-fit bordered">
-                        <div class="portlet-title">
-                            <div class="caption">
-                                <i class=" icon-layers font-green"></i>
-                                <span class="caption-subject font-green bold ">@traducaoHelper["EVOLUCAO_USUARIOS_ASSOCIADOS"]</span>
-                            </div>
-                        </div>
-                        <div class="portlet-body">
-                            <div id="linechart_material" style="height:300px;"></div>
-                        </div>
+                <div class="column col-md-2">
+                    <div class="page-title">
+                        <span id="minutes" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
+                        <span id="pontos" class="hidden" style="font-size: 18px; font-weight: 500;">:</span>
+                        <span id="seconds" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
                     </div>
                 </div>
-            }
+            </div>
 
+            <!-- END PAGE TITLE -->
         </div>
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="">@ViewBag.Title</a>
+            </li>
+            <li>
+                <a href="" class="txtTitle"></a>
+            </li>
+        </ul>
     </div>
 </div>
