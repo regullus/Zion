@@ -33,7 +33,7 @@ BEGIN
     Where
         UsuarioID = @UsuarioID and
         BoardID = @BoardID 
-
+	
     --Verifica se master nao pagou o sistema
     Select
         @PagoSistema = PagoSistema
@@ -62,7 +62,7 @@ BEGIN
 			'DonatorEsqInf1',
 			'DonatorEsqInf2'
 		)
-
+		
 	--Caso Tenha Fechado algum lado, este não entram no conunt do select acima
 	--Daí soma 4 no @total, pois já fechou um lado
 	if Exists (
@@ -91,7 +91,7 @@ BEGIN
 	Begin
 		Set @total = @total + 4
 	End
-
+			
     if(@PagoSistema = 'false')
     Begin
         -- Se total for maior que 4, informa 'NOOK'
@@ -116,8 +116,9 @@ BEGIN
 	--Nao considera os 7 principais usuarios
 	if(@UsuarioID > 2586)
 	Begin
+	    
 		--Faz a verificacao somente se recebeu mais que 1 pag
-		if(@Total > 1)
+		if(@Total >= 1)
 		Begin 
 			Declare
 				@totalBoard int,
@@ -130,19 +131,25 @@ BEGIN
 			from
 				Rede.TabuleiroUsuario
 			Where
-				UsuarioID = @UsuarioID 
-
+				UsuarioID = @UsuarioID and
+				TabuleiroID is not null
+			
 			Select 
 				@totalBoard = Count(*)
 			From
 				#tempBoard
-
+				
 			Select 
 				@totalIndicados = count(*)
 			from
-				Usuario.Usuario
+				Usuario.Usuario usu,
+				Rede.TabuleiroUsuario tab
 			Where
-				PatrocinadorDiretoID = @UsuarioID 
+				usu.PatrocinadorDiretoID = 2588 and
+				usu.ID = tab.UsuarioID and
+				tab.InformePag = 'true' and
+				tab.PagoMaster = 'true' and
+				tab.TabuleiroID is not null
 	
 			if(@totalBoard > @totalIndicados)
 			Begin
@@ -167,7 +174,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID = 2588, @BoardID = 1
+Exec spC_TabuleiroMasterRule @UsuarioID=2588, @BoardID=1
 
 
 

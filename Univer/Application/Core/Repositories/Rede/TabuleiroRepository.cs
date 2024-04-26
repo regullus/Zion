@@ -109,7 +109,16 @@ namespace Core.Repositories.Rede
                 Chamada = "Principal";
             }
 
-            string sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
+            string sql = "";
+
+            if (Chamada == "Convite") //Força a entradanum tabuleiro mais antigo
+            {
+                sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=null,@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
+            } else
+            {
+                sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
+            }
+            
             TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
 
             string ret = "OK";

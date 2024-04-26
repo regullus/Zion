@@ -70,7 +70,9 @@ Begin
             @esquerdaFechada bit,
             @tabuleiroFechado bit,
             @BoardIDProximo int,
-            @aux int
+            @aux int,
+			@PosicaoAntiga nvarchar(255),
+			@TabuleiroIDAntigo int
            
     Set @Incluido = 'false'
     Set @DireitaFinalizada = 'false'
@@ -96,6 +98,15 @@ Begin
     --Tambem ira incluir automaticamente esse mesmo master no board1
     Set @IncluiUsuAutBoard = 'false'
 
+	Select
+		@PosicaoAntiga = Posicao,
+		@TabuleiroIDAntigo = TabuleiroID
+	From
+		Rede.TabuleiroUsuario
+	Where
+		UsuarioID = @UsuarioID and
+		BoardID = @BoardID
+
     Create Table #temp 
     (
         ID int not null,
@@ -120,7 +131,7 @@ Begin
         DataFim int null
     )
 
-    Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID))
+    Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @Chamada
 
 	Set @aux = 0
 	Select 
@@ -152,7 +163,7 @@ Begin
 	--Caso Usuario jah se encontra no tabuleiro, verifica se ele esta em uma lado fechado
 	if(@aux > 0)
 	Begin
-		Set @log = @log + '|00 aux > 0 - Ja esta notabuleiro'
+		Set @log = @log + '|00 aux > 0 - Ja esta no tabuleiro'
 		--Para estar com um lado fechado ele deve ja ter ao menos um convite em um outro tabuleiro
 		if Exists (
 			Select 
@@ -162,7 +173,8 @@ Begin
 			Where
 				UsuarioID = @UsuarioID and
 				@BoardID = @BoardID and
-				StatusID = 2 --Convite
+				StatusID = 2 and --Convite
+				PagoSistema = 'true' --tem q ter pago o sistema
 		) 
 		Begin
 			Set @log = @log + '|00 jah se encontra no tabuleiro, mas vai ser incluido em outro'
@@ -178,6 +190,11 @@ Begin
         --Regra: Caso usuario jah exista no tabuleiro, nao se pode inclui-lo novamente
         Set @Historico = '01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @Chamada
         Set @log = @log + '|01 jah se encontra no tabuleiro'
+
+		if(@UsuarioPaiID is null) 
+		Begin
+			Set @UsuarioPaiID = 0;
+		End
     End
     Else
     Begin
@@ -227,6 +244,14 @@ Begin
                 Where
                     tab.BoardID = @BoardID and
                     tab.StatusID = 1 --Tem que estar ativo no board
+				Order By
+					tab.ID
+
+				Select
+					@UsuarioPaiID = Master
+				From
+					#temp
+
                 End
             Else
             Begin
@@ -1162,7 +1187,8 @@ Begin
 										Debug = 'Tabuleiro Fechado - Convite (1)'
 									Where
 										UsuarioID = @Master and --Ele vira o Master
-										BoardID = @BoardID
+										BoardID = @BoardID and
+										PagoSistema = 'true' --tem q ter pago o sistema
 								End
 							End
 						   --*************** Encerra tabuleiro Fim ****************
@@ -2860,7 +2886,8 @@ Begin
 									Where 
 										UsuarioID = @Master and 
 										BoardID = @BoardID and
-										StatusID = 0 --nao esta no boardSuperior
+										StatusID = 0 and --nao esta no boardSuperior
+										PagoSistema = 'true' --tem q ter pago o sistema
 								End
 						End
 						Else
@@ -2921,25 +2948,62 @@ Begin
         End
     End
     
-    Insert Into Rede.TabuleiroLog 
-    (
-        UsuarioID,
-        UsuarioPaiID,
-        BoardID,
-        Data,
-        Mensagem,
-        Debug
-    )
-    Values
-    (
-        Coalesce(@UsuarioID,@UsuarioID,0),
-        Coalesce(@UsuarioPaiID,@UsuarioPaiID,0),
-        Coalesce(@BoardID,@BoardID,0),
-        CONVERT(VARCHAR(8),GETDATE(),112),
-        Coalesce(@Historico,@Historico,'Sem  Dados'),
-        Coalesce(@log,@log,'Sem Dados')
-    )
-        
+    Declare 
+		@NomeUsuario nvarchar(255),
+		@NomePai nvarchar(255),
+		@NomeMaster nvarchar(255),
+		@PosicaoNova nvarchar(255),
+		@TabuleiroIDNovo int
+		
+    Select
+		@NomeUsuario = Apelido
+	From
+		Usuario.Usuario
+	Where
+		ID = @UsuarioID
+
+    Select
+		@NomePai = Apelido
+	From
+		Usuario.Usuario
+	Where
+		ID = @UsuarioPaiID
+
+	Select
+		@NomeMaster = Apelido
+	From
+		Usuario.Usuario
+	Where
+		ID = @Master
+	
+	Select
+		@PosicaoNova = Posicao,
+		@TabuleiroIDNovo = TabuleiroID
+	From
+		Rede.TabuleiroUsuario
+	Where
+		UsuarioID = @UsuarioID and
+		BoardID = @BoardID
+
+    Insert Into Rede.TabuleiroLog
+	Select 
+		Coalesce(@UsuarioID,@UsuarioID,0) as UsuarioID,
+		Coalesce(@NomeUsuario,@NomeUsuario,'Sem Nome') as NomeUsuario,
+        Coalesce(@UsuarioPaiID,@UsuarioPaiID,0) as UsuarioPaiID,
+		Coalesce(@NomePai,@NomePai,'Sem Nome') as NomePai,
+		Coalesce(@Master,@Master,0) as Master,
+		Coalesce(@NomeMaster,@NomeMaster,'Sem Nome') as NomeMaster,
+        Coalesce(@BoardID,@BoardID,0) as BoardID,
+		Coalesce(@ID,@ID,0) as TabuleiroID,
+		Coalesce(@PosicaoAntiga,@PosicaoAntiga,'Sem posicao Antiga') as PosicaoAntiga,
+		Coalesce(@PosicaoNova,@PosicaoNova,'Sem posicao Nova') as PosicaoNova,
+		Coalesce(@TabuleiroIDAntigo,@TabuleiroIDAntigo,0) as TabuleiroIDAntigo,
+		Coalesce(@TabuleiroIDNovo,@TabuleiroIDNovo,0) as TabuleiroIDNovo,
+		@Chamada as Chamada,
+        format(getdate(),'dd/MM/yyyy HH:mm:ss') as Data,
+        Coalesce(@Historico,@Historico,'Sem  Dados') as Historico,
+        Coalesce(@log,@log,'Sem Dados') as [log]
+		
     if(@Historico is null or @Historico = '')
     Begin
         if(@Chamada <> 'PaiValido')
@@ -2978,8 +3042,10 @@ Begin
     Drop Table #temp
 
 End -- Sp
+
+
 go
 Grant Exec on spG_Tabuleiro To public
 go
 
---Exec spG_Tabuleiro @UsuarioID=2584,@UsuarioPaiID=2580,@BoardID=1,@Chamada='Convite'
+--Exec spG_Tabuleiro @UsuarioID=2587,@UsuarioPaiID=2584,@BoardID=1,@Chamada='ConviteNew'

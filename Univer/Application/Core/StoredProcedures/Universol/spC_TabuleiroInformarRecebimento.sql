@@ -78,14 +78,28 @@ BEGIN
 					BoardID  = @BoardID + 1
 				)
             Begin
-                --Atualiza para criar o convite para o proximo nivel
-                Update
-                    rede.TabuleiroUsuario
-                Set 
-                    StatusID = 2 --Convite Proximo Nivel
-                Where
-                    UsuarioID = @MasterID and 
-                    BoardID  = @BoardID 
+			    --Verifica se já pagou o sistema
+				if Exists (
+					Select 
+						'OK' 
+					From 
+						rede.TabuleiroUsuario 
+					Where 
+						UsuarioID = @MasterID and 
+						BoardID  = @BoardID and
+						PagoSistema = 'true'
+					)
+				Begin
+					--Atualiza para criar o convite para o proximo nivel
+					Update
+						rede.TabuleiroUsuario
+					Set 
+						StatusID = 2 --Convite Proximo Nivel
+					Where
+						UsuarioID = @MasterID and 
+						BoardID  = @BoardID + 1 and
+						PagoSistema = 'true' --tem q ter pago o sistema
+				End
             End
         End
     End

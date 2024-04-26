@@ -344,6 +344,7 @@
                                     break;
                             }
                         </th>
+                        <th scope="col">@traducaoHelper["LOGIN"] - @traducaoHelper["PATROCINADOR"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
                     </tr>
                 </thead>
@@ -376,6 +377,7 @@
                                     break;
                             }
                         </th>
+                        <th scope="col">@traducaoHelper["LOGIN"] - @traducaoHelper["PATROCINADOR"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
                     </tr>
                 </tfoot>
@@ -428,6 +430,9 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.PatrocinadorDireto.Nome)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PatrocinadorDireto.Login)
                             </td>
                             <td>
                                 @if (item.Bloqueado)

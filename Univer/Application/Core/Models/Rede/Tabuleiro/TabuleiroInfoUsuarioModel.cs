@@ -15,5 +15,6 @@ namespace Core.Models
         public string Pix { get; set; }
         public string Carteira { get; set; }
         public bool ConfirmarRecebimento { get; set; }
+        public string Observacao { get; set; }
     }
 }

@@ -22,7 +22,8 @@ BEGIN
 
 	Declare 
         @Count int,
-        @MasterID int
+        @MasterID int,
+		@Check bit
     
 	Select
         @MasterID = MasterID
@@ -40,7 +41,7 @@ BEGIN
 			PagoSistema = 'true'
 		where 
 			UsuarioID = @UsuarioID and 
-			TabuleiroID  = @BoardID
+			BoardID  = @BoardID 
 
 		--Verifica se ja e o 4 recebimento do master
 		Select
@@ -50,7 +51,7 @@ BEGIN
 		Where
 			UsuarioID = @UsuarioID and 
 			BoardID  = @BoardID 
-
+		
 		if Exists (
 			Select 
 				'OK' 
@@ -72,7 +73,7 @@ BEGIN
 				BoardID  = @BoardID and
 				PagoMaster = 'true' and
 				Posicao in ('DonatorDirSup1','DonatorDirSup2','DonatorDirInf1','DonatorDirInf2','DonatorEsqSup1','DonatorEsqSup2','DonatorEsqInf1','DonatorEsqInf2')
-
+				
 			if(@count>=4)
 			Begin
 				--Verifica se ja nao esta no proximo nivel
@@ -83,9 +84,11 @@ BEGIN
 						rede.TabuleiroUsuario 
 					Where 
 						UsuarioID = @MasterID and 
-						BoardID  = @BoardID + 1
+						BoardID  = @BoardID + 1 and
+						TabuleiroID is not null
 					)
 				Begin
+					--Verifica se já pagou o sistema
 					--Atualiza para criar o convite para o proximo nivel
 					Update
 						rede.TabuleiroUsuario
@@ -93,7 +96,7 @@ BEGIN
 						StatusID = 2 --Convite Proximo Nivel
 					Where
 						UsuarioID = @MasterID and 
-						BoardID  = @BoardID 
+						BoardID  = @BoardID + 1 
 				End
 			End
 		End
@@ -106,7 +109,7 @@ BEGIN
 			PagoSistema = 'false',
 			InformePagSistema = 'false'
 		where 
-			UsuarioID = @UsuarioID and 
+			UsuarioID = @MasterID and 
 			TabuleiroID  = @BoardID
 	End
 
@@ -118,10 +121,5 @@ go
 Grant Exec on spC_TabuleiroConfirmarPagtoSistema To public
 go
 
---Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID = 2580, @BoardID = 1
-
---Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2587, @BoardID=1
-
-Select * from Rede.TabuleiroUsuario
-where InformePagSistema = 1 and
-PagoSistema = 0
+--Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2588, @BoardID=1, @confirmar='true'--
+--Select * from  Rede.TabuleiroUsuario where usuarioID = 2588

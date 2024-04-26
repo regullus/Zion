@@ -1024,6 +1024,8 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02");
                 }
 
+                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
+                
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = retorno,

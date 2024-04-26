@@ -28,7 +28,12 @@ BEGIN
 	Where
 		UsuarioID = @UsuarioID and
 		TabuleiroID = @TabuleiroID
-    
+
+    if (@retorno is null)
+	Begin
+		set @retorno = 0
+	End
+
     Select @retorno as Retorno
 End -- Sp
 
@@ -36,7 +41,8 @@ go
 Grant Exec on spC_TabuleiroObtemBoardIDByTabuleiroID To public
 go
 
---Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID = 2580, @TabuleiroID = 1
+--Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID=2591,@TabuleiroId=1
+
 
 
 

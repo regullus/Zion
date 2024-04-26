@@ -468,7 +468,7 @@ namespace Sistema.Controllers
                 else
                 {
                     //Obtem 1º Tabuleiro ativo do usuario
-                    tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
+                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID != 2).FirstOrDefault();
                 }
                 //Caso seja um convite StatusID =2 - Obtem o 1º Ativo
                 if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2)
@@ -722,6 +722,18 @@ namespace Sistema.Controllers
                 {
                     int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
 
+                    if(idBoard == 0)
+                    {
+                        JsonResult jsonResult0 = new JsonResult
+                        {
+                            Data = "NoValue",
+                            RecursionLimit = 1000
+                        };
+
+                        return jsonResult0;
+
+                    }
+
                     //Obtem usuario target
                     TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idBoard);
 
@@ -776,6 +788,34 @@ namespace Sistema.Controllers
                         //    obtemInfoUsuario.ConfirmarRecebimento = true;
                         //}
                         obtemInfoUsuario.ConfirmarRecebimento = true;
+                    }
+                    
+                    obtemInfoUsuario.Observacao = "";
+
+                    //Verifica se usuario é o master do sistema
+                    if (tabuleiroUsuario.MasterID == usuario.ID)
+                    {
+                        //Sendo o master verifica se ele esta ok com as regras
+                        string check = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
+
+                        switch (check)
+                        {
+                            case "OK":
+                                obtemInfoUsuario.Observacao = "";
+                                break;
+                            case "NOOK_PAGTO_SISTEMA":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_2"];
+                                break;
+                            case "NOOK_SEM_INDICACAO":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_SEM_INDICACAO_2"];
+                                break;
+                            case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_2"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO_2"];
+                                break;
+                            default:
+                                obtemInfoUsuario.Observacao = traducaoHelper[check];
+                                break;
+                        }
                     }
 
                     JsonResult jsonResult = new JsonResult
@@ -1274,6 +1314,7 @@ namespace Sistema.Controllers
                         lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
                         lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
                         lancamentoRepository.Save(lancamento);
+
 
                         //Chama incluir no tabuleiro para ver se 
                         //o tabuleiro esta completo
