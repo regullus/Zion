@@ -536,7 +536,7 @@ namespace Sistema.Controllers
                     }
 
                     //Verifica se usuario é o master do sistema
-                    if(tabuleiroUsuario.MasterID == usuario.ID)
+                    if (tabuleiroUsuario.MasterID == usuario.ID)
                     {
                         //Sendo o master verifica se ele esta ok com as regras
                         string check = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
@@ -620,12 +620,13 @@ namespace Sistema.Controllers
                                     tabuleiro.DonatorEsqSup1 == usuario.ID ||
                                     tabuleiro.DonatorEsqInf1 == usuario.ID ||
                                     tabuleiro.DonatorEsqSup2 == usuario.ID ||
-                                    tabuleiro.DonatorEsqInf2 == usuario.ID 
+                                    tabuleiro.DonatorEsqInf2 == usuario.ID
                                    )
                                 {
                                     //Já estando no tabuleiro escolhido pega o proximo disponivel
                                     tab10Disponiveis = true;
-                                } else
+                                }
+                                else
                                 {
                                     ViewBag.idTabuleiro = idTabuleiro;
                                     ViewBag.tabuleiro = tabuleiro;
@@ -639,7 +640,7 @@ namespace Sistema.Controllers
                         {
                             tab10Disponiveis = true;
                         }
-                        if(tab10Disponiveis)
+                        if (tab10Disponiveis)
                         {
                             //Obtem os 10 primeiros tabuleiros ativos
                             tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(null);
@@ -722,7 +723,7 @@ namespace Sistema.Controllers
                 {
                     int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
 
-                    if(idBoard == 0)
+                    if (idBoard == 0)
                     {
                         JsonResult jsonResult0 = new JsonResult
                         {
@@ -737,13 +738,20 @@ namespace Sistema.Controllers
                     //Obtem usuario target
                     TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoUsuario(idTarget, idUsuario, idBoard);
 
+                    //Obtem os dados do tabuleiro do usuario que se quer informações
+                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idTarget, idBoard);
+
                     if (obtemInfoUsuario != null)
                     {
-                        //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
-                        if (tabuleiroRepository.MasterRuleOK(idUsuario, idBoard) != "OK")
+                        //Se o target for o master
+                        if (tabuleiroUsuario.MasterID == idTarget)
                         {
-                            //Não estando ok, a conta do sistema é exibida para pagamento
-                            obtemInfoUsuario = tabuleiroRepository.ObtemInfoSystem();
+                            //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
+                            if (tabuleiroRepository.MasterRuleOK(idTarget, idBoard) != "OK")
+                            {
+                                //Não estando ok, a conta do sistema é exibida para pagamento
+                                obtemInfoUsuario = tabuleiroRepository.ObtemInfoSystem();
+                            }
                         }
                         obtemInfoUsuario.Pix = CriptografiaHelper.Morpho(obtemInfoUsuario.Pix, CriptografiaHelper.TipoCriptografia.Descriptografa);
                         obtemInfoUsuario.Carteira = CriptografiaHelper.Morpho(obtemInfoUsuario.Carteira, CriptografiaHelper.TipoCriptografia.Descriptografa);
@@ -755,9 +763,6 @@ namespace Sistema.Controllers
                         //Não há dados para ser exibido
                         return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_02");
                     }
-
-                    //Obtem os dados do tabuleiro do usuario que se quer informações
-                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idTarget, idBoard);
 
                     //Se o UsuarioLogado é o Master,
                     //caso o master não tenha recebido (PagoMaster = false)
@@ -789,7 +794,7 @@ namespace Sistema.Controllers
                         //}
                         obtemInfoUsuario.ConfirmarRecebimento = true;
                     }
-                    
+
                     obtemInfoUsuario.Observacao = "";
 
                     //Verifica se usuario é o master do sistema

@@ -174,7 +174,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
-Exec spC_TabuleiroMasterRule @UsuarioID=2588, @BoardID=1
+--Exec spC_TabuleiroMasterRule @UsuarioID=2588, @BoardID=1
 
 
 
