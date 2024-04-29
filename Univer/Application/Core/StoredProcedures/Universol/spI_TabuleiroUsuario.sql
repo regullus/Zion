@@ -50,6 +50,7 @@ BEGIN
                 PagoSistema,
 				DireitaFechada,
 				EsquerdaFechada,
+				TotalRecebimento,
 				DataInicio,
 				DataFim,
 				Debug
@@ -63,13 +64,14 @@ BEGIN
 				@MasterID,
 				0,
 				null, --Altera depois dele entrar em um tabuleiroi
-				1, --1o ciclo dele, ele acabou de entrar no sistema
+				0, --Será incrementado depois
 				'', --Sem posi�ao ainda
 				'false', 
 				'false',
 				'false',
 				'false',
 				'false',
+				0,
 				GetDate(),
 				null,
 				'Usuario Iniciado'
@@ -93,6 +95,7 @@ BEGIN
                 PagoSistema,
 				DireitaFechada,
 				EsquerdaFechada,
+				TotalRecebimento,
 				DataInicio,
 				DataFim,
 				Debug
@@ -106,13 +109,14 @@ BEGIN
 				@MasterID,
 				0,
 				null, --Altera depois dele entrar em um tabuleiroi
-				1, --1o ciclo dele, ele acabou de entrar no sistema
+				0, --Será incrementado depois
 				'', --Sem posi�ao ainda
 				'false', 
 				'false',
 				'false',
 				'false',
 				'false',
+				0,
 				GetDate(),
 				null,
 				'Usuario Iniciado'
@@ -133,9 +137,10 @@ BEGIN
 					Posicao,
 					PagoMaster,
 					InformePagSistema,
-                PagoSistema,
+					PagoSistema,
 					DireitaFechada,
 					EsquerdaFechada,
+					TotalRecebimento,
 					DataInicio,
 					DataFim,
 					Debug
@@ -149,13 +154,14 @@ BEGIN
 					@MasterID,
 					0,
 					null, --Altera depois dele entrar em um tabuleiroi
-					1, --1o ciclo dele, ele acabou de entrar no sistema
+					0, --Será incrementado depois
 					'', --Sem posi�ao ainda
 					'false', 
 					'false',
 					'false',
 					'false',
 					'false',
+					0,
 					GetDate(),
 					null,
 					'Usuario Iniciado'
@@ -179,6 +185,7 @@ BEGIN
                 PagoSistema,
 				DireitaFechada,
 				EsquerdaFechada,
+				TotalRecebimento,
 				DataInicio,
 				DataFim,
 				Debug
@@ -192,13 +199,14 @@ BEGIN
 				@MasterID,
 				0,
 				null, --Altera depois dele entrar em um tabuleiroi
-				1, --1o ciclo dele, ele acabou de entrar no sistema
+				0, --Será incrementado depois
 				'', --Sem posi�ao ainda
 				'false', 
 				'false',
 				'false',
 				'false',
 				'false',
+				0,
 				GetDate(),
 				null,
 				'Usuario Iniciado'
@@ -222,6 +230,7 @@ BEGIN
             PagoSistema,
 			DireitaFechada,
 			EsquerdaFechada,
+			TotalRecebimento,
 			DataInicio,
 			DataFim,
 			Debug
@@ -235,13 +244,14 @@ BEGIN
 			@MasterID,
 			0,
 			null, --Altera depois dele entrar em um tabuleiroi
-			1, --1o ciclo dele, ele acabou de entrar no sistema
+			0, --Será incrementado depois
 			'', --Sem posi�ao ainda
 			'false', 
 			'false',
 			'false',
 			'false',
 			'false',
+			0,
 			GetDate(),
 			null,
 			'Usuario Iniciado'
@@ -266,6 +276,7 @@ BEGIN
             PagoSistema,
 			DireitaFechada,
 			EsquerdaFechada,
+			TotalRecebimento,
 			DataInicio,
 			DataFim,
 			Debug
@@ -279,13 +290,14 @@ BEGIN
 			@MasterID,
 			0,
 			null, --Altera depois dele entrar em um tabuleiroi
-			1, --1o ciclo dele, ele acabou de entrar no sistema
+			0, --Será incrementado depois
 			'', --Sem posi�ao ainda
 			'false', 
 			'false',
 			'false',
 			'false',
 			'false',
+			0,
 			GetDate(),
 			null,
 			'Usuario Iniciado'
@@ -309,6 +321,7 @@ BEGIN
             PagoSistema,
 			DireitaFechada,
 			EsquerdaFechada,
+			TotalRecebimento,
 			DataInicio,
 			DataFim,
 			Debug
@@ -322,13 +335,14 @@ BEGIN
 			@MasterID,
 			0,
 			null, --Altera depois dele entrar em um tabuleiroi
-			1, --1o ciclo dele, ele acabou de entrar no sistema
+			0, --Será incrementado depois
 			'', --Sem posi�ao ainda
 			'false', 
 			'false',
 			'false',
 			'false',
 			'false',
+			0,
 			GetDate(),
 			null,
 			'Usuario Iniciado'
@@ -352,6 +366,7 @@ BEGIN
             PagoSistema,
 			DireitaFechada,
 			EsquerdaFechada,
+			TotalRecebimento,
 			DataInicio,
 			DataFim,
 			Debug
@@ -365,19 +380,43 @@ BEGIN
 			@MasterID,
 			0,
 			null, --Altera depois dele entrar em um tabuleiroi
-			1, --1o ciclo dele, ele acabou de entrar no sistema
+			0, --Será incrementado depois
 			'', --Sem posi�ao ainda
 			'false', 
 			'false',
 			'false',
 			'false',
 			'false',
+			0,
 			GetDate(),
 			null,
 			'Usuario Iniciado'
 		)
 		End
 	End
+
+	Update
+		Rede.TabuleiroUsuario
+	Set
+		TabuleiroID = null,
+		StatusID = 0,
+		MasterID = @MasterID,
+		InformePag = 0,
+		UsuarioIDPag = null,
+		Ciclo = 0,
+		Posicao = '',
+		PagoMaster = 'false',
+		InformePagSistema = 'false',
+        PagoSistema = 'false',
+		DireitaFechada = 'false',
+		EsquerdaFechada = 'false',
+		TotalRecebimento = 0,
+		DataInicio = GetDate(),
+		DataFim = null,
+		Debug = 'Usuario Iniciado'
+	Where
+		UsuarioID = @UsuarioID
+		
 	Select 'OK'
 End -- Sp
 

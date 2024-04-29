@@ -34,13 +34,21 @@ BEGIN
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 
     
-    --Verifica se ja e o 4 recebimento do master
+    --Atualiza recebimento do MAster
     Select
         @MasterID = MasterID
     From
         rede.TabuleiroUsuario 
     Where
         UsuarioID = @UsuarioID and 
+        BoardID  = @BoardID 
+
+	Update
+		rede.TabuleiroUsuario 
+	Set
+		TotalRecebimento = TotalRecebimento + 1
+    Where
+        UsuarioID = @MasterID and 
         BoardID  = @BoardID 
 
     if Exists (
@@ -51,19 +59,16 @@ BEGIN
 		Where 
 			UsuarioID = @MasterID and 
 			BoardID  = @BoardID and 
-			PagoSistema = 'true' and 
 			StatusID = 1
 		)
     Begin
         Select 
-            @Count = count(*)
+            @Count = TotalRecebimento
         From
             rede.TabuleiroUsuario 
         Where
             MasterID = @MasterID and 
-            BoardID  = @BoardID and
-            PagoMaster = 'true' and
-            Posicao in ('DonatorDirSup1','DonatorDirSup2','DonatorDirInf1','DonatorDirInf2','DonatorEsqSup1','DonatorEsqSup2','DonatorEsqInf1','DonatorEsqInf2')
+            BoardID  = @BoardID 
 
         if(@count>=4)
         Begin

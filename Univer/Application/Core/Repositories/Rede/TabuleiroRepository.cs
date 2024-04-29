@@ -322,7 +322,21 @@ namespace Core.Repositories.Rede
             string retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
             return retorno;
         }
-              
+       
+        public string MasterIndicadosOK(int idUsuario, int idBoard)
+        {
+            string sql = "Exec spC_TabuleiroIndicadosValidos @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
+            string retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+            return retorno;
+        }
+
+        public string UsuarioRuleOK(int idUsuario)
+        {
+            string sql = "Exec spC_TabuleiroUsuarioRule @UsuarioID=" + idUsuario;
+            string retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+            return retorno;
+        }
+
         public TabuleiroBoardModel ObtemTabuleiroBoard(int idTabuleiro)
         {
             string sql = "Exec spC_TabuleiroBoard @TabuleiroID=" + idTabuleiro;

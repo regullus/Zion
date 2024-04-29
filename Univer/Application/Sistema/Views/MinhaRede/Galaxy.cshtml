@@ -1,0 +1,1679 @@
+﻿@{
+    #region Layout
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    #endregion
+
+    #region init
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    #endregion
+
+    #region ViewBags
+
+    int idUsuario = ViewBag.idUsuario;
+    string planetaCor = "";
+
+    //Tabuleiros
+    IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = (IEnumerable<Core.Models.TabuleiroUsuarioModel>)ViewBag.tabuleirosUsuario;
+    Core.Models.TabuleiroUsuarioModel tabuleiroAtivo = (Core.Models.TabuleiroUsuarioModel)ViewBag.tabuleiroAtivo;
+
+    int idTabuleiro = ViewBag.idTabuleiro ?? 0;
+    Core.Models.TabuleiroModel tabuleiro = (Core.Models.TabuleiroModel)ViewBag.tabuleiro;
+
+    ViewBag.Title = traducaoHelper["MINHA_REDE"].ToLower();
+
+    var porTabuleiroMaxWidth = "96px";
+
+    bool showReportPayment = false;
+
+    if (ViewBag.ShowReportPayment != null)
+    {
+        showReportPayment = ViewBag.ShowReportPayment;
+    }
+
+    string msgConvite = "";
+
+    bool blnNovoUsuario = false;
+
+    if (ViewBag.NovoUsuario != null)
+    {
+        blnNovoUsuario = ViewBag.NovoUsuario;
+        msgConvite = "<h3>" + traducaoHelper["TABULEIRO_NAO_INICIADO_1"] + @"</h3><br />";
+        msgConvite += "<h4>" + traducaoHelper["TABULEIRO_NAO_INICIADO_2"] + @"</h4><br />";
+        msgConvite += "<h4>" + traducaoHelper["TABULEIRO_NAO_INICIADO_3"] + @"</h4><br />";
+    }
+
+    #endregion
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/home")
+    <link rel="stylesheet" href="~/Content/home/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/global/plugins/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/global/plugins/bootstrap-toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/Content/home/styles.css">
+    <style>
+        #overlay {
+            position: fixed;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            transition: 1s 0.4s;
+        }
+
+        #progress {
+            height: 1px;
+            background: #fff;
+            position: absolute;
+            width: 0; /* will be increased by JS */
+            top: 50%;
+        }
+
+        #progstat {
+            font-size: 0.7em;
+            letter-spacing: 3px;
+            position: absolute;
+            top: 50%;
+            margin-top: -40px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+        }
+
+        .cursorDefault {
+            cursor: default;
+        }
+
+        .cursorPointer {
+            cursor: pointer;
+        }
+
+        .absolute-center {
+        }
+    </style>
+}
+
+@section head {
+}
+
+@section pageScripts {
+    <script type="text/javascript" src="~/Content/scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="~/Content/scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Content/scripts/countUp.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/Content/global/plugins/jquery.pulsate.min.js" type="text/javascript"></script>
+    <script src="~/Content/global/plugins/jquery-bootpag/jquery.bootpag.min.js" type="text/javascript"></script>
+    <script src="~/Content/pages/scripts/ui-general.min.js" type="text/javascript"></script>
+    <script src="~/Content/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
+
+    <script>
+        var width = 0;
+        var posWidth = 10;
+        var showInfo = false;
+
+        $(function () {
+            startPage();
+            position();
+
+            @if (ViewBag.Pagar != null && ViewBag.Pagar)
+            {
+                <text>toastr.error('@traducaoHelper["PAGAR_SISTEMA"]');</text>
+            }
+            @if (ViewBag.ShowMsgFaltaPag != null && ViewBag.ShowMsgFaltaPag != "")
+            {
+                <text>toastr.error('@ViewBag.ShowMsgFaltaPag');</text>
+            }
+            @if (ViewBag.HaConvite != null && ViewBag.HaConvite != "")
+            {
+                <text>toastr.info('@ViewBag.HaConvite');</text>
+            }
+            @if (ViewBag.InfoUsuario != null && ViewBag.InfoUsuario != "")
+            {
+                <text>toastr.error('@ViewBag.InfoUsuario');</text>
+            }
+        });
+
+        function widthResizer() {
+            position();
+        }
+
+        // Getting the width of the browser whenever the screen resolution changes.
+        window.addEventListener('resize', widthResizer)
+
+        const el = (sel, par) => (par || document).querySelector(sel);
+
+        function loadbar() {
+            const elOverlay = el("#overlay");
+            const elProgress = el("#progress");
+            const elProgstat = el("#progstat");
+            const images = document.images;
+            const tot = images.length;
+            let c = 0;
+
+            if (tot == 0) return doneLoading();
+
+            function imgLoaded() {
+                c += 1;
+                const perc = Math.floor(100 / tot * c) + "%";
+                elProgress.style.width = perc;
+                elProgstat.textContent = `Loading ${perc}`;
+                if (c === tot) return doneLoading();
+            }
+
+            function doneLoading() {
+                elOverlay.style.opacity = 0;
+                setTimeout(() => {
+                    elOverlay.style.display = "none";
+                }, 600);
+            }
+
+            [...images].forEach(img => {
+                const tmpImg = new Image();
+                tmpImg.onload = imgLoaded;
+                tmpImg.onerror = imgLoaded;
+                tmpImg.src = img.src;
+            });
+        }
+
+        addEventListener('DOMContentLoaded', loadbar, false);
+    </script>
+
+@if (blnNovoUsuario)
+{
+    <script>
+        Swal.fire({
+            title: '@traducaoHelper["CONVITE"]',
+            html: `
+            <div>
+                <h3>@traducaoHelper["TABULEIRO_NAO_INICIADO_1"]</h3><br />
+                <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_2"]</h4><br />
+                <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4><br />
+                <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_4"]</h4><br />
+            </div>
+                `,
+            icon: 'message',
+            confirmButtonText: 'OK',
+            width: '500px',
+        });
+        function startPage() {
+            $(".divReloadPage").show();
+            $('#planetBody').hide();
+        }
+    </script>
+}
+else
+{
+    <script>
+        function startPage() {
+            $(".divReloadPage").show();
+            $('#planetBody').show();
+        }
+    </script>
+}
+
+@if (ViewBag.Timer != null)
+{
+    <script>
+        //Contador de tempo para pagamento
+        const second = 1000;
+        const minute = second * 60;
+        const hour = minute * 60;
+        let count_down = new Date('@ViewBag.Timer').getTime();
+        let x = setInterval(() => countDown(), second);
+        function countDown() {
+            let now = new Date(Date.now()).getTime();
+            let diff = count_down - now;
+            if (diff > 0) {
+                var min = Math.floor(diff % hour / minute).toString();
+                var seg = Math.floor(diff % minute / second).toString();
+                if (min.length == 1) {
+                    min = '0' + min;
+                }
+                if (seg.length == 1) {
+                    seg = '0' + seg;
+                }
+                document.getElementById('minutes').innerText = min;
+                document.getElementById('seconds').innerText = seg;
+
+                $("#minutes").removeClass('hidden');
+                $("#pontos").removeClass('hidden');
+                $("#seconds").removeClass('hidden');
+            } else {
+                $("#minutes").addClass('hidden');
+                $("#pontos").addClass('hidden');
+                $("#seconds").addClass('hidden');
+            }
+        }
+    </script>
+}
+
+@if (tabuleiro != null)
+{
+    <script>
+        function position() {
+            width = window.innerWidth;
+
+            //$('.titleSmall').html(width);
+
+            var masterID = $('#Master').attr("data-id");
+
+            var porTabuleiroHeight = 200;
+            var porTabuleiroWidth = 200;
+
+            var ajustImgTabuleiroTop = 0;
+            var ajustImgTabuleiroLeft = 0;
+
+            $('#porTabuleiro').css({
+                "width": "980px",
+                "height": "840px",
+                "overflow": "auto !important",
+                "overflow-y": "hidden !important",
+            });
+
+            $('.galaxy').css({
+                "width": "980px",
+                "height": "840px",
+            });
+
+            if (masterID == @idUsuario) {
+                $('#Master').removeClass("cursorDefault");
+                $('#Master').addClass("cursorPointer");
+                $('#DonatorEsqSup1').removeClass("cursorDefault");
+                $('#DonatorEsqSup1').addClass("cursorPointer");
+                $('#DonatorEsqSup2').removeClass("cursorDefault");
+                $('#DonatorEsqSup2').addClass("cursorPointer");
+                $('#DonatorEsqInf1').removeClass("cursorDefault");
+                $('#DonatorEsqInf1').addClass("cursorPointer");
+                $('#DonatorEsqInf2').removeClass("cursorDefault");
+                $('#DonatorEsqInf2').addClass("cursorPointer");
+                $('#DonatorDirSup1').removeClass("cursorDefault");
+                $('#DonatorDirSup1').addClass("cursorPointer");
+                $('#DonatorDirSup2').removeClass("cursorDefault");
+                $('#DonatorDirSup2').addClass("cursorPointer");
+                $('#DonatorDirInf1').removeClass("cursorDefault");
+                $('#DonatorDirInf1').addClass("cursorPointer");
+                $('#DonatorDirInf2').removeClass("cursorDefault");
+                $('#DonatorDirInf2').addClass("cursorPointer");
+                $('#IndicatorEsqSup').removeClass("cursorDefault");
+                $('#IndicatorEsqSup').addClass("cursorPointer");
+                $('#IndicatorEsqInf').removeClass("cursorDefault");
+                $('#IndicatorEsqInf').addClass("cursorPointer");
+                $('#IndicatorDirSup').removeClass("cursorDefault");
+                $('#IndicatorDirSup').addClass("cursorPointer");
+                $('#IndicatorDirInf').removeClass("cursorDefault");
+                $('#IndicatorDirInf').addClass("cursorPointer");
+                $('#CoordinatorEsq').removeClass("cursorDefault");
+                $('#CoordinatorEsq').addClass("cursorPointer");
+                $('#CoordinatorDir').removeClass("cursorDefault");
+                $('#CoordinatorDir').addClass("cursorPointer");
+            } else {
+                $('#Master').removeClass("cursorDefault");
+                $('#Master').addClass("cursorPointer");
+                $('#DonatorEsqSup1').removeClass("cursorPointer");
+                $('#DonatorEsqSup1').addClass("cursorDefault");
+                $('#DonatorEsqSup2').removeClass("cursorPointer");
+                $('#DonatorEsqSup2').addClass("cursorDefault");
+                $('#DonatorEsqInf1').removeClass("cursorPointer");
+                $('#DonatorEsqInf1').addClass("cursorDefault");
+                $('#DonatorEsqInf2').removeClass("cursorPointer");
+                $('#DonatorEsqInf2').addClass("cursorDefault");
+                $('#DonatorDirSup1').removeClass("cursorPointer");
+                $('#DonatorDirSup1').addClass("cursorDefault");
+                $('#DonatorDirSup2').removeClass("cursorPointer");
+                $('#DonatorDirSup2').addClass("cursorDefault");
+                $('#DonatorDirInf1').removeClass("cursorPointer");
+                $('#DonatorDirInf1').addClass("cursorDefault");
+                $('#DonatorDirInf2').removeClass("cursorPointer");
+                $('#DonatorDirInf2').addClass("cursorDefault");
+                $('#IndicatorEsqSup').removeClass("cursorPointer");
+                $('#IndicatorEsqSup').addClass("cursorDefault");
+                $('#IndicatorEsqInf').removeClass("cursorPointer");
+                $('#IndicatorEsqInf').addClass("cursorDefault");
+                $('#IndicatorDirSup').removeClass("cursorPointer");
+                $('#IndicatorDirSup').addClass("cursorDefault");
+                $('#IndicatorDirInf').removeClass("cursorPointer");
+                $('#IndicatorDirInf').addClass("cursorDefault");
+                $('#CoordinatorEsq').removeClass("cursorPointer");
+                $('#CoordinatorEsq').addClass("cursorDefault");
+                $('#CoordinatorDir').removeClass("cursorPointer");
+                $('#CoordinatorDir').addClass("cursorDefault");
+            }
+
+            var alinhaTxtTop = 94;
+            var alinhaTxtLeft = 51;
+
+            var ajustLeft = -46;
+
+            var ajustTop = 80;
+            var ajustLeft = 0;
+
+            //width > 1200
+            //OK
+            var xDonatorEsqSup1Top = -50;
+            var yDonatorEsqSup1Left = 184;
+            //OK
+            var xDonatorEsqSup2Top = 90;
+            var yDonatorEsqSup2Left = 24;
+            //OK
+            var xDonatorEsqInf1Top = 370;
+            var yDonatorEsqInf1Left = 76;
+
+            var xDonatorEsqInf2Top = 570;
+            var yDonatorEsqInf2Left = 200;
+            //OK
+            var xDonatorDirSup1Top = -60;
+            var yDonatorDirSup1Left = 580;
+            //OK
+            var xDonatorDirSup2Top = 120;
+            var yDonatorDirSup2Left = 700;
+            //OK
+            var xDonatorDirInf1Top = 360;
+            var yDonatorDirInf1Left = 680;
+            //OK
+            var xDonatorDirInf2Top =  590;
+            var yDonatorDirInf2Left = 540;
+            //Allie
+            var xIndicatorEsqSupTop = 50;
+            var yIndicatorEsqSupLeft = 274;
+            //John
+            var xIndicatorEsqInfTop = 400;
+            var yIndicatorEsqInfLeft = 274;
+            //Richard
+            var xIndicatorDirSupTop = 70;
+            var xIndicatorDirSupLeft = 474;
+            //Brook
+            var xIndicatorDirInfTop = 420;
+            var xIndicatorDirInfLeft = 474;
+            //Deckard
+            var xCoordinatorEsqTop = 230;
+            var yCoordinatorEsqLeft = 210;
+            //Han
+            var xCoordinatorDirTop = 230;
+            var yCoordinatorDirLeft = 540;
+            //Indy
+            var xMasterTop = 230;
+            var yMasterLeft = 376;
+
+            //1
+            if (width > 600 && width < 767) {
+                $('#porTabuleiro').css({
+                    "width": "600px",
+                    "height": "940px",
+                    "overflow": "auto !important",
+                    "overflow-y": "hidden !important",
+                });
+                $('.galaxy').css({
+                    "width": "600px",
+                    "height": "940px",
+                });
+                ajustTop = 130;
+                ajustLeft = -186;
+
+                //OK
+                xDonatorDirSup1Top = -90;
+                yDonatorDirSup1Left = 460;
+                //OK
+                xDonatorDirSup2Top = 10;
+                yDonatorDirSup2Left = 600;
+                //OK
+                xDonatorDirInf1Top = 520;
+                yDonatorDirInf1Left = 600;
+                //OK
+                xDonatorDirInf2Top = 580;
+                yDonatorDirInf2Left = 430;
+                //OK
+                xDonatorEsqSup1Top = -90;
+                yDonatorEsqSup1Left = 300;
+                //OK
+                xDonatorEsqSup2Top = -30;
+                yDonatorEsqSup2Left = 140;
+                //OK
+                xDonatorEsqInf1Top = 470;
+                yDonatorEsqInf1Left = 150;
+                //OK
+                xDonatorEsqInf2Top = 560;
+                yDonatorEsqInf2Left = 280;
+
+            }
+
+            //2
+            if (width > 450 && width <= 600) {
+                $('#porTabuleiro').css({
+                    "width": "450px",
+                    "height": "1000px",
+                    "overflow": "auto !important",
+                    "overflow-y": "hidden !important",
+                });
+                $('.galaxy').css({
+                    "width": "450px",
+                    "height": "1000px",
+                });
+
+                porTabuleiroHeight = 160;
+                porTabuleiroWidth = 160;
+
+                ajustImgTabuleiroTop = 20;
+                ajustImgTabuleiroLeft = 20;
+
+                ajustTop = 168;
+                ajustLeft = -266;
+
+                //OK
+                xDonatorDirSup1Top = -90;
+                yDonatorDirSup1Left = 440;
+                //OK
+                xDonatorDirSup2Top = -30;
+                yDonatorDirSup2Left = 550;
+                //OK
+                xDonatorDirInf1Top = 500;
+                yDonatorDirInf1Left = 550;
+                //OK
+                xDonatorDirInf2Top = 560;
+                yDonatorDirInf2Left = 420;
+                //OK
+                xDonatorEsqSup1Top = -90;
+                yDonatorEsqSup1Left = 320;
+                //OK
+                xDonatorEsqSup2Top = -30;
+                yDonatorEsqSup2Left = 220;
+                //OK
+                xDonatorEsqInf1Top = 470;
+                yDonatorEsqInf1Left = 220;
+                //OK
+                xDonatorEsqInf2Top = 560;
+                yDonatorEsqInf2Left = 300;
+                //Deckard
+                xCoordinatorEsqTop = 230;
+                yCoordinatorEsqLeft = 230;
+                //Richard
+                xIndicatorDirSupTop = 60;
+                xIndicatorDirSupLeft = 444;
+                //Allie
+                xIndicatorEsqSupTop = 60;
+                yIndicatorEsqSupLeft = 320;
+                //John
+                xIndicatorEsqInfTop = 400;
+                yIndicatorEsqInfLeft = 320;
+                //Brook
+                xIndicatorDirInfTop = 400;
+                xIndicatorDirInfLeft = 444;
+            }
+
+            //2
+            if (width > 0 && width <= 450) {
+                $('#porTabuleiro').css({
+                    "width": "375px",
+                    "height": "1100px",
+                    "overflow": "auto !important",
+                    "overflow-y": "hidden !important",
+                });
+                $('.galaxy').css({
+                    "width": "375px",
+                    "height": "1100px",
+                });
+
+                porTabuleiroHeight = 160;
+                porTabuleiroWidth = 160;
+
+                ajustImgTabuleiroTop = 20;
+                ajustImgTabuleiroLeft = 20;
+
+                ajustTop = 220;
+                ajustLeft = -300;
+
+                //OK
+                xDonatorDirSup1Top = -100;
+                yDonatorDirSup1Left = 430;
+                //OK
+                xDonatorDirSup2Top = -30;
+                yDonatorDirSup2Left = 520;
+                //OK
+                xDonatorDirInf1Top = 500;
+                yDonatorDirInf1Left = 526;
+                //OK
+                xDonatorDirInf2Top = 580;
+                yDonatorDirInf2Left = 416;
+                //OK
+                xDonatorEsqSup1Top = -100;
+                yDonatorEsqSup1Left = 330;
+                //OK
+                xDonatorEsqSup2Top = -30;
+                yDonatorEsqSup2Left = 240;
+                //OK
+                xDonatorEsqInf1Top = 480;
+                yDonatorEsqInf1Left = 234;
+                //OK
+                xDonatorEsqInf2Top = 580;
+                yDonatorEsqInf2Left = 306;
+                //Deckard
+                xCoordinatorEsqTop = 230;
+                yCoordinatorEsqLeft = 260;
+                //Han
+                xCoordinatorDirTop = 230;
+                yCoordinatorDirLeft = 500;
+                //Richard
+                xIndicatorDirSupTop = 60;
+                xIndicatorDirSupLeft = 440;
+                //Allie
+                xIndicatorEsqSupTop = 60;
+                yIndicatorEsqSupLeft = 324;
+                //John
+                xIndicatorEsqInfTop = 400;
+                yIndicatorEsqInfLeft = 320;
+                //Brook
+                xIndicatorDirInfTop = 400;
+                xIndicatorDirInfLeft = 444;
+            }
+
+            var posDonatorEsqSup1Top = ajustTop + xDonatorEsqSup1Top;
+            var posDonatorEsqSup1Left = ajustLeft + yDonatorEsqSup1Left;
+            var posTxtDonatorEsqSup1Top = posDonatorEsqSup1Top + alinhaTxtTop;
+            var posTxtDonatorEsqSup1Left = posDonatorEsqSup1Left + alinhaTxtLeft;
+
+            var posDonatorEsqSup2Top = ajustTop + xDonatorEsqSup2Top;
+            var posDonatorEsqSup2Left = ajustLeft + yDonatorEsqSup2Left;
+            var posTxtDonatorEsqSup2Top = posDonatorEsqSup2Top + alinhaTxtTop;
+            var posTxtDonatorEsqSup2Left = posDonatorEsqSup2Left + alinhaTxtLeft;
+
+            var posDonatorEsqInf1Top = ajustTop + xDonatorEsqInf1Top;
+            var posDonatorEsqInf1Left = ajustLeft + yDonatorEsqInf1Left;
+            var posTxtDonatorEsqInf1Top = posDonatorEsqInf1Top + alinhaTxtTop;
+            var posTxtDonatorEsqInf1Left = posDonatorEsqInf1Left + alinhaTxtLeft;
+
+            var posDonatorEsqInf2Top = ajustTop + xDonatorEsqInf2Top;
+            var posDonatorEsqInf2Left = ajustLeft + yDonatorEsqInf2Left;
+            var posTxtDonatorEsqInf2Top = posDonatorEsqInf2Top + alinhaTxtTop;
+            var posTxtDonatorEsqInf2Left = posDonatorEsqInf2Left + alinhaTxtLeft;
+
+            var posDonatorDirSup1Top = ajustTop + xDonatorDirSup1Top;
+            var posDonatorDirSup1Left = ajustLeft + yDonatorDirSup1Left;
+            var posTxtDonatorDirSup1Top = posDonatorDirSup1Top + alinhaTxtTop;
+            var posTxtDonatorDirSup1Left = posDonatorDirSup1Left + alinhaTxtLeft;
+
+            var posDonatorDirSup2Top = ajustTop + xDonatorDirSup2Top;
+            var posDonatorDirSup2Left = ajustLeft + yDonatorDirSup2Left;
+            var posTxtDonatorDirSup2Top = posDonatorDirSup2Top + alinhaTxtTop;
+            var posTxtDonatorDirSup2Left = posDonatorDirSup2Left + alinhaTxtLeft;
+
+            var posDonatorDirInf1Top = ajustTop + xDonatorDirInf1Top;
+            var posDonatorDirInf1Left = ajustLeft + yDonatorDirInf1Left;
+            var posTxtDonatorDirInf1Top = posDonatorDirInf1Top + alinhaTxtTop;
+            var posTxtDonatorDirInf1Left = posDonatorDirInf1Left + alinhaTxtLeft;
+
+            var posDonatorDirInf2Top = ajustTop + xDonatorDirInf2Top;
+            var posDonatorDirInf2Left = ajustLeft + yDonatorDirInf2Left;
+            var posTxtDonatorDirInf2Top = posDonatorDirInf2Top + alinhaTxtTop;
+            var posTxtDonatorDirInf2Left = posDonatorDirInf2Left + alinhaTxtLeft;
+
+            var posIndicatorEsqSupTop = ajustTop + xIndicatorEsqSupTop;
+            var posIndicatorEsqSupLeft = ajustLeft + yIndicatorEsqSupLeft;
+            var posTxtIndicatorEsqSupTop = posIndicatorEsqSupTop + alinhaTxtTop;
+            var posTxtIndicatorEsqSupLeft = posIndicatorEsqSupLeft + alinhaTxtLeft;
+
+            var posIndicatorEsqInfTop = ajustTop + xIndicatorEsqInfTop;
+            var posIndicatorEsqInfLeft = ajustLeft + yIndicatorEsqInfLeft;
+            var posTxtIndicatorEsqInfTop = posIndicatorEsqInfTop + alinhaTxtTop;
+            var posTxtIndicatorEsqInfLeft = posIndicatorEsqInfLeft + alinhaTxtLeft;
+
+            var posIndicatorDirSupTop = ajustTop + xIndicatorDirSupTop;
+            var posIndicatorDirSupLeft = ajustLeft + xIndicatorDirSupLeft;
+            var posTxtIndicatorDirSupTop = posIndicatorDirSupTop + alinhaTxtTop;
+            var posTxtIndicatorDirSupLeft = posIndicatorDirSupLeft + alinhaTxtLeft;
+
+            var posIndicatorDirInfTop = ajustTop + xIndicatorDirInfTop;
+            var posIndicatorDirInfLeft = ajustLeft + xIndicatorDirInfLeft;
+            var posTxtIndicatorDirInfTop = posIndicatorDirInfTop + alinhaTxtTop;
+            var posTxtIndicatorDirInfLeft = posIndicatorDirInfLeft + alinhaTxtLeft;
+
+            var posCoordinatorEsqTop = ajustTop + xCoordinatorEsqTop;
+            var posCoordinatorEsqLeft = ajustLeft + yCoordinatorEsqLeft;
+            var posTxtCoordinatorEsqTop = posCoordinatorEsqTop + alinhaTxtTop;
+            var posTxtCoordinatorEsqLeft = posCoordinatorEsqLeft + alinhaTxtLeft;
+
+            var posCoordinatorDirTop = ajustTop + xCoordinatorDirTop;
+            var posCoordinatorDirLeft = ajustLeft + yCoordinatorDirLeft;
+            var posTxtCoordinatorDirTop = posCoordinatorDirTop + alinhaTxtTop;
+            var posTxtCoordinatorDirLeft = posCoordinatorDirLeft + alinhaTxtLeft;
+
+            var posMasterTop = ajustTop + xMasterTop;
+            var posMasterLeft = ajustLeft + yMasterLeft;
+            var posTxtMasterTop = posMasterTop + alinhaTxtTop;
+            var posTxtMasterLeft = posMasterLeft + alinhaTxtLeft;
+
+
+            $('.DonatorEsqSup1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqSup1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqSup1Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorEsqSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup1Top + 'px; left: ' + posTxtDonatorEsqSup1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqSup1;');
+            $('#DonatorEsqSup1').addClass('@tabuleiro.corDonatorEsqSup1');
+
+            $('.DonatorEsqSup2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqSup2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqSup2Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorEsqSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqSup2Top + 'px; left: ' + posTxtDonatorEsqSup2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqSup2;');
+            $('#DonatorEsqSup2').addClass('@tabuleiro.corDonatorEsqSup2');
+
+            $('.DonatorEsqInf1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqInf1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqInf1Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorEsqInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf1Top + 'px; left: ' + posTxtDonatorEsqInf1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqInf1;');
+            $('#DonatorEsqInf1').addClass('@tabuleiro.corDonatorEsqInf1');
+
+            $('.DonatorEsqInf2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorEsqInf2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorEsqInf2Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorEsqInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorEsqInf2Top + 'px; left: ' + posTxtDonatorEsqInf2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorEsqInf2;');
+            $('#DonatorEsqInf2').addClass('@tabuleiro.corDonatorEsqInf2');
+
+            $('.DonatorDirSup1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirSup1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirSup1Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorDirSup1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup1Top + 'px; left: ' + posTxtDonatorDirSup1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirSup1;');
+            $('#DonatorDirSup1').addClass('@tabuleiro.corDonatorDirSup1');
+
+            $('.DonatorDirSup2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirSup2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirSup2Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorDirSup2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirSup2Top + 'px; left: ' + posTxtDonatorDirSup2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirSup2;');
+            $('#DonatorDirSup2').addClass('@tabuleiro.corDonatorDirSup2');
+
+            $('.DonatorDirInf1').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirInf1Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirInf1Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorDirInf1').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf1Top + 'px; left: ' + posTxtDonatorDirInf1Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirInf1;');
+            $('#DonatorDirInf1').addClass('@tabuleiro.corDonatorDirInf1');
+
+            $('.DonatorDirInf2').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posDonatorDirInf2Top + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posDonatorDirInf2Left + ajustImgTabuleiroLeft) + 'px;');
+            $('#DonatorDirInf2').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtDonatorDirInf2Top + 'px; left: ' + posTxtDonatorDirInf2Left + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoDonatorDirInf2;');
+            $('#DonatorDirInf2').addClass('@tabuleiro.corDonatorDirInf2');
+
+            $('.IndicatorEsqSup').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorEsqSupTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorEsqSupLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#IndicatorEsqSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqSupTop + 'px; left: ' + posTxtIndicatorEsqSupLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorEsqSup;');
+            $('#IndicatorEsqSup').addClass('@tabuleiro.corIndicatorEsqSup');
+
+            $('.IndicatorEsqInf').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorEsqInfTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorEsqInfLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#IndicatorEsqInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorEsqInfTop + 'px; left: ' + posTxtIndicatorEsqInfLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorEsqInf;');
+            $('#IndicatorEsqInf').addClass('@tabuleiro.corIndicatorEsqInf');
+
+            $('.IndicatorDirSup').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorDirSupTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorDirSupLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#IndicatorDirSup').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirSupTop + 'px; left: ' + posTxtIndicatorDirSupLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorDirSup;');
+            $('#IndicatorDirSup').addClass('@tabuleiro.corIndicatorDirSup');
+
+            $('.IndicatorDirInf').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posIndicatorDirInfTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posIndicatorDirInfLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#IndicatorDirInf').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtIndicatorDirInfTop + 'px; left: ' + posTxtIndicatorDirInfLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoIndicatorDirInf;');
+            $('#IndicatorDirInf').addClass('@tabuleiro.corIndicatorDirInf');
+
+            $('.CoordinatorEsq').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posCoordinatorEsqTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posCoordinatorEsqLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#CoordinatorEsq').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorEsqTop + 'px; left: ' + posTxtCoordinatorEsqLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoCoordinatorEsq;');
+            $('#CoordinatorEsq').addClass('@tabuleiro.corCoordinatorEsq');
+
+            $('.CoordinatorDir').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posCoordinatorDirTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posCoordinatorDirLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#CoordinatorDir').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtCoordinatorDirTop + 'px; left: ' + posTxtCoordinatorDirLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoCoordinatorDir;');
+            $('#CoordinatorDir').addClass('@tabuleiro.corCoordinatorDir');
+
+            $('.Master').attr('style', 'height: ' + Math.round(porTabuleiroHeight) + 'px; width: ' + Math.round(porTabuleiroWidth) + 'px; position: absolute; top: ' + Math.round(posMasterTop + ajustImgTabuleiroTop) + 'px; left: ' + Math.round(posMasterLeft + ajustImgTabuleiroLeft) + 'px;');
+            $('#Master').attr('style', 'max-width: @(porTabuleiroMaxWidth); width: @(porTabuleiroMaxWidth); position: absolute; top: ' + posTxtMasterTop + 'px; left: ' + posTxtMasterLeft + 'px; border: 2px solid #fff; color: @tabuleiro.corTextoMaster;');
+            $('#Master').addClass('@tabuleiro.corMaster');
+            $('.Master').addClass('@(showReportPayment ? "blob" : "")');
+            $('#Master').addClass('@(showReportPayment ? "cursorPointer" : "cursorDefault")');
+        }
+
+        $('.btnTabuleiro').on('click', function () {
+            var idTarget = $(this).attr("data-id");
+            var idTabuleiro = $('#tabuleiro').val();
+            var nivel = $(this).attr("data-name");
+            $("#infoID").val($(this).attr("data-id"));
+
+            if (idTarget == $('#Master').attr("data-id") || $('#Master').attr("data-id") == @idUsuario) {
+                $.ajax({
+                    url: "@Url.Action("GetData")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': '@(idUsuario)',
+                        'targetID': idTarget,
+                        'tabuleiroID': idTabuleiro,
+                        'nivel': nivel,
+                        'token': '@(ViewBag.Token)'
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data != 'NoValue') {
+                                $("#infoNome").html(data.Nome);
+                                $("#infoApelido").html(data.Apelido);
+                                $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
+                                $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
+
+                                if (data.Nome == 'System') {
+                                    if (data.Observacao != null && data.Observacao.toString() != '') {
+                                        $('#infoObs').html(data.Observacao.toString());
+                                    } else {
+                                        $('#infoObs').html('');
+                                    }
+                                } else {
+                                    $('#infoObs').html('');
+                                }
+
+                                if (data.Pix) {
+                                    $("#PixCode").html(data.Pix);
+                                    $("#PixHeader").show();
+                                    $("#PixCode").show();
+                                } else {
+                                    $(".panelPix").hide();
+                                    $("#PixHeader").html('@traducaoHelper["PIX_NAO_CADASTRADO"]');
+                                }
+
+                                if (data.Carteira) {
+                                    $("#CriptoCode").html(data.Carteira);
+                                    $("#CriptoHeader").show();
+                                    $("#CriptoCode").show();
+                                    //$("#qrCode").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
+                                } else {
+                                    $(".panelCripto").hide();
+                                    $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
+                                }
+
+                                if ($('#Master').attr("data-id") == @idUsuario) {
+                                    $(".panelCripto").hide();
+                                }
+
+                                if (data.ConfirmarRecebimento) {
+                                    $(".reportReceipt").show();
+                                    $(".deleteUser").show();
+                                } else {
+                                    $(".reportReceipt").hide();
+                                    $(".deleteUser").hide();
+                                }
+
+                                $(".reportPaymentSystem").hide();
+
+                                $('#modDados').modal('show');
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                });
+            }
+        });
+
+        $('.niveis').on('click', function () {
+            var idTabuleiro = $(this).attr("data-id");
+            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+            window.location.href = url;
+            });
+
+        $('.reportPayment').on('click', function () {
+            var idTabuleiro = $('#tabuleiro').val();
+            var idUsuarioPag = $("#infoID").val();
+            $.ajax({
+                url: "@Url.Action("ReportPayment")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'tabuleiroID': idTabuleiro,
+                    'usuarioIDPag': idUsuarioPag,
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data.toString() == "OK") {
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]',
+                                text: data.toString(),
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+
+        });
+
+        $('.reportReceipt').on('click', function () {
+            var idTabuleiro = $('#tabuleiro').val();
+            var idUsuarioConvidado = $("#infoID").val();
+            $.ajax({
+                url: "@Url.Action("ReportReceipt")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'UsuarioConvidadoID': idUsuarioConvidado,
+                    'tabuleiroID': idTabuleiro,
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data.toString() == "OK") {
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]',
+                                text: data.toString(),
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+        });
+
+        $('.paymentSystem').on('click', function () {
+            var idTabuleiro = $('#tabuleiro').val();
+            $.ajax({
+                url: "@Url.Action("GetDataSysPag")",
+                type: "POST",
+                data: {
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        $("#infoNome").html(data.Nome);
+                        $("#infoApelido").html(data.Apelido);
+                        $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
+                        $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
+
+                        if (data.Nome == 'Syspag') {
+                            $('#infoObs').html('@traducaoHelper["SISTEM_PAGAMENTO"]')
+                        } else {
+                            $('#infoObs').html('')
+                        }
+                        if (data.Pix) {
+                            $("#PixCode").html(data.Pix);
+                            $("#PixHeader").show();
+                            $("#PixCode").show();
+                        } else {
+                            $(".panelPix").hide();
+                            $("#PixHeader").html('@traducaoHelper["PIX_NAO_CADASTRADO"]');
+                        }
+
+                        if (data.Carteira) {
+                            $("#CriptoCode").html(data.Carteira);
+                            $("#CriptoHeader").show();
+                            $("#CriptoCode").show();
+                            //$("#qrCode").attr('src', 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + data.Carteira);
+                        } else {
+                            $(".panelCripto").hide();
+                            $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
+                        }
+
+                        if ($('#Master').attr("data-id") == @idUsuario) {
+                            $(".panelCripto").hide();
+                        }
+
+                        $(".paymentSystem").show();
+                        
+                        $(".reportReceipt").hide();
+
+                        $('#modDados').modal('show');
+
+                        $(".deleteUser").hide();
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+        });
+
+        $('.reportPaymentSystem').on('click', function () {
+            var idTabuleiro = $('#tabuleiro').val();
+            var idUsuarioConvidado = $("#infoID").val();
+            $.ajax({
+                url: "@Url.Action("ReportPaymentSystem")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'tabuleiroID': idTabuleiro,
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data.toString() == "OK") {
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]',
+                                text: data.toString(),
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+        });
+
+        $('.exitNivel').on('click', function () {
+            var idTabuleiro = $('#tabuleiro').val();
+            $.ajax({
+                url: "@Url.Action("ExitNivel")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'tabuleiroID': idTabuleiro,
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data.toString() == "OK") {
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]',
+                                text: data.toString(),
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+        });
+
+        $('.invite').on('click', function () {
+            var idBoard = $(this).attr("data-id");
+            $.ajax({
+                url: "@Url.Action("GetInvite")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'boardID': idBoard,
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data == "OK") {
+                            if (idTabuleiro != null && idTabuleiro > 0) {
+                                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                window.location.href = url;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            if (data = '@traducaoHelper["USUARIO_JA_POSICIONADO"]') {
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 2000);
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data,
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 2000);
+                            }
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+        });
+
+        $('.inviteNew').on('click', function () {
+            $.ajax({
+                url: "@Url.Action("GetInviteNew")",
+                type: "POST",
+                data: {
+                    'usuarioID': '@(idUsuario)',
+                    'token': '@(ViewBag.Token)'
+                },
+                success: function (data) {
+                    if (data != null) {
+                        if (data == "OK") {
+                            location.reload();
+                        } else {
+                            if (data = '@traducaoHelper["USUARIO_JA_POSICIONADO"]') {
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 2000);
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data,
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 2000);
+                            }
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["SEM_DADOS"]',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                        //Reload page
+                        if (idTabuleiro != null && idTabuleiro > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                            window.location.href = url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        Swal.fire({
+                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+            });
+        });
+
+        $('.reloadPage').on('click', function () {
+            var idTabuleiro = $(this).attr("data-id");
+            if (idTabuleiro != null && idTabuleiro > 0) {
+                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                window.location.href = url;
+            } else {
+                location.reload();
+            }
+        });
+
+        $('.deleteUser').on('click', function () {
+            var idTabuleiro = $('#tabuleiro').val();
+            var idUsuarioConvidado = $("#infoID").val();
+            Swal.fire({
+                title: "@traducaoHelper["TEM_CERTEZA_DE_QUE_DESEJA_EXCLUIR_CONVIDADO"]",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '@traducaoHelper["SIM"]',
+                cancelButtonText: '@traducaoHelper["NAO"]'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "@Url.Action("DeleteUser")",
+                        type: "POST",
+                        data: {
+                            'usuarioID': '@(idUsuario)',
+                            'UsuarioConvidadoID': idUsuarioConvidado,
+                            'tabuleiroID': idTabuleiro,
+                            'token': '@(ViewBag.Token)'
+                        },
+                        success: function (data) {
+                            if (data != null) {
+                                if (data.toString() == "OK") {
+                                    if (idTabuleiro != null && idTabuleiro > 0) {
+                                        var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                        window.location.href = url;
+                                    } else {
+                                        location.reload();
+                                    }
+                                } else {
+                                    Swal.fire({
+                                        title: '@traducaoHelper["ALERTA"]',
+                                        text: data.toString(),
+                                        icon: 'warning',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                    text: '@traducaoHelper["SEM_DADOS"]',
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                                //Reload page
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                    text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                    });
+                } else {
+                    Swal.fire(
+                        '@traducaoHelper["CANCELADO"]',
+                        '',
+                        'info'
+                    )
+                }
+            });
+        });
+
+    </script>
+}
+}
+
+@section PageLevelScripts{
+}
+
+@section jQueryRead {
+}
+
+<div id="overlay">
+    <div id="progstat"></div>
+    <div id="progress"></div>
+</div>
+
+<!-- Header -->
+<div class="portlet solid grey-cararra" style="max-width: 1600px;">
+    <div class="portlet-body">
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="row">
+                <div class="column col-md-6">
+                    <div class="page-title">
+                        <h2>@(ViewBag.tabuleiroName) <small class="titleSmall"></small></h2>
+                    </div>
+                </div>
+                <div class="column col-md-6">
+                    <div class="page-title pull-right divReloadPage" style="padding: 10px;">
+                        <button type="button" class="btn btn-info reloadPage">
+                            @traducaoHelper["RELOAD"]
+                        </button>
+                    </div>
+                    @if (ViewBag.Timer != null)
+                    {
+                        <div class="page-title">
+                            <span id="minutes" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
+                            <span id="pontos" style="font-size: 18px; font-weight: 500; color: darkred;">:</span>
+                            <span id="seconds" style="font-size: 18px; font-weight: 500; color: darkred;">00</span>
+                        </div>
+                        <div class="page-title pull-right" style="padding: 10px;">
+                            <button type="button" class="btn purple-studio btn-circle pull-right exitNivel">
+                                @traducaoHelper["SAIR_TABULEIRO"]
+                            </button>
+                        </div>
+                    }
+                    @if (ViewBag.Pagar != null && ViewBag.Pagar)
+                    {
+                        <div class="page-title pull-right" style="padding: 10px;">
+                            <button type="button" class="btn green-seagreen btn-circle pull-right paymentSystem">
+                                @traducaoHelper["PAGAR_SISTEMA"]
+                            </button>
+                        </div>
+                    }
+                    @*@if (ViewBag.ShowMsgFaltaPag != null && ViewBag.ShowMsgFaltaPag != "")
+                    {
+                        <div class="page-title pull-right" style="padding-right: 10px; color: red;">
+                            @ViewBag.ShowMsgFaltaPag
+                        </div>
+                    }
+                    else if (ViewBag.InfoUsuario != null && ViewBag.InfoUsuario != "")
+                    {
+                        <div class="page-title pull-right" style="padding-right: 10px; color: red;">
+                            @ViewBag.InfoUsuario
+                        </div>
+                    }*@
+                </div>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="">@ViewBag.Title</a>
+            </li>
+            <li>
+                <a href="" class="txtTitle"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Tabuleiro -->
+@if (blnNovoUsuario)
+{
+    <div class="portlet aba box backWrite grey-gallery">
+
+        <div class="portlet-title">
+            <div class="caption">@ViewBag.tabuleiroName - @traducaoHelper["CONVITE"]</div>
+            <div class="tools">
+                <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
+            </div>
+            <div class="actions">
+                <a href='#'>&nbsp;</a>
+                <label>&nbsp;</label>
+            </div>
+        </div>
+
+        <div class="portlet-body">
+            <div class="row" style="">
+                <div class="tiles" style="padding-left: 15px;">
+                    <div class="tile double grey-card inviteNew" style="max-height: 80px; max-width: 200px;">
+                        <div class="tile-body" style="padding:5px;">
+                            <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/1.png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                            <h3>@(traducaoHelper["MERCURIO"])</h3>
+                            <p>@traducaoHelper["CONVITE"]</p>
+                        </div>
+                    </div>
+                </div>
+                <h5 style="padding-right:10px; padding-left: 10px;">*@traducaoHelper["SUGEITO_DISPONIBILIDADE"]</h5>
+            </div>
+        </div>
+    </div>
+}
+
+@if (tabuleiro != null)
+{
+    <div style="max-width: 1600px; display: flex; height: 100%; width: 100%; justify-content: center; align-items: center; @(ViewBag.TabuleiroOpacity == true ? "opacity: 60%;" : "")">
+
+        <div id="porTabuleiro" class="" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; overflow: auto !important; overflow-y: hidden !important; @(blnNovoUsuario ? "opacity: 0.7;" : "")">
+            <div class="portlet-body">
+                <div class="row galaxy" style="background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/banner1.png")) no-repeat center center;">
+                    <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
+
+                    <div class="tiles" id="planetBody" style="padding-left: 15px;">
+                        <div id="tab_select" class="tile double @tabuleiroAtivo.BoardCor" style="max-height: 80px; max-width: 200px;">
+                            <div class="tile-body" style="padding:5px;">
+                                <img id="tab_select_img" src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                <h3 id="tab_select_name">@(traducaoHelper[tabuleiroAtivo.BoardNome])</h3>
+                                <p id="tab_select_position">@(traducaoHelper[tabuleiroAtivo.Posicao].ToUpper())</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinMaster + "_alv.png?v=" + @Helpers.Local.Versao)' class="Master @(tabuleiro.pulseMaster ? "blob" : "")">
+                    <button id="Master" data-name="master" data-id="@(tabuleiro.Master)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseMaster ? "cursorPointer" : "cursorDefault")"><span style="font-size: 14px; font-weight: 700;"> @tabuleiro.ApelidoMaster</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorDir + "_sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorDir @(tabuleiro.pulseCoordinatorEsq ? "blob" : "")">
+                    <button id="CoordinatorDir" data-name="coordinator" data-id="@(tabuleiro.CoordinatorDir)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseCoordinatorEsq  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinCoordinatorDir == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorDir</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirSup + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirSup @(tabuleiro.pulseIndicatorDirSup ? "blob" : "")">
+                    <button id="IndicatorDirSup" data-name="indicator" data-id="@(tabuleiro.IndicatorDirSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseIndicatorDirSup  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinIndicatorDirSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirSup</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorDirInf + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorDirInf @(tabuleiro.pulseIndicatorDirInf ? "blob" : "")">
+                    <button id="IndicatorDirInf" data-name="indicator" data-id="@(tabuleiro.IndicatorDirInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseIndicatorDirInf  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinIndicatorDirInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorDirInf</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinCoordinatorEsq + "_sup.png?v=" + @Helpers.Local.Versao)' class="CoordinatorEsq @(tabuleiro.pulseCoordinatorEsq ? "blob" : "")">
+                    <button id="CoordinatorEsq" data-name="coordinator" data-id="@(tabuleiro.CoordinatorEsq)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseCoordinatorEsq  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinCoordinatorEsq == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoCoordinatorEsq</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqSup + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqSup @(tabuleiro.pulseIndicatorEsqSup ? "blob" : "")">
+                    <button id="IndicatorEsqSup" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqSup)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseIndicatorEsqSup  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinIndicatorEsqSup == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqSup</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinIndicatorEsqInf + "_anf.png?v=" + @Helpers.Local.Versao)' class="IndicatorEsqInf @(tabuleiro.pulseIndicatorEsqInf ? "blob" : "")">
+                    <button id="IndicatorEsqInf" data-name="indicator" data-id="@(tabuleiro.IndicatorEsqInf)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseIndicatorEsqInf  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinIndicatorEsqInf == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoIndicatorEsqInf</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup1 @(tabuleiro.pulseDonatorDirSup1 ? "blob" : "")">
+                    <button id="DonatorDirSup1" data-name="donator" data-id="@(tabuleiro.DonatorDirSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorDirSup1  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorDirSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup1</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirSup2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirSup2 @(tabuleiro.pulseDonatorDirSup2 ? "blob" : "")">
+                    <button id="DonatorDirSup2" data-name="donator" data-id="@(tabuleiro.DonatorDirSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorDirSup2  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorDirSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirSup2</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf1 @(tabuleiro.pulseDonatorDirInf1 ? "blob" : "")">
+                    <button id="DonatorDirInf1" data-name="donator" data-id="@(tabuleiro.DonatorDirInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorDirInf1  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorDirInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf1</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorDirInf2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorDirInf2 @(tabuleiro.pulseDonatorDirInf2 ? "blob" : "")">
+                    <button id="DonatorDirInf2" data-name="donator" data-id="@(tabuleiro.DonatorDirInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorDirInf2  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorDirInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorDirInf2</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup2 @(tabuleiro.pulseDonatorEsqSup2 ? "blob" : "")">
+                    <button id="DonatorEsqSup2" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorEsqSup2  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorEsqSup2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup2</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqSup1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqSup1 @(tabuleiro.pulseDonatorEsqSup1 ? "blob" : "")">
+                    <button id="DonatorEsqSup1" data-name="donator" data-id="@(tabuleiro.DonatorEsqSup1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorEsqSup1  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorEsqSup1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqSup1</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf1 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf1 @(tabuleiro.pulseDonatorEsqInf1 ? "blob" : "")">
+                    <button id="DonatorEsqInf1" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf1)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorEsqInf1  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorEsqInf1 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf1</span></button>
+
+                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + traducaoHelper["IDIOMA_SIMPLES"] + "_" + tabuleiro.pinDonatorEsqInf2 + "_con.png?v=" + @Helpers.Local.Versao)' class="DonatorEsqInf2 @(tabuleiro.pulseDonatorEsqInf2 ? "blob" : "")">
+                    <button id="DonatorEsqInf2" data-name="donator" data-id="@(tabuleiro.DonatorEsqInf2)" class="btn btn-xs btn-circle btnTabuleiro @(tabuleiro.pulseDonatorEsqInf2  ? "cursorPointer" : "cursorDefault") @(tabuleiro.pinDonatorEsqInf2 == 0 ? "hidden" : "")"><span style="font-size: 14px; font-weight: 700;">@tabuleiro.ApelidoDonatorEsqInf2</span></button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+} 
+else
+{
+    <div class="portlet solid grey-cararra" style="max-width: 1600px;">
+        <div class="portlet-body">
+            <div class="page-head">
+                <h2>@traducaoHelper["ENTRE_TABULEIRO"]</h2> 
+            </div>
+        </div>
+    </div>
+}
+
+@section sideBarExtra {
+    @if (tabuleirosUsuario != null && !blnNovoUsuario)
+    {
+        foreach (var item in tabuleirosUsuario)
+        {
+            switch (item.BoardNome.Substring(0, 3).ToLower())
+            {
+                case "mer":
+                    planetaCor = "grey-card";
+                    break;
+                case "sat":
+                    planetaCor = "green-card";
+                    break;
+                case "mar":
+                    planetaCor = "red-card";
+                    break;
+                case "jup":
+                    planetaCor = "pink-card";
+                    break;
+                case "ven":
+                    planetaCor = "orange-card";
+                    break;
+                case "ura":
+                    planetaCor = "blue-card";
+                    break;
+                case "ter":
+                    planetaCor = "turquoise-card";
+                    break;
+                case "sol":
+                    planetaCor = "gold-card";
+                    break;
+                default:
+                    planetaCor = "orange-card";
+                    break;
+            }
+            if (item.StatusID == 2) //Convite
+            {
+                <!-- Invite -->
+                <li class="nav-item start">
+                    <a href="javascript:;" id="invite_@(item.BoardID)" data-id="@(item.BoardID)" class="invite" style="margin: 0; padding: 0;">
+                        <div class="tiles title blob" style="padding-left: 15px;">
+                            <div class="tile double invite-card invite" data-id="@(item.BoardID)" id="cardGrid@(item.BoardID)" style="max-height: 76px; max-width: 200px;">
+                                <div class="tile-body" style="padding:5px;">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                    <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                    <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item start">
+                    <a href="javascript:;" style="margin: 0; padding: 0;">
+                        <div class="tiles title" style="padding-left: 15px; @(item.StatusID == 0 ? "cursor: default;" : "")">
+                            <div class="tile double @planetaCor niveis" data-id="@item.TabuleiroID" data-cor="@planetaCor" data-board="@item.BoardID" data-name="@(traducaoHelper[item.BoardNome])" data-position="@(traducaoHelper[item.Posicao])" id="tab_menu_@item.TabuleiroID" style="max-height: 76px; max-width: 200px; @(item.StatusID == 0 ? "cursor: default; opacity: 0.5;" : "")">
+                                <div class="tile-body" style="padding: 5px;">
+                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                    <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                    <p class="card-content2-txt">@(item.StatusID == 0 ? "" : traducaoHelper[item.Posicao])</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            }
+        }
+    }
+}
+
+<!-- Dados -->
+<div id="modDados" class="modal fade modalPosition" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #eee;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="infoTitulo"></h4>
+            </div>
+            <div class="modal-body" style="background-color: #fff;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 style="font-weight: 500; padding: 20px 20px;" class="pull-right" id="infoApelido"></h3>
+                        <h3 style="font-weight: 500;" id="infoNome"></h3>
+                        <h4 style="font-weight: 500;" id="infoCelular"></h4>
+                        <h5 style="font-weight: 500; color: darkred;" id="infoObs"></h5>
+                        <input type="hidden" id="infoID" />
+                        <div class="panel-group accordion" id="accordion1" style="padding-top: 20px;">
+                            <div class="panel panel-default panelPix">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion1" href="#collapse_1"> @traducaoHelper["DADOS_PAGAMENTE_PIX"] </a>
+                                    </h4>
+                                </div>
+                                <div id="collapse_1" class="panel-collapse">
+                                    <div class="panel-body" style="overflow-y:auto; background-color: #eee;">
+                                        <h3 style="font-weight: 500;" id="PixHeader">@(traducaoHelper["PIX"])</h3>
+                                        <h4 id="PixCode" style="font-weight: 500;"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default panelCripto">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion1" href="#collapse_2"> @traducaoHelper["DADOS_PAGAMENTE_USDT"] </a>
+                                    </h4>
+                                </div>
+                                <div id="collapse_2" class="panel-collapse">
+                                    <div class="panel-body" style="overflow-y:auto; background-color: #eee;">
+                                        <h3 style="font-weight: 500;" id="CriptoHeader">@(traducaoHelper["CARTEIRA"])</h3>
+                                        <h4 id="CriptoCode" style="font-weight: 500;"></h4>
+                                        @*<img id="qrCode" class="center" src="" />*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background-color: #eee;">
+                @if (ViewBag.ShowReportPayment)
+                {
+                    <button data-dismiss="modal" class="btn btn-success btn-circle reportPayment">@(traducaoHelper["INFORMAR_PAGAMENTO"])</button>
+                }
+                <button data-dismiss="modal" class="btn btn-circle red-flamingo deleteUser">@(traducaoHelper["EXCLUIR"])</button>
+                <button data-dismiss="modal" class="btn btn-success btn-circle reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
+                <button data-dismiss="modal" class="btn btn-success btn-circle reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
+                <button data-dismiss="modal" class="btn btn-info btn-circle">@(traducaoHelper["SAIR"])</button>
+            </div>
+        </div>
+    </div>
+</div>
+

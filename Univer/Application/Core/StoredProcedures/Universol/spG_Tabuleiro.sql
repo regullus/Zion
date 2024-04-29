@@ -41,7 +41,7 @@ Begin
             @DataFim int,
             @Identity as int,
             @Ciclo int,
-            @Master int,
+            @MasterID int,
             @MasterTabuleiro int,
             @Historico nvarchar(255),
             @NovoTabuleiroID int,
@@ -106,7 +106,7 @@ Begin
 	Where
 		UsuarioID = @UsuarioID and
 		BoardID = @BoardID
-
+	
     Create Table #temp 
     (
         ID int not null,
@@ -131,8 +131,15 @@ Begin
         DataFim int null
     )
 
-    Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @Chamada
-
+	if(@UsuarioPaiID is null)
+	Begin
+		Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: null BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @Chamada
+	End
+	Else
+	Begin
+		Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @Chamada
+	End
+	
 	Set @aux = 0
 	Select 
         @aux = ID
@@ -157,6 +164,7 @@ Begin
             DonatorEsqInf1 = @UsuarioID Or
             DonatorEsqInf2 = @UsuarioID
         ) and
+		Master = Coalesce(@UsuarioPaiID, Master) and
         StatusID = 1 And --Tem que estar ativo no board
         @Chamada <> 'Completa'
     
@@ -172,7 +180,7 @@ Begin
 				Rede.TabuleiroUsuario
 			Where
 				UsuarioID = @UsuarioID and
-				@BoardID = @BoardID and
+				BoardID = @BoardID and
 				StatusID = 2 and --Convite
 				PagoSistema = 'true' --tem q ter pago o sistema
 		) 
@@ -183,7 +191,7 @@ Begin
 			set @aux = 0
 		End
 	End
-
+	
     --Ferifica se novo usuario jah se encontra em algum tabuleiro
     if (@aux > 0)
     Begin
@@ -302,10 +310,27 @@ Begin
                         tab.DonatorEsqInf2 = @UsuarioPaiID
                     )  and
                     tab.StatusID = 1 --Tem que estar ativo no board
+
+					--Remove os que o usuario já possa estar
+					Delete #temp Where CoordinatorDir = @UsuarioID
+					Delete #temp Where IndicatorDirSup = @UsuarioID
+					Delete #temp Where IndicatorDirInf = @UsuarioID
+					Delete #temp Where DonatorDirSup1 = @UsuarioID
+					Delete #temp Where DonatorDirSup2 = @UsuarioID
+					Delete #temp Where DonatorDirInf1 = @UsuarioID
+					Delete #temp Where DonatorDirInf2 = @UsuarioID
+					Delete #temp Where CoordinatorEsq = @UsuarioID
+					Delete #temp Where IndicatorEsqSup = @UsuarioID
+					Delete #temp Where IndicatorEsqInf = @UsuarioID
+					Delete #temp Where DonatorEsqSup1 = @UsuarioID
+					Delete #temp Where DonatorEsqSup2 = @UsuarioID
+					Delete #temp Where DonatorEsqInf1 = @UsuarioID
+					Delete #temp Where DonatorEsqInf2 = @UsuarioID
+
             End
 			
 			--*************FIM POPULA #temp***********
-
+			Select * from #temp
 			--Ferifica se usuario já se encontra no tabuleiro selecionado
 			Set @aux = 0
 			if(@Chamada = 'Convite')
@@ -332,22 +357,51 @@ Begin
 				Set @log = @log + '|01 Usuario jah se encontra no tabuleiro, mas vai ser incluido em outro'
 				--Usuario não pode ser incluido em um tabuleiro em que ele já se encontra
 				--Seleciona proximo tabuleiro disponivel
-				--Obtem primeiro Master velido nos tabuleiros
-                Select Top(1)
-                    @MasterTabuleiro = MasterID
-                From 
-                    Rede.TabuleiroUsuario
-                Where
-					BoardID = @BoardID and
-					MasterID <> @UsuarioPaiID and
-					StatusID = 1 
+				--Obtem primeiro Master valido nos tabuleiros
+                
+				Select 
+					*
+				Into #tempMaster
+				From 
+					Rede.Tabuleiro
+				Where
+					BoardID = 1 and
+					StatusID = 1 and
+					Master <> @UsuarioID
 
+				Delete #tempMaster Where CoordinatorDir = @UsuarioID
+				Delete #tempMaster Where IndicatorDirSup = @UsuarioID
+				Delete #tempMaster Where IndicatorDirInf = @UsuarioID
+				Delete #tempMaster Where DonatorDirSup1 = @UsuarioID
+				Delete #tempMaster Where DonatorDirSup2 = @UsuarioID
+				Delete #tempMaster Where DonatorDirInf1 = @UsuarioID
+				Delete #tempMaster Where DonatorDirInf2 = @UsuarioID
+				Delete #tempMaster Where CoordinatorEsq = @UsuarioID
+				Delete #tempMaster Where IndicatorEsqSup = @UsuarioID
+				Delete #tempMaster Where IndicatorEsqInf = @UsuarioID
+				Delete #tempMaster Where DonatorEsqSup1 = @UsuarioID
+				Delete #tempMaster Where DonatorEsqSup2 = @UsuarioID
+				Delete #tempMaster Where DonatorEsqInf1 = @UsuarioID
+				Delete #tempMaster Where DonatorEsqInf2 = @UsuarioID
+				
+				Select Top(1)
+                    @MasterTabuleiro = Master
+                From 
+                    #tempMaster
+                	
 				if(@MasterTabuleiro is not Null)
-                    Begin
-                        Set @log = @log + '| 01.2 Chama a sp novamente recursivo, pois usuario já se encontra no tabuleiro'
-                        Set @Historico = '01.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
-                        Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Convite'
-                    End
+                Begin
+                    Set @log = @log + '| 01.2 Chama a sp novamente recursivo, pois usuario já se encontra no tabuleiro'
+					Set @log = @log + '| 01.3 Chamada: @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
+
+                    Set @Historico = '01.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
+
+                    Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Convite'
+                End
+				Else
+				Begin
+					Set @log = @log + '| 01.4 N"ao hã tabuleiro disponivel para recursiva!'
+				End
 			End
 			Else
 			Begin
@@ -359,7 +413,7 @@ Begin
 					--Determina qual a posicao do pai no board
 					Select 
 						@ID = ID,
-						@Master = Master,
+						@MasterID = Master,
 						@DataInicio = DataInicio,
 						@CoordinatorDir = CoordinatorDir,
 						@IndicatorDirSup = IndicatorDirSup,
@@ -475,7 +529,7 @@ Begin
 						Begin
 							Set @log = @log + '| 12 Chama a sp novamente recursivo, agora com um pai valido jah que o antigo era um donator'
 							Set @Historico = '09.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
-							Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
+							--Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
 						End
 					End
                 
@@ -513,7 +567,7 @@ Begin
 							Set @PosicaoPai = 'CoordinatorEsq'
 						End
 						--Master
-						if (@Master = @UsuarioPaiID )
+						if (@MasterID = @UsuarioPaiID )
 						Begin
 							Set @PosicaoPai = 'Master'
 						End
@@ -536,7 +590,7 @@ Begin
 							Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (4)'
 						End
                
-						Set @log = @log + '| 13.1 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@Master))
+						Set @log = @log + '| 13.1 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@MasterID))
                     
 						--Verifica se houve pagamento ao Master na Direita
 						If Exists ( 
@@ -546,7 +600,7 @@ Begin
 								Rede.TabuleiroUsuario 
 							Where 
 								BoardID = @BoardID and
-								MasterID = @Master and
+								MasterID = @MasterID and
 								PagoMaster = 0 and 
 								(
 									Posicao = 'DonatorDirSup1' or
@@ -569,7 +623,7 @@ Begin
 								Rede.TabuleiroUsuario 
 							Where 
 								BoardID = @BoardID And 
-								MasterID = @Master and
+								MasterID = @MasterID and
 								(
 									Posicao = 'DonatorDirSup1' or
 									Posicao = 'DonatorDirSup2' or
@@ -597,7 +651,7 @@ Begin
 								Rede.TabuleiroUsuario 
 							Where 
 								BoardID = @BoardID and
-								MasterID = @Master and
+								MasterID = @MasterID and
 								PagoMaster = 0 and 
 								(
 									Posicao = 'DonatorEsqSup1' or
@@ -620,7 +674,7 @@ Begin
 								Rede.TabuleiroUsuario 
 							Where 
 								BoardID = @BoardID and
-								MasterID = @Master and
+								MasterID = @MasterID and
 								(
 									Posicao = 'DonatorEsqSup1' or
 									Posicao = 'DonatorEsqSup2' or
@@ -647,12 +701,12 @@ Begin
 						From
 							Rede.TabuleiroUsuario
 						Where
-							UsuarioID = @Master and
+							UsuarioID = @MasterID and
 							BoardID = @BoardID
                     
 						--**************** Verifica se o tabuleiro esta completo na Direita **************** 
 						if(
-							@Master is not null And 
+							@MasterID is not null And 
 							@CoordinatorDir is not null And 
 							@IndicatorDirSup is not null And 
 							@IndicatorDirInf is not null And 
@@ -678,7 +732,7 @@ Begin
 								Set
 									DireitaFechada = 'true'
 								Where
-									UsuarioID = @Master and
+									UsuarioID = @MasterID and
 									BoardID = @BoardID 
 
 								--Cria Tabuleiro da Direita
@@ -739,7 +793,8 @@ Begin
 									Rede.TabuleiroUsuario
 								Where
 									UsuarioID = @UsuarioID and
-									BoardID = @BoardID
+									BoardID = @BoardID and
+									MasterID = @UsuarioID
 
 								if(@Ciclo is null)
 								Begin
@@ -756,8 +811,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'Master',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -776,8 +830,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'CoordinatorDir',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -796,8 +849,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'CoordinatorEsq',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -816,8 +868,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorDirSup',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -836,8 +887,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorDirInf',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -856,8 +906,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorEsqSup',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -876,8 +925,7 @@ Begin
 									MasterID = @CoordinatorDir, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorEsqInf',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -892,7 +940,7 @@ Begin
                     
 						--**************** Verifica se o tabuleiro esta completo na Esquerda **************** 
 						if(
-							@Master is not null And 
+							@MasterID is not null And 
 							@IndicatorEsqSup is not null And 
 							@IndicatorEsqInf is not null And 
 							@CoordinatorEsq is not null And 
@@ -921,7 +969,7 @@ Begin
 								Set
 									EsquerdaFechada = 'true'
 								Where
-									UsuarioID = @Master and
+									UsuarioID = @MasterID and
 									BoardID = @BoardID 		
 
 								--Cria Tabuleiro da Esquerda
@@ -979,7 +1027,8 @@ Begin
 									Rede.TabuleiroUsuario
 								Where
 									UsuarioID = @UsuarioID and
-									BoardID = @BoardID
+									BoardID = @BoardID and
+									MasterID = @UsuarioID
 
 								if(@Ciclo is null)
 								Begin
@@ -996,8 +1045,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'Master',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1016,8 +1064,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'CoordinatorDir',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1036,8 +1083,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'CoordinatorEsq',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1056,8 +1102,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorDirSup',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1076,8 +1121,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorDirInf',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1096,8 +1140,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorEsqSup',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1116,8 +1159,7 @@ Begin
 									MasterID = @CoordinatorEsq, --Fixo pois o CoordinatorDir vira o master
 									Ciclo = coalesce(@Ciclo,@Ciclo,1),
 									Posicao = 'IndicatorEsqInf',
-									--PagoMaster = 'true',
-									--PagoSistema = 'true',
+									TotalRecebimento = 0,
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false',
 									DataInicio = GetDate(),
@@ -1171,7 +1213,7 @@ Begin
 									DireitaFechada = 'false',
 									EsquerdaFechada = 'false'
 								Where
-									UsuarioID = @Master and
+									UsuarioID = @MasterID and
 									BoardID = @BoardID
 							
 								--Usuario finalizou o Board 1, este eh um convite para ele entrar no sistema no board 1 novamente
@@ -1186,7 +1228,7 @@ Begin
 										StatusId = 2, --Convite
 										Debug = 'Tabuleiro Fechado - Convite (1)'
 									Where
-										UsuarioID = @Master and --Ele vira o Master
+										UsuarioID = @MasterID and --Ele vira o Master
 										BoardID = @BoardID and
 										PagoSistema = 'true' --tem q ter pago o sistema
 								End
@@ -1201,7 +1243,7 @@ Begin
 								Set @log = @log + '| 34 TABULEIRO INCOMPLETO'
 								--Verifica se tabuleiro possui posicoes livres
 								 if(
-									@Master is not null And 
+									@MasterID is not null And 
 									@CoordinatorDir is not null And 
 									@IndicatorDirSup is not null And 
 									@IndicatorDirInf is not null And 
@@ -2804,7 +2846,7 @@ Begin
 									Set
 										TabuleiroID = @ID,
 										StatusID = 1,
-										MasterID = @Master,
+										MasterID = @MasterID,
 										InformePag = 0, --false
 										UsuarioIDPag = null,
 										Ciclo = Ciclo + 1,
@@ -2812,8 +2854,9 @@ Begin
 										PagoMaster = @PagoMaster,
 										InformePagSistema = 0, --false
 										PagoSistema = 0, --false
+										TotalRecebimento = 0,
 										DataInicio = GetDate(),
-										Debug = 'Update: Posicoes livres Pai: ' + TRIM(STR(@Master))
+										Debug = 'Update: Posicoes livres Pai: ' + TRIM(STR(@MasterID))
 									Where
 										UsuarioId = @UsuarioID and
 										BoardID = @BoardID
@@ -2823,7 +2866,7 @@ Begin
 							End
 							Else 
 							Begin
-								Set @log = @log + '|100 nao completou o tabuleiro ainda'
+								Set @log = @log + '|49 nao completou o tabuleiro ainda'
 								Set @Historico = '07 - Check Completa false: chamada:' + @Chamada
 							End
 						End
@@ -2831,74 +2874,105 @@ Begin
 						--Verifica se Master jah teve 4 pagamentos se sim cria convite para entrar em nivel superior
 						Set @log = @log + '|50 Verifica se Master jah teve 4 pagamentos para gerar convite'
 
+						--Alterado para o codigo abaixo
+						--Select 
+						--	@count = count(*) 
+						--From 
+						--	Rede.TabuleiroUsuario 
+						--Where 
+						--	TabuleiroId = @ID And 
+						--	PagoMaster = 1 and 
+						--	(
+						--		Posicao = 'DonatorDirSup1' or
+						--		Posicao = 'DonatorDirSup2' or
+						--		Posicao = 'DonatorDirInf1' or
+						--		Posicao = 'DonatorDirnf2' or
+						--		Posicao = 'DonatorEsqSup1' or
+						--		Posicao = 'DonatorEsqSup2' or
+						--		Posicao = 'DonatorEsqInf1' or
+						--		Posicao = 'DonatorEsqInf2' 
+						--	)
+
 						Select 
-							@count = count(*) 
+							@count = TotalRecebimento
 						From 
 							Rede.TabuleiroUsuario 
 						Where 
-							TabuleiroId = @ID And 
-							PagoMaster = 1 and 
-							(
-								Posicao = 'DonatorDirSup1' or
-								Posicao = 'DonatorDirSup2' or
-								Posicao = 'DonatorDirInf1' or
-								Posicao = 'DonatorDirnf2' or
-								Posicao = 'DonatorEsqSup1' or
-								Posicao = 'DonatorEsqSup2' or
-								Posicao = 'DonatorEsqInf1' or
-								Posicao = 'DonatorEsqInf2' 
-							)
+							UsuarioID = @MasterID And 
+							BoardID = @BoardID
 
 						--Envia convite para o master para um nivel superior se jah teve 4 pagamentos
 						If(@count >= 4)
 						Begin
-							Set @log = @log + '|50.1 jah teve 4 pagamentos, verifica se ja esta em nivel superior'
-                        
-								--*********** Promove Usuario Master para novo Board ***********
+							--*********** Promove Usuario Master para novo Board ***********
+							Set @log = @log + 'Verifica se pagou o sistema UsuarioID = ' + TRIM(STR(@MasterID)) + ' BoardID=' + TRIM(STR(@BoardID))
+							--Verifica se pagou o sistema
+							if Exists (
+								Select 
+									'OK' 
+								From
+									Rede.TabuleiroUsuario 
+								Where 
+									UsuarioID = @MasterID and 
+									BoardID = @BoardID and
+									PagoSistema = 'true' --Caso já esteja no board superior)
+							)
+							Begin
 								--Sobe para proximo Board
 								Set @BoardID = @BoardID + 1
+
+								Set @log = @log + '|50.1 jah teve 4 pagamentos, verifica se ja esta em nivel superior: MasterID=' + TRIM(STR(@MasterID)) + ' BoardID=' + TRIM(STR(@BoardID))
+
 								--Verifica se ainda ha board acima do master
 								IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID)
 								Begin
-									Set @log = @log + '| 29 Sem board Superior'
+									Set @log = @log + '|50.2 Sem board Superior'
 									--Caso nao haja mais board superiores volta ao inicio
 									Set @BoardID = 1
 								End
                             
 								--Verifica se ele esta ou nao no Board superior
-								if Exists (
+								if Not Exists (
 									Select 
 										'OK' 
 									From
 										Rede.TabuleiroUsuario 
 									Where 
-										UsuarioID = @Master and 
+										UsuarioID = @MasterID and 
 										BoardID = @BoardID and
-										StatusID = 0 --nao esta no board superior, se estivesse seria = 1 e 2 jah foi convidado
-									)	
+										StatusID in (1,2) --Caso já esteja no board superior
+								)	
 								Begin
 									--nao estando no BoardSuperior, envia um convite para sua entrada nele
-									Set @log = @log + '| 101.0 nao deveria entrar aqui!!!'
+									Set @log = @log + '|50.3 - Não esta em Board Superior - Convite enviado'
 									Update
 										Rede.TabuleiroUsuario 
 									Set 
 										StatusID = 2 --StatusID 2 eh um convite para entrar no proximo board
 									Where 
-										UsuarioID = @Master and 
+										UsuarioID = @MasterID and 
 										BoardID = @BoardID and
-										StatusID = 0 and --nao esta no boardSuperior
-										PagoSistema = 'true' --tem q ter pago o sistema
+										StatusID = 0 --nao esta no boardSuperior
 								End
+								Else
+								Begin
+									Set @log = @log + '|50.4 - Já esta no nível superior'
+								End
+							End
+							Else
+							Begin
+								Set @log = @log + '| 30 - Convite não enviado: Não foi pago o sistema'
+							End
 						End
 						Else
 						Begin
-							Set @log = @log + '|50.2 nao teve 4 pagamentos'
+							Set @log = @log + '|50.5 nao teve 4 pagamentos'
 						End
 					End
 				End
 				Else 
 				Begin
-					Set @log = @log + '| 05.1 #temp nao tem conteudo'
+					Set @log = @log + '|5.1 #temp nao tem conteudo'
 					if(@Chamada <> 'Completa')
 					Begin
 						--Caso nao exista o tabuleiro com o board informado
@@ -2929,7 +3003,7 @@ Begin
 								Set @log = @log + '| 40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
 								--Chama novamente essa sp, agora com um pai valido
 								Set @Historico = '09.1 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
-								Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
+								--Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
 							End
 						End
 						Else
@@ -2974,7 +3048,7 @@ Begin
 	From
 		Usuario.Usuario
 	Where
-		ID = @Master
+		ID = @MasterID
 	
 	Select
 		@PosicaoNova = Posicao,
@@ -2991,7 +3065,7 @@ Begin
 		Coalesce(@NomeUsuario,@NomeUsuario,'Sem Nome') as NomeUsuario,
         Coalesce(@UsuarioPaiID,@UsuarioPaiID,0) as UsuarioPaiID,
 		Coalesce(@NomePai,@NomePai,'Sem Nome') as NomePai,
-		Coalesce(@Master,@Master,0) as Master,
+		Coalesce(@MasterID,@MasterID,0) as Master,
 		Coalesce(@NomeMaster,@NomeMaster,'Sem Nome') as NomeMaster,
         Coalesce(@BoardID,@BoardID,0) as BoardID,
 		Coalesce(@ID,@ID,0) as TabuleiroID,
@@ -3047,5 +3121,6 @@ End -- Sp
 go
 Grant Exec on spG_Tabuleiro To public
 go
+--Exec spG_Tabuleiro @UsuarioID=2589,@UsuarioPaiID=null,@BoardID=1,@Chamada='Convite'
+--Exec spG_Tabuleiro @UsuarioID=2589,@UsuarioPaiID=2604,@BoardID=1,@Chamada='Convite'
 
---Exec spG_Tabuleiro @UsuarioID=2587,@UsuarioPaiID=2584,@BoardID=1,@Chamada='ConviteNew'

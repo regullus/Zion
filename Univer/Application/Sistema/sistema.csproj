@@ -8216,7 +8216,6 @@
     <Content Include="Views\MeuExtrato\Index.cshtml" />
     <Content Include="Views\Saque\_cancelarSolicitacao.cshtml" />
     <Content Include="Views\MinhaRede\MeusInativos.cshtml" />
-    <Content Include="tsconfig.json" />
     <Content Include="Views\Seguranca\GoogleAuthenticator.cshtml" />
     <Content Include="Views\Account\SegundaEtapa.cshtml" />
     <Content Include="Views\MinhaRede\Unilevel.cshtml" />
@@ -8241,7 +8240,7 @@
     <Content Include="Views\Migracao\Rede.cshtml" />
     <Content Include="Views\MinhaRede\MigrarRede.cshtml" />
     <Content Include="Views\Shared\_LayoutLimpo.cshtml" />
-    <Content Include="Views\MinhaRede\Tabuleiro.cshtml" />
+    <Content Include="Views\MinhaRede\Galaxy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

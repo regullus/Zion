@@ -25,6 +25,7 @@ using static Core.Entities.Conta;
 using Core.Models;
 using Microsoft.Ajax.Utilities;
 using ZendeskApi_v2.Models.Brands;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 
 #endregion
@@ -424,7 +425,7 @@ namespace Sistema.Controllers
 
         #region Tabuleiro
 
-        public ActionResult Tabuleiro(int? idTab)
+        public ActionResult Galaxy(int? idTab)
         {
             obtemMensagem();
 
@@ -435,7 +436,7 @@ namespace Sistema.Controllers
             string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
             tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
             ViewBag.Token = tokenLocal;
-
+            
             int idTabuleiro = idTab ?? 0;
 
             if (idTabuleiro < 0)
@@ -454,12 +455,29 @@ namespace Sistema.Controllers
                 ViewBag.Timer = null;
                 ViewBag.NovoUsuario = false;
                 ViewBag.ShowMsgFaltaPag = "";
+                ViewBag.TabuleiroOpacity = false;
 
                 TabuleiroModel tabuleiro = null;
                 TabuleiroUsuarioModel tabuleiroUsuario = null;
 
                 IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(usuario.ID);
                 ViewBag.tabuleirosUsuario = tabuleirosUsuario;
+
+                //Verifica se usuario já esta em nivel superior StatusID != 0 em boards superiores ao primeiro board
+                bool blnTabuleiroAtivos = tabuleirosUsuario.Where(x => x.StatusID != 0 && x.BoardID > 1).Count() > 0;
+
+                //Verifica se há um convite ativo para o usuario
+                bool blnConviteAtivo = tabuleirosUsuario.Where(x => x.StatusID == 2).Count() > 0;
+
+                //Mensagem que o usuario tem um convite
+                if (blnConviteAtivo)
+                {
+                    ViewBag.HaConvite = traducaoHelper["CONVITE_ENTRAR"];
+                }
+                else
+                {
+                    ViewBag.HaConvite = "";
+                }
 
                 if (idTabuleiro > 0)
                 {
@@ -470,10 +488,16 @@ namespace Sistema.Controllers
                     //Obtem 1º Tabuleiro ativo do usuario
                     tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID != 2).FirstOrDefault();
                 }
+
                 //Caso seja um convite StatusID =2 - Obtem o 1º Ativo
-                if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2)
+                if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2 && !blnTabuleiroAtivos)
                 {
                     tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID == 0).OrderBy(x => x.BoardID).FirstOrDefault();
+                }
+
+                if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2 && blnTabuleiroAtivos)
+                {
+                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID == 1).OrderBy(x => x.BoardID).FirstOrDefault();
                 }
 
                 if (tabuleiroUsuario != null)
@@ -539,9 +563,9 @@ namespace Sistema.Controllers
                     if (tabuleiroUsuario.MasterID == usuario.ID)
                     {
                         //Sendo o master verifica se ele esta ok com as regras
-                        string check = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
+                        string ret = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
 
-                        switch (check)
+                        switch (ret)
                         {
                             case "OK":
                                 ViewBag.ShowMsgFaltaPag = "";
@@ -555,8 +579,11 @@ namespace Sistema.Controllers
                             case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
                                 ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
                                 break;
+                            case "NOOK_PAGTO_SISTEMA_INFORME_OK":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
+                                break;
                             default:
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper[check];
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper[ret];
                                 break;
                         }
                     }
@@ -590,6 +617,7 @@ namespace Sistema.Controllers
                 }
                 else
                 {
+
                     //Novo usuario, pega tabuleiro do seu pai
                     int idPai = usuario.PatrocinadorDiretoID ?? 0;
                     bool tab10Disponiveis = false;
@@ -670,6 +698,33 @@ namespace Sistema.Controllers
                             }
                         }
                     }
+                    
+                    if (blnTabuleiroAtivos)
+                    {
+                        ViewBag.NovoUsuario = false;
+                        ViewBag.TabuleiroOpacity = true;
+                    }
+                }
+
+                string check = tabuleiroRepository.UsuarioRuleOK(usuario.ID);
+
+                switch (check)
+                {
+                    case "OK":
+                        ViewBag.InfoUsuario = "";
+                        break;
+                    case "NOOK_PAGTO_SISTEMA":
+                        ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA"];
+                        break;
+                    case "NOOK_SEM_INDICACAO":
+                        ViewBag.InfoUsuario = traducaoHelper["NOOK_SEM_INDICACAO"];
+                        break;
+                    case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
+                        ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                        break;
+                    default:
+                        ViewBag.InfoUsuario = traducaoHelper[check];
+                        break;
                 }
             }
             catch (Exception ex)
@@ -752,6 +807,13 @@ namespace Sistema.Controllers
                                 //Não estando ok, a conta do sistema é exibida para pagamento
                                 obtemInfoUsuario = tabuleiroRepository.ObtemInfoSystem();
                             }
+                            //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
+                            if (tabuleiroRepository.MasterIndicadosOK(idTarget, idBoard) != "OK")
+                            {
+                                //Não estando ok, a conta do sistema é exibida para pagamento
+                                obtemInfoUsuario = tabuleiroRepository.ObtemInfoSystem();
+                            }
+
                         }
                         obtemInfoUsuario.Pix = CriptografiaHelper.Morpho(obtemInfoUsuario.Pix, CriptografiaHelper.TipoCriptografia.Descriptografa);
                         obtemInfoUsuario.Carteira = CriptografiaHelper.Morpho(obtemInfoUsuario.Carteira, CriptografiaHelper.TipoCriptografia.Descriptografa);
@@ -817,6 +879,9 @@ namespace Sistema.Controllers
                             case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
                                 obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_2"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO_2"];
                                 break;
+                            case "NOOK_PAGTO_SISTEMA_INFORME_OK":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
+                                break;
                             default:
                                 obtemInfoUsuario.Observacao = traducaoHelper[check];
                                 break;
@@ -864,7 +929,7 @@ namespace Sistema.Controllers
                 }
 
                 //Obtem usuario do systema 
-                Core.Models.TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoSysPag();
+                TabuleiroInfoUsuarioModel obtemInfoUsuario = tabuleiroRepository.ObtemInfoSysPag();
 
                 if (obtemInfoUsuario != null)
                 {
