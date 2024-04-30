@@ -167,11 +167,11 @@ Begin
 		Master = Coalesce(@UsuarioPaiID, Master) and
         StatusID = 1 And --Tem que estar ativo no board
         @Chamada <> 'Completa'
-    
+		
 	--Caso Usuario jah se encontra no tabuleiro, verifica se ele esta em uma lado fechado
 	if(@aux > 0)
 	Begin
-		Set @log = @log + '|00 aux > 0 - Ja esta no tabuleiro'
+		Set @log = @log + '|00 aux > 0 - Ja esta no tabuleiro TabuleiroID=' + TRIM(STR(@aux))
 		--Para estar com um lado fechado ele deve ja ter ao menos um convite em um outro tabuleiro
 		if Exists (
 			Select 
@@ -197,7 +197,8 @@ Begin
     Begin
         --Regra: Caso usuario jah exista no tabuleiro, nao se pode inclui-lo novamente
         Set @Historico = '01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @Chamada
-        Set @log = @log + '|01 jah se encontra no tabuleiro'
+		Set @log = @log +' |01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @Chamada
+        Set @log = @log + ' |01 jah se encontra no tabuleiro'
 
 		if(@UsuarioPaiID is null) 
 		Begin
@@ -264,6 +265,16 @@ Begin
             Else
             Begin
                 Set @log = @log + '| 04 UsuarioPaiID nao eh null: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID='+ TRIM(STR(@BoardID))
+
+				--Descobre quem é o master do pai indicado
+				Select
+					@MasterTabuleiro = MasterID
+				From
+					Rede.TabuleiroUsuario
+				Where
+					UsuarioID = @UsuarioPaiID and
+					BoardID = @BoardID
+
                 Insert Into #temp
                 Select 
                     tab.ID as ID,
@@ -290,27 +301,13 @@ Begin
                     Rede.Tabuleiro Tab,
                     Usuario.Usuario Usu
                 Where
-                    usu.id = @UsuarioPaiID and
+                    Master = @MasterTabuleiro and
+					usu.id = Master and
                     tab.BoardID = @BoardID and
-                    (
-                        tab.Master = @UsuarioPaiID Or
-                        tab.CoordinatorDir = @UsuarioPaiID Or
-                        tab.IndicatorDirSup = @UsuarioPaiID Or
-                        tab.IndicatorDirInf = @UsuarioPaiID Or
-                        tab.DonatorDirSup1 = @UsuarioPaiID Or
-                        tab.DonatorDirSup2 = @UsuarioPaiID Or
-                        tab.DonatorDirInf1 = @UsuarioPaiID Or
-                        tab.DonatorDirInf2 = @UsuarioPaiID Or
-                        tab.CoordinatorEsq = @UsuarioPaiID Or
-                        tab.IndicatorEsqSup = @UsuarioPaiID Or
-                        tab.IndicatorEsqInf = @UsuarioPaiID Or
-                        tab.DonatorEsqSup1 = @UsuarioPaiID Or
-                        tab.DonatorEsqSup2 = @UsuarioPaiID Or
-                        tab.DonatorEsqInf1 = @UsuarioPaiID Or
-                        tab.DonatorEsqInf2 = @UsuarioPaiID
-                    )  and
                     tab.StatusID = 1 --Tem que estar ativo no board
 
+				if (@Chamada = 'Convite')
+				Begin
 					--Remove os que o usuario já possa estar
 					Delete #temp Where CoordinatorDir = @UsuarioID
 					Delete #temp Where IndicatorDirSup = @UsuarioID
@@ -326,11 +323,11 @@ Begin
 					Delete #temp Where DonatorEsqSup2 = @UsuarioID
 					Delete #temp Where DonatorEsqInf1 = @UsuarioID
 					Delete #temp Where DonatorEsqInf2 = @UsuarioID
-
+				End
             End
 			
 			--*************FIM POPULA #temp***********
-			Select * from #temp
+			
 			--Ferifica se usuario já se encontra no tabuleiro selecionado
 			Set @aux = 0
 			if(@Chamada = 'Convite')
@@ -354,7 +351,7 @@ Begin
 
 			if(@aux = 1)
 			Begin
-				Set @log = @log + '|01 Usuario jah se encontra no tabuleiro, mas vai ser incluido em outro'
+				Set @log = @log + '|01 Usuario jah se encontra no tabuleiro, mas vai ser incluido'
 				--Usuario não pode ser incluido em um tabuleiro em que ele já se encontra
 				--Seleciona proximo tabuleiro disponivel
 				--Obtem primeiro Master valido nos tabuleiros
@@ -368,7 +365,9 @@ Begin
 					BoardID = 1 and
 					StatusID = 1 and
 					Master <> @UsuarioID
-
+				
+				--Aqui faz com que o usuario não reentre no mesmo tabuleiro
+				-- O que dá muit problema
 				Delete #tempMaster Where CoordinatorDir = @UsuarioID
 				Delete #tempMaster Where IndicatorDirSup = @UsuarioID
 				Delete #tempMaster Where IndicatorDirInf = @UsuarioID
@@ -396,7 +395,7 @@ Begin
 
                     Set @Historico = '01.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 
-                    Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Convite'
+                    Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'ConviteNew'
                 End
 				Else
 				Begin
@@ -411,27 +410,55 @@ Begin
 				Begin
 					Set @log = @log + '| 05 Temp tem conteudo'
 					--Determina qual a posicao do pai no board
-					Select 
-						@ID = ID,
-						@MasterID = Master,
-						@DataInicio = DataInicio,
-						@CoordinatorDir = CoordinatorDir,
-						@IndicatorDirSup = IndicatorDirSup,
-						@IndicatorDirInf = IndicatorDirInf,
-						@DonatorDirSup1 = DonatorDirSup1,
-						@DonatorDirSup2 = DonatorDirSup2,
-						@DonatorDirInf1 = DonatorDirInf1,
-						@DonatorDirInf2 = DonatorDirInf2,
-						@CoordinatorEsq = CoordinatorEsq,
-						@IndicatorEsqSup = IndicatorEsqSup,
-						@IndicatorEsqInf = IndicatorEsqInf,
-						@DonatorEsqSup1 = DonatorEsqSup1,
-						@DonatorEsqSup2 = DonatorEsqSup2,
-						@DonatorEsqInf1 = DonatorEsqInf1,
-						@DonatorEsqInf2 = DonatorEsqInf2
-					From 
-						#temp
-
+					if(@Chamada = 'ConviteNew')
+					Begin
+					    Select Top(1)
+							@ID = ID,
+							@MasterID = Master,
+							@DataInicio = DataInicio,
+							@CoordinatorDir = CoordinatorDir,
+							@IndicatorDirSup = IndicatorDirSup,
+							@IndicatorDirInf = IndicatorDirInf,
+							@DonatorDirSup1 = DonatorDirSup1,
+							@DonatorDirSup2 = DonatorDirSup2,
+							@DonatorDirInf1 = DonatorDirInf1,
+							@DonatorDirInf2 = DonatorDirInf2,
+							@CoordinatorEsq = CoordinatorEsq,
+							@IndicatorEsqSup = IndicatorEsqSup,
+							@IndicatorEsqInf = IndicatorEsqInf,
+							@DonatorEsqSup1 = DonatorEsqSup1,
+							@DonatorEsqSup2 = DonatorEsqSup2,
+							@DonatorEsqInf1 = DonatorEsqInf1,
+							@DonatorEsqInf2 = DonatorEsqInf2
+						From 
+							#temp
+						Order By 
+							ID Desc
+					End
+					Else 
+					Begin
+					    Select Top(1)
+							@ID = ID,
+							@MasterID = Master,
+							@DataInicio = DataInicio,
+							@CoordinatorDir = CoordinatorDir,
+							@IndicatorDirSup = IndicatorDirSup,
+							@IndicatorDirInf = IndicatorDirInf,
+							@DonatorDirSup1 = DonatorDirSup1,
+							@DonatorDirSup2 = DonatorDirSup2,
+							@DonatorDirInf1 = DonatorDirInf1,
+							@DonatorDirInf2 = DonatorDirInf2,
+							@CoordinatorEsq = CoordinatorEsq,
+							@IndicatorEsqSup = IndicatorEsqSup,
+							@IndicatorEsqInf = IndicatorEsqInf,
+							@DonatorEsqSup1 = DonatorEsqSup1,
+							@DonatorEsqSup2 = DonatorEsqSup2,
+							@DonatorEsqInf1 = DonatorEsqInf1,
+							@DonatorEsqInf2 = DonatorEsqInf2
+						From 
+							#temp
+					End
+					
 					if(@CoordinatorDir is not Null and @IndicatorDirSup is not Null and @IndicatorDirInf is not Null and @DonatorDirSup1  is not Null and @DonatorDirSup2 is not Null and @DonatorDirInf1 is not Null and @DonatorDirInf2  is not Null)
 					Begin
 						Set @DireitaFinalizada = 'True'
@@ -464,7 +491,7 @@ Begin
 						Set @IndicadorEsquerdaInferiorFinalizado = 'True'
 					End
       
-					--Regra: Caso ele seja um donator nao pode incluir um novo usuario
+					--Regra: Caso pai seja um donator nao pode incluir um novo usuario
 					If(@DonatorEsqSup1 = @UsuarioPaiID OR @DonatorEsqSup2 = @UsuarioPaiID OR @DonatorEsqInf1 = @UsuarioPaiID  OR @DonatorEsqInf2 = @UsuarioPaiID)
 					Begin
 						Set @PosicaoPai = 'Donator'
@@ -615,7 +642,7 @@ Begin
 						End
 						Else 
 						Begin
-							--Verifica se as 4 posicoes de donators da direita estao ocupadas
+							--Verifica se as 4 posicoes de donators da direita
 							Set @count = 0
 							Select 
 								@count = count(*) 
@@ -784,6 +811,7 @@ Begin
 								Set @Identity = @@IDentity
                
 								Set @log = @log + '| 28.1 Altera Posicao no tabuleiro: ' + TRIM(STR(@Identity))
+								
 								--inclui novo usuario no TabuleiroUsuario 1
 
 								--Update posicao no TabuleiroUsuario do pessoal da Esquerda
@@ -1226,6 +1254,7 @@ Begin
 										Rede.TabuleiroUsuario 
 									Set
 										StatusId = 2, --Convite
+										DataInicio = GetDate(),
 										Debug = 'Tabuleiro Fechado - Convite (1)'
 									Where
 										UsuarioID = @MasterID and --Ele vira o Master
@@ -2874,25 +2903,6 @@ Begin
 						--Verifica se Master jah teve 4 pagamentos se sim cria convite para entrar em nivel superior
 						Set @log = @log + '|50 Verifica se Master jah teve 4 pagamentos para gerar convite'
 
-						--Alterado para o codigo abaixo
-						--Select 
-						--	@count = count(*) 
-						--From 
-						--	Rede.TabuleiroUsuario 
-						--Where 
-						--	TabuleiroId = @ID And 
-						--	PagoMaster = 1 and 
-						--	(
-						--		Posicao = 'DonatorDirSup1' or
-						--		Posicao = 'DonatorDirSup2' or
-						--		Posicao = 'DonatorDirInf1' or
-						--		Posicao = 'DonatorDirnf2' or
-						--		Posicao = 'DonatorEsqSup1' or
-						--		Posicao = 'DonatorEsqSup2' or
-						--		Posicao = 'DonatorEsqInf1' or
-						--		Posicao = 'DonatorEsqInf2' 
-						--	)
-
 						Select 
 							@count = TotalRecebimento
 						From 
@@ -2905,7 +2915,7 @@ Begin
 						If(@count >= 4)
 						Begin
 							--*********** Promove Usuario Master para novo Board ***********
-							Set @log = @log + 'Verifica se pagou o sistema UsuarioID = ' + TRIM(STR(@MasterID)) + ' BoardID=' + TRIM(STR(@BoardID))
+							Set @log = @log + ' |50.1 Verifica se pagou o sistema UsuarioID = ' + TRIM(STR(@MasterID)) + ' BoardID=' + TRIM(STR(@BoardID))
 							--Verifica se pagou o sistema
 							if Exists (
 								Select 
@@ -2948,7 +2958,8 @@ Begin
 									Update
 										Rede.TabuleiroUsuario 
 									Set 
-										StatusID = 2 --StatusID 2 eh um convite para entrar no proximo board
+										StatusID = 2, --StatusID 2 eh um convite para entrar no proximo board
+										DataInicio = GetDate()
 									Where 
 										UsuarioID = @MasterID and 
 										BoardID = @BoardID and
@@ -3121,6 +3132,15 @@ End -- Sp
 go
 Grant Exec on spG_Tabuleiro To public
 go
---Exec spG_Tabuleiro @UsuarioID=2589,@UsuarioPaiID=null,@BoardID=1,@Chamada='Convite'
---Exec spG_Tabuleiro @UsuarioID=2589,@UsuarioPaiID=2604,@BoardID=1,@Chamada='Convite'
+/*
+Begin tran
 
+Exec spG_Tabuleiro @UsuarioID=2596,@UsuarioPaiID=2589,@BoardID=1,@Chamada='Completa'
+
+Select * from  Rede.TabuleiroLog order by id desc
+
+Rollback tran
+
+01.2 @UsuarioID=2589,@UsuarioPaiID=2604,@BoardID=1
+
+*/

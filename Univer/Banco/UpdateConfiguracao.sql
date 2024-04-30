@@ -38,6 +38,13 @@ select * from Sistema.Configuracao where chave = @chaveC
 
 --select * from Sistema.Configuracao where dados like  '%http%'
 
+--dev -> prod
+--update Sistema.Configuracao set Dados = 'https://donation.universol.global/office//Home/MTRetorno' where Dados = 'https://dev.universol.global/office//Home/MTRetorno'
+--update Sistema.Configuracao set Dados = 'https://donation.universol.global' where Dados = 'https://dev.universol.global'
+--update Sistema.Configuracao set Dados = 'https://donation.universol.global/' where Dados = 'https://dev.universol.global/'
+--update Sistema.Configuracao set Dados = 'https://donation.universol.global/office//Home/MTRetorno' where Dados = 'https://dev.universol.global/office//Home/MTRetorno'
+--update Sistema.Configuracao set Dados = 'https://donation.universol.global/account/loginexterno' where Dados = 'https://dev.universol.global/account/loginexterno'
+
 --prod -> dev
 --update Sistema.Configuracao set Dados = 'https://dev.universol.global/office//Home/MTRetorno' where Dados = 'https://universol.global/office//Home/MTRetorno'
 --update Sistema.Configuracao set Dados = 'https://dev.universol.global' where Dados = 'https://donator.universol.global'

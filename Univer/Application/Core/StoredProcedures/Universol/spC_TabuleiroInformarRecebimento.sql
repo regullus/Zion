@@ -83,7 +83,7 @@ BEGIN
 					BoardID  = @BoardID + 1
 				)
             Begin
-			    --Verifica se já pagou o sistema
+			    --Verifica se jï¿½ pagou o sistema
 				if Exists (
 					Select 
 						'OK' 
@@ -99,7 +99,8 @@ BEGIN
 					Update
 						rede.TabuleiroUsuario
 					Set 
-						StatusID = 2 --Convite Proximo Nivel
+						StatusID = 2, --Convite Proximo Nivel
+                        DataInicio = GetDate()
 					Where
 						UsuarioID = @MasterID and 
 						BoardID  = @BoardID + 1 and

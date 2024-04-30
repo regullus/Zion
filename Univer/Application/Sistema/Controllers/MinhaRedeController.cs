@@ -726,6 +726,30 @@ namespace Sistema.Controllers
                         ViewBag.InfoUsuario = traducaoHelper[check];
                         break;
                 }
+
+                if (blnConviteAtivo)
+                {
+                    //Timer para entrar no convite de uma galaxia
+                    int tempoMin = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_PAGAMENTO");
+                    int tempoMax = ConfiguracaoHelper.GetInt("TABULEIRO_TEMPO_MAX_PAGAMENTO");
+
+                    if (tempoMin == 0)
+                    {
+                        tempoMin = 15;
+                    }
+                    if (tempoMax == 0)
+                    {
+                        tempoMax = 60;
+                    }
+
+                    DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
+
+                    if (timePagamentoMin > DateTime.Now)
+                    {
+                        //Format: '03/30/2024 17:59:00'
+                        ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin).ToString("MM/dd/yyyy HH:mm:ss");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -881,6 +905,21 @@ namespace Sistema.Controllers
                                 break;
                             case "NOOK_PAGTO_SISTEMA_INFORME_OK":
                                 ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
+                                break;
+                            case "NOOK_PAGTO_SISTEMA_CONVITE":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_2"] + " - " + traducaoHelper["NOOK_CONVITE"];
+                                break;
+                            case "NOOK_SEM_INDICACAO_CONVITE":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_SEM_INDICACAO_2"] + " - " + traducaoHelper["NOOK_CONVITE"];
+                                break;
+                            case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO_CONVITE":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_2"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO_2"] + " - " + traducaoHelper["NOOK_CONVITE"];
+                                break;
+                            case "NOOK_PAGTO_SISTEMA_INFORME_OK_CONVITE":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"] + " - " + traducaoHelper["NOOK_CONVITE"];
+                                break;
+                            case "NOOK_CONVITE":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_CONVITE"];
                                 break;
                             default:
                                 obtemInfoUsuario.Observacao = traducaoHelper[check];
@@ -1219,6 +1258,7 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult ReportPayment(string usuarioID, string tabuleiroID, string usuarioIDPag, string token)
         {
+            //Confirmar PAgamento
             if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || usuarioIDPag.IsNullOrEmpty())
             {
                 string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
@@ -1300,6 +1340,7 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult ReportReceipt(string usuarioID, string UsuarioConvidadoID, string tabuleiroID, string token)
         {
+            //Confirmar Recebimento
             if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || UsuarioConvidadoID.IsNullOrEmpty())
             {
                 string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
@@ -1384,7 +1425,6 @@ namespace Sistema.Controllers
                         lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
                         lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
                         lancamentoRepository.Save(lancamento);
-
 
                         //Chama incluir no tabuleiro para ver se 
                         //o tabuleiro esta completo
@@ -1509,6 +1549,7 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult ReportPaymentSystem(string usuarioID, string tabuleiroID, string token)
         {
+            //Confirmar pagamento ao sistema
             if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
             {
                 string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };

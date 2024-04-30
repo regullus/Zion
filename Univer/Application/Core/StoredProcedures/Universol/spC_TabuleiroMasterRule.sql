@@ -120,6 +120,25 @@ BEGIN
         Select @retorno = 'OK'
     End
 
+	--Verifica se há convites pendentes
+	if Exists (
+		Select 'OK'
+		From
+			Rede.TabuleiroUsuario
+		Where
+			UsuarioID = @UsuarioID and
+			StatusID = 2
+	)
+	Begin
+		if(@retorno = 'OK')
+		Begin
+			Set @retorno = 'NOOK_CONVITE'
+		End
+		Else
+		Begin
+			Set @retorno = @retorno + '_CONVITE'
+		End
+	End
 
     Select @retorno as Retorno
 End -- Sp
@@ -128,7 +147,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID=2589, @BoardID=1
+Exec spC_TabuleiroMasterRule @UsuarioID=2589, @BoardID=1
 
 
 

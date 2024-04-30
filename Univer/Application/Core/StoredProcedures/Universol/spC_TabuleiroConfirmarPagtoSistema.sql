@@ -65,14 +65,12 @@ BEGIN
 			)
 		Begin
 			Select 
-				@Count = count(*)
-			From
-				rede.TabuleiroUsuario 
-			Where
-				MasterID = @MasterID and 
-				BoardID  = @BoardID and
-				PagoMaster = 'true' and
-				Posicao in ('DonatorDirSup1','DonatorDirSup2','DonatorDirInf1','DonatorDirInf2','DonatorEsqSup1','DonatorEsqSup2','DonatorEsqInf1','DonatorEsqInf2')
+				@count = TotalRecebimento
+			From 
+				Rede.TabuleiroUsuario 
+			Where 
+				UsuarioID = @MasterID And 
+				BoardID = @BoardID
 				
 			if(@count>=4)
 			Begin
@@ -88,12 +86,13 @@ BEGIN
 						TabuleiroID is not null
 					)
 				Begin
-					--Verifica se já pagou o sistema
+					--Verifica se jï¿½ pagou o sistema
 					--Atualiza para criar o convite para o proximo nivel
 					Update
 						rede.TabuleiroUsuario
 					Set 
-						StatusID = 2 --Convite Proximo Nivel
+						StatusID = 2, --Convite Proximo Nivel
+						DataInicio = GetDate()
 					Where
 						UsuarioID = @MasterID and 
 						BoardID  = @BoardID + 1 
@@ -121,5 +120,14 @@ go
 Grant Exec on spC_TabuleiroConfirmarPagtoSistema To public
 go
 
---Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2588, @BoardID=1, @confirmar='true'--
---Select * from  Rede.TabuleiroUsuario where usuarioID = 2588
+/*
+Begin Tran
+
+Rollback tran
+
+Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2589, @BoardID=1, @confirmar='true'
+
+Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589 --maria
+
+
+*/

@@ -131,6 +131,12 @@ BEGIN
 		Begin
 			Set @retorno = 'OK'
 		End
+	
+	--Os 7 usuarios principais, não entram na regra
+	If(@UsuarioID <= 2586)
+	Begin
+		Set @retorno = 'OK'
+	End
 
     Select @retorno as Retorno
 End -- Sp
@@ -139,7 +145,7 @@ go
 Grant Exec on spC_TabuleiroIndicadosValidos To public
 go
 
---Exec spC_TabuleiroIndicadosValidos @UsuarioID=2589, @BoardID = 1
+Exec spC_TabuleiroIndicadosValidos @UsuarioID=2581, @BoardID=1
 
 
 

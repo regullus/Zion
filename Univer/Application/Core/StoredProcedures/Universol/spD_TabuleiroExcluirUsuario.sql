@@ -23,7 +23,8 @@ BEGIN
 	Declare
 	    @TabuleiroID int,
 		@Posicao nvarchar(255),
-		@Retorno nvarchar(50)
+		@Retorno nvarchar(50),
+		@Ciclo int
 
 	Set @Retorno = 'NOOK'
 	
@@ -43,69 +44,114 @@ BEGIN
 	    
 		Select
 			@TabuleiroID = TabuleiroID,
-			@posicao = Posicao
+			@posicao = Posicao,
+			@Ciclo = Ciclo
 		From
 			Rede.TabuleiroUsuario
 		Where
 			UsuarioID = @UsuarioID and
 			BoardID = @BoardID
 
-		--Zera statusID do usuario 
-		Update
-			Rede.TabuleiroUsuario
-		Set
-			StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
-			Posicao = '',
-			TabuleiroID = null,
-			InformePag = 'false',
-			UsuarioIDPag = null,
-			Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
-		Where
-			UsuarioID = @UsuarioID and
-			BoardID = @BoardID
+		if(@Ciclo > 1)
+		Begin
+			--Dois statusID do usuario 
+			Update
+				Rede.TabuleiroUsuario
+			Set
+				StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
+				Posicao = '',
+				TabuleiroID = null,
+				InformePag = 'false',
+				UsuarioIDPag = null,
+				DataInicio = GetDate(),
+				Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
+			Where
+				UsuarioID = @UsuarioID and
+				BoardID = @BoardID
+		End
+		Else
+		Begin
+			--Zera statusID do usuario 
+			Update
+				Rede.TabuleiroUsuario
+			Set
+				StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+				Posicao = '',
+				TabuleiroID = null,
+				InformePag = 'false',
+				UsuarioIDPag = null,
+				Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
+			Where
+				UsuarioID = @UsuarioID and
+				BoardID = @BoardID
 
+		End
+		
 		--Remove usuario que nao pagou no tabuleiro
-		if Exists (Select 'OK' from Rede.Tabuleiro Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID) 
+		if(@posicao = 'DonatorDirSup1')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorDirSup1 = null Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID) 
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorDirSup1 = null Where ID = @TabuleiroID and DonatorDirSup1 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirSup2 = @UsuarioID)
+		if(@posicao = 'DonatorDirSup2')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorDirSup2 = null Where ID = @TabuleiroID and DonatorDirSup2 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirSup2 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorDirSup2 = null Where ID = @TabuleiroID and DonatorDirSup2 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirInf1 = @UsuarioID)
+		if(@posicao = 'DonatorDirInf1')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorDirInf1 = null Where ID = @TabuleiroID and DonatorDirInf1 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirInf1 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorDirInf1 = null Where ID = @TabuleiroID and DonatorDirInf1 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirInf2 = @UsuarioID)
+		if(@posicao = 'DonatorDirInf2')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorDirInf2 = null Where ID = @TabuleiroID and DonatorDirInf2 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorDirInf2 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorDirInf2 = null Where ID = @TabuleiroID and DonatorDirInf2 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqSup1 = @UsuarioID)
+		if(@posicao = 'DonatorEsqSup1')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorEsqSup1 = null Where ID = @TabuleiroID and DonatorEsqSup1 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqSup1 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorEsqSup1 = null Where ID = @TabuleiroID and DonatorEsqSup1 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqSup2 = @UsuarioID)
+		if(@posicao = 'DonatorEsqSup2')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorEsqSup2 = null Where ID = @TabuleiroID and DonatorEsqSup2 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqSup2 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorEsqSup2 = null Where ID = @TabuleiroID and DonatorEsqSup2 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqInf1 = @UsuarioID)
+		if(@posicao = 'DonatorEsqInf1')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorEsqInf1 = null Where ID = @TabuleiroID and DonatorEsqInf1 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqInf1 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorEsqInf1 = null Where ID = @TabuleiroID and DonatorEsqInf1 = @UsuarioID
+			End
 		End
-		if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqInf2 = @UsuarioID)
+		if(@posicao = 'DonatorEsqInf2')
 		Begin
-			Set @Retorno = 'OK'
-			Update Rede.Tabuleiro Set DonatorEsqInf2 = null Where ID = @TabuleiroID and DonatorEsqInf2 = @UsuarioID
+			if Exists (Select 'OK' from Rede.Tabuleiro  Where ID = @TabuleiroID and DonatorEsqInf2 = @UsuarioID)
+			Begin
+				Set @Retorno = 'OK'
+				Update Rede.Tabuleiro Set DonatorEsqInf2 = null Where ID = @TabuleiroID and DonatorEsqInf2 = @UsuarioID
+			End
 		End
-    
 	End
 	Else 
 	Begin

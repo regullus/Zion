@@ -27,7 +27,7 @@ delete rede.Bonificacao where usuarioid > @usuarioId
 delete rede.Bonificacao where PedidoID in (select id from Loja.Pedido where usuarioid > @usuarioId)
 delete Financeiro.Lancamento where usuarioid > @usuarioId
 delete Financeiro.Lancamento where PedidoID in (select id from Loja.Pedido where usuarioid > @usuarioId)
-delete Rede.Upline_Ciclo  where usuarioid > @usuarioId
+
 delete Loja.Pedido where usuarioid > @usuarioId
 delete Rede.Posicao where usuarioid > @usuarioId
 delete Financeiro.saquestatus where Saqueid in (select id from Financeiro.saque where usuarioid > @usuarioId)
