@@ -186,9 +186,9 @@
         addEventListener('DOMContentLoaded', loadbar, false);
     </script>
 
-@if (blnNovoUsuario)
-{
-    <script>
+    @if (blnNovoUsuario)
+    {
+        <script>
         Swal.fire({
             title: '@traducaoHelper["CONVITE"]',
             html: `
@@ -207,21 +207,21 @@
             $(".divReloadPage").show();
             $('#planetBody').hide();
         }
-    </script>
-}
-else
-{
-    <script>
-        function startPage() {
-            $(".divReloadPage").show();
-            $('#planetBody').show();
-        }
-    </script>
-}
+        </script>
+    }
+    else
+    {
+        <script>
+            function startPage() {
+                $(".divReloadPage").show();
+                $('#planetBody').show();
+            }
+        </script>
+    }
 
-@if (ViewBag.Timer != null)
-{
-    <script>
+    @if (ViewBag.Timer != null)
+    {
+        <script>
         //Contador de tempo para pagamento
         const second = 1000;
         const minute = second * 60;
@@ -252,12 +252,12 @@ else
                 $("#seconds").addClass('hidden');
             }
         }
-    </script>
-}
+        </script>
+    }
 
-@if (tabuleiro != null)
-{
-    <script>
+    @if (tabuleiro != null)
+    {
+        <script>
         function position() {
             width = window.innerWidth;
 
@@ -743,8 +743,14 @@ else
                                     } else {
                                         $('#infoObs').html('');
                                     }
+                                    if (data.MasterID = data.UsuarioID) {
+                                        $(".reportPaymentSystem").hide();
+                                    } else {
+                                        $(".reportPaymentSystem").show();
+                                    }
                                 } else {
                                     $('#infoObs').html('');
+                                    $(".reportPaymentSystem").hide();
                                 }
 
                                 if (data.Pix) {
@@ -778,7 +784,7 @@ else
                                     $(".deleteUser").hide();
                                 }
 
-                                $(".reportPaymentSystem").hide();
+                                //$(".reportPaymentSystem").hide();
 
                                 $('#modDados').modal('show');
                             }
@@ -987,7 +993,7 @@ else
                         }
 
                         $(".paymentSystem").show();
-                        
+
                         $(".reportReceipt").hide();
 
                         $('#modDados').modal('show');
@@ -1345,8 +1351,8 @@ else
             });
         });
 
-    </script>
-}
+        </script>
+    }
 }
 
 @section PageLevelScripts{
@@ -1452,7 +1458,7 @@ else
 
 @if (tabuleiro != null)
 {
-    <div style="max-width: 1600px; display: flex; height: 100%; width: 100%; justify-content: center; align-items: center; @(ViewBag.TabuleiroOpacity == true ? "opacity: 60%;" : "")">
+    <div style="max-width: 1600px; display: flex; height: 100%; width: 100%; justify-content: center; align-items: center; @(ViewBag.TabuleiroOpacity == true ? "opacity: 60%;" : "") @(tabuleiro.StatusID == 2 ? "opacity: 60%;" : "") ">
 
         <div id="porTabuleiro" class="" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; overflow: auto !important; overflow-y: hidden !important; @(blnNovoUsuario ? "opacity: 0.7;" : "")">
             <div class="portlet-body">
@@ -1519,13 +1525,13 @@ else
         </div>
 
     </div>
-} 
+}
 else
 {
     <div class="portlet solid grey-cararra" style="max-width: 1600px;">
         <div class="portlet-body">
             <div class="page-head">
-                <h2>@traducaoHelper["ENTRE_TABULEIRO"]</h2> 
+                <h2>@traducaoHelper["ENTRE_TABULEIRO"]</h2>
             </div>
         </div>
     </div>
@@ -1568,20 +1574,38 @@ else
             }
             if (item.StatusID == 2) //Convite
             {
-                <!-- Invite -->
-                <li class="nav-item start">
-                    <a href="javascript:;" id="invite_@(item.BoardID)" data-id="@(item.BoardID)" class="invite" style="margin: 0; padding: 0;">
-                        <div class="tiles title blob" style="padding-left: 15px;">
-                            <div class="tile double invite-card invite" data-id="@(item.BoardID)" id="cardGrid@(item.BoardID)" style="max-height: 76px; max-width: 200px;">
-                                <div class="tile-body" style="padding:5px;">
-                                    <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
-                                    <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
-                                    <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
+                if (item.Eterno)
+                {
+                    <li class="nav-item start">
+                        <a href="javascript:;" id="invite_@(item.BoardID)" data-id="@(item.BoardID)" class="invite" style="margin: 0; padding: 0;">
+                            <div class="tiles title blob" style="padding-left: 15px;">
+                                <div class="tile double invite-card invite" data-id="@(item.BoardID)" id="cardGrid@(item.BoardID)" style="max-height: 76px; max-width: 200px;">
+                                    <div class="tile-body" style="padding:5px;">
+                                        <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                        <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                        <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item start">
+                        <a href="javascript:;" style="margin: 0; padding: 0;">
+                            <div class="tiles title" style="padding-left: 15px;">
+                                <div class="tile double invite-card" style="max-height: 76px; max-width: 200px; cursor: default; opacity: 0.5;">
+                                    <div class="tile-body" style="padding:5px;">
+                                        <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao))' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
+                                        <h3 class="card-content-txt">@(traducaoHelper[item.BoardNome])</h3>
+                                        <p class="card-content2-txt">@traducaoHelper["CONVITE"]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                }
             }
             else
             {

@@ -456,6 +456,8 @@ namespace Sistema.Controllers
                 ViewBag.NovoUsuario = false;
                 ViewBag.ShowMsgFaltaPag = "";
                 ViewBag.TabuleiroOpacity = false;
+                ViewBag.InfoUsuario = "";
+                ViewBag.HaConvite = "";
 
                 TabuleiroModel tabuleiro = null;
                 TabuleiroUsuarioModel tabuleiroUsuario = null;
@@ -582,6 +584,9 @@ namespace Sistema.Controllers
                             case "NOOK_PAGTO_SISTEMA_INFORME_OK":
                                 ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
                                 break;
+                            case "NOOK_BOARD_SUPERIOR":
+                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_BOARD_SUPERIOR"];
+                                break;
                             default:
                                 ViewBag.ShowMsgFaltaPag = traducaoHelper[ret];
                                 break;
@@ -612,6 +617,10 @@ namespace Sistema.Controllers
                     }
                     else
                     {
+                        if(usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema && tabuleiro.StatusID == 2)
+                        {
+                            ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"]; 
+                        }
                         ViewBag.Pagar = false;
                     }
                 }
@@ -711,19 +720,19 @@ namespace Sistema.Controllers
                 switch (check)
                 {
                     case "OK":
-                        ViewBag.InfoUsuario = "";
+                        ViewBag.InfoUsuario = ViewBag.InfoUsuario;
                         break;
                     case "NOOK_PAGTO_SISTEMA":
-                        ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA"];
+                        ViewBag.InfoUsuario = ViewBag.InfoUsuario + " " + traducaoHelper["NOOK_PAGTO_SISTEMA"];
                         break;
                     case "NOOK_SEM_INDICACAO":
-                        ViewBag.InfoUsuario = traducaoHelper["NOOK_SEM_INDICACAO"];
+                        ViewBag.InfoUsuario = ViewBag.InfoUsuario + " " + traducaoHelper["NOOK_SEM_INDICACAO"];
                         break;
                     case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
-                        ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                        ViewBag.InfoUsuario = ViewBag.InfoUsuario + " " + traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
                         break;
                     default:
-                        ViewBag.InfoUsuario = traducaoHelper[check];
+                        ViewBag.InfoUsuario = ViewBag.InfoUsuario + " " + traducaoHelper[check];
                         break;
                 }
 
@@ -916,10 +925,13 @@ namespace Sistema.Controllers
                                 obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_2"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO_2"] + " - " + traducaoHelper["NOOK_CONVITE"];
                                 break;
                             case "NOOK_PAGTO_SISTEMA_INFORME_OK_CONVITE":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"] + " - " + traducaoHelper["NOOK_CONVITE"];
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"] + " - " + traducaoHelper["NOOK_CONVITE"];
                                 break;
                             case "NOOK_CONVITE":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_CONVITE"];
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_CONVITE"];
+                                break;
+                            case "NOOK_BOARD_SUPERIOR":
+                                obtemInfoUsuario.Observacao = traducaoHelper["NOOK_BOARD_SUPERIOR"];
                                 break;
                             default:
                                 obtemInfoUsuario.Observacao = traducaoHelper[check];

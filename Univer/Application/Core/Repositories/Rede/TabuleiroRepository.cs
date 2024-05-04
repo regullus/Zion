@@ -48,10 +48,10 @@ namespace Core.Repositories.Rede
 
             if (idUsuario == null)
             {
-                sql = "Exec spC_TabuleiroUsuario @UsuarioID=null, @BoardID=null";
+                sql = "Exec spC_TabuleiroUsuario @UsuarioID=null";
             } else
             {
-                sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @BoardID=null";
+                sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario;
             }
 
             var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).ToList();

@@ -207,7 +207,7 @@ Begin
     End
     Else
     Begin
-        Set @log = @log + '| 01 Existe'
+        Set @log = @log + '|01 Existe'
         if Exists (
             Select 
                 'Novo Usuario Existe' 
@@ -217,14 +217,14 @@ Begin
                 ID = @UsuarioID
         )
         Begin
-            Set @log = @log + '| 02 Novo Usuario Existe'
+            Set @log = @log + '|02 Novo Usuario Existe'
 
             --*************INICIO POPULA #temp***********
 
             --Procura pai na rede board indicada
             if (@UsuarioPaiID is null)
             Begin
-                Set @log = @log + '| 03 UsuarioPaiID eh null - #temp Criada'
+                Set @log = @log + '|03 UsuarioPaiID eh null - #temp Criada'
                 --Caso @UsuarioPaiID seja null, obtem primeiro tabuleiro disponivel no board passado como paramentro
                 Insert Into #temp
                 Select top(1)
@@ -264,7 +264,7 @@ Begin
                 End
             Else
             Begin
-                Set @log = @log + '| 04 UsuarioPaiID nao eh null: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID='+ TRIM(STR(@BoardID))
+                Set @log = @log + '|04 UsuarioPaiID nao eh null: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID='+ TRIM(STR(@BoardID))
 
 				--Descobre quem é o master do pai indicado
 				Select
@@ -390,8 +390,8 @@ Begin
                 	
 				if(@MasterTabuleiro is not Null)
                 Begin
-                    Set @log = @log + '| 01.2 Chama a sp novamente recursivo, pois usuario já se encontra no tabuleiro'
-					Set @log = @log + '| 01.3 Chamada: @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
+                    Set @log = @log + '|01.2 Chama a sp novamente recursivo, pois usuario já se encontra no tabuleiro'
+					Set @log = @log + '|01.3 Chamada: @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 
                     Set @Historico = '01.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 
@@ -399,7 +399,7 @@ Begin
                 End
 				Else
 				Begin
-					Set @log = @log + '| 01.4 N"ao hã tabuleiro disponivel para recursiva!'
+					Set @log = @log + '|01.4 N"ao hã tabuleiro disponivel para recursiva!'
 				End
 			End
 			Else
@@ -408,10 +408,11 @@ Begin
 				If Exists (Select 'ok' From #temp)
 				--Caso esteja ativo no board
 				Begin
-					Set @log = @log + '| 05 Temp tem conteudo'
+					Set @log = @log + '|05 Temp tem conteudo'
 					--Determina qual a posicao do pai no board
 					if(@Chamada = 'ConviteNew')
 					Begin
+						Set @log = @log + '|05.1 @Chamada=' + @Chamada
 					    Select Top(1)
 							@ID = ID,
 							@MasterID = Master,
@@ -437,6 +438,7 @@ Begin
 					End
 					Else 
 					Begin
+						Set @log = @log + '|05.2 Chamada=' + @Chamada
 					    Select Top(1)
 							@ID = ID,
 							@MasterID = Master,
@@ -507,7 +509,7 @@ Begin
 						--***Donator nao pode incluir um usuario, dai busca um pai valido, se possivel, para usar na inclussao do novo usuario***
 
 						--nao continua o processo se for um donator
-						Set @log = @log + '| 07 DONATOR'
+						Set @log = @log + '|07 DONATOR'
 						Set @Continua = 'false'
 
 						--Obtem Master do usuario pai passado como parametro e usa este master como pai
@@ -522,7 +524,7 @@ Begin
 						--Caso nao encontre um master com o usuario pai informado, obtem o primeiro master valido e usa este como pai
 						if (@MasterTabuleiro is null Or @MasterTabuleiro = 0)
 						Begin
-							Set @log = @log + '| 08 obtem o primeiro master valido'
+							Set @log = @log + '|08 obtem o primeiro master valido'
                         
 							--Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuario nesse tabuleiro
 							Select Top(1)
@@ -535,26 +537,26 @@ Begin
 
 							if(@MasterTabuleiro is null Or @MasterTabuleiro = 0)
 							Begin
-								Set @log = @log + '| 09 eh um donator'
+								Set @log = @log + '|09 eh um donator'
 								--Problemas nenhum pai foi encontrado!
 								Set @Historico = '02 Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') eh um Donator, nao eh possivel adicionar um novo usuario. Chamada: ' + @Chamada
 								Set @PosicaoFilho = 'Quando o Pai eh um Donator, nao eh possivel adicionar um novo usuario'
 							End
 							Else 
 							Begin
-								Set @log = @log + '| 10 nao eh um donator'
+								Set @log = @log + '|10 nao eh um donator'
 								Set @UsuarioPaiID = @MasterTabuleiro
 							End
 						End
 						Else
 						Begin
-							Set @log = @log + '| 11 set UsuarioPaiID'
+							Set @log = @log + '|11 set UsuarioPaiID'
 							Set @UsuarioPaiID = @MasterTabuleiro
 						End
 
 						if(@MasterTabuleiro is not Null)
 						Begin
-							Set @log = @log + '| 12 Chama a sp novamente recursivo, agora com um pai valido jah que o antigo era um donator'
+							Set @log = @log + '|12 Chama a sp novamente recursivo, agora com um pai valido jah que o antigo era um donator'
 							Set @Historico = '09.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 							--Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
 						End
@@ -562,7 +564,7 @@ Begin
                 
 					if(@Continua = 'true')
 					Begin
-						Set @log = @log + '| 13 Continua'
+						Set @log = @log + '|13 Continua'
 						--IndicatorDirSup
 						if (@IndicatorDirSup = @UsuarioPaiID )
 						Begin
@@ -617,7 +619,7 @@ Begin
 							Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (4)'
 						End
                
-						Set @log = @log + '| 13.1 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@MasterID))
+						Set @log = @log + '|13.1 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@MasterID))
                     
 						--Verifica se houve pagamento ao Master na Direita
 						If Exists ( 
@@ -637,11 +639,12 @@ Begin
 								)
 						)
 						Begin
-						   Set @log = @log + '| 21 PagoMaster false direita'
+						   Set @log = @log + '|21.1 PagoMaster false direita BoardID=' + TRIM(STR(@BoardID)) + ' NasterID=' + TRIM(STR(@MasterID))
 						   Set @PagoMasterDireita = 'false'     
 						End
 						Else 
 						Begin
+							Set @log = @log + '|21.2 PagoMaster true direita BoardID=' + TRIM(STR(@BoardID)) + ' NasterID=' + TRIM(STR(@MasterID))
 							--Verifica se as 4 posicoes de donators da direita
 							Set @count = 0
 							Select 
@@ -657,15 +660,15 @@ Begin
 									Posicao = 'DonatorDirInf1' or
 									Posicao = 'DonatorDirInf2' 
 								)
-							Set @log = @log + '| 22 PagoMaster direita count: ' + TRIM(STR(@count))
+							Set @log = @log + '|22 PagoMaster direita count: ' + TRIM(STR(@count))
 							if(@count=4)
 							Begin
-								Set @log = @log + '| 22.1 PagoMaster direita true'
+								Set @log = @log + '|22.1 PagoMaster direita true'
 								Set @PagoMasterDireita = 'true'     
 							End
 							Else
 							Begin
-								Set @log = @log + '| 22.2 PagoMaster direita false'
+								Set @log = @log + '|22.2 PagoMaster direita false'
 								Set @PagoMasterDireita = 'false'     
 							End
 						End
@@ -688,11 +691,12 @@ Begin
 								)
 						)
 						Begin
-						   Set @log = @log + '| 21 PagoMaster esquerda false esquerda'
+						   Set @log = @log + '|21.3 PagoMaster false esquerda BoardID=' + TRIM(STR(@BoardID)) + ' NasterID=' + TRIM(STR(@MasterID))
 						   Set @PagoMasterEsquerda = 'false'     
 						End
 						Else 
 						Begin
+							Set @log = @log + '|21.2 PagoMaster true esquerda BoardID=' + TRIM(STR(@BoardID)) + ' NasterID=' + TRIM(STR(@MasterID))
 							--Verifica se as 4 posicoes de donators da  esquerda estao ocupadas
 							Set @count = 0
 							Select 
@@ -708,20 +712,22 @@ Begin
 									Posicao = 'DonatorEsqInf1' or
 									Posicao = 'DonatorEsqInf2' 
 								)
-							Set @log = @log + '| 22 PagoMaster  esquerda count: ' + TRIM(STR(@count))
+							Set @log = @log + '|22 PagoMaster  esquerda count: ' + TRIM(STR(@count))
 							if(@count=4)
 							Begin
-								Set @log = @log + '| 22.1 PagoMaster esquerda true'
+								Set @log = @log + '|22.1 PagoMaster esquerda true'
 								Set @PagoMasterEsquerda = 'true'     
 							End
 							Else
 							Begin
-								Set @log = @log + '| 22.2 PagoMaster esquerda false'
+								Set @log = @log + '|22.2 PagoMaster esquerda false'
 								Set @PagoMasterEsquerda = 'false'     
 							End
 						End
 
 						--Verificar se lado esquerdo e lado direito fecharam
+						Set @log = @log + '|13.2 Verificar se lado esquerdo e lado direito fecharam'
+
 						Select
 							@direitaFechada = DireitaFechada,
 							@esquerdaFechada = EsquerdaFechada
@@ -747,12 +753,12 @@ Begin
 						) 
 						--Tabuleiro completo DITEITA
 						Begin
-							Set @log = @log + '| 23.1 TABULEIRO COMPLETO DIREITA'
+							Set @log = @log + '|23.1 TABULEIRO COMPLETO DIREITA'
 							Set @Historico = '08.1 - Check Completa true DIREITA'
                         
 							if (@direitaFechada = 'false')
 							Begin
-								Set @log = @log + '| 23.2.1 Update TABULEIRO DIREITA'
+								Set @log = @log + '|23.2.1 Update TABULEIRO DIREITA'
 
 								Update 
 									Rede.TabuleiroUsuario 
@@ -810,7 +816,7 @@ Begin
 
 								Set @Identity = @@IDentity
                
-								Set @log = @log + '| 28.1 Altera Posicao no tabuleiro: ' + TRIM(STR(@Identity))
+								Set @log = @log + '|28.1 Altera Posicao no tabuleiro: ' + TRIM(STR(@Identity))
 								
 								--inclui novo usuario no TabuleiroUsuario 1
 
@@ -982,15 +988,15 @@ Begin
 						) 
 						--Tabuleiro completo ESQUERDA
 						Begin
-							Set @log = @log + '| 23.2 TABULEIRO COMPLETO ESQUERDA'
+							Set @log = @log + '|23.2 TABULEIRO COMPLETO ESQUERDA'
 							Set @Historico = '08.2 - Check Completa true ESQUERDA'
                         
 							if(@esquerdaFechada = 'false')
 							Begin
-								Set @log = @log + '| 23.2.1 Update TABULEIRO ESQUERDA'
+								Set @log = @log + '|23.2.1 Update TABULEIRO ESQUERDA'
 								--Seta true para todos os usuarios do tabuleiro, informando que o lado direito esta finalizado
                             
-								Set @log = @log + '| 23.2.3 Cria novo tabuleiro'
+								Set @log = @log + '|23.2.3 Cria novo tabuleiro'
 
 								Update 
 									Rede.TabuleiroUsuario 
@@ -1200,14 +1206,14 @@ Begin
 							End
 						End
                     
-						Set @log = @log + '| 40.0 Verifica se encerra tabuleiro direitaFechada: ' + TRIM(STR(@direitaFechada)) + ' esquerdaFechada: ' + TRIM(STR(@esquerdaFechada))
+						Set @log = @log + '|40.0 Verifica se encerra tabuleiro direitaFechada: ' + TRIM(STR(@direitaFechada)) + ' esquerdaFechada: ' + TRIM(STR(@esquerdaFechada))
                     
 						--Encerra tabuleiro
 						if (@direitaFechada = 'true' and @esquerdaFechada = 'true')
 						Begin
 							--*************** Encerra tabuleiro Inicio ****************    
 							--Verifica se tabuleiro jah esta fechado
-							Set @log = @log + '| 40.1 Modo Encerra tabuleiro'
+							Set @log = @log + '|40.1 Modo Encerra tabuleiro'
 
 							Set @tabuleiroFechado = 'false'
                         
@@ -1220,11 +1226,11 @@ Begin
 								ID = @ID and
 								StatusID = 2 --Finalizado
                         
-							Set @log = @log + '| 41.0 Verifica se tabuleiro jah esta fechado: ' + TRIM(STR(@tabuleiroFechado))
+							Set @log = @log + '|41.0 Verifica se tabuleiro jah esta fechado: ' + TRIM(STR(@tabuleiroFechado))
                         
 							if(@tabuleiroFechado = 'false')
 							Begin
-								Set @log = @log + '| 26 Encerra tabuleiro'
+								Set @log = @log + '|26 Encerra tabuleiro'
 
 								Update
 									Rede.Tabuleiro
@@ -1244,23 +1250,21 @@ Begin
 									UsuarioID = @MasterID and
 									BoardID = @BoardID
 							
-								--Usuario finalizou o Board 1, este eh um convite para ele entrar no sistema no board 1 novamente
-								If (@BoardID = 1)
-								Begin
-									Set @log = @log + '| 27 Convite para: Master: ' + TRIM(STR(@UsuarioPaiID))
+								--Usuario finalizou o Board, este eh um convite para ele entrar no sistema no board 1 novamente
+								Set @log = @log + '|27 Convite para: Master: ' + TRIM(STR(@UsuarioPaiID))
                                 
-									--Master
-									Update
-										Rede.TabuleiroUsuario 
-									Set
-										StatusId = 2, --Convite
-										DataInicio = GetDate(),
-										Debug = 'Tabuleiro Fechado - Convite (1)'
-									Where
-										UsuarioID = @MasterID and --Ele vira o Master
-										BoardID = @BoardID and
-										PagoSistema = 'true' --tem q ter pago o sistema
-								End
+								--Master
+								Update
+									Rede.TabuleiroUsuario 
+								Set
+									StatusId = 2, --Convite
+									DataInicio = GetDate(),
+									Debug = 'Tabuleiro Fechado - Convite BaordID=' + TRIM(STR(@BoardID))
+								Where
+									UsuarioID = @MasterID and --Ele vira o Master
+									BoardID = @BoardID and
+									PagoSistema = 'true' --tem q ter pago o sistema
+								
 							End
 						   --*************** Encerra tabuleiro Fim ****************
 						End
@@ -1269,7 +1273,7 @@ Begin
 						Begin
 							if(@Chamada <> 'Completa')
 							Begin
-								Set @log = @log + '| 34 TABULEIRO INCOMPLETO'
+								Set @log = @log + '|34 TABULEIRO INCOMPLETO'
 								--Verifica se tabuleiro possui posicoes livres
 								 if(
 									@MasterID is not null And 
@@ -1289,24 +1293,24 @@ Begin
 									@DonatorEsqInf2 is not null 
 								) 
 								Begin
-									Set @log = @log + '| 34.1 Posicoes estao ocupadas'
+									Set @log = @log + '|34.1 Posicoes estao ocupadas'
 									Set @Historico = '04 nao ha Posicoes livres no momento para o usuario: ' + TRIM(STR(@UsuarioID)) + ' no Tabuleiro: ' +TRIM(STR(@ID)) + ' no BoardID: ' + TRIM(STR(@BoardID))
 								End
 								Else
 								Begin
-									Set @log = @log + '| 34.2 ha Posicoes livres para o TabuleiroID=' + TRIM(STR(@ID))
+									Set @log = @log + '|34.2 ha Posicoes livres para o TabuleiroID=' + TRIM(STR(@ID))
                             
 									--*********INICIO UPDATES***********
 
 									--*********** MASTER **************
 									if(@PosicaoPai = 'Master')
 									Begin
-										Set @log = @log + '| 34.3.1 Pai eh master:' + @PosicaoPai
+										Set @log = @log + '|34.3.1 Pai eh master:' + @PosicaoPai
 										--*********** COORDINATOR **************
 										--Verifica se ha coordinator, caso nao inclui usuario como coordinator na direita
 										if (@CoordinatorDir is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 14.1 COORDINATOR DIREITA'
+												Set @log = @log + '|14.1 COORDINATOR DIREITA'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1321,7 +1325,7 @@ Begin
 										--Verifica se ha coordinator, caso nao inclui usuario como coordinator na esquerda
 										if (@CoordinatorEsq is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 14.1 COORDINATOR ESQUERDA'
+												Set @log = @log + '|14.1 COORDINATOR ESQUERDA'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1337,7 +1341,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1353,7 +1357,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 										if (@IndicatorDirInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1369,7 +1373,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 										if (@IndicatorEsqSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1385,7 +1389,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 										if (@IndicatorEsqInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1402,7 +1406,7 @@ Begin
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1418,7 +1422,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1434,7 +1438,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1450,7 +1454,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1467,7 +1471,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1483,7 +1487,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1499,7 +1503,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1515,7 +1519,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1534,12 +1538,12 @@ Begin
 									--*********** COORDINATOR DIREITA **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir'))
 									Begin
-										Set @log = @log + '| 34.3.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+										Set @log = @log + '|34.3.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
 										
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1555,7 +1559,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 										if (@IndicatorDirInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1572,7 +1576,7 @@ Begin
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1588,7 +1592,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1604,7 +1608,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1620,7 +1624,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1637,7 +1641,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 										if (@IndicatorEsqSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1653,7 +1657,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 										if (@IndicatorEsqInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1670,7 +1674,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1686,7 +1690,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1702,7 +1706,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1718,7 +1722,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1737,11 +1741,11 @@ Begin
 									--*********** COORDINATOR ESQUERDA **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq'))
 									Begin
-										Set @log = @log + '| 34.3.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
+										Set @log = @log + '|34.3.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 										if (@IndicatorEsqSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1757,7 +1761,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 										if (@IndicatorEsqInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1774,7 +1778,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1790,7 +1794,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1806,7 +1810,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1822,7 +1826,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1839,7 +1843,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1855,7 +1859,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 										if (@IndicatorDirInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1872,7 +1876,7 @@ Begin
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1888,7 +1892,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1904,7 +1908,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1920,7 +1924,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1938,12 +1942,12 @@ Begin
 									--*********** INDICATOR DIREITA Superior ************** 
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup'))
 									Begin
-										Set @log = @log + '| 34.3.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+										Set @log = @log + '|34.3.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
 										
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1959,7 +1963,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1975,7 +1979,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -1991,7 +1995,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2008,7 +2012,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 										if (@IndicatorEsqSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2024,7 +2028,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 										if (@IndicatorEsqInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2041,7 +2045,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2057,7 +2061,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2073,7 +2077,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2089,7 +2093,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2108,11 +2112,11 @@ Begin
 									--*********** INDICATOR DIREITA Inferior ************** 
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf'))
 									Begin
-										Set @log = @log + '| 34.3.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+										Set @log = @log + '|34.3.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2128,7 +2132,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2144,7 +2148,7 @@ Begin
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2160,7 +2164,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2177,7 +2181,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 										if (@IndicatorEsqSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Sup'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2193,7 +2197,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 										if (@IndicatorEsqInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.1 INDICATOR ESQUERDA Inf'
+												Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2210,7 +2214,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2226,7 +2230,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2242,7 +2246,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2258,7 +2262,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2276,11 +2280,11 @@ Begin
 									--*********** INDICATOR ESQUERDA Superior **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup'))
 									Begin
-										Set @log = @log + '| 34.3.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+										Set @log = @log + '|34.3.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2296,7 +2300,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2312,7 +2316,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2328,7 +2332,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2345,7 +2349,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2361,7 +2365,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 										if (@IndicatorDirInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2378,7 +2382,7 @@ Begin
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2394,7 +2398,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2410,7 +2414,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2426,7 +2430,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2445,11 +2449,11 @@ Begin
 									--*********** INDICATOR ESQUERDA Inferior **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf'))
 									Begin
-										Set @log = @log + '| 34.3.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+										Set @log = @log + '|34.3.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
 										--Verifica se ha Donator Esquerda Inferior 1
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2465,7 +2469,7 @@ Begin
 										--Verifica se ha Donator Esquerda Inferior 2
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.1 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2481,7 +2485,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 1
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2497,7 +2501,7 @@ Begin
 										--Verifica se ha Donator Esquerda Superior 2
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2514,7 +2518,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA SUP'
+												Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2530,7 +2534,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 										if (@IndicatorDirInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.1 INDICATOR DIREITA Inf'
+												Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2547,7 +2551,7 @@ Begin
 										--Verifica se ha Donator Direita Superior 1
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2563,7 +2567,7 @@ Begin
 										--Verifica se ha Donator Direita Superior s
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.1 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2579,7 +2583,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior 1
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2595,7 +2599,7 @@ Begin
 										--Verifica se ha Donator Direita Inferior s
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.1 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2613,12 +2617,12 @@ Begin
 									--**********************Segunda Passagem Caso nao seja incluido acima *******************************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.1 Pai eh master:' + @PosicaoPai
+										Set @log = @log + '|34.4.1 Pai eh master:' + @PosicaoPai
 										--*********** COORDINATOR **************
 										--Verifica se ha coordinator, caso nao inclui usuario como coordinator na direita
 										if (@CoordinatorDir is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 14.2 COORDINATOR DIREITA'
+												Set @log = @log + '|14.2 COORDINATOR DIREITA'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2634,7 +2638,7 @@ Begin
 										--Verifica se ha coordinator, caso nao inclui usuario como coordinator na esquerda
 										if (@CoordinatorEsq is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 14.2 COORDINATOR ESQUERDA'
+												Set @log = @log + '|14.2 COORDINATOR ESQUERDA'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2652,11 +2656,11 @@ Begin
 									--*********** COORDINATOR DIREITA 2 **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+										Set @log = @log + '|34.4.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 										if (@IndicatorDirSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.2 INDICATOR DIREITA SUP'
+												Set @log = @log + '|15.2 INDICATOR DIREITA SUP'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2672,7 +2676,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 										if (@IndicatorDirInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 15.2 INDICATOR DIREITA Inf'
+												Set @log = @log + '|15.2 INDICATOR DIREITA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2690,11 +2694,11 @@ Begin
 									--*********** COORDINATOR ESQUERDA 2 **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
+										Set @log = @log + '|34.4.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 										if (@IndicatorEsqSup is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.2 INDICATOR ESQUERDA Sup'
+												Set @log = @log + '|16.2 INDICATOR ESQUERDA Sup'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2710,7 +2714,7 @@ Begin
 										--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 										if (@IndicatorEsqInf is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 16.2 INDICATOR ESQUERDA Inf'
+												Set @log = @log + '|16.2 INDICATOR ESQUERDA Inf'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2728,10 +2732,10 @@ Begin
 									--*********** INDICATOR DIREITA Superior 2 ************** 
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+										Set @log = @log + '|34.4.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
 										if (@DonatorDirSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.2 DONATOR DIREITA Sup 1'
+												Set @log = @log + '|17.2 DONATOR DIREITA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2746,7 +2750,7 @@ Begin
 											End
 										if (@DonatorDirSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 17.2 DONATOR DIREITA Sup 2'
+												Set @log = @log + '|17.2 DONATOR DIREITA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2764,10 +2768,10 @@ Begin
 									--*********** INDICATOR DIREITA Inferior 2 ************** 
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+										Set @log = @log + '|34.4.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
 										if (@DonatorDirInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.2 DONATOR DIREITA Inf 1'
+												Set @log = @log + '|18.2 DONATOR DIREITA Inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2782,7 +2786,7 @@ Begin
 											End
 										if (@DonatorDirInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 18.2 DONATOR DIREITA Inf 2'
+												Set @log = @log + '|18.2 DONATOR DIREITA Inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2800,10 +2804,10 @@ Begin
 									--*********** INDICATOR ESQUERDA Superior 2 **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+										Set @log = @log + '|34.4.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
 										if (@DonatorEsqSup1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19.2 DONATOR ESQUERDA Sup 1'
+												Set @log = @log + '|19.2 DONATOR ESQUERDA Sup 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2818,7 +2822,7 @@ Begin
 											End
 										if (@DonatorEsqSup2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 19.2 DONATOR ESQUERDA Sup 2'
+												Set @log = @log + '|19.2 DONATOR ESQUERDA Sup 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2836,10 +2840,10 @@ Begin
 									--*********** INDICATOR ESQUERDA Inferior 2 **************
 									if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
 									Begin
-										Set @log = @log + '| 34.4.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+										Set @log = @log + '|34.4.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
 										if (@DonatorEsqInf1 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.2 DONATOR ESQUERDA inf 1'
+												Set @log = @log + '|20.2 DONATOR ESQUERDA inf 1'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2854,7 +2858,7 @@ Begin
 											End
 										if (@DonatorEsqInf2 is null and @Incluido = 'false')
 											Begin
-												Set @log = @log + '| 20.2 DONATOR ESQUERDA inf 2'
+												Set @log = @log + '|20.2 DONATOR ESQUERDA inf 2'
 												Update
 													Rede.Tabuleiro
 												Set
@@ -2972,7 +2976,7 @@ Begin
 							End
 							Else
 							Begin
-								Set @log = @log + '| 30 - Convite não enviado: Não foi pago o sistema'
+								Set @log = @log + '|30 - Convite não enviado: Não foi pago o sistema'
 							End
 						End
 						Else
@@ -2987,11 +2991,11 @@ Begin
 					if(@Chamada <> 'Completa')
 					Begin
 						--Caso nao exista o tabuleiro com o board informado
-						Set @log = @log + '| 37 Caso nao exista o tabuleiro com o board informado'
+						Set @log = @log + '|37 Caso nao exista o tabuleiro com o board informado'
 						--Verifica se ha usuario ativo no board corrente
 						if Exists(Select 'Existe' From Rede.TabuleiroUsuario Where StatusID = 1 and BoardID = @BoardID)
 						Begin
-							Set @log = @log + '| 38 Obtem primeiro Master ativo '
+							Set @log = @log + '|38 Obtem primeiro Master ativo '
 							--Obtem primeiro Master ativo no primeiro tabuleiro da tabela, e inclui o novo usuario nesse tabuleiro
 							Select Top(1)
 								@MasterTabuleiro = MasterID 
@@ -3006,12 +3010,12 @@ Begin
             
 							if(@MasterTabuleiro is null)
 							Begin
-								Set @log = @log + '| 39 Master eh null - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
+								Set @log = @log + '|39 Master eh null - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
 								Set @Historico = '05 usuario pai (' + TRIM(STR(@MasterTabuleiro)) + ') nao existe! Chamada: ' + @Chamada + ' - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
 							End
 							Else
 							Begin
-								Set @log = @log + '| 40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
+								Set @log = @log + '|40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
 								--Chama novamente essa sp, agora com um pai valido
 								Set @Historico = '09.1 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 								--Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
@@ -3020,7 +3024,7 @@ Begin
 						Else
 						Begin
 							--nao deve entrar aqui, mas por precausao, cria o log
-							Set @log = @log + '| 41 nao existe usuario no board informado UsuarioID: '  + TRIM(STR(@tabuleiroFechado)) + ' BoardID: '  + TRIM(STR(@tabuleiroFechado))
+							Set @log = @log + '|41 nao existe usuario no board informado UsuarioID: '  + TRIM(STR(@tabuleiroFechado)) + ' BoardID: '  + TRIM(STR(@tabuleiroFechado))
 						End
 					End
 				End
@@ -3028,7 +3032,7 @@ Begin
 		End
         Else
         Begin
-            Set @log = @log + '| 43 Usuario nao cadastrado'
+            Set @log = @log + '|43 Usuario nao cadastrado'
             Set @Historico = '06 Novo usuario ' + TRIM(STR(@UsuarioID)) + ' nao esta cadastrado! Chamada: ' + @Chamada
         End
     End

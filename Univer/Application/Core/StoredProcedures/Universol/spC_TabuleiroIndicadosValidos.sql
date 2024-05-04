@@ -145,7 +145,7 @@ go
 Grant Exec on spC_TabuleiroIndicadosValidos To public
 go
 
-Exec spC_TabuleiroIndicadosValidos @UsuarioID=2581, @BoardID=1
+--Exec spC_TabuleiroIndicadosValidos @UsuarioID=2581, @BoardID=1
 
 
 

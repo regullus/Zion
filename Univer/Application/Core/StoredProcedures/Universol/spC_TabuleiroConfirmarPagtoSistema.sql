@@ -86,7 +86,7 @@ BEGIN
 						TabuleiroID is not null
 					)
 				Begin
-					--Verifica se j� pagou o sistema
+					--Verifica se ja pagou o sistema
 					--Atualiza para criar o convite para o proximo nivel
 					Update
 						rede.TabuleiroUsuario
@@ -98,6 +98,10 @@ BEGIN
 						BoardID  = @BoardID + 1 
 				End
 			End
+		
+			--Verifica se já fechou o tabuleiro para abrir outro
+			Exec spG_Tabuleiro @UsuarioID=@UsuarioID, @UsuarioPaiID=@MasterID, @BoardID=@BoardID, @Chamada='Completa'
+		
 		End
 	End
 	Else 
@@ -125,9 +129,9 @@ Begin Tran
 
 Rollback tran
 
-Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2589, @BoardID=1, @confirmar='true'
+Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2582, @BoardID=1, @confirmar='true'
 
-Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589 --maria
+Select * from Rede.TabuleiroUsuario where  UsuarioID = 2582
 
 
 */

@@ -103,38 +103,38 @@ namespace Core.Repositories.Rede
             return pontos;
         }
 
-        public double? ObtemPontuacao(int idUsuario)
-        {
-            string sql = "EXEC spOC_US_ObtemPontuacao " + idUsuario;
+        //public double? ObtemPontuacao(int idUsuario)
+        //{
+        //    string sql = "EXEC spOC_US_ObtemPontuacao " + idUsuario;
 
-            var retorno = _context.Database.SqlQuery<double?>(sql).FirstOrDefault();
-            return retorno != null ? retorno : 0;
+        //    var retorno = _context.Database.SqlQuery<double?>(sql).FirstOrDefault();
+        //    return retorno != null ? retorno : 0;
 
-        }
+        //}
 
-        public double? ObtemPontuacaoCicloVt(int idUsuario)
-        {
-            string sql = "EXEC spOC_US_ObtemPontuacaoCiclo " + idUsuario + " , 'Vt' ";
+        //public double? ObtemPontuacaoCicloVt(int idUsuario)
+        //{
+        //    string sql = "EXEC spOC_US_ObtemPontuacaoCiclo " + idUsuario + " , 'Vt' ";
 
-            var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
-            return retorno != null ? retorno : 0;
-        }
+        //    var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
+        //    return retorno != null ? retorno : 0;
+        //}
 
-        public double? ObtemPontuacaoCiclo(int idUsuario, string tipoPonto, string tipoCiclo)
-        {
-            string sql = "EXEC spOC_US_ObtemPontuacaoCiclo " + idUsuario + " ," + tipoPonto + ", " + tipoCiclo;
+        //public double? ObtemPontuacaoCiclo(int idUsuario, string tipoPonto, string tipoCiclo)
+        //{
+        //    string sql = "EXEC spOC_US_ObtemPontuacaoCiclo " + idUsuario + " ," + tipoPonto + ", " + tipoCiclo;
 
-            var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
-            return retorno != null ? retorno : 0;
-        }
+        //    var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
+        //    return retorno != null ? retorno : 0;
+        //}
 
-        public double? ObtemPontuacaoMaxima(int idUsuario, string tipoPonto)
-        {
-            string sql = "EXEC spOC_US_ObtemMaximaPontuacao " + idUsuario + " ," + tipoPonto;
+        //public double? ObtemPontuacaoMaxima(int idUsuario, string tipoPonto)
+        //{
+        //    string sql = "EXEC spOC_US_ObtemMaximaPontuacao " + idUsuario + " ," + tipoPonto;
 
-            var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
-            return retorno != null ? retorno : 0;
-        }
+        //    var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
+        //    return retorno != null ? retorno : 0;
+        //}
 
         public double? ObtemPontuacaTotal(int idUsuario)
         {
@@ -144,12 +144,12 @@ namespace Core.Repositories.Rede
             return retorno != null ? retorno : 0;
         }
 
-        public double? ObtemPontuacaoCicloVq(int idUsuario)
-        {
-            string sql = "EXEC spOC_US_ObtemPontuacaoCiclo " + idUsuario + " , 'Vq' ";
-            var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
-            return retorno != null ? retorno : 0;
-        }
+        //public double? ObtemPontuacaoCicloVq(int idUsuario)
+        //{
+        //    string sql = "EXEC spOC_US_ObtemPontuacaoCiclo " + idUsuario + " , 'Vq' ";
+        //    var retorno = _context.Database.SqlQuery<int?>(sql).FirstOrDefault();
+        //    return retorno != null ? retorno : 0;
+        //}
 
         public int? ObtemTotalAfiliadosRede(int idUsuario)
         {

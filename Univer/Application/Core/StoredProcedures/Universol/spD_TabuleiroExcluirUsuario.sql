@@ -41,7 +41,6 @@ BEGIN
 		StatusID = 1 --Ativo
 	)
 	Begin
-	    
 		Select
 			@TabuleiroID = TabuleiroID,
 			@posicao = Posicao,
@@ -71,20 +70,39 @@ BEGIN
 		End
 		Else
 		Begin
-			--Zera statusID do usuario 
-			Update
-				Rede.TabuleiroUsuario
-			Set
-				StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
-				Posicao = '',
-				TabuleiroID = null,
-				InformePag = 'false',
-				UsuarioIDPag = null,
-				Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
-			Where
-				UsuarioID = @UsuarioID and
-				BoardID = @BoardID
+			if(@BoardID > 1)
+			Begin
+				 --Dois statusID do usuario 
+				Update
+					Rede.TabuleiroUsuario
+				Set
+					StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
+					Posicao = '',
+					TabuleiroID = null,
+					InformePag = 'false',
+					UsuarioIDPag = null,
+					Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
+				Where
+					UsuarioID = @UsuarioID and
+					BoardID = @BoardID
 
+			End
+			Else
+			Begin
+				--Zera statusID do usuario 
+				Update
+					Rede.TabuleiroUsuario
+				Set
+					StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+					Posicao = '',
+					TabuleiroID = null,
+					InformePag = 'false',
+					UsuarioIDPag = null,
+					Debug = 'Removido pelo master:' + TRIM(STR(@MasterID))
+				Where
+					UsuarioID = @UsuarioID and
+					BoardID = @BoardID
+			End
 		End
 		
 		--Remove usuario que nao pagou no tabuleiro

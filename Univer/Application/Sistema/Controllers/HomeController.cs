@@ -841,96 +841,6 @@
 
                     #endregion
 
-                    #region Pontuacao
-
-                    ViewBag.Pontos = 0.0;
-                    ViewBag.PontosMax = 0.0;
-                    ViewBag.PontosTotal = 0.0;
-                    if (Core.Helpers.ConfiguracaoHelper.GetBoolean("REDE_BINARIA"))
-                    {
-                        var qtdeEsquerdo1 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 1).Count();
-                        var qtdeDireito1 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 1).Count();
-
-                        var qtdeEsquerdo2 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 2).Count();
-                        var qtdeDireito2 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 2).Count();
-
-                        var qtdeEsquerdo3 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 3).Count();
-                        var qtdeDireito3 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 3).Count();
-
-                        var qtdeEsquerdo4 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 4).Count();
-                        var qtdeDireito4 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 4).Count();
-
-                        var qtdeEsquerdo5 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 5).Count();
-                        var qtdeDireito5 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 5).Count();
-
-                        strErro = "Quantidades - try";
-                        try //Para caso de null - valor fica zero
-                        {
-                            //Deixou de calcular para pegar campos [AcumuladoEsquerda] e [AcumuladoDireita] da tabela [Rede].[Posicao]
-                            //acumuladoBonusEsquerda = pagamentos.Where(p => p.Usuario.Assinatura.StartsWith(usuario.Assinatura + "0")).Sum(p => p.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
-                            acumuladoBonusEsquerda = posicaoRepository.AcumuladoEsquerda(usuario.ID) + pontosBinarioRepository.AcumuladoEsquerda(usuario.ID);
-
-                        }
-                        catch (Exception)
-                        {
-                            acumuladoBonusEsquerda = 0;
-                        }
-
-                        strErro = "Quantidades - Acumulado";
-                        double acumuladoBonusDireita = 0;
-                        strErro = "Quantidades - Acumulado try";
-                        try //Para caso de null - valor fica zero
-                        {
-                            //Deixou de calcular para pegar campos [AcumuladoEsquerda] e [AcumuladoDireita] da tabela [Rede].[Posicao]
-                            //acumuladoBonusDireita = pagamentos.Where(p => p.Usuario.Assinatura.StartsWith(usuario.Assinatura + "1")).Sum(p => p.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
-                            acumuladoBonusDireita = posicaoRepository.AcumuladoDireita(usuario.ID) + pontosBinarioRepository.AcumuladoDireita(usuario.ID);
-                        }
-                        catch (Exception)
-                        {
-                            acumuladoBonusDireita = 0;
-                        }
-
-                        strErro = "Pontuacao -  ViewBag";
-                        ViewBag.Pontos = posicaoRepository.ObtemPontuacao(usuario.ID);
-                        if (ViewBag.Pontos < 0)
-                            ViewBag.PontosLado = traducaoHelper["ESQUERDA"];
-                        else
-                            ViewBag.PontosLado = traducaoHelper["DIREITA"];
-
-                        strErro = "Pontuacao -  ViewBag Pontos";
-                        ViewBag.Pontos = Math.Abs(ViewBag.Pontos);
-
-                        ViewBag.PontuacaoEsquerdo = acumuladoBonusEsquerda;
-                        ViewBag.PontuacaoDireito = acumuladoBonusDireita;
-
-                        strErro = "Pontuacao -  ViewBag Rede";
-                        ViewBag.RedeEsquerdo = qtdeEsquerdo;
-                        ViewBag.RedeDireito = qtdeDireito;
-                        ViewBag.RedeTotal = qtdeTotal;
-
-                        ViewBag.RedeEsquerdo1 = qtdeEsquerdo1;
-                        ViewBag.RedeDireito1 = qtdeDireito1;
-                        ViewBag.RedeTotal1 = qtdeEsquerdo1 + qtdeDireito1;
-
-                        ViewBag.RedeEsquerdo2 = qtdeEsquerdo2;
-                        ViewBag.RedeDireito2 = qtdeDireito2;
-                        ViewBag.RedeTotal2 = qtdeEsquerdo2 + qtdeDireito2;
-
-                        ViewBag.RedeEsquerdo3 = qtdeEsquerdo3;
-                        ViewBag.RedeDireito3 = qtdeDireito3;
-                        ViewBag.RedeTotal3 = qtdeEsquerdo3 + qtdeDireito3;
-
-                        ViewBag.RedeEsquerdo4 = qtdeEsquerdo4;
-                        ViewBag.RedeDireito4 = qtdeDireito4;
-                        ViewBag.RedeTotal4 = qtdeEsquerdo4 + qtdeDireito4;
-
-                        ViewBag.RedeEsquerdo5 = qtdeEsquerdo5;
-                        ViewBag.RedeDireito5 = qtdeDireito5;
-                        ViewBag.RedeTotal5 = qtdeEsquerdo5 + qtdeDireito5;
-                    }
-            
-                    #endregion
-
                     #region Pedidos Pendente de Pagamento
                     strErro = "Pedidos Pendente -  ViewBag";
                     if (ViewBag.DashboardPedidosPendentesPgto)
@@ -1015,75 +925,6 @@
 
                     #endregion
 
-                    #region Info Usuario 
-
-                    strErro = "Info Usuario -  ViewBag";
-
-                    var pontosUsuarios = posicaoRepository.ObtemPontuacao(usuario.ID);
-                    double pontosMax = 0;
-                    //Obtem Ponto maximo da classificacao atual do usuario
-                    var classificacao = classificacaoRepository.GetByExpression(x => x.Pontos >= pontosUsuarios).OrderBy(x => x.Pontos).FirstOrDefault();
-
-                    if (classificacao != null)
-                    {
-                        pontosMax = (double)classificacao.Pontos;
-                    }
-
-                    ViewBag.PontosRestantesInfoUsuario = pontosMax - pontosUsuarios;
-
-                    var qualificacaoUsuario = qualificacaoRepository.GetByExpression(x => x.UsuarioID == usuario.ID);
-
-                    if (qualificacaoUsuario.Count() > 0)
-                    {
-                        var isQualifyBinary = qualificacaoUsuario.OrderBy(x => x.DataQualificacao).FirstOrDefault().DataQualificacao;
-                        ViewBag.isQualificacaoBinario = isQualifyBinary != null ? true : false;
-                    }
-
-                    #endregion
-
-                    #region BonusBinario
-
-                    strErro = "Bonus -  ViewBag Dashboard";
-
-                    if (ViewBag.DashboardBinDiario)
-                    {
-                        var posicao = posicaoRepository.GetByExpression(x => x.UsuarioID == usuario.ID).OrderByDescending(x => x.DataInicio).Take(5);
-                        ViewBag.BinarioData = posicao;
-                    }
-
-                    #endregion
-
-                    #region Bonificacoes
-
-                    strErro = "Bonificacoes";
-
-                    if (ViewBag.DashboardBonificacao)
-                    {
-                        strErro = "Bonificacoes - ViewBag";
-                        List<Core.Entities.Categoria> listBonificacoes = categoriaRepository.GetByTipo(Core.Entities.Lancamento.Tipos.Bonificacao).ToList();
-                        ViewBag.Bonificacoes = listBonificacoes;
-                        strErro = "Bonificacoes - ViewBag Lista";
-                        if (listBonificacoes.Count() > 0)
-                        {
-                            int ID_Bonus_01 = ViewBag.Bonificacoes[0].ID;
-                            var bonus_01 = lancamentoRepository.GetByExpression(lan => lan.UsuarioID == usuario.ID && lan.CategoriaID == ID_Bonus_01).Sum(lan => lan.Valor);
-                            ViewBag.Bonus_01 = (bonus_01.HasValue ? bonus_01.Value.ToString("#.##").Replace(",", ".") : "0");
-                        }
-                        strErro = "Bonificacoes - ViewBag > 1";
-                        if (listBonificacoes.Count() > 1)
-                        {
-                            int ID_Bonus_02 = ViewBag.Bonificacoes[1].ID;
-                            var bonus_02 = lancamentoRepository.GetByExpression(lan => lan.UsuarioID == usuario.ID && lan.CategoriaID == ID_Bonus_02).Sum(lan => lan.Valor);
-                            ViewBag.Bonus_02 = (bonus_02.HasValue ? bonus_02.Value.ToString("#.##").Replace(",", ".") : "0");
-                        }
-                    }
-                    else
-                    {
-                        ViewBag.Bonus_01 = "0";
-                        ViewBag.Bonus_02 = "0";
-                    }
-                    #endregion
-
                     #region Titulo
 
                     strErro = "Titulo";
@@ -1094,33 +935,6 @@
                         ViewBag.Mensagem = Session["Mensagem"];
                         Session["TituloMensagem"] = null;
                         Session["Mensagem"] = null;
-                    }
-
-                    #endregion
-
-                    #region Teto Ganhos
-
-                    ViewBag.GanhosTotaisBonificacao = lancamentoRepository.GetByExpression(lan => lan.UsuarioID == usuario.ID && lan.TipoID == 6).Sum(lan => lan.Valor);
-                    if (ViewBag.GanhosTotaisBonificacao == null)
-                    {
-                        ViewBag.GanhosTotaisBonificacao = 0d;
-                    }
-
-                    if (ViewBag.DashboardTetoGanhosTotais)
-                        ViewBag.TetoGanhosTotais = Math.Round(posicaoRepository.ObtemBonusTetoGanhoTotal(usuario.ID), 2);
-
-                    if (ViewBag.DashboardTetoGanhosAlavancagem)
-                        ViewBag.TetoGanhosAlavancagem = Math.Round(posicaoRepository.ObtemBonusTetoGanhoAlavancagem(usuario.ID), 2);
-
-                    if (ViewBag.DashboardTetoGanhosBonusEquipeBinario)
-                    {
-                        var categoriaBonusBinarioID = categoriaRepository.GetByExpression(cat => cat.Nome.Equals("Bonus Equipe")).First().ID;
-                        var dataMenor = App.DateTimeZion.Date;
-                        var dataMaior = App.DateTimeZion.AddDays(1).Date;
-                        var bonusBinario = lancamentoRepository.GetByExpression(lan => lan.UsuarioID == usuario.ID && lan.CategoriaID == categoriaBonusBinarioID && (lan.DataLancamento >= dataMenor && lan.DataLancamento <= dataMaior)).Sum(lst => lst.Valor);
-                        ViewBag.GanhosBonusEquipeBinario = bonusBinario ?? 0;
-
-                        ViewBag.TetoGanhosBonusEquipeBinario = Math.Round(posicaoRepository.ObtemBonusTetoGanhoBinario(usuario.ID).Value, 2);
                     }
 
                     #endregion
@@ -1247,69 +1061,7 @@
             }
 
             #endregion
-
-            #region Pontuacao
-
-            ViewBag.Pontos = posicaoRepository.ObtemPontuacao(usuario.ID);
-            if (ViewBag.Pontos < 0)
-                ViewBag.PontosLado = traducaoHelper["ESQUERDA"];
-            else
-                ViewBag.PontosLado = traducaoHelper["DIREITA"];
-
-            ViewBag.Pontos = Math.Abs(ViewBag.Pontos);
-
-
-            ViewBag.PontuacaoEsquerdo = acumuladoBonusEsquerda;
-            ViewBag.PontuacaoDireito = acumuladoBonusDireita;
-
-            ViewBag.RedeEsquerdo = qtdeEsquerdo;
-            ViewBag.RedeDireito = qtdeDireito;
-            ViewBag.RedeTotal = qtdeTotal;
-
-            //ViewBag.RedeEsquerdo1 = qtdeEsquerdo1;
-            //ViewBag.RedeDireito1 = qtdeDireito1;
-            //ViewBag.RedeTotal1 = qtdeEsquerdo1 + qtdeDireito1;
-
-            //ViewBag.RedeEsquerdo2 = qtdeEsquerdo2;
-            //ViewBag.RedeDireito2 = qtdeDireito2;
-            //ViewBag.RedeTotal2 = qtdeEsquerdo2 + qtdeDireito2;
-
-            //ViewBag.RedeEsquerdo3 = qtdeEsquerdo3;
-            //ViewBag.RedeDireito3 = qtdeDireito3;
-            //ViewBag.RedeTotal3 = qtdeEsquerdo3 + qtdeDireito3;
-
-            //ViewBag.RedeEsquerdo4 = qtdeEsquerdo4;
-            //ViewBag.RedeDireito4 = qtdeDireito4;
-            //ViewBag.RedeTotal4 = qtdeEsquerdo4 + qtdeDireito4;
-
-            //ViewBag.RedeEsquerdo5 = qtdeEsquerdo5;
-            //ViewBag.RedeDireito5 = qtdeDireito5;
-            //ViewBag.RedeTotal5 = qtdeEsquerdo5 + qtdeDireito5;
-
-            #endregion
-
-            #region PlanoCarreira
-
-            if (ViewBag.DashboardPontos)
-            {
-                ViewBag.PlanoCarreiraNome = usuarioService.PlanoCarreira(usuario.ID, ViewBag.Pontos);
-                decimal percentagem = usuarioService.PlanoCarreiraPercentagem(usuario.ID, ViewBag.Pontos);
-                ViewBag.PlanoCarreiraPercentagem = Math.Round(percentagem * 100, 2) + "%";
-                ViewBag.PlanoCarreiraNivel = usuarioService.PlanoCarreiraNivel(usuario.ID, ViewBag.Pontos);
-            }
-
-            #endregion
-
-            #region BonusBinario
-
-            if (ViewBag.DashboardBinDiario)
-            {
-                var posicao = posicaoRepository.GetByExpression(x => x.UsuarioID == usuario.ID).OrderByDescending(x => x.DataFim).Take(4);
-                ViewBag.BinarioData = posicao;
-            }
-
-            #endregion
-
+            
             #region Titulo
 
             if (Session["TituloMensagem"] != null)

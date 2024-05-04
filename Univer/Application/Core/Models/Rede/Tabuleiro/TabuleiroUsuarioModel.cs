@@ -15,6 +15,7 @@ namespace Core.Models
         public string BoardNome { get; set; }
         public string BoardCor { get; set; }
         public int StatusID { get; set; }
+        public bool Eterno { get; set; }
         public int MasterID { get; set; }
         public bool InformePag { get; set; }
         public int? UsuarioIDPag { get; set; }

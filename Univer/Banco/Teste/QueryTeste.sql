@@ -8,7 +8,7 @@ Select id,login, apelido from usuario.usuario where id > 2500 order by id desc -
 Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and apelido like '%tita%'
 
 --Inidcados
-Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and PatrocinadorDiretoID = 2589
+Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and PatrocinadorDiretoID = 2604
 
 --Select usuarioID, count(*) Total from Rede.TabuleiroUsuario Group by UsuarioID
 --Select * from Rede.TabuleiroUsuario where  UsuarioID = 2587 --Mario
@@ -19,17 +19,19 @@ Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2
 Select * from  Rede.TabuleiroUsuario where boardID = 1 and usuarioID in ( 2580,2581)
 
 Select * from Rede.TabuleiroUsuario where  UsuarioID = 2591 and BoardID =1
-Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589 and BoardID =1
+Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589
 
 Select * From Rede.Tabuleiro where id =1
-Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589
+Select * from Rede.TabuleiroUsuario where  UsuarioID = 2604
+Select * from Rede.TabuleiroUsuario where  UsuarioID = 2580
 
-Begin tran
+Select *
+FROM Rede.TabuleiroUsuario 
+Where 
+UsuarioID = 2604 and BoardID = 2 and StatusID = 1 and PagoMaster = 'true' 
 
 
-Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589
-Exec spD_TabuleiroExcluirUsuario @UsuarioID=2589, @MasterID=2580, @BoardID =1
-Select * from Rede.TabuleiroUsuario where  UsuarioID = 2589
+Exec spC_Tabuleiro @id=29, @UsuarioID = 2589
 
+Exec spC_TabuleiroMasterRule @UsuarioID=2594, @BoardID=1
 
-Rollback tran
