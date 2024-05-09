@@ -28,11 +28,13 @@ BEGIN
 		Eterno bit,
 		MasterID int,
 		InformePag bit,
+		UsuarioIDPag int, --*
 		Ciclo int,
 		Posicao nvarchar(100),
 		PagoMaster bit,
+		PagoSistema bit, --*
 		InformePagSistema bit,
-		PagoSistema bit,
+		TotalRecebimento int, --*
 		DataInicio datetime,
 		DataFim int
 	)
@@ -51,26 +53,28 @@ BEGIN
 			'true' as Eterno,
 			tab.MasterID,
 			tab.InformePag,
+			tab.UsuarioIDPag,
 			tab.Ciclo,
 			tab.Posicao,
 			tab.PagoMaster,
-			tab.InformePagSistema,
 			tab.PagoSistema,
+			tab.InformePagSistema,
+			tab.TotalRecebimento,
 			tab.DataInicio,
 			tab.DataFim
 		From 
-			Rede.TabuleiroUsuario tab,
-			Rede.TabuleiroBoard tb
+			Rede.TabuleiroUsuario tab (nolock),
+			Rede.TabuleiroBoard tb (nolock)
 		Where
 			tab.BoardID = tb.ID And
 			tab.StatusID = 1 And
 			tab.BoardID = 1
 		Order By
-			BoardID
+			TabuleiroID
 	End
 	Else 
 	Begin
-		--Obtem todos os Boards (niveis) do usuario
+	    --Obtem todos os Boards (niveis) do usuario
 		Insert Into #temp
 		Select 
 			tab.UsuarioID,
@@ -82,67 +86,66 @@ BEGIN
 			'true' as Eterno,
 			tab.MasterID,
 			tab.InformePag,
+			tab.UsuarioIDPag,
 			tab.Ciclo,
 			tab.Posicao,
 			tab.PagoMaster,
-			tab.InformePagSistema,
 			tab.PagoSistema,
+			tab.InformePagSistema,
+			tab.TotalRecebimento,
 			tab.DataInicio,
 			tab.DataFim
 		From 
-			Rede.TabuleiroUsuario tab,
-			Rede.TabuleiroBoard tb
+			Rede.TabuleiroUsuario tab (nolock),
+			Rede.TabuleiroBoard tb (nolock)
 		Where
 			tab.UsuarioID = @UsuarioID and
 			tab.BoardID = tb.ID
 		Order By
-			BoardID
+			TabuleiroID
 	End
 
 	--Verifica se disponibiliza Mercurio para o usuario
-	--Se ele não pagou o alvo no proximo nivel, estando nele, não abilita
+	--Se ele nao pagou o alvo no proximo nivel, estando nele, nao abilita
 	-- a entrada em mercurio
 
-	if(@UsuarioID > 2586)
+	--Verifica se a reentrada em mercurio StatusID = 2 no BoardID = 1
+	If Exists( 
+		Select 'OK'
+		From
+			#temp
+		Where
+			BoardID = 1 and
+			StatusID = 2
+	)
 	Begin
-		--Verifica se a reentrada em mercurio StatusID = 2 no BoardID = 1
-		If Exists( 
-			Select 'OK'
+		--Havendo reentrada, verifica em que boardID superior o usuario se encontra
+		Declare @BoardID int
+		Select 
+			@BoardID = MAX(BoardID)
+		From
+			#temp
+		Where
+			StatusID <> 0
+		
+		--Verifica se nao pagou o Master no board superior
+		If Exists (
+			Select 
+				'OK'
 			From
 				#temp
 			Where
-				BoardID = 1 and
-				StatusID = 2
+				BoardID = @BoardID and
+				PagoMaster = 'false'
 		)
 		Begin
-			--Havendo reentrada, verifica em que boardID superior o usuario se encontra
-			Declare @BoardID int
-			Select 
-				@BoardID = MAX(BoardID)
-			From
+			--Nao estando pago, nao abilita mercurio para reentrada
+			Update
 				#temp
+			Set 
+				Eterno = 'false'
 			Where
-				StatusID <> 0
-		
-			--Verifica se não pagou o Master no board superior
-			If Exists (
-				Select 
-					'OK'
-				From
-					#temp
-				Where
-					BoardID = @BoardID and
-					PagoMaster = 'false'
-			)
-			Begin
-				--Não estando pago, não abilita mercurio para reentrada
-				Update
-					#temp
-				Set 
-					Eterno = 'false'
-				Where
-					BoardID = 1 --Mercurio
-			End
+				BoardID = 1 --Mercurio
 		End
 	End
 
@@ -156,11 +159,13 @@ BEGIN
 		Eterno,
 		MasterID,
 		InformePag,
+		UsuarioIDPag,
 		Ciclo,
 		Posicao,
 		PagoMaster,
-		InformePagSistema,
 		PagoSistema,
+		InformePagSistema,
+		TotalRecebimento,
 		DataInicio,
 		DataFim
 	From 
@@ -172,7 +177,7 @@ go
 Grant Exec on spC_TabuleiroUsuario To public
 go
 
---Exec spC_TabuleiroUsuario @UsuarioID=2604
+--Exec spC_TabuleiroUsuario @UsuarioID=null
 
 
 

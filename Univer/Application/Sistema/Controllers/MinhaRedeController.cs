@@ -26,6 +26,10 @@ using Core.Models;
 using Microsoft.Ajax.Utilities;
 using ZendeskApi_v2.Models.Brands;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing;
+using Core.Repositories.Loja;
+using PagedList;
+using System.Data.SqlClient;
 
 
 #endregion
@@ -436,7 +440,20 @@ namespace Sistema.Controllers
             string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
             tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
             ViewBag.Token = tokenLocal;
-            
+            ViewBag.ShowReportPayment = false;
+            ViewBag.RedeTabuleiro = true;
+            ViewBag.idTabuleiro = 0;
+            ViewBag.tabuleiro = null;
+            ViewBag.tabuleirosUsuario = null;
+            ViewBag.tabuleiroAtivo = null;
+            ViewBag.Timer = null;
+            ViewBag.NovoUsuario = false;
+            ViewBag.ShowMsgFaltaPag = "";
+            ViewBag.TabuleiroOpacity = false;
+            ViewBag.InfoUsuario = "";
+            ViewBag.HaConvite = "";
+            ViewBag.TotalRecebimento = 0;
+
             int idTabuleiro = idTab ?? 0;
 
             if (idTabuleiro < 0)
@@ -446,18 +463,6 @@ namespace Sistema.Controllers
 
             try
             {
-                ViewBag.ShowReportPayment = false;
-                ViewBag.RedeTabuleiro = true;
-                ViewBag.idTabuleiro = 0;
-                ViewBag.tabuleiro = null;
-                ViewBag.tabuleirosUsuario = null;
-                ViewBag.tabuleiroAtivo = null;
-                ViewBag.Timer = null;
-                ViewBag.NovoUsuario = false;
-                ViewBag.ShowMsgFaltaPag = "";
-                ViewBag.TabuleiroOpacity = false;
-                ViewBag.InfoUsuario = "";
-                ViewBag.HaConvite = "";
 
                 TabuleiroModel tabuleiro = null;
                 TabuleiroUsuarioModel tabuleiroUsuario = null;
@@ -490,7 +495,59 @@ namespace Sistema.Controllers
                     //Obtem 1º Tabuleiro ativo do usuario
                     tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID != 2).FirstOrDefault();
                 }
+                //Verifica se o tabuleiro esta fechado, para um masterID logado
+                if (tabuleiroUsuario != null && usuario.ID == tabuleiroUsuario.MasterID)
+                {
+                    //Verifica se o tabuleiro esta fechado
+                    bool tabuleiroFechado = tabuleiroRepository.TabuleiroFechado(tabuleiroUsuario.TabuleiroID ?? 0);
 
+                    if (tabuleiroFechado)
+                    {
+                        //Se sim tenta fechar o tabuleiro
+                        //Verifica se master tem pendencias
+                        string retMasterOK = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
+                        if (retMasterOK == "OK")
+                        {
+                            //Master não tendo pendencias
+                            //Tenta fechar tabuleiro
+                            string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, tabuleiroUsuario.MasterID, tabuleiroUsuario.BoardID, "Completa");
+                            if (tabuleiroIncluir == "OK")
+                            {
+                                //Tabuleiro pode ter sido fechado ou não, ver log para confirmar
+
+                                //Refaz carregamento de variaveis, considerando que o tabuleiro foi fechado
+                                tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(usuario.ID);
+                                ViewBag.tabuleirosUsuario = tabuleirosUsuario;
+
+                                //Verifica se usuario já esta em nivel superior StatusID != 0 em boards superiores ao primeiro board
+                                blnTabuleiroAtivos = tabuleirosUsuario.Where(x => x.StatusID != 0 && x.BoardID > 1).Count() > 0;
+
+                                //Verifica se há um convite ativo para o usuario
+                                blnConviteAtivo = tabuleirosUsuario.Where(x => x.StatusID == 2).Count() > 0;
+
+                                //Mensagem que o usuario tem um convite
+                                if (blnConviteAtivo)
+                                {
+                                    ViewBag.HaConvite = traducaoHelper["CONVITE_ENTRAR"];
+                                }
+                                else
+                                {
+                                    ViewBag.HaConvite = "";
+                                }
+
+                                if (idTabuleiro > 0)
+                                {
+                                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.TabuleiroID == idTabuleiro).FirstOrDefault();
+                                }
+                                else
+                                {
+                                    //Obtem 1º Tabuleiro ativo do usuario
+                                    tabuleiroUsuario = tabuleirosUsuario.Where(x => x.StatusID != 2).FirstOrDefault();
+                                }
+                            }
+                        }
+                    }
+                }
                 //Caso seja um convite StatusID =2 - Obtem o 1º Ativo
                 if (tabuleiroUsuario != null && tabuleiroUsuario.StatusID == 2 && !blnTabuleiroAtivos)
                 {
@@ -561,55 +618,11 @@ namespace Sistema.Controllers
                         }
                     }
 
-                    //Verifica se usuario é o master do sistema
-                    if (tabuleiroUsuario.MasterID == usuario.ID)
-                    {
-                        //Sendo o master verifica se ele esta ok com as regras
-                        string ret = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
-
-                        switch (ret)
-                        {
-                            case "OK":
-                                ViewBag.ShowMsgFaltaPag = "";
-                                break;
-                            case "NOOK_PAGTO_SISTEMA":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"];
-                                break;
-                            case "NOOK_SEM_INDICACAO":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_SEM_INDICACAO"];
-                                break;
-                            case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
-                                break;
-                            case "NOOK_PAGTO_SISTEMA_INFORME_OK":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
-                                break;
-                            case "NOOK_BOARD_SUPERIOR":
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_BOARD_SUPERIOR"];
-                                break;
-                            default:
-                                ViewBag.ShowMsgFaltaPag = traducaoHelper[ret];
-                                break;
-                        }
-                    }
-
                     //Obtem o tabuleiro que será exibido quando a pag for carregada
                     tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, usuario.ID);
                     ViewBag.tabuleiro = tabuleiro;
+                    ViewBag.tabuleiroName = tabuleiroUsuario.BoardNome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("000000");
 
-                    //Obtem Nome do Tabuleiro para exibir na tela
-                    if (!String.IsNullOrEmpty(tabuleiro.ApelidoMaster) && tabuleiro.ApelidoMaster.Length > 3)
-                    {
-                        String nome = tabuleiro.ApelidoMaster.Replace(" ", "").Replace("_", "").Replace("-", "").Replace("@", "").Replace("#", "").Replace("!", "").Replace("=", "").Replace(".", "");
-                        if (nome.Length >= 3)
-                        {
-                            ViewBag.tabuleiroName = nome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
-                        }
-                        else
-                        {
-                            ViewBag.tabuleiroName = "GAL";
-                        }
-                    }
                     //Verifica se usuario tem que pagar ou não o sistema
                     if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.InformePagSistema)
                     {
@@ -617,16 +630,15 @@ namespace Sistema.Controllers
                     }
                     else
                     {
-                        if(usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema && tabuleiro.StatusID == 2)
+                        if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema && tabuleiro.StatusID == 2)
                         {
-                            ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"]; 
+                            ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
                         }
                         ViewBag.Pagar = false;
                     }
                 }
                 else
                 {
-
                     //Novo usuario, pega tabuleiro do seu pai
                     int idPai = usuario.PatrocinadorDiretoID ?? 0;
                     bool tab10Disponiveis = false;
@@ -642,6 +654,7 @@ namespace Sistema.Controllers
                             if (idTabuleiro > 0)
                             {
                                 tabuleiro = tabuleiroRepository.ObtemTabuleiro(idTabuleiro, idPai);
+
                                 //Verifica se usuario já esta no tabuleiro selecionado
                                 if (tabuleiro.Master == usuario.ID ||
                                     tabuleiro.CoordinatorDir == usuario.ID ||
@@ -660,7 +673,7 @@ namespace Sistema.Controllers
                                     tabuleiro.DonatorEsqInf2 == usuario.ID
                                    )
                                 {
-                                    //Já estando no tabuleiro escolhido pega o proximo disponivel
+                                    //Já estando no tabuleiro escolhido obtem o mais antigo tabuleiro disponivel
                                     tab10Disponiveis = true;
                                 }
                                 else
@@ -669,7 +682,22 @@ namespace Sistema.Controllers
                                     ViewBag.tabuleiro = tabuleiro;
                                     ViewBag.tabuleiroAtivo = tabuleiroUsuario;
                                     ViewBag.NovoUsuario = true;
-                                    ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                                    ViewBag.tabuleiroName = tabuleiroUsuario.BoardNome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("000000");
+                                }
+                                //Verifica se há vagas no tabuleiro escolhido
+                                if (
+                                    tabuleiro.DonatorDirSup1 != null &&
+                                    tabuleiro.DonatorDirInf1 != null &&
+                                    tabuleiro.DonatorDirSup2 != null &&
+                                    tabuleiro.DonatorDirInf2 != null &&
+                                    tabuleiro.DonatorEsqSup1 != null &&
+                                    tabuleiro.DonatorEsqInf1 != null &&
+                                    tabuleiro.DonatorEsqSup2 != null &&
+                                    tabuleiro.DonatorEsqInf2 != null
+                                   )
+                                {
+                                    //Não havendo vagas obtem o mais antigo tabuleiro disponivel
+                                    tab10Disponiveis = true;
                                 }
                             }
                         }
@@ -682,6 +710,7 @@ namespace Sistema.Controllers
                             //Obtem os 10 primeiros tabuleiros ativos
                             tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(null);
                             tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
+
                             //Verifica se ainda esta no Mercurio
                             if (tabuleiroUsuario != null && tabuleiroUsuario.BoardID == 1)
                             {
@@ -694,7 +723,7 @@ namespace Sistema.Controllers
                                     ViewBag.tabuleiro = tabuleiro;
                                     ViewBag.tabuleiroAtivo = tabuleiroUsuario;
                                     ViewBag.NovoUsuario = true;
-                                    ViewBag.tabuleiroName = tabuleiro.ApelidoMaster.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("00000");
+                                    ViewBag.tabuleiroName = tabuleiroUsuario.BoardNome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("000000");
                                 }
                             }
                             else
@@ -707,11 +736,43 @@ namespace Sistema.Controllers
                             }
                         }
                     }
-                    
+
                     if (blnTabuleiroAtivos)
                     {
                         ViewBag.NovoUsuario = false;
                         ViewBag.TabuleiroOpacity = true;
+                    }
+                }
+
+                //Verifica se usuario é o master do sistema
+                if (tabuleiroUsuario.MasterID == usuario.ID)
+                {
+                    //Sendo o master verifica se ele esta ok com as regras
+                    string ret = tabuleiroRepository.MasterRuleOK(usuario.ID, tabuleiroUsuario.BoardID);
+
+                    switch (ret)
+                    {
+                        case "OK":
+                            ViewBag.ShowMsgFaltaPag = "";
+                            break;
+                        case "NOOK_PAGTO_SISTEMA":
+                            ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"];
+                            break;
+                        case "NOOK_SEM_INDICACAO":
+                            ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_SEM_INDICACAO"];
+                            break;
+                        case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
+                            ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                            break;
+                        case "NOOK_PAGTO_SISTEMA_INFORME_OK":
+                            ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
+                            break;
+                        case "NOOK_BOARD_SUPERIOR":
+                            ViewBag.ShowMsgFaltaPag = traducaoHelper["NOOK_BOARD_SUPERIOR"];
+                            break;
+                        default:
+                            ViewBag.ShowMsgFaltaPag = traducaoHelper[ret];
+                            break;
                     }
                 }
 
@@ -759,6 +820,9 @@ namespace Sistema.Controllers
                         ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin).ToString("MM/dd/yyyy HH:mm:ss");
                     }
                 }
+
+                ViewBag.TotalRecebimento = tabuleiroUsuario.TotalRecebimento;
+
             }
             catch (Exception ex)
             {
@@ -1749,6 +1813,122 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01" + "[" + ex.Message + "]");
             }
+        }
+
+        public ActionResult Indicados(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraGalaxia, string ProcuraGalaxia, int? NumeroPaginas, int? Page)
+        {
+            //Verifica se a msg em popup para ser exibido na view
+            obtemMensagem();
+
+            //Persistencia dos paramentros da tela
+            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
+            objFuncoes.Persistencia(ref SortOrder,
+                                    ref CurrentProcuraLogin,
+                                    ref ProcuraLogin,
+                                    ref CurrentProcuraGalaxia,
+                                    ref ProcuraGalaxia,
+                                    ref NumeroPaginas,
+                                    ref Page,
+                                    "Usuarios");
+
+            objFuncoes = null;
+
+            //List
+            if (String.IsNullOrEmpty(SortOrder))
+            {
+                ViewBag.CurrentSort = "login";
+            }
+            else
+            {
+                ViewBag.CurrentSort = SortOrder;
+            }
+
+            if (!(ProcuraLogin != null || ProcuraGalaxia != null))
+            {
+                if (ProcuraLogin == null)
+                {
+                    ProcuraLogin = CurrentProcuraLogin;
+                }
+                if (ProcuraGalaxia == null)
+                {
+                    ProcuraGalaxia = CurrentProcuraGalaxia;
+                }
+            }
+
+            ViewBag.CurrentProcuraLogin = ProcuraLogin;
+            ViewBag.CurrentProcuraGalaxia = ProcuraGalaxia;
+
+            IEnumerable<TabuleiroIndicados> lista = tabuleiroRepository.ObtemTabuleirosIndicados(usuario.ID);
+
+            if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraGalaxia))
+            {
+                lista = lista.Where(x => x.Galaxia.ToLower().Contains(ProcuraGalaxia.ToLower()) && (x.Login.ToLower().Contains(ProcuraLogin.ToLower()) || x.Apelido.ToLower().Contains(ProcuraLogin.ToLower())));
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(ProcuraLogin))
+                {
+                    lista = lista.Where(x => x.Login.ToLower().Contains(ProcuraLogin.ToLower()) || x.Apelido.ToLower().Contains(ProcuraLogin.ToLower()));
+                }
+                if (!String.IsNullOrEmpty(ProcuraGalaxia))
+                {
+                    lista = lista.Where(x => x.Galaxia.ToLower().Contains(ProcuraGalaxia.ToLower()));
+                }
+            }
+
+            switch (SortOrder)
+            {
+                case "login_desc":
+                    ViewBag.FirstSortParm = "login";
+                    ViewBag.SecondSortParm = "patrocinador";
+                    lista = lista.OrderByDescending(x => x.Login);
+                    break;
+                case "patrocinador":
+                    ViewBag.FirstSortParm = "login";
+                    ViewBag.SecondSortParm = "patrocinador_desc";
+                    lista = lista.OrderBy(x => x.Master);
+                    break;
+                case "patrocinador_desc":
+                    ViewBag.FirstSortParm = "login";
+                    ViewBag.SecondSortParm = "patrocinador";
+                    lista = lista.OrderByDescending(x => x.Master);
+                    break;
+                case "login":
+                    ViewBag.FirstSortParm = "login_desc";
+                    ViewBag.SecondSortParm = "date";
+                    lista = lista.OrderBy(x => x.Login);
+                    break;
+                default:  // Name ascending 
+                    ViewBag.FirstSortParm = "login_desc";
+                    ViewBag.SecondSortParm = "patrocinador";
+                    lista = lista.OrderBy(x => x.Login);
+                    break;
+            }
+
+            //Numero de linhas por Pagina
+            int PageSize = (NumeroPaginas ?? 5);
+
+            //Caso seja selecionada toda a lista (-1), pega na verdade 1000
+            if (PageSize == -1)
+            {
+                PageSize = 1000;
+            }
+            ViewBag.PageSize = PageSize;
+            ViewBag.CurrentNumeroPaginas = NumeroPaginas;
+
+            //Pagina corrente
+            int PageNumber = (Page ?? 1);
+
+            //DropDown de paginação
+            int intNumeroPaginas = (NumeroPaginas ?? 5);
+
+            #region ViewBags
+            ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
+            ViewBag.Lista = lista;
+
+            #endregion
+
+            return View(lista.ToPagedList(PageNumber, PageSize));
         }
 
         #endregion Tabuleiro

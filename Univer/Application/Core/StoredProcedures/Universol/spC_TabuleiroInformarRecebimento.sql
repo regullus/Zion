@@ -38,7 +38,7 @@ BEGIN
     Select
         @MasterID = MasterID
     From
-        rede.TabuleiroUsuario 
+        rede.TabuleiroUsuario (nolock)
     Where
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 
@@ -55,7 +55,7 @@ BEGIN
 		Select 
 			'OK' 
 		From 
-			rede.TabuleiroUsuario 
+			rede.TabuleiroUsuario (nolock)
 		Where 
 			UsuarioID = @MasterID and 
 			BoardID  = @BoardID and 
@@ -65,7 +65,7 @@ BEGIN
         Select 
             @Count = TotalRecebimento
         From
-            rede.TabuleiroUsuario 
+            rede.TabuleiroUsuario (nolock)
         Where
             MasterID = @MasterID and 
             BoardID  = @BoardID 
@@ -77,7 +77,7 @@ BEGIN
 				Select 
 					'OK' 
 				From 
-					rede.TabuleiroUsuario 
+					rede.TabuleiroUsuario (nolock) 
 				Where 
 					UsuarioID = @MasterID and 
 					BoardID  = @BoardID + 1
@@ -88,7 +88,7 @@ BEGIN
 					Select 
 						'OK' 
 					From 
-						rede.TabuleiroUsuario 
+						rede.TabuleiroUsuario (nolock)
 					Where 
 						UsuarioID = @MasterID and 
 						BoardID  = @BoardID and

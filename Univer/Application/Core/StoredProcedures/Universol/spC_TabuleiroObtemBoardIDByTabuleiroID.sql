@@ -24,7 +24,7 @@ BEGIN
 	Select 
 		@retorno = BoardID
 	From 
-		Rede.TabuleiroUsuario
+		Rede.TabuleiroUsuario (nolock)
 	Where
 		UsuarioID = @UsuarioID and
 		TabuleiroID = @TabuleiroID

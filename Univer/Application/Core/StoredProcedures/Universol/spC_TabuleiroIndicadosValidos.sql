@@ -11,7 +11,7 @@ As
 -- =============================================================================================
 -- Author.....: 
 -- Create date: 
--- Description: Verifica se o Master do tabuleiro j� possui mais que 4 pagamentos e ainda nao pagou o sistema
+-- Description: Verifica se o Master do tabuleiro jah possui mais que 4 pagamentos e ainda nao pagou o sistema
 -- =============================================================================================
 
 BEGIN
@@ -46,7 +46,7 @@ BEGIN
 			Select
 				ID
 			From
-				usuario.usuario
+				usuario.usuario (nolock)
 			Where
 				PatrocinadorDiretoID = @UsuarioID
 
@@ -66,7 +66,7 @@ BEGIN
 			Select 
 				@totalBoard = count(*)
 			from
-				Rede.TabuleiroUsuario
+				Rede.TabuleiroUsuario (nolock)
 			Where
 				UsuarioID = @ID and
 				TabuleiroID is not null
@@ -75,7 +75,7 @@ BEGIN
 			Select 
 				@totalPagoMaster = @totalPagoMaster + count(*)
 			from
-				Rede.TabuleiroUsuario
+				Rede.TabuleiroUsuario (nolock)
 			Where
 				UsuarioID = @ID and
 				PagoMaster = 'true' and
@@ -106,7 +106,7 @@ BEGIN
 	Select 
 		@totalBoard = count(*)
 	from
-		Rede.TabuleiroUsuario
+		Rede.TabuleiroUsuario (nolock)
 	Where
 		UsuarioID = @UsuarioID and
 		MasterID = @UsuarioID and
@@ -122,7 +122,7 @@ BEGIN
 		Select 
 			'OK' 
 		From 
-			Rede.TabuleiroUsuario
+			Rede.TabuleiroUsuario (nolock)
 		Where
 			UsuarioID = @UsuarioID and
 			BoardID = @BoardID and

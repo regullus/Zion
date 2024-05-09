@@ -40,7 +40,7 @@ BEGIN
         '',
         'false'
     from
-        Usuario.Usuario
+        Usuario.Usuario (nolock)
     Where 
         id = @idTarget
     

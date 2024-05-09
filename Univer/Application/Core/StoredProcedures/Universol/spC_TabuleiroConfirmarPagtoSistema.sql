@@ -23,12 +23,14 @@ BEGIN
 	Declare 
         @Count int,
         @MasterID int,
-		@Check bit
+		@Check bit,
+		@TabuleiroID int
     
 	Select
-        @MasterID = MasterID
+        @MasterID = MasterID,
+		@TabuleiroID = TabuleiroID
     From
-        rede.TabuleiroUsuario 
+        rede.TabuleiroUsuario (nolock)
     Where
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 
@@ -47,7 +49,7 @@ BEGIN
 		Select
 			@MasterID = MasterID
 		From
-			rede.TabuleiroUsuario 
+			rede.TabuleiroUsuario (nolock)
 		Where
 			UsuarioID = @UsuarioID and 
 			BoardID  = @BoardID 
@@ -56,7 +58,7 @@ BEGIN
 			Select 
 				'OK' 
 			From 
-				rede.TabuleiroUsuario 
+				rede.TabuleiroUsuario (nolock)
 			Where 
 				UsuarioID = @MasterID and 
 				BoardID  = @BoardID and 
@@ -67,7 +69,7 @@ BEGIN
 			Select 
 				@count = TotalRecebimento
 			From 
-				Rede.TabuleiroUsuario 
+				Rede.TabuleiroUsuario (nolock)
 			Where 
 				UsuarioID = @MasterID And 
 				BoardID = @BoardID
@@ -79,7 +81,7 @@ BEGIN
 					Select 
 						'OK' 
 					From 
-						rede.TabuleiroUsuario 
+						rede.TabuleiroUsuario (nolock)
 					Where 
 						UsuarioID = @MasterID and 
 						BoardID  = @BoardID + 1 and
@@ -100,8 +102,37 @@ BEGIN
 			End
 		
 			--Verifica se já fechou o tabuleiro para abrir outro
-			Exec spG_Tabuleiro @UsuarioID=@UsuarioID, @UsuarioPaiID=@MasterID, @BoardID=@BoardID, @Chamada='Completa'
-		
+			if Exists (
+				Select
+					'OK'
+				From
+					Rede.Tabuleiro (nolock)
+				Where
+					ID = @TabuleiroID and
+					StatusID = 2 
+			)
+			Begin
+				Update
+					Rede.TabuleiroUsuario
+				Set
+					DireitaFechada = 'false',
+					EsquerdaFechada = 'false'
+				Where
+					UsuarioID = @MasterID and
+					BoardID = @BoardID and
+					PagoSistema = 'true' --tem q ter pago o sistema
+							
+				Update
+					Rede.TabuleiroUsuario 
+				Set
+					StatusId = 2, --Convite
+					DataInicio = GetDate(),
+					Debug = 'Tabuleiro Fechado -Confirma Pag Sistema - Convite BaordID=' + TRIM(STR(@BoardID))
+				Where
+					UsuarioID = @MasterID and --Ele vira o Master
+					BoardID = @BoardID and
+					PagoSistema = 'true' --tem q ter pago o sistema
+			End
 		End
 	End
 	Else 
@@ -133,5 +164,9 @@ Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2582, @BoardID=1, @confirmar=
 
 Select * from Rede.TabuleiroUsuario where  UsuarioID = 2582
 
+Select * from  Rede.TabuleiroLog order by id desc
+
+Select * from Rede.TabuleiroUsuario where  UsuarioID = 2582 and BoardID = 1
+Select * From Rede.Tabuleiro where id = 41
 
 */

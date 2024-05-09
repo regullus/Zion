@@ -1,4 +1,4 @@
-use UniverDev
+use univerDev
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroUsuarioRule'))
    Drop Procedure spC_TabuleiroUsuarioRule
@@ -10,7 +10,7 @@ As
 -- =============================================================================================
 -- Author.....: 
 -- Create date: 
--- Description: Verifica se o Master do tabuleiro já possui mais que 4 pagamentos e ainda nao pagou o sistema
+-- Description: Verifica se o Usuario do tabuleiro esta ok com as indicacaoes
 -- =============================================================================================
 
 BEGIN
@@ -38,7 +38,7 @@ BEGIN
 		Into
 			#tempBoard
 		from
-			Rede.TabuleiroUsuario
+			Rede.TabuleiroUsuario (nolock)
 		Where
 			UsuarioID = @UsuarioID and
 			TabuleiroID is not null and
@@ -52,8 +52,8 @@ BEGIN
 		Select 
 			@totalIndicados = count(*)
 		from
-			Usuario.Usuario usu,
-			Rede.TabuleiroUsuario tab
+			Usuario.Usuario usu (nolock),
+			Rede.TabuleiroUsuario tab (nolock)
 		Where
 			usu.PatrocinadorDiretoID = @UsuarioID and
 			usu.ID = tab.UsuarioID and

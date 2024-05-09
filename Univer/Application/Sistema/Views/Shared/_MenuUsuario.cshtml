@@ -201,14 +201,6 @@
                             </span>
                         </a>
                     </li>
-                    <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_UNILEVEL") == "true" ? "" : "hidden")>
-                        <a href="@Url.Action("unilevel", "minha-rede", new { area = "" })">
-                            <i class="fa fa-group"></i>
-                            <span class="title">
-                                @traducaoHelper["UNILEVEL"]
-                            </span>
-                        </a>
-                    </li>
                     <li @(Core.Helpers.ConfiguracaoHelper.GetString("MENU_OFFICE_MEUS_INATIVOS") == "true" ? "" : "hidden")>
                         <a href="@Url.Action("meus-INATIVOS", "minha-rede", new { area = "" })">
                             <i class="fa fa-thumbs-down"></i>
@@ -366,6 +358,15 @@ else
             <i class="fa fa-rocket"></i>
             <span class="title">
                 @traducaoHelper["MINHA_REDE"]
+            </span>
+        </a>
+    </li>
+
+    <li>
+        <a href="@Url.Action("indicados", "minha-rede")">
+            <i class="fa fa-group"></i>
+            <span class="title">
+                @traducaoHelper["INDICADOS"]
             </span>
         </a>
     </li>

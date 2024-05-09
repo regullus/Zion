@@ -38,7 +38,7 @@ BEGIN
 	Select
 		@TabuleiroID = TabuleiroID
 	From
-		Rede.TabuleiroUsuario
+		Rede.TabuleiroUsuario (nolock)
 	Where
 		UsuarioID = @UsuarioID And
 		BoardID = @BoardID
@@ -46,7 +46,7 @@ BEGIN
     Select 
         @MasterID = Master 
     from
-        Rede.Tabuleiro
+        Rede.Tabuleiro (nolock)
     Where
         id = @TabuleiroID
 
@@ -62,7 +62,7 @@ BEGIN
             '',
             'false'
         from
-            Usuario.Usuario
+            Usuario.Usuario (nolock)
         Where 
             id = @TargetID
 		
@@ -91,7 +91,7 @@ BEGIN
             '',
             'false'
         from
-            Usuario.Usuario
+            Usuario.Usuario (nolock)
         Where 
             id = @TargetID
     

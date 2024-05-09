@@ -22,7 +22,7 @@ BEGIN
     Select
         @BoardID = BoardID
     From
-        Rede.Tabuleiro
+        Rede.Tabuleiro (nolock)
     Where
         ID = @TabuleiroID
 
@@ -39,7 +39,7 @@ BEGIN
         Transferencia,
         indicados
     FROM 
-        Rede.TabuleiroBoard
+        Rede.TabuleiroBoard (nolock)
     WHERE
         ID = @BoardID
 

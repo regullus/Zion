@@ -30,7 +30,7 @@ BEGIN
     Select 
         @tempoFim = DATEADD(mi, 60, DataInicio)
     From 
-        rede.TabuleiroUsuario
+        rede.TabuleiroUsuario (nolock)
     where 
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 

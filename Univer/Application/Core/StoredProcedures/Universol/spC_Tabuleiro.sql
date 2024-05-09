@@ -42,19 +42,19 @@ BEGIN
         @DonatorEsqInf2 int,
         @MasterID int
    
-    Select @dadosTempoPagto = CONVERT(INT, Dados)  from Sistema.Configuracao where chave = 'TABULEIRO_TEMPO_PAGAMENTO'
-    Select @dadosTempoMaxPagto = CONVERT(INT, Dados) from Sistema.Configuracao where chave = 'TABULEIRO_TEMPO_MAX_PAGAMENTO'
+    Select @dadosTempoPagto = CONVERT(INT, Dados) From Sistema.Configuracao (nolock) where chave = 'TABULEIRO_TEMPO_PAGAMENTO'
+    Select @dadosTempoMaxPagto = CONVERT(INT, Dados) From Sistema.Configuracao (nolock) where chave = 'TABULEIRO_TEMPO_MAX_PAGAMENTO'
     Set @dadosTempoPagto = @dadosTempoPagto + @dadosTempoMaxPagto
     Set @tempo = DATEADD(mi, @dadosTempoPagto,   GetDate());
 
-    Select @CorMercurio = CorTexto From Rede.TabuleiroBoard Where ID = 1
-    Select @corSaturno = CorTexto From Rede.TabuleiroBoard Where ID = 2
-    Select @corMarte = CorTexto From Rede.TabuleiroBoard Where ID = 3
-    Select @corJupiter = CorTexto From Rede.TabuleiroBoard Where ID = 4
-    Select @corVenus = CorTexto From Rede.TabuleiroBoard Where ID = 5
-    Select @corUrano = CorTexto From Rede.TabuleiroBoard Where ID = 6
-    Select @corTerra = CorTexto From Rede.TabuleiroBoard Where ID = 7
-    Select @CorSol = CorTexto From Rede.TabuleiroBoard Where ID = 8
+    Select @CorMercurio = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 1
+    Select @corSaturno = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 2
+    Select @corMarte = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 3
+    Select @corJupiter = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 4
+    Select @corVenus = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 5
+    Select @corUrano = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 6
+    Select @corTerra = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 7
+    Select @CorSol = CorTexto From Rede.TabuleiroBoard (nolock) Where ID = 8
  
     CREATE TABLE #temp
     (
@@ -284,7 +284,7 @@ BEGIN
         DataInicio,
         DataFim
     FROM 
-        Rede.Tabuleiro
+        Rede.Tabuleiro (nolock)
     Where 
         Id = @id
 
@@ -309,7 +309,11 @@ BEGIN
 	
     --Pin Master
 	Set @UsuarioIDPin = (select master from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinmaster = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -321,7 +325,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinmaster = @aux-1 
 		Else
@@ -329,32 +333,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinmaster = @pin 
 	End
 	
 	--Pin CoordinatorDir
 	Set @UsuarioIDPin = (select CoordinatorDir from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinCoordinatorDir = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -366,7 +374,7 @@ BEGIN
 	End	
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinCoordinatorDir = @aux-1 
 		Else
@@ -374,32 +382,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorDir = @pin 
 	End
 	
 	--Pin IndicatorDirSup
 	Set @UsuarioIDPin = (select IndicatorDirSup from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinIndicatorDirSup = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -411,7 +423,7 @@ BEGIN
 	End	
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinIndicatorDirSup = @aux-1 
 		Else
@@ -419,32 +431,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirSup = @pin 
 	End
 	
 	--Pin IndicatorDirInf
 	Set @UsuarioIDPin = (select IndicatorDirInf from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinIndicatorDirInf = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -456,7 +472,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinIndicatorDirInf = @aux-1 
 		Else
@@ -464,32 +480,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorDirInf = @pin 
 	End
 
 	--Pin DonatorDirSup1
 	Set @UsuarioIDPin = (select DonatorDirSup1 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorDirSup1 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -501,7 +521,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorDirSup1 = @aux-1 
 		Else
@@ -509,32 +529,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup1 = @pin 
 	End
 	
 	--Pin DonatorDirSup2
 	Set @UsuarioIDPin = (select DonatorDirSup2 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorDirSup2 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -546,7 +570,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorDirSup2 = @aux-1 
 		Else
@@ -554,32 +578,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirSup2 = @pin 
 	End
 	
 	--Pin DonatorDirInf1
 	Set @UsuarioIDPin = (select DonatorDirInf1 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorDirInf1 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -591,7 +619,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorDirInf1 = @aux-1 
 		Else
@@ -599,32 +627,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf1 = @pin 
 	End
 
 	--Pin DonatorDirInf2
 	Set @UsuarioIDPin = (select DonatorDirInf2 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorDirInf2 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -636,7 +668,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorDirInf2 = @aux-1 
 		Else
@@ -644,32 +676,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorDirInf2 = @pin 
 	End
 
 	--Pin CoordinatorEsq
 	Set @UsuarioIDPin = (select CoordinatorEsq from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinCoordinatorEsq = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -681,7 +717,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinCoordinatorEsq = @aux-1 
 		Else
@@ -689,32 +725,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinCoordinatorEsq = @pin 
 	End
 
 	--Pin IndicatorEsqSup
 	Set @UsuarioIDPin = (select IndicatorEsqSup from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinIndicatorEsqSup = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -726,7 +766,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinIndicatorEsqSup = @aux-1 
 		Else
@@ -734,32 +774,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqSup = @pin 
 	End
 
 	--Pin IndicatorEsqInf
 	Set @UsuarioIDPin = (select IndicatorEsqInf from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinIndicatorEsqInf = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -771,7 +815,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinIndicatorEsqInf = @aux-1 
 		Else
@@ -779,33 +823,42 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinIndicatorEsqInf = @pin 
 	End
 
 	--Pin DonatorEsqSup1
 	Set @UsuarioIDPin = (select DonatorEsqSup1 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorEsqSup1 = @aux - 1
+	
 	if(@aux <= 1)
 	Begin
 		Update #temp Set pinDonatorEsqSup1 = 0
@@ -816,7 +869,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorEsqSup1 = @aux-1 
 		Else
@@ -824,32 +877,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup1 = @pin 
 	End
 
 	--Pin DonatorEsqSup2
 	Set @UsuarioIDPin = (select DonatorEsqSup2 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorEsqSup2 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -861,7 +918,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorEsqSup2 = @aux-1 
 		Else
@@ -869,32 +926,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqSup2 = @pin 
 	End
 
 	--Pin DonatorEsqInf1
 	Set @UsuarioIDPin = (select DonatorEsqInf1 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorEsqInf1 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -906,7 +967,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorEsqInf1 = @aux-1 
 		Else
@@ -914,32 +975,36 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf1 = @pin 
 	End
 
 	--Pin DonatorEsqInf2
 	Set @UsuarioIDPin = (select DonatorEsqInf2 from #temp)
-	Select @aux = Count(*) From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And TabuleiroID is not null
+	if(@aux > 1) --Esta acima de mercurio
+	Begin
+		Select @aux = Count(*) From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin And PagoMaster = 'true' And TabuleiroID is not null
+	End
 	Update #temp Set pinDonatorEsqInf2 = @aux - 1
 	if(@aux <= 1)
 	Begin
@@ -951,7 +1016,7 @@ BEGIN
 	End
 	if(@aux = 2)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' 
 		if(@pin is null)
 			Update #temp Set pinDonatorEsqInf2 = @aux-1 
 		Else
@@ -959,27 +1024,27 @@ BEGIN
 	End
 	if(@aux = 3)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
 	End
 	if(@aux = 4)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
 	End
 	if(@aux = 5)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
 	End
 	if(@aux = 6)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
 	End
 	if(@aux = 7)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = @aux and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
 	End
 	if(@aux >= 8)
 	Begin
-		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
+		Select @pin = max(BoardID) FROM Rede.TabuleiroUsuario (nolock) Where UsuarioID = @UsuarioIDPin and BoardID = 8 and StatusID = 1 and PagoMaster = 'true' Update #temp Set pinDonatorEsqInf2 = @pin 
 	End
 
     Update #temp Set pinMaster=0 Where pinMaster is null
@@ -1166,35 +1231,35 @@ BEGIN
 
     if(@MasterID = @UsuarioID)
     Begin
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup1 And PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirSup1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirSup2 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirInf1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorDirInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirInf2 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqSup1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqSup2 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqInf1 = 1
-        if Exists(Select 'ok' From Rede.TabuleiroUsuario Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqInf2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorDirSup1 And PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirSup1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorDirSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirSup2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorDirInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirInf1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorDirInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorDirInf2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorEsqSup1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqSup1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorEsqSup2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqSup2 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorEsqInf1 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqInf1 = 1
+        if Exists(Select 'ok' From Rede.TabuleiroUsuario (nolock) Where UsuarioID = @DonatorEsqInf2 and PagoMaster = 0 And InformePag = 1 and @tempo > DataInicio and TabuleiroID = @id and StatusID=1) Update #Temp Set pulseDonatorEsqInf2 = 1
     End
 
     --Alerta Vermelho - Donator nao informou o pagamento ao Master
-    Update temp Set corTextoDonatorDirSup1 = '#fff', corDonatorDirSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorDirSup2 = '#fff', corDonatorDirSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorDirInf1 = '#fff', corDonatorDirInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorDirInf2 = '#fff', corDonatorDirInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqSup1 = '#fff', corDonatorEsqSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqSup2 = '#fff', corDonatorEsqSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqInf1 = '#fff', corDonatorEsqInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqInf2 = '#fff', corDonatorEsqInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirSup1 = '#fff', corDonatorDirSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirSup2 = '#fff', corDonatorDirSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirInf1 = '#fff', corDonatorDirInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirInf2 = '#fff', corDonatorDirInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqSup1 = '#fff', corDonatorEsqSup1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqSup2 = '#fff', corDonatorEsqSup2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqInf1 = '#fff', corDonatorEsqInf1 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqInf2 = '#fff', corDonatorEsqInf2 = 'red-thunderbird' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
 
     --Alerta Amarelo - Master ainda nao validou pagamento do Convidado
-    Update temp Set corTextoDonatorDirSup1 = '#333', corDonatorDirSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorDirSup2 = '#333', corDonatorDirSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorDirInf1 = '#333', corDonatorDirInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorDirInf2 = '#333', corDonatorDirInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqSup1 = '#333', corDonatorEsqSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqSup2 = '#333', corDonatorEsqSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqInf1 = '#333', corDonatorEsqInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
-    Update temp Set corTextoDonatorEsqInf2 = '#333', corDonatorEsqInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirSup1 = '#333', corDonatorDirSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirSup2 = '#333', corDonatorDirSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirInf1 = '#333', corDonatorDirInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorDirInf2 = '#333', corDonatorDirInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorDirInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqSup1 = '#333', corDonatorEsqSup1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqSup1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqSup2 = '#333', corDonatorEsqSup2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqSup2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqInf1 = '#333', corDonatorEsqInf1 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqInf1 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
+    Update temp Set corTextoDonatorEsqInf2 = '#333', corDonatorEsqInf2 = 'yellow-crusta' From #temp temp, Rede.TabuleiroUsuario tab (nolock) Where temp.DonatorEsqInf2 = tab.UsuarioID and tab.informePag = 1 and tab.PagoMaster = 0 and tab.TabuleiroID = @id and tab.StatusID = 1
 
     Select 
         ID,
@@ -1318,7 +1383,7 @@ go
 Grant Exec on spC_Tabuleiro To public
 go
 
---Exec spC_Tabuleiro @id=24, @UsuarioID = 2604
---Exec spC_Tabuleiro @id=29, @UsuarioID = 2589
+--Exec spC_Tabuleiro @id=87, @UsuarioID = 2803
+
 
 

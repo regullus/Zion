@@ -123,10 +123,6 @@
             startPage();
             position();
 
-            @if (ViewBag.Pagar != null && ViewBag.Pagar)
-            {
-                <text>toastr.error('@traducaoHelper["PAGAR_SISTEMA"]');</text>
-            }
             @if (ViewBag.ShowMsgFaltaPag != null && ViewBag.ShowMsgFaltaPag != "")
             {
                 <text>toastr.error('@ViewBag.ShowMsgFaltaPag');</text>
@@ -356,49 +352,38 @@
             var ajustLeft = 0;
 
             //width > 1200
-            //OK
-            var xDonatorEsqSup1Top = -50;
-            var yDonatorEsqSup1Left = 184;
-            //OK
+            var xDonatorEsqSup1Top = -70;
+            var yDonatorEsqSup1Left = 180;
             var xDonatorEsqSup2Top = 90;
             var yDonatorEsqSup2Left = 24;
-            //OK
             var xDonatorEsqInf1Top = 370;
             var yDonatorEsqInf1Left = 76;
-
             var xDonatorEsqInf2Top = 570;
             var yDonatorEsqInf2Left = 200;
-            //OK
+
             var xDonatorDirSup1Top = -60;
             var yDonatorDirSup1Left = 580;
-            //OK
             var xDonatorDirSup2Top = 120;
             var yDonatorDirSup2Left = 700;
-            //OK
             var xDonatorDirInf1Top = 360;
             var yDonatorDirInf1Left = 680;
-            //OK
             var xDonatorDirInf2Top =  590;
             var yDonatorDirInf2Left = 540;
-            //Allie
-            var xIndicatorEsqSupTop = 50;
+
+            var xIndicatorEsqSupTop = 60;
             var yIndicatorEsqSupLeft = 274;
-            //John
             var xIndicatorEsqInfTop = 400;
             var yIndicatorEsqInfLeft = 274;
-            //Richard
             var xIndicatorDirSupTop = 70;
             var xIndicatorDirSupLeft = 474;
-            //Brook
             var xIndicatorDirInfTop = 420;
             var xIndicatorDirInfLeft = 474;
-            //Deckard
+
             var xCoordinatorEsqTop = 230;
             var yCoordinatorEsqLeft = 210;
-            //Han
             var xCoordinatorDirTop = 230;
             var yCoordinatorDirLeft = 540;
-            //Indy
+
             var xMasterTop = 230;
             var yMasterLeft = 376;
 
@@ -1386,9 +1371,9 @@
                     @if (ViewBag.Timer != null)
                     {
                         <div class="page-title">
-                            <span id="minutes" style="font-size: 24px; font-weight: 500; color: darkred;">00</span>
-                            <span id="pontos" style="font-size: 24px; font-weight: 500; color: darkred;">:</span>
-                            <span id="seconds" style="font-size: 24px; font-weight: 500; color: darkred;">00</span>
+                            <span id="minutes" style="font-size: 32px; font-weight: 500; color: darkred;">00</span>
+                            <span id="pontos" style="font-size: 32px; font-weight: 500; color: darkred;">:</span>
+                            <span id="seconds" style="font-size: 32px; font-weight: 500; color: darkred;">00</span>
                         </div>
                         <div class="page-title pull-right" style="padding: 10px;">
                             <button type="button" class="btn purple-studio btn-circle pull-right exitNivel">
@@ -1458,7 +1443,7 @@
 
 @if (tabuleiro != null)
 {
-    <div style="max-width: 1600px; display: flex; height: 100%; width: 100%; justify-content: center; align-items: center; @(ViewBag.TabuleiroOpacity == true ? "opacity: 60%;" : "") @(tabuleiro.StatusID == 2 ? "opacity: 60%;" : "") ">
+    <div style="max-width: 1600px; display: flex; height: 100%; width: 100%; justify-content: center; align-items: center; @(ViewBag.TabuleiroOpacity == true ? "opacity: 60%;" : "") @(tabuleiro.StatusID == 2 || ViewBag.TotalRecebimento == 8  ? "opacity: 60%;" : "") ">
 
         <div id="porTabuleiro" class="" style="position: relative; padding: 0; margin: 0; padding-right: 10px; margin-bottom: 0; background-color: transparent; overflow: auto !important; overflow-y: hidden !important; @(blnNovoUsuario ? "opacity: 0.7;" : "")">
             <div class="portlet-body">

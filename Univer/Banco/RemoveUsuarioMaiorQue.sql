@@ -1,6 +1,10 @@
 use Univer
 go
---select nome, login, * from usuario.usuario
+--usuario.usuario
+--autenticacao
+--Loja.Pedido
+--Usuario.Endereco
+
 declare @usuarioId int
 select @usuarioId = 2586
 
@@ -43,6 +47,6 @@ delete Financeiro.ContaDeposito Where IDUsuario > @usuarioID
 
 delete usuario.usuario where id > @usuarioId
 
-select login from usuario.usuario where Id > @usuarioId
+--select login from usuario.usuario where Id > @usuarioId
 
 

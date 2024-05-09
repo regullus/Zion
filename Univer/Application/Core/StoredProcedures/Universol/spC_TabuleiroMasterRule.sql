@@ -24,144 +24,142 @@ BEGIN
         @total int,
         @MasterID int,
         @PagoSistema bit,
-		@InfomePagSistema bit
-	
-	if(@UsuarioID > 2586) --Não entra na regra os 7 usuarios principais do sistema
+		@InfomePagSistema bit,
+		@quebraTabuleiro int
+
+	Set @quebraTabuleiro = 3	
+	--Obtem o MasterID do Tabuleiro do usuario informado
+	Select
+		@MasterID = MasterID
+	From
+		Rede.TabuleiroUsuario (nolock)
+	Where
+		UsuarioID = @UsuarioID and
+		BoardID = @BoardID 
+		
+	--Caso o usuarioId passado seja o master
+	if(@MasterID = @UsuarioID)
 	Begin
-		--Obtem o MasterID do Tabuleiro do usuario informado
+		--Verifica se master nao pagou o sistema
 		Select
-			@MasterID = MasterID
+			@PagoSistema = PagoSistema,
+			@InfomePagSistema = InformePagSistema
 		From
-			Rede.TabuleiroUsuario 
+			Rede.TabuleiroUsuario (nolock)
 		Where
 			UsuarioID = @UsuarioID and
 			BoardID = @BoardID 
-		
-		--Caso o usuarioId passado seja o master
-		if(@MasterID = @UsuarioID)
-		Begin
-			--Verifica se master nao pagou o sistema
-			Select
-				@PagoSistema = PagoSistema,
-				@InfomePagSistema = InformePagSistema
-			From
-				Rede.TabuleiroUsuario 
-			Where
-				UsuarioID = @UsuarioID and
-				BoardID = @BoardID 
     
-			--Verifica total de pagamentos que master recebeu sem pagar o sistema
-			Select 
-				@total = Count(*)
-			From 
-				Rede.TabuleiroUsuario 
-			Where
-				MasterID = @UsuarioID and
-				BoardID = @BoardID and
-				PagoMaster = 'true' and
-				Posicao in (
-					'DonatorDirSup1',
-					'DonatorDirSup2',
-					'DonatorDirInf1',
-					'DonatorDirInf2',
-					'DonatorEsqSup1',
-					'DonatorEsqSup2',
-					'DonatorEsqInf1',
-					'DonatorEsqInf2'
-				)
+		--Verifica total de pagamentos que master recebeu sem pagar o sistema
+		Select 
+			@total = Count(*)
+		From 
+			Rede.TabuleiroUsuario (nolock)
+		Where
+			MasterID = @UsuarioID and
+			BoardID = @BoardID and
+			PagoMaster = 'true' and
+			Posicao in (
+				'DonatorDirSup1',
+				'DonatorDirSup2',
+				'DonatorDirInf1',
+				'DonatorDirInf2',
+				'DonatorEsqSup1',
+				'DonatorEsqSup2',
+				'DonatorEsqInf1',
+				'DonatorEsqInf2'
+			)
 		
-			--Caso Tenha Fechado algum lado, este não entram no count do select acima
-			--Daí soma 4 no @total, pois já fechou um lado
-			if Exists (
-				Select 
-					'OK' 
-					From 
-						Rede.TabuleiroUsuario 
-					Where
-						MasterID = @UsuarioID and
-						BoardID = @BoardID and
-						DireitaFechada = 'true'
-				)
-			Begin
-				Set @total = @total + 4
-			End
-			if Exists (
-				Select 
-					'OK' 
-					From 
-						Rede.TabuleiroUsuario 
-					Where
-						MasterID = @UsuarioID and
-						BoardID = @BoardID and
-						EsquerdaFechada = 'true'
-				)
-			Begin
-				Set @total = @total + 4
-			End
+		--Caso Tenha Fechado algum lado, este não entram no count do select acima
+		--Daí soma 4 no @total, pois já fechou um lado
+		if Exists (
+			Select 
+				'OK' 
+				From 
+					Rede.TabuleiroUsuario (nolock)
+				Where
+					MasterID = @UsuarioID and
+					BoardID = @BoardID and
+					DireitaFechada = 'true'
+			)
+		Begin
+			Set @total = @total + 4
+		End
+		if Exists (
+			Select 
+				'OK' 
+				From 
+					Rede.TabuleiroUsuario (nolock)
+				Where
+					MasterID = @UsuarioID and
+					BoardID = @BoardID and
+					EsquerdaFechada = 'true'
+			)
+		Begin
+			Set @total = @total + 4
+		End
 			
-			if(@PagoSistema = 'false')
-			Begin
-				-- Se total for maior que 4, informa 'NOOK'
-				--pois o Master deve pagar o sistema ate os 4 primeiros pagamentos
-				if(@Total > 3)
-				Begin 
-					if(@InfomePagSistema = 'true')
-					Begin
-						Select @retorno = 'NOOK_PAGTO_SISTEMA_INFORME_OK'
-					End
-					Else
-					Begin
-						Select @retorno = 'NOOK_PAGTO_SISTEMA'
-					End
+		if(@PagoSistema = 'false')
+		Begin
+			-- Se total for maior que 4, informa 'NOOK'
+			--pois o Master deve pagar o sistema ate os 4 primeiros pagamentos
+			if(@Total > 3)
+			Begin 
+				if(@InfomePagSistema = 'true')
+				Begin
+					Select @retorno = 'NOOK_PAGTO_SISTEMA_INFORME_OK'
 				End
 				Else
 				Begin
-					Select @retorno = 'OK'
+					Select @retorno = 'NOOK_PAGTO_SISTEMA'
 				End
 			End
 			Else
 			Begin
-				--Jah pagou o sistema
 				Select @retorno = 'OK'
-			End
-
-			if(@retorno = 'OK')
-			Begin
-				--Verifica se usuario esta em board superior e não pagou o master
-				Declare @BoardIDMax int
-				Select 
-					@BoardIDMax = MAX(BoardID)
-				From
-					Rede.TabuleiroUsuario
-				Where
-					UsuarioID = @UsuarioID and
-					StatusID <> 0
-			    
-				--Verifica se não pagou o Master no board superior
-				If Exists (
-					Select 
-						'OK'
-					From
-						Rede.TabuleiroUsuario
-					Where
-						BoardID = @BoardIDMax and
-						UsuarioID = @UsuarioID and
-						PagoMaster = 'false'
-				)
-				Begin
-					--Não estando pago, não abilita mercurio para reentrada
-					Set @retorno = 'NOOK_BOARD_SUPERIOR'
-				End
 			End
 		End
 		Else
 		Begin
-			-- Não sendo o master, retorna ok
-			Set @retorno = 'OK'
+			--Jah pagou o sistema
+			Select @retorno = 'OK'
+		End
+
+		if(@retorno = 'OK')
+		Begin
+			--Verifica se usuario esta em board superior e não pagou o master
+			Declare @BoardIDMax int
+			Select 
+				@BoardIDMax = MAX(BoardID)
+			From
+				Rede.TabuleiroUsuario (nolock)
+			Where
+				UsuarioID = @UsuarioID and
+				StatusID <> 0
+			    
+			--Verifica se não pagou o Master no board superior
+			If Exists (
+				Select 
+					'OK'
+				From
+					Rede.TabuleiroUsuario (nolock)
+				Where
+					BoardID = @BoardIDMax and
+					UsuarioID = @UsuarioID and
+					PagoMaster = 'false'
+			)
+			Begin
+			    --Não vale para venus
+			    if(@BoardID = @quebraTabuleiro) 
+				Begin
+					Set @retorno = 'NOOK_BOARD_SUPERIOR'
+				End
+			End
 		End
 	End
-	Else 
+	Else
 	Begin
+		-- Não sendo o master, retorna ok
 		Set @retorno = 'OK'
 	End
 	
@@ -169,7 +167,7 @@ BEGIN
 	if Exists (
 		Select 'OK'
 		From
-			Rede.TabuleiroUsuario
+			Rede.TabuleiroUsuario (nolock)
 		Where
 			UsuarioID = @UsuarioID and
 			StatusID = 2
@@ -177,7 +175,12 @@ BEGIN
 	Begin
 		if(@retorno = 'OK')
 		Begin
-			Set @retorno = 'NOOK_CONVITE'
+			 --Não vale para venus
+			 --Tem que ver em que board o usuario esta se for maior q venus, da NOOK, se for menor da OK
+			if(@BoardID = @quebraTabuleiro and @BoardIDMax > @quebraTabuleiro) 
+			Begin
+				Set @retorno = 'NOOK_CONVITE'
+			End
 		End
 		Else
 		Begin
@@ -192,7 +195,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID=2599, @BoardID=1
+--Exec spC_TabuleiroMasterRule @UsuarioID=2584, @BoardID=1
 
 
 

@@ -29,7 +29,8 @@ BEGIN
         @DonatorEsqSup2 int,
         @DonatorEsqInf1 int,
         @DonatorEsqInf2 int,
-        @retorno nvarchar(10)
+        @retorno nvarchar(10),
+		@maxBoard int
 
     Select @dadosTempoPagto = CONVERT(INT, Dados)  from Sistema.Configuracao where chave = 'TABULEIRO_TEMPO_PAGAMENTO'
     Select @dadosTempoMaxPagto = CONVERT(INT, Dados) from Sistema.Configuracao where chave = 'TABULEIRO_TEMPO_MAX_PAGAMENTO'
@@ -74,11 +75,15 @@ BEGIN
     While @AntFetch = 0
     Begin
         Set @tempo = DATEADD(mi, @dadosTempoPagto, @DataInicio);
+
+		--Ultimo board em que o usuario se encontra
+		Select @maxBoard = BoardID From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and TabuleiroID is not null
+		
         IF(@tempo < GetDate())
         Begin
-			if(@Ciclo > 1)
+			if(@maxBoard > 1)
 			Begin
-				--Dois statusID do usuario 
+				--statusID do usuario para 2 é convite
 				Update
 					Rede.TabuleiroUsuario
 				Set
@@ -95,20 +100,39 @@ BEGIN
 			End
 			Else
 			Begin
-				--Zera statusID do usuario 
-				Update
-					Rede.TabuleiroUsuario
-				Set
-					StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
-					Posicao = '',
-					TabuleiroID = null,
-					InformePag = 'false',
-					UsuarioIDPag = null,
-					Debug = 'Removido pelo job 1.2'
-				Where
-					UsuarioID = @UsuarioID and
-					BoardID = @BoardID
-
+				if(@Ciclo > 1)
+				Begin
+					--statusID do usuario para 2 é convite
+					Update
+						Rede.TabuleiroUsuario
+					Set
+						StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
+						Posicao = '',
+						TabuleiroID = null,
+						InformePag = 'false',
+						UsuarioIDPag = null,
+						DataInicio = GetDate(),
+						Debug = 'Removido pelo job 1.1'
+					Where
+						UsuarioID = @UsuarioID and
+						BoardID = @BoardID
+				End
+				Else
+				Begin
+					--statusID do usuario para 0 é quando é a primeira entrada do usuario no tabuleiroconvite
+					Update
+						Rede.TabuleiroUsuario
+					Set
+						StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+						Posicao = '',
+						TabuleiroID = null,
+						InformePag = 'false',
+						UsuarioIDPag = null,
+						Debug = 'Removido pelo job 1.2'
+					Where
+						UsuarioID = @UsuarioID and
+						BoardID = @BoardID
+				End
 			End
 		
 			--Remove usuario que nao pagou no tabuleiro
@@ -245,7 +269,7 @@ BEGIN
 						TabuleiroID = null,
 						InformePag = 'false',
 						UsuarioIDPag = null,
-						Debug = 'Usuario saiu 1'
+						Debug = 'Removido pelo job 2.2'
 					Where
 						UsuarioID = @UsuarioID and
 						BoardID = @BoardID
@@ -261,7 +285,7 @@ BEGIN
 						TabuleiroID = null,
 						InformePag = 'false',
 						UsuarioIDPag = null,
-						Debug = 'Usuario saiu 2'
+						Debug = 'Removido pelo job 2.3'
 					Where
 						UsuarioID = @UsuarioID and
 						BoardID = @BoardID

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity.Core.Objects;
 using Core.Models;
+using System.Collections;
 
 namespace Core.Repositories.Rede
 {
@@ -36,7 +37,7 @@ namespace Core.Repositories.Rede
             {
                 sql = "Exec spC_TabuleiroNivel @UsuarioID=" + idUsuario + ", @StatusID=null";
             }
-            
+
             var retorno = _context.Database.SqlQuery<TabuleiroNivelModel>(sql).ToList();
 
             return retorno;
@@ -49,7 +50,8 @@ namespace Core.Repositories.Rede
             if (idUsuario == null)
             {
                 sql = "Exec spC_TabuleiroUsuario @UsuarioID=null";
-            } else
+            }
+            else
             {
                 sql = "Exec spC_TabuleiroUsuario @UsuarioID=" + idUsuario;
             }
@@ -63,7 +65,6 @@ namespace Core.Repositories.Rede
         {
             string sql = "Exec spC_TabuleiroUsuarioID @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
             var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).FirstOrDefault();
-
             return retorno;
         }
 
@@ -71,7 +72,7 @@ namespace Core.Repositories.Rede
         {
             string sql = "Exec spC_Tabuleiro @id=" + id + ", @UsuarioID = " + usuarioID;
 
-            TabuleiroModel retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).FirstOrDefault();;
+            TabuleiroModel retorno = _context.Database.SqlQuery<TabuleiroModel>(sql).FirstOrDefault(); ;
             if (retorno != null)
             {
                 retorno.ApelidoMaster = retorno.ApelidoMaster.ToLower();
@@ -104,7 +105,7 @@ namespace Core.Repositories.Rede
             //idPai patrocinador do usuario acima
             //idBoard board a ser inserido o usuario
             //chamada deve ser principal para incluir novo usuario
-            if(String.IsNullOrEmpty(Chamada))
+            if (String.IsNullOrEmpty(Chamada))
             {
                 Chamada = "Principal";
             }
@@ -114,16 +115,17 @@ namespace Core.Repositories.Rede
             if (Chamada == "Convite") //Força a entradanum tabuleiro mais antigo
             {
                 sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=null,@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
-            } else
+            }
+            else
             {
                 sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
             }
-            
+
             TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
 
             string ret = "OK";
-            
-            if (retorno !=  null && retorno.Retorno != null)
+
+            if (retorno != null && retorno.Retorno != null)
             {
                 if (retorno.Retorno != "OK")
                 {
@@ -165,11 +167,13 @@ namespace Core.Repositories.Rede
                             ret = "OK";
                             break;
                     }
-                } else
+                }
+                else
                 {
                     ret = retorno.Retorno;
                 }
-            } else
+            }
+            else
             {
                 ret = "SEM_DADOS";
             }
@@ -185,7 +189,7 @@ namespace Core.Repositories.Rede
             //chamada deve ser principal para incluir novo usuario
             string sql = "Exec spI_TabuleiroUsuario @UsuarioID=" + idUsuario + ", @MasterID=" + idPai;
             string ret = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
-            
+
             if (ret == "OK")
             {
                 sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=1,@Chamada='ConviteNew'";
@@ -239,9 +243,14 @@ namespace Core.Repositories.Rede
                 }
                 else
                 {
+                    if (ret.Substring(0, 4) == "NOOK")
+                    {
+                        //panda - Criar log
+                    }
                     ret = "SEM_DADOS";
                 }
-            } else
+            }
+            else
             {
                 ret = "SEM_DADOS";
             }
@@ -287,7 +296,7 @@ namespace Core.Repositories.Rede
         public TabuleiroInfoUsuarioModel ObtemInfoUsuario(int idTarget, int idUsuario, int idBoard)
         {
             string sql = "Exec spC_TabuleiroInfoUsuario @TargetID=" + idTarget + ", @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
-            var retorno = _context.Database.SqlQuery<TabuleiroInfoUsuarioModel>(sql).FirstOrDefault(); 
+            var retorno = _context.Database.SqlQuery<TabuleiroInfoUsuarioModel>(sql).FirstOrDefault();
 
             return retorno;
         }
@@ -307,7 +316,7 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
-        
+
         public int ObtemBoardIDByTabuleiroID(int idUsuario, int idTabuleiro)
         {
             string sql = "Exec spC_TabuleiroObtemBoardIDByTabuleiroID @UsuarioID=" + idUsuario + ",@TabuleiroId=" + idTabuleiro;
@@ -322,7 +331,7 @@ namespace Core.Repositories.Rede
             string retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
             return retorno;
         }
-       
+
         public string MasterIndicadosOK(int idUsuario, int idBoard)
         {
             string sql = "Exec spC_TabuleiroIndicadosValidos @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
@@ -344,7 +353,7 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
-        
+
         public string TabuleiroSair(int idUsuario, int idBoard)
         {
 
@@ -381,9 +390,9 @@ namespace Core.Repositories.Rede
         public string ConfirmarPagtoSistema(int idUsuario, int idBoard, bool confirmar)
         {
             string sql = "";
-            if (confirmar) 
+            if (confirmar)
             {
-                sql = "Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard +  ", @confirmar='true'";
+                sql = "Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard + ", @confirmar='true'";
             }
             else
             {
@@ -394,7 +403,33 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+        public bool TabuleiroFechado(int idTabuleiro)
+        {
+            bool retorno = false;
+            if (idTabuleiro > 0)
+            {
+                string sql = "Exec spC_TabuleiroFechado @TabuleiroID=" + idTabuleiro;
+                var ret = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+                if (ret == "sim")
+                {
+                    retorno = true;
+                }
+            }
+            return retorno;
+        }
 
-        
+        public IEnumerable<TabuleiroIndicados> ObtemTabuleirosIndicados(int idUsuario)
+        {
+            string sql = "Exec spC_TabuleiroIndicados @UsuarioID=" + idUsuario;
+
+            IEnumerable<TabuleiroIndicados> tabuleiroIndicados = _context.Database.SqlQuery<TabuleiroIndicados>(sql).ToList();
+
+            foreach (TabuleiroIndicados item in tabuleiroIndicados)
+            {
+                item.Galaxia = item.BoardNome.Substring(0, 3).ToUpper() + "-" + (item.TabuleiroID.HasValue ? item.TabuleiroID.Value : 0).ToString("000000");
+            }
+            
+            return tabuleiroIndicados;
+        }
     }
 }

@@ -8241,6 +8241,7 @@
     <Content Include="Views\MinhaRede\MigrarRede.cshtml" />
     <Content Include="Views\Shared\_LayoutLimpo.cshtml" />
     <Content Include="Views\MinhaRede\Galaxy.cshtml" />
+    <Content Include="Views\MinhaRede\Indicados.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
