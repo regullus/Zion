@@ -1,15 +1,15 @@
 use UniverDev
 go
 declare @chave nvarchar(255), @TextoP nvarchar(255), @TextoE nvarchar(255), @TextoI nvarchar(255)
-select @chave = '"NOOK_PAGTO_SISTEMA_AGUAR_ADMIN'
+select @chave = 'INDICADOS'
 Select * from Globalizacao.Traducao where chave like '%' + @chave + '%'
 
 delete Globalizacao.Traducao  where chave = @chave
 
 select 
-    @TextoP = 'Aguardando a verificação do seu pagamento ao sistema',
-	@TextoE = 'Esperando verificación de su pago al sistema',
-	@TextoI = 'Waiting for verification of your payment to the system'
+    @TextoP = 'Indicados',
+	@TextoE = 'Nominados',
+	@TextoI = 'Nominees'
 	
 --update Globalizacao.Traducao set Texto = @TextoP where chave = @chave and IdiomaID = 1
 --update Globalizacao.Traducao set Texto = @TextoE where chave = @chave and IdiomaID = 2

@@ -72,7 +72,7 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroUsuarioRule To public
 go
---Exec spC_TabuleiroUsuarioRule @UsuarioID=2587
+--Exec spC_TabuleiroUsuarioRule @UsuarioID=2614
 --Exec spC_TabuleiroUsuarioRule @UsuarioID=2822
 
 

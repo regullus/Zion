@@ -423,14 +423,11 @@ BEGIN
 		Select 'OK'
 		COMMIT TRANSACTION
 	END TRY
-	BEGIN CATCH
+		BEGIN CATCH
 		ROLLBACK TRANSACTION
-		
 		DECLARE @error int, @message varchar(4000), @xstate int;
 		SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE();
-        Select @retorno = 'Error SPGTS: ' + @error + '-' + @message
-
-		Select 'NOOK - ' + @retorno
+		Select 'NOOK - ' + 'Error SPGTS: ' + @error + '-' + @message
 	END CATCH
 End -- Sp
 

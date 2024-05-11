@@ -369,11 +369,20 @@ namespace Core.Repositories.Rede
         /// Usado no Admin
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TabuleiroUsuarioModel> ObtemTabuleirosInformaramPgto()
+        public IEnumerable<TabuleiroInformaramPagtoModel> ObtemTabuleirosInformaramPgto()
         {
             string sql = "Exec spC_TabuleiroInformaramPagto";
 
-            var retorno = _context.Database.SqlQuery<TabuleiroUsuarioModel>(sql).ToList();
+            var retorno = _context.Database.SqlQuery<TabuleiroInformaramPagtoModel>(sql).ToList();
+
+            return retorno;
+        }
+
+        public IEnumerable<TabuleiroInformaramPagtoModel> ObtemTabuleirosPagos()
+        {
+            string sql = "Exec spC_TabuleiroPagos";
+
+            var retorno = _context.Database.SqlQuery<TabuleiroInformaramPagtoModel>(sql).ToList();
 
             return retorno;
         }

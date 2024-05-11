@@ -46,7 +46,6 @@ namespace Core.Helpers
             {
                traducao = traducaoRepository.GetByIdiomaChave(_idioma.ID, chave);
                Retorno = traducao != null ? traducao.Texto : "[" + chave + "]";
-
             }
             catch (Exception)
             {

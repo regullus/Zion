@@ -47,6 +47,7 @@ using Base32;
 using OtpSharp;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Fluentx;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 #endregion
 
@@ -379,7 +380,8 @@ namespace Sistema.Controllers
                     item.SenhaLegado = usuario.BoardNome; //Usando o campo SenhaLegado para exibir o nome da galaxia que o usuario está
                     item.TipoID = usuario.BoardID; //Usado o campo TipoID como BoardID
                     item.Oculto = true; //Usado para exibir icone de confirmação de pagamento
-                } else
+                }
+                else
                 {
                     item.Oculto = false; //Usado para exibir icone de confirmação de pagamento
                 }
@@ -516,7 +518,7 @@ namespace Sistema.Controllers
 
         // POST: Usuarios/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,Assinatura,PaisID,PatrocinadorDiretoID,PatrocinadorPosicaoID,UltimoDireitaID,UltimoEsquerdaID,NivelAssociacao,NivelClassificacao,ProfundidadeRede,DerramamentoID,TipoID,StatusID,StatusCelularID,StatusEmailID,Nome,NomeFantasia,Apelido,Celular,Telefone,Sexo,Email,Login,Senha,Documento,DataNascimento,UltimoLogin,DataCriacao,GeraBonus,RecebeBonus,EntradaID,Bloqueado,Oculto,SenhaLegado,DataAtivacao,DataValidade,DataMigracao,TipoAtivacao,FilialID,IdAutenticacao,ExibeSaque,QtdeDiretos,DataRenovacao")] Usuario usuario)
@@ -845,146 +847,275 @@ namespace Sistema.Controllers
                                     ref Page,
                                     "Usuarios");
 
-            objFuncoes = null;
+            try
+            {
 
-            //List
-            if (String.IsNullOrEmpty(SortOrder))
-            {
-                ViewBag.CurrentSort = "login";
-            }
-            else
-            {
-                ViewBag.CurrentSort = SortOrder;
-            }
+                objFuncoes = null;
 
-            if (!(ProcuraLogin != null || ProcuraPatrocinador != null))
-            {
-                if (ProcuraLogin == null)
+                //List
+                if (String.IsNullOrEmpty(SortOrder))
                 {
-                    ProcuraLogin = CurrentProcuraLogin;
+                    ViewBag.CurrentSort = "login";
                 }
-                if (ProcuraPatrocinador == null)
+                else
                 {
-                    ProcuraPatrocinador = CurrentProcuraPatrocinador;
+                    ViewBag.CurrentSort = SortOrder;
                 }
-            }
 
-            ViewBag.CurrentProcuraLogin = ProcuraLogin;
-            ViewBag.CurrentProcuraPatrocinador = ProcuraPatrocinador;
-
-            IQueryable<Usuario> lista = null;
-
-            lista = db.Usuarios.Include(u => u.Pais).Include(u => u.PatrocinadorDireto).Include(u => u.PatrocinadorPosicao).Include(u => u.UltimoDireita).Include(u => u.UltimoEsquerda).Include(u => u.Filial).Include(u => u.Autenticacao);
-            lista = lista.Where(x => x.ID > 2500); //Anteriores são admins ou logins do Sistema que não podem ser alterados
-
-            //Obtem lista de usuarioID que informaram o pagamento
-            IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosInformaramPgto();
-
-            //Remove da lista os usuarios que não informaram um pagamento
-            foreach (var item in lista)
-            {
-                //Verifica se o usuario informou um pagamento ao sistema
-                var usuario = tabuleirosUsuario.Where(x => x.UsuarioID == item.ID).FirstOrDefault();
-                if(usuario == null)
+                if (!(ProcuraLogin != null || ProcuraPatrocinador != null))
                 {
-                    //Usario não informou um pagamento, assi ele é removido da lista
-                    lista = lista.Where(x => x.ID != item.ID);
-                } else
-                {
-                    item.Documento = usuario.Posicao; //Usando o campo Documento para exibir a posição do usuario   
-                    item.SenhaLegado = usuario.BoardNome; //Usando o campo SenhaLegado para exibir o nome da galaxia que o usuario está
-                    item.TipoID = usuario.BoardID; //Usado o campo TipoID como BoardID
+                    if (ProcuraLogin == null)
+                    {
+                        ProcuraLogin = CurrentProcuraLogin;
+                    }
+                    if (ProcuraPatrocinador == null)
+                    {
+                        ProcuraPatrocinador = CurrentProcuraPatrocinador;
+                    }
                 }
-            }
 
-            if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
-            {
-                lista = lista.Where(x => x.PatrocinadorDireto.Login.Contains(ProcuraPatrocinador) &&
-                                       (x.Login.Contains(ProcuraLogin) ||
-                                         x.Nome.Contains(ProcuraLogin) ||
-                                         x.Email.Contains(ProcuraLogin)
-                                       )
-                                    );
-            }
-            else
-            {
-                if (!String.IsNullOrEmpty(ProcuraLogin))
+                ViewBag.CurrentProcuraLogin = ProcuraLogin;
+                ViewBag.CurrentProcuraPatrocinador = ProcuraPatrocinador;
+
+                //Obtem lista de usuarioID que informaram o pagamento
+                IEnumerable<Core.Models.TabuleiroInformaramPagtoModel> lista = tabuleiroRepository.ObtemTabuleirosInformaramPgto();
+
+                if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
                 {
-                    lista = lista.Where(x => x.Login.Contains(ProcuraLogin) ||
+                    lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador) &&
+                                           (x.Login.Contains(ProcuraLogin) ||
                                              x.Nome.Contains(ProcuraLogin) ||
                                              x.Email.Contains(ProcuraLogin)
-                                       );
+                                           )
+                                        );
                 }
-                if (!String.IsNullOrEmpty(ProcuraPatrocinador))
+                else
                 {
-                    lista = lista.Where(x => x.PatrocinadorDireto.Nome.Contains(ProcuraPatrocinador));
+                    if (!String.IsNullOrEmpty(ProcuraLogin))
+                    {
+                        lista = lista.Where(x => x.Login.Contains(ProcuraLogin) ||
+                                                 x.Nome.Contains(ProcuraLogin) ||
+                                                 x.Email.Contains(ProcuraLogin)
+                                           );
+                    }
+                    if (!String.IsNullOrEmpty(ProcuraPatrocinador))
+                    {
+                        lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador));
+                    }
                 }
-            }
 
-            switch (SortOrder)
+                switch (SortOrder)
+                {
+                    case "login_desc":
+                        ViewBag.FirstSortParm = "login";
+                        ViewBag.SecondSortParm = "patrocinador";
+                        lista = lista.OrderByDescending(x => x.Login);
+                        break;
+                    case "patrocinador":
+                        ViewBag.FirstSortParm = "login";
+                        ViewBag.SecondSortParm = "patrocinador_desc";
+                        lista = lista.OrderBy(x => x.Patrocinador);
+                        break;
+                    case "patrocinador_desc":
+                        ViewBag.FirstSortParm = "login";
+                        ViewBag.SecondSortParm = "patrocinador";
+
+                        lista = lista.OrderByDescending(x => x.Patrocinador);
+                        break;
+                    case "login":
+                        ViewBag.FirstSortParm = "login_desc";
+                        ViewBag.SecondSortParm = "date";
+
+                        lista = lista.OrderBy(x => x.Login);
+                        break;
+                    default:  // Name ascending 
+                        ViewBag.FirstSortParm = "login_desc";
+                        ViewBag.SecondSortParm = "patrocinador";
+                        lista = lista.OrderBy(x => x.Login);
+                        break;
+                }
+
+                //Numero de linhas por Pagina
+                int PageSize = (NumeroPaginas ?? 5);
+
+                //Caso seja selecionada toda a lista (-1), pega na verdade 1000
+                if (PageSize == -1)
+                {
+                    PageSize = 1000;
+                }
+                ViewBag.PageSize = PageSize;
+                ViewBag.CurrentNumeroPaginas = NumeroPaginas;
+
+                //Pagina corrente
+                int PageNumber = (Page ?? 1);
+
+                //DropDown de paginação
+                int intNumeroPaginas = (NumeroPaginas ?? 5);
+
+                #region ViewBags
+
+                ViewBag.UsuarioEntraOutraAba = ConfiguracaoHelper.GetBoolean("USUARIO_ENTRA_OUTRA_ABA");
+
+                ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
+                ViewBag.Lista = lista;
+
+                #endregion
+
+                return View(lista.ToPagedList(PageNumber, PageSize));
+
+            }
+            catch (Exception ex)
             {
-                case "login_desc":
-                    ViewBag.FirstSortParm = "login";
-                    ViewBag.SecondSortParm = "patrocinador";
-                    lista = lista.OrderByDescending(x => x.Login);
-                    break;
-                case "patrocinador":
-                    ViewBag.FirstSortParm = "login";
-                    ViewBag.SecondSortParm = "patrocinador_desc";
-                    lista = lista.OrderBy(x => x.PatrocinadorDireto.Login);
-                    break;
-                case "patrocinador_desc":
-                    ViewBag.FirstSortParm = "login";
-                    ViewBag.SecondSortParm = "patrocinador";
-
-                    lista = lista.OrderByDescending(x => x.PatrocinadorDireto.Nome);
-                    break;
-                case "login":
-                    ViewBag.FirstSortParm = "login_desc";
-                    ViewBag.SecondSortParm = "date";
-
-                    lista = lista.OrderBy(x => x.Login);
-                    break;
-                default:  // Name ascending 
-                    ViewBag.FirstSortParm = "login_desc";
-                    ViewBag.SecondSortParm = "patrocinador";
-                    lista = lista.OrderBy(x => x.Login);
-                    break;
+                String erro = ex.Message;
+                return View();
             }
-
-            //Numero de linhas por Pagina
-            int PageSize = (NumeroPaginas ?? 5);
-
-            //Caso seja selecionada toda a lista (-1), pega na verdade 1000
-            if (PageSize == -1)
-            {
-                PageSize = 1000;
-            }
-            ViewBag.PageSize = PageSize;
-            ViewBag.CurrentNumeroPaginas = NumeroPaginas;
-
-            //Pagina corrente
-            int PageNumber = (Page ?? 1);
-
-            //DropDown de paginação
-            int intNumeroPaginas = (NumeroPaginas ?? 5);
-
-            #region ViewBags
-
-            ViewBag.UsuarioEntraOutraAba = ConfiguracaoHelper.GetBoolean("USUARIO_ENTRA_OUTRA_ABA");
-
-            ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
-            ViewBag.Associacoes = associacaoRepository.GetAll().ToList();
-            ViewBag.Classificacoes = classificacaoRepository.GetAll().ToList();
-            ViewBag.Produtos = produtoRepository.GetAtivacao();
-            ViewBag.MeioPagamento = meioPagamentoRepository.GetAtivos();
-            ViewBag.Lista = lista;
-
-            #endregion
-
-            return View(lista.ToPagedList(PageNumber, PageSize));
 
         }
+
+
+        public ActionResult PagamentoOK(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraPatrocinador, string ProcuraPatrocinador, int? NumeroPaginas, int? Page)
+        {
+            // return View(usuarios.ToList());
+
+            //Verifica se a msg em popup para ser exibido na view
+            obtemMensagem();
+
+            //Persistencia dos paramentros da tela
+            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
+            objFuncoes.Persistencia(ref SortOrder,
+                                    ref CurrentProcuraLogin,
+                                    ref ProcuraLogin,
+                                    ref CurrentProcuraPatrocinador,
+                                    ref ProcuraPatrocinador,
+                                    ref NumeroPaginas,
+                                    ref Page,
+                                    "Usuarios");
+
+            try
+            {
+
+                objFuncoes = null;
+
+                //List
+                if (String.IsNullOrEmpty(SortOrder))
+                {
+                    ViewBag.CurrentSort = "login";
+                }
+                else
+                {
+                    ViewBag.CurrentSort = SortOrder;
+                }
+
+                if (!(ProcuraLogin != null || ProcuraPatrocinador != null))
+                {
+                    if (ProcuraLogin == null)
+                    {
+                        ProcuraLogin = CurrentProcuraLogin;
+                    }
+                    if (ProcuraPatrocinador == null)
+                    {
+                        ProcuraPatrocinador = CurrentProcuraPatrocinador;
+                    }
+                }
+
+                ViewBag.CurrentProcuraLogin = ProcuraLogin;
+                ViewBag.CurrentProcuraPatrocinador = ProcuraPatrocinador;
+
+                //Obtem lista de usuarioID que informaram o pagamento
+                IEnumerable<Core.Models.TabuleiroInformaramPagtoModel> lista = tabuleiroRepository.ObtemTabuleirosPagos();
+
+                if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
+                {
+                    lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador) &&
+                                           (x.Login.Contains(ProcuraLogin) ||
+                                             x.Nome.Contains(ProcuraLogin) ||
+                                             x.Email.Contains(ProcuraLogin)
+                                           )
+                                        );
+                }
+                else
+                {
+                    if (!String.IsNullOrEmpty(ProcuraLogin))
+                    {
+                        lista = lista.Where(x => x.Login.Contains(ProcuraLogin) ||
+                                                 x.Nome.Contains(ProcuraLogin) ||
+                                                 x.Email.Contains(ProcuraLogin)
+                                           );
+                    }
+                    if (!String.IsNullOrEmpty(ProcuraPatrocinador))
+                    {
+                        lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador));
+                    }
+                }
+
+                switch (SortOrder)
+                {
+                    case "login_desc":
+                        ViewBag.FirstSortParm = "login";
+                        ViewBag.SecondSortParm = "patrocinador";
+                        lista = lista.OrderByDescending(x => x.Login);
+                        break;
+                    case "patrocinador":
+                        ViewBag.FirstSortParm = "login";
+                        ViewBag.SecondSortParm = "patrocinador_desc";
+                        lista = lista.OrderBy(x => x.Patrocinador);
+                        break;
+                    case "patrocinador_desc":
+                        ViewBag.FirstSortParm = "login";
+                        ViewBag.SecondSortParm = "patrocinador";
+
+                        lista = lista.OrderByDescending(x => x.Patrocinador);
+                        break;
+                    case "login":
+                        ViewBag.FirstSortParm = "login_desc";
+                        ViewBag.SecondSortParm = "date";
+
+                        lista = lista.OrderBy(x => x.Login);
+                        break;
+                    default:  // Name ascending 
+                        ViewBag.FirstSortParm = "login_desc";
+                        ViewBag.SecondSortParm = "patrocinador";
+                        lista = lista.OrderBy(x => x.Login);
+                        break;
+                }
+
+                //Numero de linhas por Pagina
+                int PageSize = (NumeroPaginas ?? 5);
+
+                //Caso seja selecionada toda a lista (-1), pega na verdade 1000
+                if (PageSize == -1)
+                {
+                    PageSize = 1000;
+                }
+                ViewBag.PageSize = PageSize;
+                ViewBag.CurrentNumeroPaginas = NumeroPaginas;
+
+                //Pagina corrente
+                int PageNumber = (Page ?? 1);
+
+                //DropDown de paginação
+                int intNumeroPaginas = (NumeroPaginas ?? 5);
+
+                #region ViewBags
+
+                ViewBag.UsuarioEntraOutraAba = ConfiguracaoHelper.GetBoolean("USUARIO_ENTRA_OUTRA_ABA");
+
+                ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
+                ViewBag.Lista = lista;
+
+                #endregion
+
+                return View(lista.ToPagedList(PageNumber, PageSize));
+
+            }
+            catch (Exception ex)
+            {
+                String erro = ex.Message;
+                return View();
+            }
+
+        }
+
 
         [HttpPost]
         public ActionResult FoiPago(string usuarioID, string BoardID)
@@ -1025,7 +1156,7 @@ namespace Sistema.Controllers
                 }
 
                 string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
-                
+
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = retorno,
@@ -1193,7 +1324,7 @@ namespace Sistema.Controllers
             {
                 contaDeposito.IdentificacaoProprietario = contaDeposito.Usuario.Nome;
             }
-            return Json(new { contaDeposito.Agencia, contaDeposito.Conta, contaDeposito.DigitoConta, contaDeposito.IdentificacaoProprietario, contaDeposito.Bitcoin, contaDeposito.Litecoin, contaDeposito.Tether}, JsonRequestBehavior.AllowGet);
+            return Json(new { contaDeposito.Agencia, contaDeposito.Conta, contaDeposito.DigitoConta, contaDeposito.IdentificacaoProprietario, contaDeposito.Bitcoin, contaDeposito.Litecoin, contaDeposito.Tether }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Editar(int id)

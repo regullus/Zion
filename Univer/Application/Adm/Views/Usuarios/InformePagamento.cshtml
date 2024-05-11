@@ -1,4 +1,4 @@
-﻿@model PagedList.IPagedList<Core.Entities.Usuario>
+﻿@model PagedList.IPagedList<Core.Models.TabuleiroInformaramPagtoModel>
 @using PagedList.Mvc;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -270,11 +270,9 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        var associacao = associacoes.FirstOrDefault(a => a.Nivel == item.NivelAssociacao);
-                        var classificacao = classificacoes.FirstOrDefault(c => c.Nivel == item.NivelClassificacao);
                         <tr>
                             <td>
-                                <a class="gridNovo confirmarPagto" data-id="@item.ID" data-board="@item.TipoID" title="@(traducaoHelper["CONFIRMAR_PAGAMENTO"] + " " + item.Nome)"> @traducaoHelper["CONFIRMAR_PAGAMENTO"]</a>
+                                <a class="gridNovo confirmarPagto" data-id="@item.UsuarioID" data-board="@item.BoardID" title="@(traducaoHelper["CONFIRMAR_PAGAMENTO"] + " " + item.Nome)"> @traducaoHelper["CONFIRMAR_PAGAMENTO"]</a>
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Login)
@@ -289,13 +287,13 @@
                                 @Html.DisplayFor(modelItem => item.Celular)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => @traducaoHelper[item.Documento])
+                                @Html.DisplayFor(modelItem => @traducaoHelper[item.Posicao])
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => @traducaoHelper[item.SenhaLegado])
+                                @Html.DisplayFor(modelItem => item.Galaxia)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.PatrocinadorDireto.Nome)
+                                @Html.DisplayFor(modelItem => item.Patrocinador)
                             </td>
                         </tr>
                     }

@@ -272,6 +272,9 @@
             <a href='@Url.Action("InformePagamento", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm purple-soft">
                 <i class="fa fa-money"></i> @traducaoHelper["INFORME_PGTO"]
             </a>
+            <a href='@Url.Action("PagamentoOK", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm green-meadow">
+                <i class="fa fa-money"></i> @traducaoHelper["PAGOS"]
+            </a>
             <label>&nbsp;</label>
         </div>
     </div>

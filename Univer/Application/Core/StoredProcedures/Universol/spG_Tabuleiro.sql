@@ -8,7 +8,7 @@ Create  Proc [dbo].[spG_Tabuleiro]
     @UsuarioID int,
     @UsuarioPaiID int,
     @BoardID int,
-    @Chamada nvarchar(100)
+    @chamada nvarchar(100)
 As
 Begin
     --Necessario para o entity reconhecer retorno de select com tabela temporaria
@@ -131,11 +131,11 @@ Begin
 
 		if(@UsuarioPaiID is null)
 		Begin
-			Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: null BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @Chamada
+			Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: null BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @chamada
 		End
 		Else
 		Begin
-			Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @Chamada
+			Set @log = @log + 'Usuario: ' + TRIM(STR(@UsuarioID)) + ' UsuarioPaiID: ' + TRIM(STR(@UsuarioPaiID)) + ' BoardID: ' + TRIM(STR(@BoardID)) + ' Chamada: ' + @chamada
 		End
 		
 		Set @aux = 0
@@ -164,7 +164,7 @@ Begin
 			) and
 			Master = Coalesce(@UsuarioPaiID, Master) and
 			StatusID = 1 And --Tem que estar ativo no board
-			@Chamada <> 'Completa'
+			@chamada <> 'Completa'
 			
 		--Caso Usuario jah se encontra no tabuleiro, verifica se ele esta em uma lado fechado
 		if(@aux > 0)
@@ -194,11 +194,11 @@ Begin
 		if (@aux > 0)
 		Begin
 			--Regra: Caso usuario jah exista no tabuleiro, nao se pode inclui-lo novamente
-			Set @Historico = '01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @Chamada
-			Set @log = @log +' |01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @Chamada
+			Set @Historico = '01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @chamada
+			Set @log = @log +' |01 usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (0). Chamada: ' + @chamada
 			Set @log = @log + ' |01 jah se encontra no tabuleiro'
 			--Se for um novo convite remove o usuario do redeTabuleiro, para sanar um bug de ele estar no tabuleiro, mas nao estar no Rede.TabuleiroUsuario
-			if(@Chamada='ConviteNew')
+			if(@chamada='ConviteNew')
 			Begin
 				--Verifica se ele realmente nao esta ativo no RedeTabuleiroUsuario
 				Set @log = @log +' |01.1 Verifica se ele realmente nao esta ativo no RedeTabuleiroUsuario'
@@ -348,7 +348,7 @@ Begin
 						tab.BoardID = @BoardID and
 						tab.StatusID = 1 --Tem que estar ativo no board
 					
-					if(@Chamada <> 'Completa')
+					if(@chamada <> 'Completa')
 					Begin
 						--Verifica se #temp tem vagas em algum donator
 						If not exists (
@@ -416,7 +416,7 @@ Begin
 						End
 					End
 
-					if (@Chamada = 'Convite')
+					if (@chamada = 'Convite')
 					Begin
 						--Remove os que o usuario jah possa estar
 						Delete #temp Where CoordinatorDir = @UsuarioID
@@ -440,7 +440,7 @@ Begin
 
 				--Ferifica se usuario jah se encontra no tabuleiro selecionado
 				Set @aux = 0
-				if(@Chamada = 'Convite')
+				if(@chamada = 'Convite')
 				Begin
 					Set @log = @log + '|01.4 Convite'
 					if exists (Select 'OK' From #temp where Master = @UsuarioID) Set @aux = 1
@@ -506,7 +506,7 @@ Begin
 
 						Set @Historico = '01.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 
-						Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'ConviteNew'
+						Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @chamada = 'ConviteNew'
 					End
 					Else
 					Begin
@@ -521,9 +521,9 @@ Begin
 					Begin
 						Set @log = @log + '|05 Temp tem conteudo'
 						--Determina qual a posicao do pai no board
-						if(@Chamada = 'ConviteNew')
+						if(@chamada = 'ConviteNew')
 						Begin
-							Set @log = @log + '|05.1 Chamada=' + @Chamada
+							Set @log = @log + '|05.1 Chamada=' + @chamada
 							Select Top(1)
 								@ID = ID,
 								@MasterID = Master,
@@ -549,7 +549,7 @@ Begin
 						End
 						Else 
 						Begin
-							Set @log = @log + '|05.2 Chamada=' + @Chamada
+							Set @log = @log + '|05.2 Chamada=' + @chamada
 							Select Top(1)
 								@ID = ID,
 								@MasterID = Master,
@@ -650,7 +650,7 @@ Begin
 								Begin
 									Set @log = @log + '|09 eh um donator'
 									--Problemas nenhum pai foi encontrado!
-									Set @Historico = '02 Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') eh um Donator, nao eh possivel adicionar um novo usuario. Chamada: ' + @Chamada
+									Set @Historico = '02 Quando o Pai (' + TRIM(STR(@MasterTabuleiro)) + ') eh um Donator, nao eh possivel adicionar um novo usuario. Chamada: ' + @chamada
 									Set @PosicaoFilho = 'Quando o Pai eh um Donator, nao eh possivel adicionar um novo usuario'
 								End
 								Else 
@@ -669,7 +669,7 @@ Begin
 							Begin
 								Set @log = @log + '|12 Chama a sp novamente recursivo, agora com um pai valido jah que o antigo era um donator'
 								Set @Historico = '09.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
-								Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'Donator'
+								Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @chamada = 'Donator'
 							End
 						End
 					
@@ -750,8 +750,8 @@ Begin
 									)
 							)
 							Begin
-							Set @log = @log + '|21.1 PagoMaster false direita BoardID=' + TRIM(STR(@BoardID)) + ' NasterID=' + TRIM(STR(@MasterID))
-							Set @PagoMasterDireita = 'false'     
+								Set @log = @log + '|21.1 PagoMaster false direita BoardID=' + TRIM(STR(@BoardID)) + ' NasterID=' + TRIM(STR(@MasterID))
+								Set @PagoMasterDireita = 'false'     
 							End
 							Else 
 							Begin
@@ -779,8 +779,33 @@ Begin
 								End
 								Else
 								Begin
-									Set @log = @log + '|22.2 PagoMaster direita false'
-									Set @PagoMasterDireita = 'false'     
+								    if(@count = 0)
+									Begin
+									    --Caso seja zero pode ser que o lado direito já esteja completo, e os usuarios migraram para outra galaxia
+										if Exists(
+											Select 
+												'OK' 
+											From 
+												Rede.Tabuleiro 
+											Where 
+												ID = @ID and 
+												(
+													DonatorDirSup1 is not null and
+													DonatorDirSup2 is not null and
+													DonatorDirInf1 is not null and
+													DonatorDirInf2 is not null
+												)
+										)
+										Begin
+											Set @log = @log + '|22.3 PagoMaster direita true - usuarios migraram para outra galaxia'
+											Set @PagoMasterDireita = 'true'     
+										End
+										Else
+										Begin
+											Set @log = @log + '|22.2 PagoMaster direita false'
+											Set @PagoMasterDireita = 'false'     
+										End
+									End
 								End
 							End
 
@@ -831,13 +856,35 @@ Begin
 								End
 								Else
 								Begin
-									Set @log = @log + '|22.2 PagoMaster esquerda false'
-									Set @PagoMasterEsquerda = 'false'     
+									if(@count = 0)
+									Begin
+									    --Caso seja zero pode ser que o lado esquerdo já esteja completo, e os usuarios migraram para outra galaxia
+										if Exists(
+											Select 
+												'OK' 
+											From 
+												Rede.Tabuleiro 
+											Where 
+												ID = @ID and 
+												(
+													DonatorEsqSup1 is not null and
+													DonatorEsqSup2 is not null and
+													DonatorEsqInf1 is not null and
+													DonatorEsqInf2 is not null
+												)
+										)
+										Begin
+											Set @log = @log + '|22.3 PagoMaster esquerda true - usuarios migraram para outra galaxia'
+											Set @PagoMasterEsquerda = 'true'     
+										End
+										Else
+										Begin
+											Set @log = @log + '|22.2 PagoMaster esquerda false'
+											Set @PagoMasterEsquerda = 'false'     
+										End
+									End
 								End
 							End
-
-							--Verificar se lado esquerdo e lado direito fecharam
-							Set @log = @log + '|13.2 Verificar se lado esquerdo e lado direito fecharam'
 
 							Select
 								@direitaFechada = DireitaFechada,
@@ -847,7 +894,10 @@ Begin
 							Where
 								UsuarioID = @MasterID and
 								BoardID = @BoardID
-						
+							
+							--Verificar se lado esquerdo e lado direito fecharam
+							Set @log = @log + '|13.2 Verificar se lado esquerdo e lado direito fecharam direitaFechada=' + TRIM(STR(@direitaFechada)) + ' esquerdaFechada=' + TRIM(STR(@esquerdaFechada)) + ' chamada=' + @chamada
+
 							--**************** Verifica se o tabuleiro esta completo na Direita **************** 
 							if(
 								@MasterID is not null And 
@@ -860,7 +910,7 @@ Begin
 								@DonatorDirInf2 is not null And 
 								@PosicaoPai <> 'Donator' and
 								@PagoMasterDireita = 'true' and
-								@Chamada = 'Completa'
+								@chamada = 'Completa'
 							) 
 							--Tabuleiro completo DITEITA
 							Begin
@@ -1095,7 +1145,7 @@ Begin
 								@DonatorEsqInf2 is not null And
 								@PosicaoPai <> 'Donator' and
 								@PagoMasterEsquerda = 'true' and
-								@Chamada = 'Completa'
+								@chamada = 'Completa'
 							) 
 							--Tabuleiro completo ESQUERDA
 							Begin
@@ -1384,7 +1434,7 @@ Begin
 							Else
 							--Tabuleiro incompleto
 							Begin
-								if(@Chamada <> 'Completa')
+								if(@chamada <> 'Completa')
 								Begin
 									Set @log = @log + '|34 TABULEIRO INCOMPLETO'
 									--Verifica se tabuleiro possui posicoes livres
@@ -3013,7 +3063,7 @@ Begin
 								Else 
 								Begin
 									Set @log = @log + '|49 nao completou o tabuleiro ainda'
-									Set @Historico = '07 - Check Completa false: chamada:' + @Chamada
+									Set @Historico = '07 - Check Completa false: chamada:' + @chamada
 								End
 							End
 
@@ -3045,13 +3095,10 @@ Begin
 										PagoSistema = 'true' --Caso jah esteja no board superior)
 								)
 								Begin
-									--Sobe para proximo Board
-									Set @BoardID = @BoardID + 1
-
-									Set @log = @log + '|50.1 jah teve 4 pagamentos, verifica se ja esta em nivel superior: MasterID=' + TRIM(STR(@MasterID)) + ' BoardID=' + TRIM(STR(@BoardID))
+									Set @log = @log + '|50.1 jah teve 4 pagamentos, verifica se ja esta em nivel superior: MasterID=' + TRIM(STR(@MasterID)) + ' BoardID=' + TRIM(STR(@BoardID + 1))
 
 									--Verifica se ainda ha board acima do master
-									IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID)
+									IF Not Exists (Select 'Existe' From Rede.TabuleiroBoard Where ID = @BoardID + 1)
 									Begin
 										Set @log = @log + '|50.2 Sem board Superior'
 										--Caso nao haja mais board superiores volta ao inicio
@@ -3066,7 +3113,7 @@ Begin
 											Rede.TabuleiroUsuario 
 										Where 
 											UsuarioID = @MasterID and 
-											BoardID = @BoardID and
+											BoardID = @BoardID + 1 and
 											StatusID in (1,2) --Caso jah esteja no board superior
 									)	
 									Begin
@@ -3079,7 +3126,7 @@ Begin
 											DataInicio = GetDate()
 										Where 
 											UsuarioID = @MasterID and 
-											BoardID = @BoardID and
+											BoardID = @BoardID + 1 and
 											StatusID = 0 --nao esta no boardSuperior
 									End
 									Else
@@ -3101,7 +3148,7 @@ Begin
 					Else 
 					Begin
 						Set @log = @log + '|5.1 #temp nao tem conteudo'
-						if(@Chamada <> 'Completa')
+						if(@chamada <> 'Completa')
 						Begin
 							--Caso nao exista o tabuleiro com o board informado
 							Set @log = @log + '|37 Caso nao exista o tabuleiro com o board informado'
@@ -3124,14 +3171,14 @@ Begin
 								if(@MasterTabuleiro is null)
 								Begin
 									Set @log = @log + '|39 Master eh null - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
-									Set @Historico = '05 usuario pai (' + TRIM(STR(@MasterTabuleiro)) + ') nao existe! Chamada: ' + @Chamada + ' - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
+									Set @Historico = '05 usuario pai (' + TRIM(STR(@MasterTabuleiro)) + ') nao existe! Chamada: ' + @chamada + ' - Muito improvavel que entre aqui, essa rotina esta aqui por consistencia!'
 								End
 								Else
 								Begin
 									Set @log = @log + '|40 Chama novamente essa sp recursivo UsuarioID: ' + TRIM(STR(@UsuarioID)) + ' Master: ' + TRIM(STR(@MasterTabuleiro)) + ' BoardID: ' + TRIM(STR(@BoardID))
 									--Chama novamente essa sp, agora com um pai valido
 									Set @Historico = '09.1 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
-									--Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @Chamada = 'PaiValido'
+									--Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @chamada = 'PaiValido'
 								End
 							End
 							Else
@@ -3146,10 +3193,228 @@ Begin
 			Else
 			Begin
 				Set @log = @log + '|43 Usuario nao cadastrado'
-				Set @Historico = '06 Novo usuario ' + TRIM(STR(@UsuarioID)) + ' nao esta cadastrado! Chamada: ' + @Chamada
+				Set @Historico = '06 Novo usuario ' + TRIM(STR(@UsuarioID)) + ' nao esta cadastrado! Chamada: ' + @chamada
+			End
+		End
+
+		--Verifica se há donators no Rede.Tabuleiro que não esteja no Rede.TabuleiroUsuario (usuarios duplicados no tabuleiro?!)
+		--Não estando Remove o usuario em questão do Rede.Tabuleiro
+		Select 
+			@DonatorEsqSup1 = DonatorEsqSup1,
+			@DonatorEsqSup2 = DonatorEsqSup2, 
+			@DonatorEsqInf1 = DonatorEsqInf1, 
+			@DonatorEsqInf2 = DonatorEsqInf2,
+			@DonatorDirSup1 = DonatorDirSup1,
+			@DonatorDirSup2 = DonatorDirSup2, 
+			@DonatorDirInf1 = DonatorDirInf1, 
+			@DonatorDirInf2 = DonatorDirInf2
+		From 
+			Rede.Tabuleiro 
+		Where 
+			ID = @ID
+		
+		--*****************************ESQUERDA*******************************
+		if(@esquerdaFechada = 'false')
+		Begin
+			if(@DonatorEsqSup1 is not null)
+			Begin
+				--DonatorEsqSup1
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorEsqSup1 and
+						Posicao = 'DonatorEsqSup1'
+				)
+				Begin
+					Set @log = @log + '|70.1 Removido DonatorEsqSup1=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorEsqSup1 = null
+					Where
+						ID=@ID
+				End
+			End
+			if(@DonatorEsqSup2 is not null)
+			Begin
+				--DonatorEsqSup2
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorEsqSup2 and
+						Posicao = 'DonatorEsqSup2'
+				)
+				Begin
+					Set @log = @log + '|70.2 Removido DonatorEsqSup2=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorEsqSup2 = null
+					Where
+						ID=@ID
+				End
+			End
+			if(@DonatorEsqInf1 is not null)
+			Begin
+				--DonatorEsqInf1
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorEsqInf1 and
+						Posicao = 'DonatorEsqInf1'
+				)
+				Begin
+					Set @log = @log + '|70.3 Removido DonatorEsqInf1=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorEsqInf1 = null
+					Where
+						ID=@ID
+				End
+			End
+			if(@DonatorEsqInf2 is not null)
+			Begin
+				--DonatorEsqInf2
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorEsqInf2 and
+						Posicao = 'DonatorEsqInf2'
+				)
+				Begin
+					Set @log = @log + '|70.2 Removido DonatorEsqInf2=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorEsqInf2 = null
+					Where
+						ID=@ID
+				End
 			End
 		End
 		
+		--*****************************DIREITA*******************************
+		if(@direitaFechada = 'false')
+		Begin
+			if(@DonatorDirSup1 is not null)
+			Begin
+				--DonatorDirSup1
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorDirSup1 and
+						Posicao = 'DonatorDirSup1'
+				)
+				Begin
+					Set @log = @log + '|70.1 Removido DonatorDirSup1=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorDirSup1 = null
+					Where
+						ID=@ID
+				End
+			End
+			if(@DonatorDirSup2 is not null)
+			Begin
+				--DonatorDirSup2
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorDirSup2 and
+						Posicao = 'DonatorDirSup2'
+				)
+				Begin
+					Set @log = @log + '|70.2 Removido DonatorDirSup2=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorDirSup2 = null
+					Where
+						ID=@ID
+				End
+			End
+			if(@DonatorDirInf1 is not null)
+			Begin
+				--DonatorDirInf1
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorDirInf1 and
+						Posicao = 'DonatorDirInf1'
+				)
+				Begin
+					Set @log = @log + '|70.3 Removido DonatorDirInf1=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorDirInf1 = null
+					Where
+						ID=@ID
+				End
+			End
+			if(@DonatorDirInf2 is not null)
+			Begin
+				--DonatorDirInf2
+				if not Exists (
+					Select
+						'OK'
+					From
+						Rede.TabuleiroUsuario
+					Where
+						MasterID = @MasterID and
+						BoardID = @BoardID and
+						UsuarioId = @DonatorDirInf2 and
+						Posicao = 'DonatorDirInf2'
+				)
+				Begin
+					Set @log = @log + '|70.2 Removido DonatorDirInf2=' + TRIM(STR(@UsuarioID)) + ' do tabuleiro=' + TRIM(STR(@ID)) + ' pois não estava no TabuleiroUsuario BoardID=' + TRIM(STR(@BoardID)) + ' no MasterID='+ TRIM(STR(@MasterID))
+					Update
+						Rede.Tabuleiro
+					Set
+						DonatorDirInf2 = null
+					Where
+						ID=@ID
+				End
+			End		
+		End
+
 		Declare 
 			@NomeUsuario nvarchar(255),
 			@NomePai nvarchar(255),
@@ -3201,14 +3466,14 @@ Begin
 			Coalesce(@PosicaoNova,@PosicaoNova,'Sem posicao Nova') as PosicaoNova,
 			Coalesce(@TabuleiroIDAntigo,@TabuleiroIDAntigo,0) as TabuleiroIDAntigo,
 			Coalesce(@TabuleiroIDNovo,@TabuleiroIDNovo,0) as TabuleiroIDNovo,
-			@Chamada as Chamada,
+			@chamada as Chamada,
 			format(getdate(),'dd/MM/yyyy HH:mm:ss') as Data,
 			Coalesce(@Historico,@Historico,'Sem  Dados') as Historico,
 			Coalesce(@log,@log,'Sem Dados') as [log]
 			
 		if(@Historico is null or @Historico = '')
 		Begin
-			if(@Chamada <> 'PaiValido')
+			if(@chamada <> 'PaiValido')
 			Begin
 				Select 
 					'OK' as Retorno, 
@@ -3224,7 +3489,7 @@ Begin
 		End
 		Else
 		Begin
-			if(@Chamada <> 'PaiValido')
+			if(@chamada <> 'PaiValido')
 			Begin
 				Select 
 					'NOOK' as Retorno, 
@@ -3271,7 +3536,7 @@ go
 /*
 Begin Tran
 
-Exec spG_Tabuleiro @UsuarioID=2739,@UsuarioPaiID=2602,@BoardID=1,@Chamada='Completa'
+Exec spG_Tabuleiro @UsuarioID=2593,@UsuarioPaiID=2593,@BoardID=1,@Chamada='Completa'
 
 Select * from  Rede.TabuleiroLog order by id desc
 

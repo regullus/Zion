@@ -19,6 +19,14 @@ BEGIN
 
 	Create Table #temp (
 		UsuarioID int,
+        Nome nvarchar(255),
+        Login nvarchar(255),
+        Apelido nvarchar(255),
+        Email nvarchar(255),
+        Celular nvarchar(255),
+        Posicao nvarchar(100),
+        Galaxia nvarchar(255),
+        Patrocinador nvarchar(255),
 		TabuleiroID int,
 		BoardID int,
 		BoardNome nvarchar(50),
@@ -29,7 +37,6 @@ BEGIN
 		InformePag bit,
 		UsuarioIDPag int, --*
 		Ciclo int,
-		Posicao nvarchar(100),
 		PagoMaster bit,
 		PagoSistema bit, --*
 		InformePagSistema bit,
@@ -41,6 +48,14 @@ BEGIN
 	insert into #temp
 	Select 
 		tab.UsuarioID,
+        '' Nome,
+        '' Login,
+        '' Apelido,
+        '' Email,
+        '' Celular,
+        tab.Posicao,
+        Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+        '' Patrocinador,
 		tab.TabuleiroID,
 		tab.BoardID,
 		tb.Nome as BoardNome,
@@ -51,7 +66,6 @@ BEGIN
 		tab.InformePag,
 		tab.UsuarioIDPag,
 		tab.Ciclo,
-		tab.Posicao,
 		tab.PagoMaster,
 		tab.PagoSistema,
 		tab.InformePagSistema,
@@ -69,8 +83,39 @@ BEGIN
 		tab.BoardID,
 		tab.UsuarioID
 
+    Update
+        tmp
+    Set
+        Patrocinador = usu.apelido
+    From
+        #temp tmp,
+        Usuario.Usuario usu
+    Where
+        tmp.MasterID = usu.id
+
+    Update
+        tmp
+    Set
+        Nome = usu.nome,
+        Login = usu.Login,
+        Apelido = usu.Apelido,
+        Email = usu.Email,
+        Celular = usu.Celular
+    From
+        #temp tmp,
+        Usuario.Usuario usu
+    Where
+        tmp.UsuarioID = usu.id
+
 	Select 
 		UsuarioID,
+        Nome,
+        Login,
+        Email,
+        Celular,
+        Posicao,
+        Galaxia,
+        Patrocinador,
 		TabuleiroID,
 		BoardID,
 		BoardNome,
@@ -81,7 +126,6 @@ BEGIN
 		InformePag,
 		UsuarioIDPag,
 		Ciclo,
-		Posicao,
 		PagoMaster,
 		PagoSistema,
 		InformePagSistema,

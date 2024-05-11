@@ -125,9 +125,7 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroIndicados To public
 go
-
-Exec spC_TabuleiroIndicados @UsuarioID=2580
-
+--Exec spC_TabuleiroIndicados @UsuarioID=2580
 
 
 
