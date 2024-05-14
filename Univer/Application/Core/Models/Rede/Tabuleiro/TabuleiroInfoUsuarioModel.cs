@@ -14,6 +14,10 @@ namespace Core.Models
         public string Celular { get; set; }
         public string Pix { get; set; }
         public string Carteira { get; set; }
+        public int PatrocinadorID { get; set; }
+        public string Patrocinador { get; set; }
+        public string PatrocinadorApelido { get; set; }
+        public string PatrocinadorCelular { get; set; }
         public bool ConfirmarRecebimento { get; set; }
         public string Observacao { get; set; }
     }

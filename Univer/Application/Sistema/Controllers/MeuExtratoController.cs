@@ -129,30 +129,13 @@ namespace Sistema.Controllers
             var contas = contaRepository.GetByAtiva();
 
             ArrayList contasLancamentos = new ArrayList();
-            foreach(var conta in contas)
+            foreach (var conta in contas)
             {
-                var lancamentos = usuario.Lancamento.Where(l => l.ContaID == conta.ID); 
+                var lancamentos = usuario.Lancamento.Where(l => l.ContaID == conta.ID);
                 contasLancamentos.Add(lancamentos);
             }
-
             ViewBag.Contas = contas;
             ViewBag.Contaslancamentos = contasLancamentos;
-
-            //if (ConfiguracaoHelper.GetBoolean("SALDO_DIVIDIDO"))
-            //{
-            //    ViewBag.SaquesContaRentabilidade = usuario.Lancamento.Where(l => l.ContaID == (int)Conta.Contas.Rentabilidade && l.TipoID != (int)Lancamento.Tipos.Compra).GroupBy(l => l.Conta);
-            //    ViewBag.ContasBonusDiario = usuario.Lancamento.Where(l => l.ContaID == (int)Conta.Contas.Bonus && l.TipoID != (int)Lancamento.Tipos.Compra).GroupBy(l => l.Conta);
-            //    ViewBag.SaquesContaBonus = new List<IGrouping<Conta, Lancamento>>();
-            //    ViewBag.ExibeSaldoBonusDiario = true;
-            //}
-            //else
-            //{
-            //    ViewBag.SaquesContaRentabilidade = usuario.Lancamento.Where(l => l.ContaID == (int)Conta.Contas.Rentabilidade && l.TipoID != (int)Lancamento.Tipos.Compra).GroupBy(l => l.Conta);
-            //    ViewBag.SaquesContaBonus = usuario.Lancamento.Where(l => l.ContaID == (int)Conta.Contas.Bonus && l.TipoID != (int)Lancamento.Tipos.Compra).GroupBy(l => l.Conta);
-            //    ViewBag.ContasBonusDiario = new List<IGrouping<Conta, Lancamento>>();
-            //    ViewBag.ExibeSaldoBonusDiario = false;
-            //}
-            //ViewBag.ExibePontos = ConfiguracaoHelper.GetBoolean("UTILIZA_PONTOS");
 
             return View();
         }

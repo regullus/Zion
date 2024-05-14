@@ -351,6 +351,7 @@
     <Compile Include="Controllers\DadosBasicos\TraducoesController.cs" />
     <Compile Include="Controllers\Erro\ErrorController.cs" />
     <Compile Include="Controllers\DadosBasicos\MoedaCotacoesController.cs" />
+    <Compile Include="Controllers\ExtratoController.cs" />
     <Compile Include="Controllers\MovimentacoesController.cs" />
     <Compile Include="Controllers\PedidosController.cs" />
     <Compile Include="Controllers\Perfil\AccountController.cs">
@@ -8325,6 +8326,7 @@
     <Content Include="Views\Relatorios\VendasComposicao.cshtml" />
     <Content Include="Views\Usuarios\InformePagamento.cshtml" />
     <Content Include="Views\Usuarios\PagamentoOK.cshtml" />
+    <Content Include="Views\Extrato\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

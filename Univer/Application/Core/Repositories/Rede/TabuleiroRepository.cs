@@ -325,6 +325,14 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public int ObtemUsuarioIDPag(int idUsuario, int idBoard)
+        {
+            string sql = "Exec spC_TabuleiroObtemUsuarioIDPag @UsuarioID=" + idUsuario + ",@BoardID=" + idBoard;
+            var ret = _context.Database.SqlQuery<int>(sql).FirstOrDefault();
+            int retorno = ret;
+            return retorno;
+        }
+
         public string MasterRuleOK(int idUsuario, int idBoard)
         {
             string sql = "Exec spC_TabuleiroMasterRule @UsuarioID=" + idUsuario + ", @BoardID=" + idBoard;
@@ -354,6 +362,13 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public TabuleiroBoardModel ObtemTabuleiroBoardID(int idBoard)
+        {
+            string sql = "Exec spC_TabuleiroBoardID @BoardID=" + idBoard;
+            var retorno = _context.Database.SqlQuery<TabuleiroBoardModel>(sql).FirstOrDefault();
+
+            return retorno;
+        }
         public string TabuleiroSair(int idUsuario, int idBoard)
         {
 
@@ -440,5 +455,14 @@ namespace Core.Repositories.Rede
             
             return tabuleiroIndicados;
         }
+
+        public DateTime TabuleiroGetDate()
+        {
+            string sql = "Exec spC_TabuleiroGetDate";
+            var ret = _context.Database.SqlQuery<DateTime>(sql).FirstOrDefault();
+            
+            return ret;
+        }
+
     }
 }

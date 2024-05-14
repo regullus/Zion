@@ -135,6 +135,14 @@
             {
                 <text>toastr.error('@ViewBag.InfoUsuario');</text>
             }
+            @if(ViewBag.TimerConvite)
+            {
+                <text>toastr.error('@traducaoHelper["MENSAGEM_TEMPO_CONVITE"]');</text>
+            }
+            @if(ViewBag.TimerPagamento)
+            {
+                <text>toastr.error('@traducaoHelper["MENSAGEM_TEMPO_PAGAMENTO"]');</text>
+            }
         });
 
         function widthResizer() {
@@ -254,6 +262,7 @@
     @if (tabuleiro != null)
     {
         <script>
+
         function position() {
             width = window.innerWidth;
 
@@ -721,7 +730,9 @@
                                 $("#infoApelido").html(data.Apelido);
                                 $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
-
+                                $("#infoID").html(data.UsuarioID);
+                                $("#infoID").val(data.UsuarioID);
+                                
                                 if (data.Nome == 'System') {
                                     if (data.Observacao != null && data.Observacao.toString() != '') {
                                         $('#infoObs').html(data.Observacao.toString());
@@ -733,9 +744,11 @@
                                     } else {
                                         $(".reportPaymentSystem").show();
                                     }
+                                    $(".panelPatrocinador").hide();
                                 } else {
                                     $('#infoObs').html('');
                                     $(".reportPaymentSystem").hide();
+                                    $(".panelPatrocinador").show();
                                 }
 
                                 if (data.Pix) {
@@ -757,6 +770,23 @@
                                     $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
                                 }
 
+                                if (data.Patrocinador != null || data.Patrocinador != '') {
+                                    $("#patrocinadorNome").html(data.Patrocinador);
+                                    $("#patrocinadorNomeHeader").show();
+                                    $("#patrocinadorNome").show();
+
+                                    $("#patrocinadorApelido").html(data.PatrocinadorApelido);
+                                    $("#patrocinadorApelidoHeader").show();
+                                    $("#patrocinadorApelido").show();
+
+                                    $("#patrocinadorCelular").html(data.PatrocinadorCelular);
+                                    $("#patrocinadorCelularHeader").show();
+                                    $("#patrocinadorCelular").show();
+                                } else {
+                                    $(".panelPatrocinador").hide();
+                                    $("#patrocinadorNomeHeader").html('@traducaoHelper["SEM_DADOS"]');
+                                }
+
                                 if ($('#Master').attr("data-id") == @idUsuario) {
                                     $(".panelCripto").hide();
                                 }
@@ -768,8 +798,6 @@
                                     $(".reportReceipt").hide();
                                     $(".deleteUser").hide();
                                 }
-
-                                //$(".reportPaymentSystem").hide();
 
                                 $('#modDados').modal('show');
                             }
@@ -971,6 +999,23 @@
                         } else {
                             $(".panelCripto").hide();
                             $("#CriptoHeader").html('@traducaoHelper["CARTEIRA_NAO_CADASTRADA"]');
+                        }
+
+                        if (data.Patrocinador != null || data.Patrocinador != '') {
+                            $("#patrocinadorNome").html(data.Patrocinador);
+                            $("#patrocinadorNomeHeader").show();
+                            $("#patrocinadorNome").show();
+
+                            $("#patrocinadorApelido").html(data.PatrocinadorApelido);
+                            $("#patrocinadorApelidoHeader").show();
+                            $("#patrocinadorApelido").show();
+
+                            $("#patrocinadorCelular").html(data.PatrocinadorCelular);
+                            $("#patrocinadorCelularHeader").show();
+                            $("#patrocinadorCelular").show();
+                        } else {
+                            $(".panelPatrocinador").hide();
+                            $("#patrocinadorNomeHeader").html('@traducaoHelper["SEM_DADOS"]');
                         }
 
                         if ($('#Master').attr("data-id") == @idUsuario) {
@@ -1516,7 +1561,7 @@ else
     <div class="portlet solid grey-cararra" style="max-width: 1600px;">
         <div class="portlet-body">
             <div class="page-head">
-                <h2>@traducaoHelper["ENTRE_TABULEIRO"]</h2>
+                <h2>@traducaoHelper["OOPS"]</h2>
             </div>
         </div>
     </div>
@@ -1628,34 +1673,55 @@ else
                         <h4 style="font-weight: 500;" id="infoCelular"></h4>
                         <h5 style="font-weight: 500; color: darkred;" id="infoObs"></h5>
                         <input type="hidden" id="infoID" />
-                        <div class="panel-group accordion" id="accordion1" style="padding-top: 20px;">
+                        <div class="panel-group accordion" id="accordion3">
+
                             <div class="panel panel-default panelPix">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
-                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion1" href="#collapse_1"> @traducaoHelper["DADOS_PAGAMENTE_PIX"] </a>
+                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_1">@traducaoHelper["DADOS_PAGAMENTE_PIX"]</a>
                                     </h4>
                                 </div>
-                                <div id="collapse_1" class="panel-collapse">
-                                    <div class="panel-body" style="overflow-y:auto; background-color: #eee;">
+                                <div id="collapse_3_1" class="panel-collapse in">
+                                    <div class="panel-body" style="background-color: #eee;">
                                         <h3 style="font-weight: 500;" id="PixHeader">@(traducaoHelper["PIX"])</h3>
                                         <h4 id="PixCode" style="font-weight: 500;"></h4>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="panel panel-default panelCripto">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
-                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion1" href="#collapse_2"> @traducaoHelper["DADOS_PAGAMENTE_USDT"] </a>
+                                        <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_2"> @traducaoHelper["DADOS_PAGAMENTE_USDT"] </a>
                                     </h4>
                                 </div>
-                                <div id="collapse_2" class="panel-collapse">
-                                    <div class="panel-body" style="overflow-y:auto; background-color: #eee;">
+                                <div id="collapse_3_2" class="panel-collapse collapse">
+                                    <div class="panel-body" style="background-color: #eee;">
                                         <h3 style="font-weight: 500;" id="CriptoHeader">@(traducaoHelper["CARTEIRA"])</h3>
                                         <h4 id="CriptoCode" style="font-weight: 500;"></h4>
                                         @*<img id="qrCode" class="center" src="" />*@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="panel panel-default panelPatrocinador">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_3"> @traducaoHelper["PATROCINADOR"] </a>
+                                    </h4>
+                                </div>
+                                <div id="collapse_3_3" class="panel-collapse collapse">
+                                    <div class="panel-body" style="background-color: #eee;">
+                                        <h3 style="font-weight: 500;" id="patrocinadorNomeHeader">@(traducaoHelper["NOME"])</h3>
+                                        <h4 id="patrocinadorNome" style="font-weight: 500;"></h4>
+                                        <h3 style="font-weight: 500;" id="patrocinadorApelidoHeader">@(traducaoHelper["APELIDO"])</h3>
+                                        <h4 id="patrocinadorApelido" style="font-weight: 500;"></h4>
+                                        <h3 style="font-weight: 500;" id="patrocinadorCelularHeader">@(traducaoHelper["CELULAR"])</h3>
+                                        <h4 id="patrocinadorCelular" style="font-weight: 500;"></h4>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -1667,7 +1733,15 @@ else
                 }
                 <button data-dismiss="modal" class="btn btn-circle red-flamingo deleteUser">@(traducaoHelper["EXCLUIR"])</button>
                 <button data-dismiss="modal" class="btn btn-success btn-circle reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
-                <button data-dismiss="modal" class="btn btn-success btn-circle reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
+                @if (ViewBag.PagarInforme)
+                {
+                    <button data-dismiss="modal" class="btn btn-success btn-circle reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
+                }
+                else
+                {
+                    <h4 style="font-weight: 500;" id="patrocinadorApelidoHeader">@(traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"])</h4>
+                }
+
                 <button data-dismiss="modal" class="btn btn-info btn-circle">@(traducaoHelper["SAIR"])</button>
             </div>
         </div>

@@ -243,11 +243,21 @@
             }
         }
 
+        $('#pais').on('change', function () {
+            var currentVal = $(this).val();
+            localStorage.setItem('selectVal', currentVal);
+        });
+
     </script>
 
     <script type="text/javascript">
         //Read
         $(document).ready(function () {
+
+            if (localStorage.selectVal) {
+                // Select the value stored
+                $('#pais').val(localStorage.selectVal);
+            }
 
             $('#Busca').keyup(function (e) {
             var code = e.which;
@@ -738,7 +748,7 @@
                                     <div class="row well bg-grey-cararra margem-5">
 
                                         <div class="form-group form-md-line-input has-info">
-                                            <select class="form-control dropone" name="pais" onchange="form.submit()">
+                                            <select class="form-control dropone" name="pais" id="pais" onchange="form.submit()">
                                                 @foreach (var _pais in paises)
                                                 {
                                                     <option value="@_pais.ID" @Html.Raw(_pais.Sigla == pais.Sigla ? "selected=\"selected\"" : "")>@_pais.Nome</option>

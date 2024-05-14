@@ -641,6 +641,11 @@ namespace Sistema.Controllers
                     lstMensagem.Add(traducaoHelper["LOGIN"] + ": " + traducaoHelper["MINIMO_3_CARACTERES"]);
                 }
             }
+            //Login somente letras e numeros
+            if (!Regex.IsMatch(strLogin, @"^[a-zA-Z0-9]+$"))
+            {
+                lstMensagem.Add(traducaoHelper["LOGIN_LETRAS_NUMERO"]);
+            }
 
             //Data
             if (String.IsNullOrEmpty(strDataNascimento))

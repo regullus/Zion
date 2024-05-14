@@ -453,6 +453,10 @@ namespace Sistema.Controllers
             ViewBag.InfoUsuario = "";
             ViewBag.HaConvite = "";
             ViewBag.TotalRecebimento = 0;
+            ViewBag.TimerConvite = false;
+            ViewBag.TimerPagamento = false;
+            ViewBag.Pagar = false;
+            ViewBag.PagarInforme = false;
 
             int idTabuleiro = idTab ?? 0;
 
@@ -602,11 +606,13 @@ namespace Sistema.Controllers
 
                             DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
 
+                            ViewBag.TimerPagamento = false;
                             if (timePagamentoMin > DateTime.Now)
                             {
                                 //Format: '03/30/2024 17:59:00'
-                                ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin).ToString("MM/dd/yyyy HH:mm:ss");
+                                ViewBag.Timer = timePagamentoMin.ToString("MM/dd/yyyy HH:mm:ss");
                                 ViewBag.ShowReportPayment = true;
+                                ViewBag.TimerPagamento = true;
                             }
 
                             //Convidado tem até 1h para pagar
@@ -624,17 +630,26 @@ namespace Sistema.Controllers
                     ViewBag.tabuleiroName = tabuleiroUsuario.BoardNome.Substring(0, 3).ToUpper() + "-" + tabuleiro.ID.ToString("000000");
 
                     //Verifica se usuario tem que pagar ou não o sistema
-                    if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.InformePagSistema)
+                    if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema)
                     {
                         ViewBag.Pagar = true;
                     }
                     else
                     {
+                        ViewBag.Pagar = false;
+                    }
+
+                    if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.InformePagSistema)
+                    {
+                        ViewBag.PagarInforme = true;
+                    }
+                    else
+                    {
+                        ViewBag.PagarInforme = false;
                         if (usuario.ID == tabuleiro.Master && !tabuleiroUsuario.PagoSistema && tabuleiro.StatusID == 2)
                         {
                             ViewBag.InfoUsuario = traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"];
                         }
-                        ViewBag.Pagar = false;
                     }
                 }
                 else
@@ -647,7 +662,7 @@ namespace Sistema.Controllers
                         tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosUsuario(idPai);
                         tabuleiroUsuario = tabuleirosUsuario.FirstOrDefault();
                         //Verifica se pai ainda esta no Mercurio
-                        if (tabuleiroUsuario != null && tabuleiroUsuario.BoardID == 1)
+                        if (tabuleiroUsuario != null && tabuleiroUsuario.BoardID == 1 && tabuleiroUsuario.TabuleiroID != null)
                         {
                             idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
                             //Ok carrega tabuleiro
@@ -812,12 +827,20 @@ namespace Sistema.Controllers
                         tempoMax = 60;
                     }
 
-                    DateTime timePagamentoMin = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
+                    ViewBag.TimerConvite = false;
+                    DateTime dataCheck = DateTime.Now;
 
-                    if (timePagamentoMin > DateTime.Now)
+                    TabuleiroUsuarioModel tabuleiroConvite = tabuleirosUsuario.Where(x => x.StatusID == 2).FirstOrDefault();
+                    if (tabuleiroConvite != null)
                     {
-                        //Format: '03/30/2024 17:59:00'
-                        ViewBag.Timer = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin).ToString("MM/dd/yyyy HH:mm:ss");
+                        DateTime timePagamentoMin = tabuleiroConvite.DataInicio.AddMinutes(tempoMin);
+
+                        if (timePagamentoMin > dataCheck)
+                        {
+                            //Format: '03/30/2024 17:59:00'
+                            ViewBag.Timer = timePagamentoMin.ToString("MM/dd/yyyy HH:mm:ss");
+                            ViewBag.TimerConvite = true;
+                        }
                     }
                 }
 
@@ -945,12 +968,6 @@ namespace Sistema.Controllers
                         DateTime timePagamento = tabuleiroUsuario.DataInicio.AddMinutes(tempoMin);
                         timePagamento = tabuleiroUsuario.DataInicio.AddMinutes(tempoMax);
 
-                        //Se estiver no prazo, master pode confirmar recebimento
-                        //Removido, pois job vai retirar o usuario do tabuleiro
-                        //if (timePagamento > DateTime.Now)
-                        //{
-                        //    obtemInfoUsuario.ConfirmarRecebimento = true;
-                        //}
                         obtemInfoUsuario.ConfirmarRecebimento = true;
                     }
 
@@ -1342,6 +1359,8 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            string retorno = "";
+
             try
             {
                 int idUsuario = int.Parse(usuarioID);
@@ -1377,24 +1396,55 @@ namespace Sistema.Controllers
 
                 int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
 
-                //Informar Pagamento
-                string retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idBoard, idUsuarioPag);
-                switch (retorno)
+                //Verifica se é realmente o master do tabuleiro
+                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                bool masterIDValido = false;
+                if (tabuleiroUsuario.MasterID == idUsuarioPag || idUsuarioPag == 2000)
                 {
-                    case "OK":
-                        string[] strMensagem = new string[] { traducaoHelper["PAGAMENTO_INFORMADO_COM_SUCESSO"], traducaoHelper["ALVO_1H_DAR_ACEITE"] };
-                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                        break;
-                    case "NOOK":
-                        string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
-                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
-                    default:
-                        string[] strMensagemParam5 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
-                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
+                    masterIDValido = true;
                 }
 
+                if (masterIDValido)
+                {
+                    //Verifica se master esta ok
+                    if (idUsuarioPag != 2000)
+                    {
+                        //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
+                        if (tabuleiroRepository.MasterRuleOK(idUsuarioPag, idBoard) != "OK")
+                        {
+                            //Não estando ok, a conta do sistema é usada para pagamento
+                            idUsuarioPag = 2000;
+                        }
+                        //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
+                        if (tabuleiroRepository.MasterIndicadosOK(idUsuarioPag, idBoard) != "OK")
+                        {
+                            //Não estando ok, a conta do sistema é usada para pagamento
+                            idUsuarioPag = 2000;
+                        }
+                    }
+
+                    //Informar Pagamento
+                    retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idBoard, idUsuarioPag);
+                    switch (retorno)
+                    {
+                        case "OK":
+                            string[] strMensagem = new string[] { traducaoHelper["PAGAMENTO_INFORMADO_COM_SUCESSO"], traducaoHelper["ALVO_1H_DAR_ACEITE"] };
+                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                            break;
+                        case "NOOK":
+                            string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
+                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
+                        default:
+                            string[] strMensagemParam5 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
+                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
+                    }
+                }
+                else
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_03");
+                }
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = retorno,
@@ -1458,91 +1508,124 @@ namespace Sistema.Controllers
                 }
 
                 int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
-                //Informar Recebimento
-                string retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuario, idBoard);
-                switch (retorno)
+                int idUsuarioPag = tabuleiroRepository.ObtemUsuarioIDPag(idUsuarioConvidado, idBoard);
+
+                //Verifica se é realmente o master do tabuleiro
+                TabuleiroUsuarioModel tabuleiroUsuarioCheck = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+
+                bool masterIDValido = false;
+                if (tabuleiroUsuarioCheck.MasterID == idUsuarioPag || idUsuarioPag == 2000)
                 {
-                    case "OK":
-
-                        TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
-                        Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
-                        TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
-
-                        //Pega quem recebeu o MAster ou o Siustema
-                        if (tabuleiroUsuario != null)
-                        {
-                            idUsuario = tabuleiroUsuario.UsuarioIDPag ?? idUsuario;
-                        }
-
-                        //Efetuar Credito no Master
-                        var lancamento = new Lancamento();
-                        lancamento.UsuarioID = idUsuario;
-                        lancamento.Tipo = Lancamento.Tipos.Credito;
-                        lancamento.ReferenciaID = lancamento.UsuarioID;
-                        lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome], " - ", usuarioConvidado.Nome);
-                        lancamento.DataLancamento = App.DateTimeZion;
-                        lancamento.DataCriacao = App.DateTimeZion;
-                        lancamento.ContaID = 7; //Transferencia
-                        lancamento.CategoriaID = 7; //Transferencia
-                        lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                        lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                        lancamentoRepository.Save(lancamento);
-
-                        //Efetuar Debito no Convidado
-                        lancamento = new Lancamento();
-                        lancamento.UsuarioID = idUsuarioConvidado;
-                        lancamento.Tipo = Lancamento.Tipos.Debito;
-                        lancamento.ReferenciaID = lancamento.UsuarioID;
-                        lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome], " - ", usuario.Nome);
-                        lancamento.DataLancamento = App.DateTimeZion;
-                        lancamento.DataCriacao = App.DateTimeZion;
-                        lancamento.ContaID = 7; //Transferencia
-                        lancamento.CategoriaID = 7; //Transferencia
-                        lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                        lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                        lancamentoRepository.Save(lancamento);
-
-                        //Chama incluir no tabuleiro para ver se 
-                        //o tabuleiro esta completo
-                        string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
-                        if (tabuleiroIncluir == "COMPLETO")
-                        {
-                            string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
-                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                        }
-                        else
-                        {
-                            string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
-                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                        }
-
-                        break;
-                    case "NOOK":
-                        string[] strMensagemParam4 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
-                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
-                    default:
-                        string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
-                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                    masterIDValido = true;
                 }
 
-                JsonResult jsonResult = new JsonResult
+                //Informar Recebimento
+                if (masterIDValido)
                 {
-                    Data = retorno,
-                    RecursionLimit = 1000
-                };
+                    //Verifica se master esta ok
+                    if (idUsuarioPag != 2000)
+                    {
+                        //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
+                        if (tabuleiroRepository.MasterRuleOK(idUsuarioPag, idBoard) != "OK")
+                        {
+                            //Não estando ok, a conta do sistema é usada para pagamento
+                            idUsuarioPag = 2000;
+                        }
+                        //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
+                        if (tabuleiroRepository.MasterIndicadosOK(idUsuarioPag, idBoard) != "OK")
+                        {
+                            //Não estando ok, a conta do sistema é usada para pagamento
+                            idUsuarioPag = 2000;
+                        }
+                    }
 
-                return jsonResult;
+                    string retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuarioPag, idBoard);
+                    switch (retorno)
+                    {
+                        case "OK":
 
+                            TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
+                            Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
+                            TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
+
+                            //Pega quem recebeu o Master ou o Siustema
+                            if (tabuleiroUsuario != null)
+                            {
+                                idUsuario = tabuleiroUsuario.UsuarioIDPag ?? idUsuario;
+                            }
+
+                            //Efetuar Credito no Master
+                            var lancamento = new Lancamento();
+                            lancamento.UsuarioID = idUsuarioPag;
+                            lancamento.Tipo = Lancamento.Tipos.Credito;
+                            lancamento.ReferenciaID = lancamento.UsuarioID;
+                            lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome], " - ", usuarioConvidado.Nome);
+                            lancamento.DataLancamento = App.DateTimeZion;
+                            lancamento.DataCriacao = App.DateTimeZion;
+                            lancamento.ContaID = 7; //Transferencia
+                            lancamento.CategoriaID = 7; //Transferencia
+                            lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                            lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                            lancamentoRepository.Save(lancamento);
+
+                            //Efetuar Debito no Convidado
+                            lancamento = new Lancamento();
+                            lancamento.UsuarioID = idUsuarioConvidado;
+                            lancamento.Tipo = Lancamento.Tipos.Debito;
+                            lancamento.ReferenciaID = lancamento.UsuarioID;
+                            lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome], " - ", usuario.Nome);
+                            lancamento.DataLancamento = App.DateTimeZion;
+                            lancamento.DataCriacao = App.DateTimeZion;
+                            lancamento.ContaID = 7; //Transferencia
+                            lancamento.CategoriaID = 7; //Transferencia
+                            lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                            lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                            lancamentoRepository.Save(lancamento);
+
+                            //Chama incluir no tabuleiro para ver se 
+                            //o tabuleiro esta completo
+                            string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
+                            if (tabuleiroIncluir == "COMPLETO")
+                            {
+                                string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
+                                Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                            }
+                            else
+                            {
+                                string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
+                                Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                            }
+
+                            break;
+                        case "NOOK":
+                            string[] strMensagemParam4 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
+                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                        default:
+                            string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
+                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                    }
+
+                    JsonResult jsonResult = new JsonResult
+                    {
+                        Data = retorno,
+                        RecursionLimit = 1000
+                    };
+
+                    return jsonResult;
+                }
+                else
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RR_01");
+                }
             }
             catch (Exception ex)
             {
-
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01" + "[" + ex.Message + "]");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RR_02" + "[" + ex.Message + "]");
             }
         }
 

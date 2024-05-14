@@ -1,10 +1,10 @@
 use UniverDev
 go
-If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroFechado'))
-   Drop Procedure spC_TabuleiroFechado
+If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroGetDate'))
+   Drop Procedure spC_TabuleiroGetDate
 go
 
-Create  Proc [dbo].[spC_TabuleiroFechado]
+Create  Proc [dbo].[spC_TabuleiroGetDate]
    @TabuleiroID int
 
 As
@@ -103,11 +103,11 @@ BEGIN
 End -- Sp
 
 go
-Grant Exec on spC_TabuleiroFechado To public
+Grant Exec on spC_TabuleiroGetDate To public
 go
 
---Exec spC_TabuleiroFechado @TabuleiroID=19
---Exec spC_TabuleiroFechado @TabuleiroID=40
+--Exec spC_TabuleiroGetDate @TabuleiroID=19
+--Exec spC_TabuleiroGetDate @TabuleiroID=40
 
 
 

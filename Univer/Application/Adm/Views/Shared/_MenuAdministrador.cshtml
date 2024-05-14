@@ -72,38 +72,23 @@
     </a>
 </li>
 
-
-@*<li>
-    <a href="javascript:;">
-        <i class="fa fa-users"></i>
+<li>
+    <a href="@Url.Action("Index", "Extrato", new { idUsuario = 2000 })">
+        <i class="fa fa-money"></i>
         <span class="title">
-            @traducaoHelper["USUARIOS"]
+            Extrato Sistema
         </span>
-        <span class="arrow " />
     </a>
-    <ul class="sub-menu">
-        <li>1
-            <a href="@Url.Action("Index", "Usuarios", new { area = "" })">
-                <i class="fa fa-user"></i>
-                <span class="title">
-                    @traducaoHelper["CADASTRO"]
-                </span>
-            </a>
-        </li>
+</li>
 
-        @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_MENU_AVISO"))
-        {
-            <li>
-                <a href="@Url.Action("Index", "Avisos", new { area = "" })">
-                    <i class="fa fa-bell-o"></i>
-                    <span class="title">
-                        @traducaoHelper["AVISO"]
-                    </span>
-                </a>
-            </li>
-        }
-    </ul>
-</li>*@
+<li>
+    <a href="@Url.Action("Index", "Extrato", new { idUsuario = 2001 })">
+        <i class="fa fa-money"></i>
+        <span class="title">
+            Extrato Taxa
+        </span>
+    </a>
+</li>
 
 <li>
     <a href="@Url.Action("GoogleAuthenticator", "Seguranca")">

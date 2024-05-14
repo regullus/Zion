@@ -171,6 +171,7 @@ Begin
 		Begin
 			Set @log = @log + '|00 aux > 0 - Ja esta no tabuleiro TabuleiroID=' + TRIM(STR(@aux))
 			--Para estar com um lado fechado ele deve ja ter ao menos um convite em um outro tabuleiro
+            --E ter pago o Master
 			if Exists (
 				Select 
 					'OK'
@@ -607,22 +608,22 @@ Begin
 						--Regra: Caso pai seja um donator nao pode incluir um novo usuario
 						If(@DonatorEsqSup1 = @UsuarioPaiID OR @DonatorEsqSup2 = @UsuarioPaiID OR @DonatorEsqInf1 = @UsuarioPaiID  OR @DonatorEsqInf2 = @UsuarioPaiID)
 						Begin
-							Set @PosicaoPai = 'Donator'
+							Set @PosicaoPai = 'DonatorEsq'
 						End
 						If(@DonatorDirSup1 = @UsuarioPaiID OR @DonatorDirSup2 = @UsuarioPaiID OR @DonatorDirInf1 = @UsuarioPaiID  OR @DonatorDirInf2 = @UsuarioPaiID)
 						Begin
-							Set @PosicaoPai = 'Donator'
+							Set @PosicaoPai = 'DonatorDir'
 						End
 
 						--*********** DONATOR **************
-						if(@PosicaoPai = 'Donator')
+						if(@PosicaoPai = 'DonatorDir' or @PosicaoPai = 'DonatorEsq')
 						Begin
 							--***Donator nao pode incluir um usuario, dai busca um pai valido, se possivel, para usar na inclussao do novo usuario***
 
 							--nao continua o processo se for um donator
-							Set @log = @log + '|07 DONATOR'
+							
 							Set @Continua = 'false'
-
+                            
 							--Obtem Master do usuario pai passado como parametro e usa este master como pai
 							Select Top(1)
 								@MasterTabuleiro = MasterID
@@ -631,6 +632,31 @@ Begin
 							Where
 								UsuarioID = @UsuarioPaiID and
 								BoardID = @BoardID
+                            Set @log = @log + '|07.0 DONATOR Default TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@MasterTabuleiro))
+
+                            if(@PosicaoPai = 'DonatorEsq')
+                            Begin
+							    --Obtem Master do usuario pai passado como parametro e usa este master como pai
+							    Select
+								    @MasterTabuleiro = CoordinatorEsq
+							    From 
+								    Rede.Tabuleiro
+							    Where
+								    ID = @ID
+                                Set @log = @log + '|07.1 DONATOR Esquerda TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@MasterTabuleiro))
+                            End
+
+                            if(@PosicaoPai = 'DonatorDir')
+                            Begin
+							    --Obtem Master do usuario pai passado como parametro e usa este master como pai
+							    Select
+								    @MasterTabuleiro = CoordinatorDir
+							    From 
+								    Rede.Tabuleiro
+							    Where
+								    ID = @ID
+                                Set @log = @log + '|07.2 DONATOR Direita TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@MasterTabuleiro))               
+                            End
 
 							--Caso nao encontre um master com o usuario pai informado, obtem o primeiro master valido e usa este como pai
 							if (@MasterTabuleiro is null Or @MasterTabuleiro = 0)
@@ -996,7 +1022,143 @@ Begin
 										Set @Ciclo = 1
 									End
 								
+                                    --Donators
+                                     Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorDirSup1 and
+										BoardID = @BoardID
+
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorDirSup2 and
+										BoardID = @BoardID
+
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorDirInf1 and
+										BoardID = @BoardID
+
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorDirInf2 and
+										BoardID = @BoardID
+
 									--Master
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @MasterID and
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1016,6 +1178,33 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorDir
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @CoordinatorDir and
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1035,6 +1224,33 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorEsq
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @CoordinatorEsq and
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1054,6 +1270,33 @@ Begin
 										BoardID = @BoardID
 								
 									--IndicatorDirSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @IndicatorDirSup and
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1073,6 +1316,33 @@ Begin
 										BoardID = @BoardID
 								
 									--IndicatorDirInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorDirInf and
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1092,6 +1362,33 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorEsqSup and --Ele vira o CoordinatorEsq
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1111,6 +1408,33 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @IndicatorEsqInf and --Ele vira o CoordinatorEsq
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1229,8 +1553,144 @@ Begin
 									Begin
 										Set @Ciclo = 1
 									End
+                                    
+                                    --Donators
+                                     Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorEsqSup1 and
+										BoardID = @BoardID
+
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorEsqSup2 and
+										BoardID = @BoardID
+
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorEsqInf1 and
+										BoardID = @BoardID
+
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @DonatorEsqInf2 and
+										BoardID = @BoardID
 
 									--Master
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @MasterID and 
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1250,6 +1710,33 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorDir
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @CoordinatorDir and
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1269,6 +1756,33 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorEsq
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @CoordinatorEsq and 
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1288,6 +1802,33 @@ Begin
 										BoardID = @BoardID
 								
 									--IndicatorDirSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorDirSup and 
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1307,6 +1848,33 @@ Begin
 										BoardID = @BoardID
 								
 									--IndicatorDirInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @IndicatorDirInf and 
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1326,6 +1894,33 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorEsqSup and 
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1345,6 +1940,33 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorEsqInf and 
+										BoardID = @BoardID
+
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -3536,7 +4158,7 @@ go
 /*
 Begin Tran
 
-Exec spG_Tabuleiro @UsuarioID=2593,@UsuarioPaiID=2593,@BoardID=1,@Chamada='Completa'
+Exec spG_Tabuleiro @UsuarioID=3831,@UsuarioPaiID=2692,@BoardID=1,@Chamada='ConviteNew'
 
 Select * from  Rede.TabuleiroLog order by id desc
 

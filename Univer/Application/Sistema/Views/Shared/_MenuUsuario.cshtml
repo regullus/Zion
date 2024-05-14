@@ -25,7 +25,6 @@
     </a>
 </li>
 
-
 @if (!Core.Helpers.ConfiguracaoHelper.GetBoolean("REDE_TABULEIRO"))
 {
     if (usuarioContainer.PendenteMigracao)
@@ -367,6 +366,15 @@ else
             <i class="fa fa-group"></i>
             <span class="title">
                 @traducaoHelper["INDICADOS"]
+            </span>
+        </a>
+    </li>
+
+    <li>
+        <a href="@Url.Action("index", "meu-extrato", new { area = "" })">
+            <i class="fa fa-reorder"></i>
+            <span class="title">
+                @traducaoHelper["MEU_EXTRATO"]
             </span>
         </a>
     </li>

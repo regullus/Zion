@@ -43,7 +43,7 @@ BEGIN
 	Begin
 		--Obtem os 10 primeiros ativos no Board 1
 		Insert Into #temp
-		Select top(10)
+		Select distinct top(60)
 			tab.UsuarioID,
 			tab.TabuleiroID,
 			tab.BoardID,
@@ -64,11 +64,14 @@ BEGIN
 			tab.DataFim
 		From 
 			Rede.TabuleiroUsuario tab (nolock),
-			Rede.TabuleiroBoard tb (nolock)
+			Rede.TabuleiroBoard tb (nolock),
+            Rede.Tabuleiro redtab (nolock)
 		Where
 			tab.BoardID = tb.ID And
 			tab.StatusID = 1 And
-			tab.BoardID = 1
+			tab.BoardID = 1 and
+            redtab.id = tab.TabuleiroID and
+            redtab.StatusID <> 2
 		Order By
 			TabuleiroID
 	End
@@ -177,7 +180,7 @@ go
 Grant Exec on spC_TabuleiroUsuario To public
 go
 
---Exec spC_TabuleiroUsuario @UsuarioID=null
+Exec spC_TabuleiroUsuario @UsuarioID=2619
 
 
 

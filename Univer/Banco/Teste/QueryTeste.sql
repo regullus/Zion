@@ -4,8 +4,8 @@ go
 --36
 --Select * from  Rede.TabuleiroLog order by id desc
 
---Select id,login, apelido from usuario.usuario where id = 2583
---Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and apelido like '%nata84%'
+--Select id,login, apelido from usuario.usuario where id = 2601
+Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and apelido like 'top160'
 
 --Inidcados
 --Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and PatrocinadorDiretoID = 2604
@@ -16,20 +16,28 @@ go
 --Select * from Rede.TabuleiroUsuario where  UsuarioID = 2588 --pedro
 --Select * from Rede.TabuleiroUsuario where  UsuarioID = 2591 --enzo
 
-Select id,login, apelido, PatrocinadorDiretoID, StatusEmailID from usuario.usuario where id > 2500 and apelido like '%dinamite%'
+Select id,login, apelido, PatrocinadorDiretoID, StatusEmailID from usuario.usuario where id = 5182
 
-Select * From Rede.Tabuleiro where ID = 35
-Select * From Rede.TabuleiroUsuario Where UsuarioID = 2846 and BoardID = 1
-Select * From Rede.TabuleiroUsuario Where UsuarioID = 2593 and BoardID = 1
 
-Select * from  Rede.TabuleiroLog order by id desc
+Select * From Rede.TabuleiroUsuario Where statusid=2 and boardID=2
 
-Select
-	'OK'
-From
-	Rede.TabuleiroUsuario
-Where
-	MasterID = @MasterID and
-	BoardID = @BoardID and
-	UsuarioId = @DonatorEsqSup1 and
-	Posicao = 'DonatorEsqSup1'
+
+Select id,login, apelido, PatrocinadorDiretoID, StatusEmailID from usuario.usuario where id in (2607)
+Select * From Rede.TabuleiroUsuario Where UsuarioID in (2607) 
+
+Select * From Rede.Tabuleiro where ID = 36
+
+ 
+ Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id in (
+    2597,
+2619,
+2647,
+2658,
+2676,
+2702,
+2709,
+2742,
+2744,
+2774,
+2775
+)

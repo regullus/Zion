@@ -48,6 +48,8 @@ using OtpSharp;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Fluentx;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Core.Models;
 
 #endregion
 
@@ -80,6 +82,7 @@ namespace Sistema.Controllers
         private FilialRepository filialRepository;
         private UsuarioLoginExternoRepository usuarioLoginExternoRepository;
         private TabuleiroRepository tabuleiroRepository;
+        private LancamentoRepository lancamentoRepository;
 
         private Core.Helpers.TraducaoHelper traducaoHelper;
 
@@ -106,6 +109,7 @@ namespace Sistema.Controllers
             filialRepository = new FilialRepository(context);
             usuarioLoginExternoRepository = new UsuarioLoginExternoRepository(context);
             tabuleiroRepository = new TabuleiroRepository(context);
+            lancamentoRepository = new LancamentoRepository(context);
 
             Localizacao();
         }
@@ -975,8 +979,6 @@ namespace Sistema.Controllers
 
         public ActionResult PagamentoOK(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraPatrocinador, string ProcuraPatrocinador, int? NumeroPaginas, int? Page)
         {
-            // return View(usuarios.ToList());
-
             //Verifica se a msg em popup para ser exibido na view
             obtemMensagem();
 
@@ -1156,6 +1158,38 @@ namespace Sistema.Controllers
                 }
 
                 string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
+                
+                Usuario usuario = db.Usuarios.Find(idUsuario);
+
+                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
+
+                //Efetuar Credito no syspag
+                var lancamento = new Lancamento();
+                lancamento.UsuarioID = 2001; //Syspag
+                lancamento.Tipo = Lancamento.Tipos.Credito;
+                lancamento.ReferenciaID = lancamento.UsuarioID;
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board"+BoardID], " - ", usuario.Nome);
+                lancamento.DataLancamento = App.DateTimeZion;
+                lancamento.DataCriacao = App.DateTimeZion;
+                lancamento.ContaID = 7; //Transferencia
+                lancamento.CategoriaID = 7; //Transferencia
+                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                lancamentoRepository.Save(lancamento);
+
+                //Efetuar Debito no Convidado
+                lancamento = new Lancamento();
+                lancamento.UsuarioID = idUsuario;
+                lancamento.Tipo = Lancamento.Tipos.Debito;
+                lancamento.ReferenciaID = lancamento.UsuarioID;
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - ", traducaoHelper["Board" + BoardID]);
+                lancamento.DataLancamento = App.DateTimeZion;
+                lancamento.DataCriacao = App.DateTimeZion;
+                lancamento.ContaID = 7; //Transferencia
+                lancamento.CategoriaID = 7; //Transferencia
+                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                lancamentoRepository.Save(lancamento);
 
                 JsonResult jsonResult = new JsonResult
                 {
@@ -1164,7 +1198,6 @@ namespace Sistema.Controllers
                 };
 
                 return jsonResult;
-
             }
             catch (Exception ex)
             {

@@ -32,6 +32,10 @@ BEGIN
         Celular nvarchar(100),
         Pix nvarchar(255),
         Carteira nvarchar(255),
+        PatrocinadorID int,
+        Patrocinador nvarchar(255),
+        PatrocinadorApelido nvarchar(255),
+        PatrocinadorCelular nvarchar(100),
         ConfirmarRecebimento bit
     )
 
@@ -60,11 +64,27 @@ BEGIN
             Celular,
             '',
             '',
+            PatrocinadorDiretoID,
+            '',
+            '',
+            '',
             'false'
         from
             Usuario.Usuario (nolock)
         Where 
             id = @TargetID
+
+        Update
+            temp
+        Set
+            temp.Patrocinador = usu.nome,
+            temp.PatrocinadorApelido = usu.Apelido,
+            temp.PatrocinadorCelular = usu.Celular
+        From
+            #temp temp,
+            Usuario.Usuario usu
+        Where
+            usu.ID = temp.PatrocinadorID
 		
         Update
             temp
@@ -85,8 +105,12 @@ BEGIN
         Select
             @TargetID,
             Nome,
-			lower(Apelido),
+			Lower(Apelido),
             Celular,
+            '',
+            '',
+            PatrocinadorDiretoID,
+            '',
             '',
             '',
             'false'
@@ -94,6 +118,18 @@ BEGIN
             Usuario.Usuario (nolock)
         Where 
             id = @TargetID
+
+        Update
+            temp
+        Set
+            temp.Patrocinador = usu.nome,
+            temp.PatrocinadorApelido = usu.Apelido,
+            temp.PatrocinadorCelular = usu.Celular
+        From
+            #temp temp,
+            Usuario.Usuario usu
+        Where
+            usu.ID = temp.PatrocinadorID
     
         Update 
             temp
@@ -107,13 +143,17 @@ BEGIN
             temp.UsuarioID = cd.IDUsuario
     End
 
-    Select
+    Select top(1)
         UsuarioID,
         Nome,
 		Apelido,
         Celular,
         Pix,
         Carteira,
+        Patrocinador,
+        PatrocinadorID,
+        PatrocinadorApelido,
+        PatrocinadorCelular,
         ConfirmarRecebimento
     From
         #temp
@@ -124,8 +164,9 @@ go
 Grant Exec on spC_TabuleiroInfoUsuario To public
 go
 
---Exec spC_TabuleiroInfoUsuario @TargetID=2580, @UsuarioID=2581, @BoardID=1
---Exec spC_TabuleiroInfoUsuario @TargetID=2589, @UsuarioID=2581, @BoardID=1
+--Exec spC_TabuleiroInfoUsuario @TargetID=2586, @UsuarioID=2586, @BoardID=1
+--Exec spC_TabuleiroInfoUsuario @TargetID=3735, @UsuarioID=2947, @BoardID=1
+
 
 
 

@@ -93,7 +93,7 @@ BEGIN
 					InformePag = 'false',
 					UsuarioIDPag = null,
 					DataInicio = GetDate(),
-					Debug = 'Removido pelo job 1.1'
+					Debug = 'Removido pelo job 1.1 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
 				Where
 					UsuarioID = @UsuarioID and
 					BoardID = @BoardID
@@ -112,26 +112,55 @@ BEGIN
 						InformePag = 'false',
 						UsuarioIDPag = null,
 						DataInicio = GetDate(),
-						Debug = 'Removido pelo job 1.1'
+						Debug = 'Removido pelo job 1.1 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
 					Where
 						UsuarioID = @UsuarioID and
 						BoardID = @BoardID
 				End
 				Else
 				Begin
-					--statusID do usuario para 0 é quando é a primeira entrada do usuario no tabuleiroconvite
-					Update
-						Rede.TabuleiroUsuario
-					Set
-						StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
-						Posicao = '',
-						TabuleiroID = null,
-						InformePag = 'false',
-						UsuarioIDPag = null,
-						Debug = 'Removido pelo job 1.2'
-					Where
-						UsuarioID = @UsuarioID and
-						BoardID = @BoardID
+				    --Checa se ele não esta em Saturno mesmo, daí pode dar como StatusId 0, como um novo usuario
+				    if Exists (
+						Select 'OK' 
+						From 
+							Rede.TabuleiroUsuario 
+						Where 
+							UsuarioID = @UsuarioID and
+							BoardID = 2 and --Saturno 
+							TabuleiroID is not Null --Garante que ele não esta em Saturno
+					)
+					Begin
+						--statusID do usuario para 0 é quando é a primeira entrada do usuario no tabuleiroconvite
+						Update
+							Rede.TabuleiroUsuario
+						Set
+							StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+							Posicao = '',
+							TabuleiroID = null,
+							InformePag = 'false',
+							UsuarioIDPag = null,
+							Debug = 'Removido pelo job 1.2 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
+						Where
+							UsuarioID = @UsuarioID and
+							BoardID = @BoardID
+					End
+					Else
+					Begin
+						--statusID do usuario para 2 é convite
+						Update
+							Rede.TabuleiroUsuario
+						Set
+							StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
+							Posicao = '',
+							TabuleiroID = null,
+							InformePag = 'false',
+							UsuarioIDPag = null,
+							DataInicio = GetDate(),
+							Debug = 'Removido pelo job 1.3 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
+						Where
+							UsuarioID = @UsuarioID and
+							BoardID = @BoardID						
+					End
 				End
 			End
 		
@@ -251,7 +280,7 @@ BEGIN
 					InformePag = 'false',
 					UsuarioIDPag = null,
 					DataInicio = GetDate(),
-					Debug = 'Removido pelo job 2.1'
+					Debug = 'Removido pelo job 2.1 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
 				Where
 					UsuarioID = @UsuarioID and
 					BoardID = @BoardID
@@ -269,26 +298,53 @@ BEGIN
 						TabuleiroID = null,
 						InformePag = 'false',
 						UsuarioIDPag = null,
-						Debug = 'Removido pelo job 2.2'
+						Debug = 'Removido pelo job 2.2 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
 					Where
 						UsuarioID = @UsuarioID and
 						BoardID = @BoardID
 				End
 				Else
 				Begin
-					--Zera statusID do usuario 
-					Update
-						Rede.TabuleiroUsuario
-					Set
-						StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
-						Posicao = '',
-						TabuleiroID = null,
-						InformePag = 'false',
-						UsuarioIDPag = null,
-						Debug = 'Removido pelo job 2.3'
-					Where
-						UsuarioID = @UsuarioID and
-						BoardID = @BoardID
+					if Exists (
+						Select 'OK' 
+						From 
+							Rede.TabuleiroUsuario 
+						Where 
+							UsuarioID = @UsuarioID and
+							BoardID = 2 and --Saturno
+							TabuleiroID is not Null --Garante que ele não esta em Saturno
+					)
+					Begin
+						--Zera statusID do usuario 
+						Update
+							Rede.TabuleiroUsuario
+						Set
+							StatusID = 0, -- Esta disponivel para entrar em um tabuleiro
+							Posicao = '',
+							TabuleiroID = null,
+							InformePag = 'false',
+							UsuarioIDPag = null,
+							Debug = 'Removido pelo job 2.3 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
+						Where
+							UsuarioID = @UsuarioID and
+							BoardID = @BoardID
+					End
+					Else
+					Begin
+						 --Dois statusID do usuario 
+						Update
+							Rede.TabuleiroUsuario
+						Set
+							StatusID = 2, -- Esta disponivel para entrar em um tabuleiro
+							Posicao = '',
+							TabuleiroID = null,
+							InformePag = 'false',
+							UsuarioIDPag = null,
+							Debug = 'Removido pelo job 2.2 @maxBoard=' + TRIM(STR(@maxBoard)) + ' BoardID=' + + TRIM(STR(@BoardID))
+						Where
+							UsuarioID = @UsuarioID and
+							BoardID = @BoardID
+					End
 				End
 			End
 
@@ -374,8 +430,16 @@ BEGIN
 End -- Sp
 
 
+
 go
 Grant Exec on spD_TabuleiroJob To public
 go
---Exec spD_TabuleiroJob
+/*
+Begin Tran
 
+Select * From Rede.TabuleiroUsuario Where UsuarioID = 2594 and BoardID = 1
+Exec spD_TabuleiroJob
+Select * From Rede.TabuleiroUsuario Where UsuarioID = 2594 and BoardID = 1
+
+Rollback tran
+*/

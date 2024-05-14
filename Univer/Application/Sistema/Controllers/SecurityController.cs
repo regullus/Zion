@@ -104,13 +104,6 @@ namespace Sistema.Controllers
                     traducaoHelper = Local.TraducaoHelper;
                 }
 
-                //filterContext.Result = RedirectToAction("Login", "Account", new
-                //{
-                //    strPopupTitle = traducaoHelper["LOGIN_SESSAO_EXPIRADA_TITULO"],
-                //    strPopupMessage = traducaoHelper["LOGIN_SESSAO_EXPIRADA"],
-                //    Sair = "true"
-                //});
-
                 filterContext.Result = RedirectToAction("Login", "Account", new
                 {
                     Sair = "true"

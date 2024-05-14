@@ -1,0 +1,160 @@
+﻿@{
+    #region Layout
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    #endregion
+
+    #region ViewBags
+
+    var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
+
+    ViewBag.Title = "extrato";
+    var usuario = (Core.Entities.Usuario)ViewBag.Usuario;
+    #endregion
+
+    #region Variaveis
+
+    var contas = ViewBag.Contas;
+    var contasLancamentos = ViewBag.Contaslancamentos;
+    int intN = 0;
+    var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
+    var saldoInvestimento = "";
+    String mascaraData = "dd/MM/yyyy";
+
+    #endregion
+}
+
+@section pageStyles {
+    @Styles.Render("~/Content/table")
+    @Styles.Render("~/Content/sweetAlert")
+}
+
+@section head {}
+
+@section pageScripts {
+    @Scripts.Render("~/scripts/table")
+    @Scripts.Render("~/scripts/sweetAlert")
+}
+
+@section PageLevelScripts{
+    
+}
+
+@section jQueryRead {
+    TableExtrato.init();
+}
+
+<div class="portlet solid grey-cararra">
+    <div class="portlet-body">
+
+        <div class="page-head">
+            <!-- BEGIN PAGE TITLE -->
+            <div class="page-title">
+                <h2>@ViewBag.Title <small></small></h2>
+            </div>
+            <!-- END PAGE TITLE -->
+        </div>
+
+        <ul class="page-breadcrumb breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">home</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a href="#">@ViewBag.Title</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<ul class="nav nav-tabs tabContatos">
+    @{
+        var i = 1;
+        foreach (var conta in contas)
+        {
+            <li class="@(i==1 ? "active" : "")">
+                <a href="@("#tab_" + @i)" data-toggle="tab">
+                    <i class="fa fa-reorder"></i>
+                    @conta.Nome.ToUpper()
+                </a>
+            </li>
+            i++;
+        }
+    }
+</ul>
+
+<div class="tab-content">
+    @if (contasLancamentos != null)
+    {
+        foreach (IEnumerable<Core.Entities.Lancamento> conta in contasLancamentos)
+        {
+            intN++;
+            <div id="@("tab_" + intN)" class="tab-pane @(intN==1 ? "active" : "")">
+                <div class="portlet aba box backWrite grey-gallery">
+
+                    <div class="portlet-title">
+                        <div class="caption"></div>
+                        <div class="tools">
+                            <a href='@Url.Action("Index")' class="atualizar" title="Atualizar" />
+                            <a href="javascript:;" class="collapse grey" title="Fechar" />
+                        </div>
+                        <div class="actions">
+                            <a href='#'>&nbsp;</a>
+                            <label>&nbsp;</label>
+                        </div>
+                    </div>
+
+                    <div class="portlet-body">
+                        @if (conta != null && conta.Count() > 0)
+                        {
+                            var saldo = conta.Sum(l => l.Valor);
+                            if (intN == 4) //Investimento
+                            {
+                                saldoInvestimento = moedaPadrao.Simbolo + " " + saldo.Value.ToString(moedaPadrao.MascaraOut);
+                            }
+                            <table class="table table-striped table-bordered table-hover" id="@("table_" + intN)">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Categoria</th>
+                                        <th>Descrição</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px;" colspan="4">Saldo atual</td>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;">@moedaPadrao.Simbolo @saldo.Value.ToString(moedaPadrao.MascaraOut) </td>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px;" colspan="4">Saldo atual</td>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;">@moedaPadrao.Simbolo @saldo.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    @foreach (var lancamento in conta.OrderByDescending(l => l.DataLancamento))
+                                    {
+                                        <tr>
+                                            <td>@lancamento.DataLancamento.ToString(mascaraData)</td>
+                                            <td>@lancamento.Tipo.ToString()</td>
+                                            <td>@(lancamento.Categoria != null ? lancamento.Categoria.Nome : "-")</td>
+                                            <td>
+                                                @lancamento.Descricao.Replace("[NM1]", "Direto: ").Replace("[N]", "Nivel: ").Replace("[P]", "Produto: ").Replace("[NP]", "Nível Pago: ").Replace("[PT]", "Pontos: ").Replace("[%]", "%: ").Replace("[NM]", "Afiliado: ")
+                                            </td>
+                                            <td>@moedaPadrao.Simbolo @lancamento.Valor.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <h3>Extrato sem dados</h3>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
