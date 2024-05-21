@@ -5,7 +5,7 @@ If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroAdminU
 go
 
 Create  Proc [dbo].[spC_TabuleiroAdminUsuarios]
-   @UsuarioID int
+   @tipo nvarchar(10)
 
 As
 -- =============================================================================================
@@ -20,6 +20,14 @@ BEGIN
 
 	Create Table #temp (
 		UsuarioID int,
+        Nome nvarchar(255),
+        Login nvarchar(255),
+        Apelido nvarchar(255),
+        Email nvarchar(255),
+        Celular nvarchar(255),
+        Posicao nvarchar(100),
+        Galaxia nvarchar(255),
+        Patrocinador nvarchar(255),
 		TabuleiroID int,
 		BoardID int,
 		BoardNome nvarchar(50),
@@ -30,7 +38,6 @@ BEGIN
 		InformePag bit,
 		UsuarioIDPag int, --*
 		Ciclo int,
-		Posicao nvarchar(100),
 		PagoMaster bit,
 		PagoSistema bit, --*
 		InformePagSistema bit,
@@ -38,133 +45,204 @@ BEGIN
 		DataInicio datetime,
 		DataFim int
 	)
+    
+    if(@tipo = 'InformePagto')
+    Begin
+	    insert into #temp
+	    Select 
+		    tab.UsuarioID,
+            '' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+		    tab.TotalRecebimento,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID And
+            tab.InformePagSistema = 'true' and
+		    tab.PagoSistema = 'false'
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
 
-	if(@UsuarioID is null or @UsuarioID = 0)
-	Begin
-		--Obtem os 60 primeiros ativos no Board 1
-		Insert Into #temp
-		Select distinct top(60)
-			tab.UsuarioID,
-			tab.TabuleiroID,
-			tab.BoardID,
-			tb.Nome as BoardNome,
-			tb.Cor as BoardCor,
-			tab.StatusID,
-			'true' as Eterno,
-			tab.MasterID,
-			tab.InformePag,
-			tab.UsuarioIDPag,
-			tab.Ciclo,
-			tab.Posicao,
-			tab.PagoMaster,
-			tab.PagoSistema,
-			tab.InformePagSistema,
-			tab.TotalRecebimento,
-			tab.DataInicio,
-			tab.DataFim
-		From 
-			Rede.TabuleiroUsuario tab (nolock),
-			Rede.TabuleiroBoard tb (nolock),
-            Rede.Tabuleiro redtab (nolock)
-		Where
-			tab.BoardID = tb.ID And
-			tab.StatusID = 1 And
-			tab.BoardID = 1 and
-            redtab.id = tab.TabuleiroID and
-            tab.UsuarioID = tab.MasterID and
-            redtab.StatusID <> 2 and (
-                redtab.DonatorDirSup1 is null or
-                redtab.DonatorDirSup2 is null or
-                redtab.DonatorDirInf1 is null or
-                redtab.DonatorDirInf2 is null or
-                redtab.DonatorEsqSup1 is null or
-                redtab.DonatorEsqSup2 is null or
-                redtab.DonatorEsqInf1 is null or
-                redtab.DonatorEsqInf2 is null
-            )
-		Order By
-			TabuleiroID
+    if(@tipo = 'Pagos')
+    Begin
+        insert into #temp
+	    Select 
+		    tab.UsuarioID,
+            '' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+		    tab.TotalRecebimento,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID And
+            tab.InformePagSistema = 'true' and
+		    tab.PagoSistema = 'true'
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
 
-	End
-	Else 
-	Begin
-	    --Obtem todos os Boards (niveis) do usuario
-		Insert Into #temp
-		Select 
-			tab.UsuarioID,
-			tab.TabuleiroID,
-			tab.BoardID,
-			tb.Nome as BoardNome,
-			tb.Cor as BoardCor,
-			tab.StatusID,
-			'true' as Eterno,
-			tab.MasterID,
-			tab.InformePag,
-			tab.UsuarioIDPag,
-			tab.Ciclo,
-			tab.Posicao,
-			tab.PagoMaster,
-			tab.PagoSistema,
-			tab.InformePagSistema,
-			tab.TotalRecebimento,
-			tab.DataInicio,
-			tab.DataFim
-		From 
-			Rede.TabuleiroUsuario tab (nolock),
-			Rede.TabuleiroBoard tb (nolock)
-		Where
-			tab.UsuarioID = @UsuarioID and
-			tab.BoardID = tb.ID
-		Order By
-			TabuleiroID
-	End
+    if(@tipo = 'ConfirmarRecebimento')
+    Begin
+        insert into #temp
+	    Select 
+		    tab.UsuarioID,
+            '' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+		    tab.TotalRecebimento,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID And
+            tab.InformePagSistema = 'true' and
+            tab.PagoMaster = 'false' 
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
 
-	--Verifica se disponibiliza Mercurio para o usuario
-	--Se ele nao pagou o alvo no proximo nivel, estando nele, nao abilita
-	-- a entrada em mercurio
 
-	--Verifica se a reentrada em mercurio StatusID = 2 no BoardID = 1
-	If Exists( 
-		Select 'OK'
-		From
-			#temp
-		Where
-			BoardID = 1 and
-			StatusID = 2
-	)
-	Begin
-		--Havendo reentrada, verifica em que boardID superior o usuario se encontra
-		Declare @BoardID int
-		Select 
-			@BoardID = MAX(BoardID)
-		From
-			#temp
-		Where
-			StatusID <> 0
-		
-		--Verifica se nao pagou o Master no board superior
-		If Exists (
-			Select 
-				'OK'
-			From
-				#temp
-			Where
-				BoardID = @BoardID and
-				PagoMaster = 'false'
-		)
-		Begin
-			--Nao estando pago, nao abilita mercurio para reentrada
-			Update
-				#temp
-			Set 
-				Eterno = 'false'
-			Where
-				BoardID = 1 --Mercurio
-		End
-	End
+
+    if(@tipo <> 'InformePagto' and @tipo <> 'Pagos' and @tipo <> 'ConfirmarRecebimento')
+    Begin
+        insert into #temp
+	    Select 
+		    tab.UsuarioID,
+            '' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+		    tab.TotalRecebimento,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
+    
+    Update
+        tmp
+    Set
+        Patrocinador = usu.apelido
+    From
+        #temp tmp,
+        Usuario.Usuario usu
+    Where
+        tmp.MasterID = usu.id
+
+    Update
+        tmp
+    Set
+        Nome = usu.nome,
+        Login = usu.Login,
+        Apelido = usu.Apelido,
+        Email = usu.Email,
+        Celular = usu.Celular
+    From
+        #temp tmp,
+        Usuario.Usuario usu
+    Where
+        tmp.UsuarioID = usu.id
 
 	Select 
 		UsuarioID,
+        Nome,
+        Login,
+        Email,
+        Celular,
+        Posicao,
+        Galaxia,
+        Patrocinador,
 		TabuleiroID,
 		BoardID,
 		BoardNome,
@@ -175,7 +253,6 @@ BEGIN
 		InformePag,
 		UsuarioIDPag,
 		Ciclo,
-		Posicao,
 		PagoMaster,
 		PagoSistema,
 		InformePagSistema,
