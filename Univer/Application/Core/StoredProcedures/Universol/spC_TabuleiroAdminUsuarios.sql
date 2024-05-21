@@ -5,8 +5,7 @@ If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroAdminU
 go
 
 Create  Proc [dbo].[spC_TabuleiroAdminUsuarios]
-   @tipo nvarchar(10)
-
+   @tipo nvarchar(50)
 As
 -- =============================================================================================
 -- Author.....: 
@@ -19,6 +18,7 @@ BEGIN
     Set nocount on
 
 	Create Table #temp (
+		tipo nvarchar(50),
 		UsuarioID int,
         Nome nvarchar(255),
         Login nvarchar(255),
@@ -36,20 +36,25 @@ BEGIN
 		Eterno bit,
 		MasterID int,
 		InformePag bit,
-		UsuarioIDPag int, --*
+		UsuarioIDPag int,
+		UsuarioPagNome nvarchar(255),
+		ValorPagMaster decimal(10,2),
 		Ciclo int,
 		PagoMaster bit,
-		PagoSistema bit, --*
+		PagoSistema bit, 
 		InformePagSistema bit,
-		TotalRecebimento int, --*
+		ValorPagoSistema decimal(10,2),
+		TotalRecebimento int,
 		DataInicio datetime,
 		DataFim int
 	)
     
-    if(@tipo = 'InformePagto')
+	--Usuarios que informaram o pagamento ao sistema
+    if(@tipo = 'InformePagtoSistema')
     Begin
 	    insert into #temp
-	    Select 
+	    Select
+			'InformePagtoSistema',
 		    tab.UsuarioID,
             '' Nome,
             '' Login,
@@ -68,10 +73,13 @@ BEGIN
 		    tab.MasterID,
 		    tab.InformePag,
 		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
+			0.0 ValorPagMaster,
 		    tab.Ciclo,
 		    tab.PagoMaster,
 		    tab.PagoSistema,
 		    tab.InformePagSistema,
+			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
 		    tab.DataInicio,
 		    tab.DataFim
@@ -87,10 +95,12 @@ BEGIN
 		    tab.UsuarioID
     End
 
-    if(@tipo = 'Pagos')
+	--Usuarios que pagaram o sistema
+    if(@tipo = 'PagosSistema')
     Begin
-        insert into #temp
+        Insert into #temp
 	    Select 
+		    'PagosSistema',
 		    tab.UsuarioID,
             '' Nome,
             '' Login,
@@ -109,11 +119,14 @@ BEGIN
 		    tab.MasterID,
 		    tab.InformePag,
 		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
+			0.0 ValorPagMaster,
 		    tab.Ciclo,
 		    tab.PagoMaster,
 		    tab.PagoSistema,
 		    tab.InformePagSistema,
-		    tab.TotalRecebimento,
+		    0.0 ValorPagoSistema,
+			tab.TotalRecebimento,
 		    tab.DataInicio,
 		    tab.DataFim
 	    From 
@@ -128,10 +141,12 @@ BEGIN
 		    tab.UsuarioID
     End
 
-    if(@tipo = 'ConfirmarRecebimento')
+	--Usuarios que necessitem que se valide o pagamento ao master
+    if(@tipo = 'InformePagtoMaster')
     Begin
-        insert into #temp
-	    Select 
+	    insert into #temp
+	    Select
+		    'InformePagtoMaster',
 		    tab.UsuarioID,
             '' Nome,
             '' Login,
@@ -150,10 +165,13 @@ BEGIN
 		    tab.MasterID,
 		    tab.InformePag,
 		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
 		    tab.Ciclo,
+			0.0 ValorPagMaster,
 		    tab.PagoMaster,
 		    tab.PagoSistema,
 		    tab.InformePagSistema,
+			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
 		    tab.DataInicio,
 		    tab.DataFim
@@ -162,17 +180,18 @@ BEGIN
 		    Rede.TabuleiroBoard tb (nolock)
 	    Where
 		    tab.BoardID = tb.ID And
-            tab.InformePagSistema = 'true' and
+            tab.InformePag = 'true' and
             tab.PagoMaster = 'false' 
 	    Order By
 		    tab.BoardID,
 		    tab.UsuarioID
     End
 
-    if(@tipo <> 'InformePagto' and @tipo <> 'Pagos' and @tipo <> 'ConfirmarRecebimento')
+	if(@tipo = 'PagoMaster')
     Begin
-        insert into #temp
+	    insert into #temp
 	    Select 
+		    'PagoMaster',
 		    tab.UsuarioID,
             '' Nome,
             '' Login,
@@ -191,10 +210,13 @@ BEGIN
 		    tab.MasterID,
 		    tab.InformePag,
 		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
+			0.0 ValorPagMaster,
 		    tab.Ciclo,
 		    tab.PagoMaster,
 		    tab.PagoSistema,
 		    tab.InformePagSistema,
+			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
 		    tab.DataInicio,
 		    tab.DataFim
@@ -202,37 +224,121 @@ BEGIN
 		    Rede.TabuleiroUsuario tab (nolock),
 		    Rede.TabuleiroBoard tb (nolock)
 	    Where
-		    tab.BoardID = tb.ID
+		    tab.BoardID = tb.ID And
+            tab.InformePag = 'true' and
+            tab.PagoMaster = 'true' 
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
+
+    if(@tipo <> 'InformePagtoSistema' and @tipo <> 'PagosSistema' and @tipo <> 'InformePagtoMaster' and @tipo <> 'PagoMaster')
+    Begin
+        insert into #temp
+	    Select 
+		    'Tudo',
+			tab.UsuarioID,
+			'' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
+			0.0 ValorPagMaster,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+			0.0 ValorPagoSistema,
+		    tab.TotalRecebimento,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID and
+			tab.StatusID in (1,2)
 	    Order By
 		    tab.BoardID,
 		    tab.UsuarioID
     End
     
+	--Patrocinador
     Update
         tmp
     Set
-        Patrocinador = usu.apelido
+        tmp.Patrocinador = usu.apelido
     From
         #temp tmp,
         Usuario.Usuario usu
     Where
         tmp.MasterID = usu.id
 
+	--Nome Usuario
     Update
         tmp
     Set
-        Nome = usu.nome,
-        Login = usu.Login,
-        Apelido = usu.Apelido,
-        Email = usu.Email,
-        Celular = usu.Celular
+        tmp.Nome = usu.nome,
+        tmp.Login = usu.Login,
+        tmp.Apelido = usu.Apelido,
+        tmp.Email = usu.Email,
+        tmp.Celular = usu.Celular
     From
         #temp tmp,
         Usuario.Usuario usu
     Where
         tmp.UsuarioID = usu.id
 
+	--Nome Usuario Pagamento
+    Update
+        tmp
+    Set
+        tmp.UsuarioPagNome = usu.apelido
+    From
+        #temp tmp,
+        Usuario.Usuario usu
+    Where
+        tmp.UsuarioIDPag = usu.id
+
+	--Valores
+	Update
+        tmp
+    Set
+        tmp.ValorPagMaster = boa.Transferencia
+    From
+        #temp tmp,
+        Rede.TabuleiroBoard boa
+    Where
+        tmp.BoardID = boa.id and
+		tmp.UsuarioIDPag is not null
+
+	--Valores
+	Update
+        tmp
+    Set
+   	tmp.ValorPagoSistema =  boa.Licenca
+    From
+        #temp tmp,
+        Rede.TabuleiroBoard boa
+    Where
+        tmp.BoardID = boa.id and
+		tmp.PagoSistema <> 0
+
 	Select 
+	    tipo,
 		UsuarioID,
         Nome,
         Login,
@@ -250,10 +356,13 @@ BEGIN
 		MasterID,
 		InformePag,
 		UsuarioIDPag,
+		UsuarioPagNome,
+		ValorPagMaster,
 		Ciclo,
 		PagoMaster,
 		PagoSistema,
 		InformePagSistema,
+		ValorPagoSistema,
 		TotalRecebimento,
 		DataInicio,
 		DataFim
@@ -266,9 +375,9 @@ go
 Grant Exec on spC_TabuleiroAdminUsuarios To public
 go
 
-Exec spC_TabuleiroAdminUsuarios @tipo='InformePagto'
-
-
-
-
+--Exec spC_TabuleiroAdminUsuarios @tipo='InformePagtoSistema'
+--Exec spC_TabuleiroAdminUsuarios @tipo='PagosSistema'
+--Exec spC_TabuleiroAdminUsuarios @tipo='InformePagtoMaster'
+--Exec spC_TabuleiroAdminUsuarios @tipo='PagoMaster'
+Exec spC_TabuleiroAdminUsuarios @tipo='Tudo'
 

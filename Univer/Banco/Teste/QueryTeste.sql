@@ -22,12 +22,12 @@ Set @TabuleiroID = 1
 --Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and PatrocinadorDiretoID = 5578
 
 --****************** TabuleiroUsuario ******************
---Select * from Rede.TabuleiroUsuario where usuarioID = @UsuarioID and BoardID in (1,2)
+Select * from Rede.TabuleiroUsuario where usuarioID = @UsuarioID --and BoardID in (1,2)
 
 --Exec spC_TabuleiroUsuario @UsuarioID=@UsuarioID
 
 --****************** lOG ******************
-Select * from  Rede.TabuleiroLog where UsuarioID = @UsuarioID
+--Select * from  Rede.TabuleiroLog where UsuarioID = @UsuarioID
 
 --****************** REGRAS ******************
 --Exec spC_TabuleiroUsuarioRule @UsuarioID=@UsuarioID
