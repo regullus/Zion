@@ -112,7 +112,7 @@ namespace Core.Repositories.Rede
 
             string sql = "";
 
-            if (Chamada == "Convite") //Força a entradanum tabuleiro mais antigo
+            if (Chamada == "Convite" && idBoard == 1) //Força a entradanum tabuleiro mais antigo
             {
                 sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=null,@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
             }
@@ -392,6 +392,14 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
+        public IEnumerable<TabuleiroInformaramPagtoModel> AdminUsuarios()
+        {
+            string sql = "Exec spC_TabuleiroAdminUsuarios";
+
+            var retorno = _context.Database.SqlQuery<TabuleiroInformaramPagtoModel>(sql).ToList();
+
+            return retorno;
+        }
 
         public IEnumerable<TabuleiroInformaramPagtoModel> ObtemTabuleirosPagos()
         {
@@ -427,17 +435,13 @@ namespace Core.Repositories.Rede
 
             return retorno;
         }
-        public bool TabuleiroFechado(int idTabuleiro)
+        public string TabuleiroFechado(int idTabuleiro)
         {
-            bool retorno = false;
+            string retorno = "nao";
             if (idTabuleiro > 0)
             {
                 string sql = "Exec spC_TabuleiroFechado @TabuleiroID=" + idTabuleiro;
-                var ret = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
-                if (ret == "sim")
-                {
-                    retorno = true;
-                }
+                retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
             }
             return retorno;
         }

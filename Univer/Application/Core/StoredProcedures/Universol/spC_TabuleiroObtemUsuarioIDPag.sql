@@ -27,7 +27,10 @@ BEGIN
     Where
         UsuarioID = @UsuarioID and
         BoardID = @BoardID
-
+    if(@UsuarioIDPag is null)
+    Begin
+        set @UsuarioIDPag = 0
+    End
     Select @UsuarioIDPag UsuarioIDPag
      
 End -- Sp
@@ -36,7 +39,6 @@ go
 Grant Exec on spC_TabuleiroObtemUsuarioIDPag To public
 go
 
-
---Exec spC_TabuleiroObtemUsuarioIDPag @UsuarioID=2947,@BoardID=1
+Exec spC_TabuleiroObtemUsuarioIDPag @UsuarioID=2642,@BoardID=1
 
 

@@ -193,24 +193,24 @@
     @if (blnNovoUsuario)
     {
         <script>
-        Swal.fire({
-            title: '@traducaoHelper["CONVITE"]',
-            html: `
-            <div>
-                <h3>@traducaoHelper["TABULEIRO_NAO_INICIADO_1"]</h3><br />
-                <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_2"]</h4><br />
-                <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4><br />
-                <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_4"]</h4><br />
-            </div>
-                `,
-            icon: 'message',
-            confirmButtonText: 'OK',
-            width: '500px',
-        });
-        function startPage() {
-            $(".divReloadPage").show();
-            $('#planetBody').hide();
-        }
+            Swal.fire({
+                title: '@traducaoHelper["CONVITE"]',
+                html: `
+                <div>
+                    <h3>@traducaoHelper["TABULEIRO_NAO_INICIADO_1"]</h3><br />
+                    <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_2"]</h4><br />
+                    <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_3"]</h4><br />
+                    <h4>@traducaoHelper["TABULEIRO_NAO_INICIADO_4"]</h4><br />
+                </div>
+                    `,
+                icon: 'message',
+                confirmButtonText: 'OK',
+                width: '500px',
+            });
+            function startPage() {
+                $(".divReloadPage").show();
+                $('#planetBody').hide();
+            }
         </script>
     }
     else
@@ -226,42 +226,42 @@
     @if (ViewBag.Timer != null)
     {
         <script>
-        //Contador de tempo para pagamento
-        const second = 1000;
-        const minute = second * 60;
-        const hour = minute * 60;
-        let count_down = new Date('@ViewBag.Timer').getTime();
-        let x = setInterval(() => countDown(), second);
-        function countDown() {
-            let now = new Date(Date.now()).getTime();
-            let diff = count_down - now;
-            if (diff > 0) {
-                var min = Math.floor(diff % hour / minute).toString();
-                var seg = Math.floor(diff % minute / second).toString();
-                if (min.length == 1) {
-                    min = '0' + min;
-                }
-                if (seg.length == 1) {
-                    seg = '0' + seg;
-                }
-                document.getElementById('minutes').innerText = min;
-                document.getElementById('seconds').innerText = seg;
+            //Contador de tempo para pagamento
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            let count_down = new Date('@ViewBag.Timer').getTime();
+            let x = setInterval(() => countDown(), second);
+            function countDown() {
+                let now = new Date(Date.now()).getTime();
+                let diff = count_down - now;
+                if (diff > 0) {
+                    var min = Math.floor(diff % hour / minute).toString();
+                    var seg = Math.floor(diff % minute / second).toString();
+                    if (min.length == 1) {
+                        min = '0' + min;
+                    }
+                    if (seg.length == 1) {
+                        seg = '0' + seg;
+                    }
+                    document.getElementById('minutes').innerText = min;
+                    document.getElementById('seconds').innerText = seg;
 
-                $("#minutes").removeClass('hidden');
-                $("#pontos").removeClass('hidden');
-                $("#seconds").removeClass('hidden');
-            } else {
-                $("#minutes").addClass('hidden');
-                $("#pontos").addClass('hidden');
-                $("#seconds").addClass('hidden');
+                    $("#minutes").removeClass('hidden');
+                    $("#pontos").removeClass('hidden');
+                    $("#seconds").removeClass('hidden');
+                } else {
+                    $("#minutes").addClass('hidden');
+                    $("#pontos").addClass('hidden');
+                    $("#seconds").addClass('hidden');
+                }
             }
-        }
         </script>
     }
 
     @if (tabuleiro != null)
     {
-        <script>
+    <script>
 
         function position() {
             width = window.innerWidth;
@@ -732,7 +732,7 @@
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
                                 $("#infoID").html(data.UsuarioID);
                                 $("#infoID").val(data.UsuarioID);
-                                
+
                                 if (data.Nome == 'System') {
                                     if (data.Observacao != null && data.Observacao.toString() != '') {
                                         $('#infoObs').html(data.Observacao.toString());
@@ -803,7 +803,7 @@
                             }
                         } else {
                             Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                title: '@traducaoHelper["ALERTA"]',
                                 text: '@traducaoHelper["SEM_DADOS"]',
                                 icon: 'warning',
                                 confirmButtonText: 'OK'
@@ -821,7 +821,7 @@
                             }
                         } else {
                             Swal.fire({
-                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                title: '@traducaoHelper["ERRO"] 01: ' + xhr.status + '!',
                                 text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                                 icon: 'error',
                                 confirmButtonText: 'OK'
@@ -869,7 +869,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -887,7 +887,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ERRO"] 02: ' + xhr.status + '!',
                             text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                             icon: 'error',
                             confirmButtonText: 'OK'
@@ -934,7 +934,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -952,7 +952,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ERRO"] 03: ' + xhr.status + '!',
                             text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                             icon: 'error',
                             confirmButtonText: 'OK'
@@ -1031,7 +1031,7 @@
                         $(".deleteUser").hide();
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -1049,7 +1049,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ERRO"] 04: ' + xhr.status + '!',
                             text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                             icon: 'error',
                             confirmButtonText: 'OK'
@@ -1089,7 +1089,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -1107,7 +1107,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ERRO"] 05: ' + xhr.status + '!',
                             text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                             icon: 'error',
                             confirmButtonText: 'OK'
@@ -1141,7 +1141,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -1159,7 +1159,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ERRO"] 06: ' + xhr.status + '!',
                             text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                             icon: 'error',
                             confirmButtonText: 'OK'
@@ -1171,6 +1171,7 @@
 
         $('.invite').on('click', function () {
             var idBoard = $(this).attr("data-id");
+            var idTabuleiro = $('#tabuleiro').val();
             $.ajax({
                 url: "@Url.Action("GetInvite")",
                 type: "POST",
@@ -1189,25 +1190,18 @@
                                 location.reload();
                             }
                         } else {
-                            if (data = '@traducaoHelper["USUARIO_JA_POSICIONADO"]') {
-                                setTimeout(function () {
-                                    location.reload();
-                                }, 2000);
-                            } else {
+                            if (data != '@traducaoHelper["USUARIO_JA_POSICIONADO"]') {
                                 Swal.fire({
                                     title: '@traducaoHelper["ALERTA"]',
                                     text: data,
                                     icon: 'warning',
                                     confirmButtonText: 'OK'
                                 });
-                                setTimeout(function () {
-                                    location.reload();
-                                }, 2000);
                             }
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -1223,14 +1217,7 @@
                         } else {
                             location.reload();
                         }
-                    } else {
-                        Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
-                            text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
+                    } 
                 },
             });
         });
@@ -1266,7 +1253,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ALERTA"]',
                             text: '@traducaoHelper["SEM_DADOS"]',
                             icon: 'warning',
                             confirmButtonText: 'OK'
@@ -1284,7 +1271,7 @@
                         }
                     } else {
                         Swal.fire({
-                            title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                            title: '@traducaoHelper["ERRO"] 08: ' + xhr.status + '!',
                             text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                             icon: 'error',
                             confirmButtonText: 'OK'
@@ -1345,7 +1332,7 @@
                                 }
                             } else {
                                 Swal.fire({
-                                    title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                    title: '@traducaoHelper["ALERTA"]',
                                     text: '@traducaoHelper["SEM_DADOS"]',
                                     icon: 'warning',
                                     confirmButtonText: 'OK'
@@ -1363,7 +1350,7 @@
                                 }
                             } else {
                                 Swal.fire({
-                                    title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                    title: '@traducaoHelper["ERRO"] 09: ' + xhr.status + '!',
                                     text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
                                     icon: 'error',
                                     confirmButtonText: 'OK'
@@ -1381,7 +1368,7 @@
             });
         });
 
-        </script>
+    </script>
     }
 }
 
@@ -1420,6 +1407,9 @@
                             <span id="pontos" style="font-size: 32px; font-weight: 500; color: darkred;">:</span>
                             <span id="seconds" style="font-size: 32px; font-weight: 500; color: darkred;">00</span>
                         </div>
+                    }
+                    @if(ViewBag.Timer != null && ViewBag.ShowExitBoard != null && ViewBag.ShowExitBoard == true)
+                    {
                         <div class="page-title pull-right" style="padding: 10px;">
                             <button type="button" class="btn purple-studio btn-circle pull-right exitNivel">
                                 @traducaoHelper["SAIR_TABULEIRO"]
@@ -1733,13 +1723,17 @@ else
                 }
                 <button data-dismiss="modal" class="btn btn-circle red-flamingo deleteUser">@(traducaoHelper["EXCLUIR"])</button>
                 <button data-dismiss="modal" class="btn btn-success btn-circle reportReceipt">@(traducaoHelper["CONFIRMAR_RECEBIMENTO"])</button>
+
                 @if (ViewBag.PagarInforme)
                 {
                     <button data-dismiss="modal" class="btn btn-success btn-circle reportPaymentSystem">@(traducaoHelper["INFORMAR_PAGAMENTO_SISTEMA"])</button>
                 }
                 else
                 {
-                    <h4 style="font-weight: 500;" id="patrocinadorApelidoHeader">@(traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"])</h4>
+                    if (ViewBag.Pagar)
+                    {
+                        <h4 style="font-weight: 500;" id="patrocinadorApelidoHeader">@(traducaoHelper["NOOK_PAGTO_SISTEMA_AGUAR_ADMIN"])</h4>
+                    }
                 }
 
                 <button data-dismiss="modal" class="btn btn-info btn-circle">@(traducaoHelper["SAIR"])</button>

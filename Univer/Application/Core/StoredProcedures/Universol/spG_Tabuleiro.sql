@@ -110,7 +110,7 @@ Begin
     Set @PagoMasterDireita = 'false'
     Set @PagoMasterEsquerda = 'false'
 	Set @PagoMaster = 'false'
-    Set @log = 'Inicio |'
+    Set @log = '||Inicio spG_Tabuleiro|'
     Set @Historico = ''
     Set @direitaFechada = 'false'
     Set @esquerdaFechada = 'false'
@@ -518,8 +518,7 @@ Begin
 				Begin
 					--Tudo ok continua o processo
 					If Exists (Select 'ok' From #temp)
-					--Caso esteja ativo no board
-					Begin
+					Begin --Caso esteja ativo no board
 						Set @log = @log + '|05 Temp tem conteudo'
 						--Determina qual a posicao do pai no board
 						if(@chamada = 'ConviteNew')
@@ -618,10 +617,8 @@ Begin
 						--*********** DONATOR **************
 						if(@PosicaoPai = 'DonatorDir' or @PosicaoPai = 'DonatorEsq')
 						Begin
+                            Set @log = @log + '|07 é DONATOR'
 							--***Donator nao pode incluir um usuario, dai busca um pai valido, se possivel, para usar na inclussao do novo usuario***
-
-							--nao continua o processo se for um donator
-							
 							Set @Continua = 'false'
                             
 							--Obtem Master do usuario pai passado como parametro e usa este master como pai
@@ -632,7 +629,7 @@ Begin
 							Where
 								UsuarioID = @UsuarioPaiID and
 								BoardID = @BoardID
-                            Set @log = @log + '|07.0 DONATOR Default TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@MasterTabuleiro))
+                            Set @log = @log + '|07.0 DONATOR Default TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@UsuarioPaiID))
 
                             if(@PosicaoPai = 'DonatorEsq')
                             Begin
@@ -643,7 +640,7 @@ Begin
 								    Rede.Tabuleiro
 							    Where
 								    ID = @ID
-                                Set @log = @log + '|07.1 DONATOR Esquerda TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@MasterTabuleiro))
+                                Set @log = @log + '|07.1 DONATOR Esquerda TabuleiroID=' + TRIM(STR(@ID)) + ' Pai=' + TRIM(STR(@UsuarioPaiID))
                             End
 
                             if(@PosicaoPai = 'DonatorDir')
@@ -696,12 +693,13 @@ Begin
 								Set @log = @log + '|12 Chama a sp novamente recursivo, agora com um pai valido jah que o antigo era um donator'
 								Set @Historico = '09.2 @UsuarioID=' + TRIM(STR(@UsuarioID)) + ',@UsuarioPaiID=' + TRIM(STR(@MasterTabuleiro)) + ',@BoardID=' + TRIM(STR(@BoardID))
 								Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = @MasterTabuleiro, @BoardID = @BoardID, @chamada = 'Donator'
+                                Set @Continua = 'false'
 							End
 						End
-					
-						if(@Continua = 'true')
+						
+                        if(@Continua = 'true')
 						Begin
-							Set @log = @log + '|13 Continua'
+                            Set @log = @log + '|05.0.1 Continua=true'
 							--IndicatorDirSup
 							if (@IndicatorDirSup = @UsuarioPaiID )
 							Begin
@@ -738,25 +736,65 @@ Begin
 								Set @PosicaoPai = 'Master'
 							End
 
-							--Verifica se novo usuario jah esta no tabuleiro do pai
-							If(@DonatorEsqSup1 = @UsuarioID OR @DonatorEsqSup2 = @UsuarioID OR @DonatorEsqInf1 = @UsuarioID  OR @DonatorEsqInf2 = @UsuarioID)
-							Begin
-								Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (1)'
-							End
-							If(@DonatorDirSup1 = @UsuarioID OR @DonatorDirSup2 = @UsuarioID OR @DonatorDirInf1 = @UsuarioID  OR @DonatorDirInf2 = @UsuarioID)
-							Begin
-								Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (2)'
-							End
-							If(@IndicatorDirSup = @UsuarioID OR @IndicatorDirInf = @UsuarioID OR @IndicatorEsqSup = @UsuarioID  OR @IndicatorEsqInf = @UsuarioID)
-							Begin
-								Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (3)'
-							End
-							If(@CoordinatorDir = @UsuarioID OR @CoordinatorEsq = @UsuarioID)
-							Begin
-								Set @PosicaoPai = 'usuario (' + TRIM(STR(@UsuarioID)) + ') jah se encontra no tabuleiro (4)'
-							End
-				
-							Set @log = @log + '|13.1 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@MasterID))
+                            if(@PosicaoPai is null)
+                            Begin
+                                Set @log = @log + '|13.3 Continua PosicaoPai é null'
+                            End
+                            Else
+                            Begin
+                                Set @log = @log + '|13.4 Continua PosicaoPai=' + @PosicaoPai
+                            End
+
+                            Set @log = @log + '|PosicaoPai:' + @PosicaoPai
+
+                            if Exists (Select 'OK' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and BoardID=@BoardID and TabuleiroID is null)
+                            Begin
+                                --Verifica se novo usuario jah esta no tabuleiro do pai, não deve estar, se estiver é lixo, daí remove ele
+                                --Existindo remove o usuario do RedeTabuleiro
+							    If(@DonatorEsqSup1 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.1 Removido DonatorEsqSup1 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+							        Update Rede.Tabuleiro Set DonatorEsqSup1 = null Where id = @ID
+							    End
+                                If(@DonatorEsqSup2 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.2 Removido DonatorEsqSup2 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+								    Update Rede.Tabuleiro Set DonatorEsqSup2 = null Where id = @ID
+							    End
+                                If(@DonatorEsqInf1 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.3 Removido DonatorEsqInf1 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+								    Update Rede.Tabuleiro Set DonatorEsqInf1 = null Where id = @ID
+							    End
+                                If(@DonatorEsqInf2 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.4 Removido DonatorEsqInf2 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+								    Update Rede.Tabuleiro Set DonatorEsqInf2 = null Where id = @ID
+							    End
+
+                                If(@DonatorDirSup1 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.5 Removido DonatorDirSup1 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+							        Update Rede.Tabuleiro Set DonatorDirSup1 = null Where id = @ID
+							    End
+                                If(@DonatorDirSup2 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.6 Removido DonatorDirSup2 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+								    Update Rede.Tabuleiro Set DonatorDirSup2 = null Where id = @ID
+							    End
+                                If(@DonatorDirInf1 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.7 Removido DonatorDirInf1 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+								    Update Rede.Tabuleiro Set DonatorDirInf1 = null Where id = @ID
+							    End
+                                If(@DonatorDirInf2 = @UsuarioID)
+							    Begin
+                                    Set @log = @log + '|13.5.1 Removido DonatorDirInf2 do Tabuleiro id=' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' chamada=' + @chamada
+								    Update Rede.Tabuleiro Set DonatorDirInf2 = null Where id = @ID
+							    End
+                            End
+							
+							Set @log = @log + '|13.5 TabuleiroID: ' + TRIM(STR(@ID)) + ' Master: ' + TRIM(STR(@MasterID)) + ' PosicaoPai=' + @PosicaoPai
 						
 							--Verifica se houve pagamento ao Master na Direita
 							If Exists ( 
@@ -921,8 +959,11 @@ Begin
 								UsuarioID = @MasterID and
 								BoardID = @BoardID
 							
-							--Verificar se lado esquerdo e lado direito fecharam
-							Set @log = @log + '|13.2 Verificar se lado esquerdo e lado direito fecharam direitaFechada=' + TRIM(STR(@direitaFechada)) + ' esquerdaFechada=' + TRIM(STR(@esquerdaFechada)) + ' chamada=' + @chamada
+                            if(@chamada = 'Completa')
+                            Begin
+							    --Verificar se lado esquerdo e lado direito fecharam
+							    Set @log = @log + '|13.6 Verificar se lado esquerdo e lado direito fecharam direitaFechada=' + TRIM(STR(@direitaFechada)) + ' esquerdaFechada=' + TRIM(STR(@esquerdaFechada)) + ' chamada=' + @chamada
+                            End
 
 							--**************** Verifica se o tabuleiro esta completo na Direita **************** 
 							if(
@@ -1002,8 +1043,8 @@ Begin
 									)
 
 									Set @Identity = @@IDentity
-				
-									Set @log = @log + '|28.1 Altera Posicao no tabuleiro: ' + TRIM(STR(@Identity))
+									
+                                    Set @log = @log + '|23.2.4 Criado tabuleiro vindo da direita id:' + TRIM(STR(@Identity))
 									
 									--inclui novo usuario no TabuleiroUsuario 1
 
@@ -1022,8 +1063,10 @@ Begin
 										Set @Ciclo = 1
 									End
 								
-                                    --Donators
-                                     Insert into
+                                    Set @log = @log + '|28.3 Inserts: ' + TRIM(STR(@Identity))
+                              
+                                   --Donators
+                                    Insert into
                                        Rede.TabuleiroUsuarioFinalizados
                                     Select
                                         UsuarioID,
@@ -1042,7 +1085,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1069,7 +1112,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1096,7 +1139,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1123,15 +1166,15 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
 									Where
 										UsuarioID = @DonatorDirInf2 and
 										BoardID = @BoardID
-
-									--Master
+                                    
+                                    --Master
                                     Insert into
                                        Rede.TabuleiroUsuarioFinalizados
                                     Select
@@ -1151,7 +1194,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1159,6 +1202,203 @@ Begin
                                     	UsuarioID = @MasterID and
 										BoardID = @BoardID
 
+                                    --CoordinatorDir
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @CoordinatorDir and
+										BoardID = @BoardID
+									
+                                    --CoordinatorEsq
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @CoordinatorEsq and
+										BoardID = @BoardID
+
+                                    --CoordinatorEsq
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @CoordinatorEsq and
+										BoardID = @BoardID
+
+                                    --IndicatorDirSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @IndicatorDirSup and
+										BoardID = @BoardID
+
+                                    --IndicatorDirInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorDirInf and
+										BoardID = @BoardID
+
+                                    --IndicatorEsqSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorEsqSup and --Ele vira o CoordinatorEsq
+										BoardID = @BoardID
+
+                                    --IndicatorEsqInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @IndicatorEsqInf and --Ele vira o CoordinatorEsq
+										BoardID = @BoardID
+
+                                    --Master
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1178,33 +1418,6 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorDir
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @CoordinatorDir and
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1224,33 +1437,6 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorEsq
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                        UsuarioID = @CoordinatorEsq and
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1268,35 +1454,8 @@ Begin
 									Where
 										UsuarioID = @IndicatorDirInf and --Ele vira o CoordinatorEsq
 										BoardID = @BoardID
-								
-									--IndicatorDirSup
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                        UsuarioID = @IndicatorDirSup and
-										BoardID = @BoardID
-
+                                    
+                                    --IndicatorDirSup
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1312,37 +1471,10 @@ Begin
 										DataInicio = GetDate(),
 										Debug = 'Direita Fechada - Update IndicatorDirSup'
 									Where
-										UsuarioID = @DonatorDirSup1 and --Ele vira o CoordinatorEsq
+										UsuarioID = @DonatorDirSup1 and --Ele vira o IndicatorDirSup
 										BoardID = @BoardID
-								
-									--IndicatorDirInf
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @IndicatorDirInf and
-										BoardID = @BoardID
-
+								    
+                                    --IndicatorDirInf
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1358,37 +1490,10 @@ Begin
 										DataInicio = GetDate(),
 										Debug = 'Direita Fechada - Update IndicatorDirInf'
 									Where
-										UsuarioID = @DonatorDirSup2 and --Ele vira o CoordinatorEsq
+										UsuarioID = @DonatorDirSup2 and --Ele vira o IndicatorDirInf
 										BoardID = @BoardID
 
 									--IndicatorEsqSup
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @IndicatorEsqSup and --Ele vira o CoordinatorEsq
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1408,33 +1513,6 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqInf
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                        UsuarioID = @IndicatorEsqInf and --Ele vira o CoordinatorEsq
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1539,6 +1617,8 @@ Begin
 
 									Set @Identity = @@IDentity
 
+                                    Set @log = @log + '|23.2.4 Criado tabuleiro vindo da esquerda id:' + TRIM(STR(@Identity))
+
 									--Update posicao no TabuleiroUsuario do pessoal da Esquerda
 									Select
 										@Ciclo = MAX(Ciclo) + 1
@@ -1555,7 +1635,7 @@ Begin
 									End
                                     
                                     --Donators
-                                     Insert into
+                                    Insert into
                                        Rede.TabuleiroUsuarioFinalizados
                                     Select
                                         UsuarioID,
@@ -1574,7 +1654,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1601,7 +1681,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1628,7 +1708,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1655,7 +1735,7 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
@@ -1683,14 +1763,183 @@ Begin
                                         EsquerdaFechada,
                                         TotalRecebimento,
                                         DataInicio,
-                                        DataFim,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
                                         Debug
                                     From
                                         Rede.TabuleiroUsuario
 									Where
 										UsuarioID = @MasterID and 
 										BoardID = @BoardID
+                                    
+                                    --CoordinatorDir
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+										UsuarioID = @CoordinatorDir and
+										BoardID = @BoardID
 
+                                    --CoordinatorEsq
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @CoordinatorEsq and 
+										BoardID = @BoardID
+
+                                    --IndicatorDirSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorDirSup and 
+										BoardID = @BoardID
+
+                                    --IndicatorDirInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                        UsuarioID = @IndicatorDirInf and 
+										BoardID = @BoardID
+
+                                    --IndicatorEsqSup
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorEsqSup and 
+										BoardID = @BoardID
+
+                                    --IndicatorEsqInf
+                                    Insert into
+                                       Rede.TabuleiroUsuarioFinalizados
+                                    Select
+                                        UsuarioID,
+                                        BoardID,
+                                        TabuleiroID,
+                                        StatusID,
+                                        MasterID,
+                                        InformePag,
+                                        UsuarioIDPag,
+                                        Ciclo,
+                                        Posicao,
+                                        PagoMaster,
+                                        InformePagSistema,
+                                        PagoSistema,
+                                        DireitaFechada,
+                                        EsquerdaFechada,
+                                        TotalRecebimento,
+                                        DataInicio,
+                                        CONVERT(VARCHAR(8),GETDATE(),112) DataFim,
+                                        Debug
+                                    From
+                                        Rede.TabuleiroUsuario
+									Where
+                                    	UsuarioID = @IndicatorEsqInf and 
+										BoardID = @BoardID
+
+                                    --Master
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1710,33 +1959,6 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorDir
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-										UsuarioID = @CoordinatorDir and
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1756,33 +1978,6 @@ Begin
 										BoardID = @BoardID
 
 									--CoordinatorEsq
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @CoordinatorEsq and 
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1802,33 +1997,6 @@ Begin
 										BoardID = @BoardID
 								
 									--IndicatorDirSup
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @IndicatorDirSup and 
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1848,33 +2016,6 @@ Begin
 										BoardID = @BoardID
 								
 									--IndicatorDirInf
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                        UsuarioID = @IndicatorDirInf and 
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1894,33 +2035,6 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqSup
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @IndicatorEsqSup and 
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -1940,33 +2054,6 @@ Begin
 										BoardID = @BoardID
 
 									--IndicatorEsqInf
-                                    Insert into
-                                       Rede.TabuleiroUsuarioFinalizados
-                                    Select
-                                        UsuarioID,
-                                        BoardID,
-                                        TabuleiroID,
-                                        StatusID,
-                                        MasterID,
-                                        InformePag,
-                                        UsuarioIDPag,
-                                        Ciclo,
-                                        Posicao,
-                                        PagoMaster,
-                                        InformePagSistema,
-                                        PagoSistema,
-                                        DireitaFechada,
-                                        EsquerdaFechada,
-                                        TotalRecebimento,
-                                        DataInicio,
-                                        DataFim,
-                                        Debug
-                                    From
-                                        Rede.TabuleiroUsuario
-									Where
-                                    	UsuarioID = @IndicatorEsqInf and 
-										BoardID = @BoardID
-
 									Update
 										Rede.TabuleiroUsuario 
 									Set
@@ -2054,8 +2141,7 @@ Begin
 							--*************** Encerra tabuleiro Fim ****************
 							End
 							Else
-							--Tabuleiro incompleto
-							Begin
+							Begin --Tabuleiro incompleto
 								if(@chamada <> 'Completa')
 								Begin
 									Set @log = @log + '|34 TABULEIRO INCOMPLETO'
@@ -2084,6 +2170,15 @@ Begin
 									Else
 									Begin
 										Set @log = @log + '|34.2 ha Posicoes livres para o TabuleiroID=' + TRIM(STR(@ID))
+
+                                        if(@PosicaoPai is null)
+                                        Begin
+                                            Set @log = @log + '|34.2.1 PosicaoPai é null'
+                                        End
+                                        Else
+                                        Begin
+                                            Set @log = @log + '|34.2.1 PosicaoPai=' + @PosicaoPai
+                                        End
 								
 										--*********INICIO UPDATES***********
 
@@ -2095,7 +2190,7 @@ Begin
 											--Verifica se ha coordinator, caso nao inclui usuario como coordinator na direita
 											if (@CoordinatorDir is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|14.1 COORDINATOR DIREITA'
+													Set @log = @log + '|34.4.01 entrou em CoordinatorDir no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2110,7 +2205,7 @@ Begin
 											--Verifica se ha coordinator, caso nao inclui usuario como coordinator na esquerda
 											if (@CoordinatorEsq is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|14.1 COORDINATOR ESQUERDA'
+													Set @log = @log + '|34.4.02 entrou em CoordinatorEsq no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2122,11 +2217,10 @@ Begin
 													Set @Incluido = 'true'
 													Set @PosicaoFilho = 'CoordinatorEsq'
 												End
-											
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 											if (@IndicatorDirSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
+													Set @log = @log + '|34.4.03 entrou em IndicatorDirSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2142,7 +2236,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 											if (@IndicatorDirInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
+													Set @log = @log + '|34.4.04 entrou em IndicatorDirInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2158,7 +2252,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 											if (@IndicatorEsqSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
+													Set @log = @log + '|34.4.05 entrou em IndicatorEsqSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2174,7 +2268,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 											if (@IndicatorEsqInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
+													Set @log = @log + '|34.4.06 entrou em IndicatorEsqInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2187,11 +2281,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorEsqInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.4.07 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2207,7 +2300,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.4.08 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2223,7 +2316,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.4.09 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2239,7 +2332,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.4.10 entrou em DonatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2252,11 +2345,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-											
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.4.11 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2272,7 +2364,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.4.12 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2288,7 +2380,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.4.13 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2304,7 +2396,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.4.14 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2317,18 +2409,16 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-										
-										End --Master
+										End --Fim Master
 				
 										--*********** COORDINATOR DIREITA **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir'))
 										Begin
-											Set @log = @log + '|34.3.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
-											
+											Set @log = @log + '|34.5.0 Pai eh master ou CoordinatorDir:' + @PosicaoPai
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 											if (@IndicatorDirSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
+													Set @log = @log + '|34.5.01 entrou em IndicatorDirSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2344,7 +2434,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 											if (@IndicatorDirInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
+													Set @log = @log + '|34.5.02 entrou em IndicatorDirInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2357,11 +2447,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorDirInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.5.03 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2377,7 +2466,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.5.04 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2393,7 +2482,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.5.05 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2409,7 +2498,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.5.06 entrou em DonatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2422,11 +2511,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-											
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 											if (@IndicatorEsqSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
+													Set @log = @log + '|34.5.07 entrou em IndicatorEsqSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2442,7 +2530,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 											if (@IndicatorEsqInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
+													Set @log = @log + '|34.5.08 entrou em IndicatorEsqInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2455,11 +2543,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorEsqInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.5.09 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2475,7 +2562,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.5.10 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2491,7 +2578,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.5.11 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2507,7 +2594,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.5.12 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2520,24 +2607,23 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-
-										End
+										End --Fim COORDINATOR Direita
 				
 										--*********** COORDINATOR ESQUERDA **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq'))
 										Begin
-											Set @log = @log + '|34.3.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
+											Set @log = @log + '|34.6.0 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 											if (@IndicatorEsqSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
+													Set @log = @log + '|34.6.01 entrou em IndicatorEsqSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
 														IndicatorEsqSup = @UsuarioID
 													Where
 														ID = @ID
-				
+
 													Set @IndicatorEsqSup = @UsuarioID
 													Set @Incluido = 'true'
 													Set @PosicaoFilho = 'IndicatorEsqSup'
@@ -2546,7 +2632,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 											if (@IndicatorEsqInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
+													Set @log = @log + '|34.6.01 entrou em IndicatorEsqInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2559,11 +2645,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorEsqInf'
 													Set @PagoMaster = 'true'
 												End
-
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.6.01 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2579,7 +2664,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.6.01 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2595,7 +2680,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.6.01 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2611,7 +2696,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.6.01 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2624,11 +2709,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 											if (@IndicatorDirSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
+													Set @log = @log + '|34.6.01 entrou em IndicatorDirSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2644,7 +2728,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 											if (@IndicatorDirInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
+													Set @log = @log + '|34.6.01 entrou em IndicatorDirInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2657,11 +2741,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorDirInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.6.01 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2677,7 +2760,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.6.01 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2693,7 +2776,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.6.01 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2709,7 +2792,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.6.01 entrou em DonatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2722,17 +2805,17 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --Fim COORDINATOR ESQUERDA
 				
 										--*********** INDICATOR DIREITA Superior ************** 
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup'))
 										Begin
-											Set @log = @log + '|34.3.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+											Set @log = @log + '|34.7.0 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
 											
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.7.01 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2748,7 +2831,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.7.02 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2764,7 +2847,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.7.03 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2780,7 +2863,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.7.04 entrou em DonatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2793,11 +2876,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-											
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 											if (@IndicatorEsqSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
+													Set @log = @log + '|34.7.05 entrou em IndicatorEsqSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2813,7 +2895,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 											if (@IndicatorEsqInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
+													Set @log = @log + '|34.7.06 entrou em IndicatorEsqInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2826,11 +2908,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorEsqInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.7.07 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2846,7 +2927,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.7.08 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2862,7 +2943,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.7.09 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2878,7 +2959,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.7.10 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2891,17 +2972,16 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-											
-										End
+										End --Fim INDICATOR DIREITA
 				
 										--*********** INDICATOR DIREITA Inferior ************** 
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf'))
 										Begin
-											Set @log = @log + '|34.3.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+											Set @log = @log + '|34.8.0 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.8.01 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2917,7 +2997,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.8.02 entrou em onatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2933,7 +3013,7 @@ Begin
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.8.03 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2949,7 +3029,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.8.04 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2962,11 +3042,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirSup2'
 													Set @PagoMaster = 'false'
 												End
-											
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 											if (@IndicatorEsqSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Sup'
+													Set @log = @log + '|34.8.05 entrou em IndicatorEsqSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2982,7 +3061,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 											if (@IndicatorEsqInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.1 INDICATOR ESQUERDA Inf'
+													Set @log = @log + '|34.8.06 entrou em IndicatorEsqInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -2995,11 +3074,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorEsqInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.8.07 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3015,7 +3093,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.8.08 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3031,7 +3109,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.8.09 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3047,7 +3125,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.8.10 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3060,16 +3138,16 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --Fim INDICATOR DIREITA
 				
 										--*********** INDICATOR ESQUERDA Superior **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup'))
 										Begin
-											Set @log = @log + '|34.3.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+											Set @log = @log + '|34.9.0 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.9.01 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3085,7 +3163,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.9.02 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3101,7 +3179,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.9.03 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3117,7 +3195,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.9.04 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3130,11 +3208,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 											if (@IndicatorDirSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
+													Set @log = @log + '|34.9.05 entrou em IndicatorDirSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3150,7 +3227,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 											if (@IndicatorDirInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
+													Set @log = @log + '|34.9.06 entrou em IndicatorDirInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3163,11 +3240,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorDirInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.9.07 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3183,7 +3259,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.9.08 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3199,7 +3275,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.9.09 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3215,7 +3291,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.9.10 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3228,17 +3304,16 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-										
-										End
+										End --Fim INDICATOR ESQUERDA
 
 										--*********** INDICATOR ESQUERDA Inferior **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf'))
 										Begin
-											Set @log = @log + '|34.3.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+											Set @log = @log + '|34.10.0 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
 											--Verifica se ha Donator Esquerda Inferior 1
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.10.01 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3254,7 +3329,7 @@ Begin
 											--Verifica se ha Donator Esquerda Inferior 2
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.1 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.10.02 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3270,7 +3345,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 1
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.10.03 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3286,7 +3361,7 @@ Begin
 											--Verifica se ha Donator Esquerda Superior 2
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.10.04 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3299,11 +3374,10 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqSup2'
 													Set @PagoMaster = 'false'
 												End
-
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 											if (@IndicatorDirSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA SUP'
+													Set @log = @log + '|34.10.05 entrou em IndicatorDirSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3319,7 +3393,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 											if (@IndicatorDirInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.1 INDICATOR DIREITA Inf'
+													Set @log = @log + '|34.10.06 entrou em IndicatorDirInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3332,11 +3406,10 @@ Begin
 													Set @PosicaoFilho = 'IndicatorDirInf'
 													Set @PagoMaster = 'true'
 												End
-											
 											--Verifica se ha Donator Direita Superior 1
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.10.07 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3352,7 +3425,7 @@ Begin
 											--Verifica se ha Donator Direita Superior s
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.1 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.10.08 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3368,7 +3441,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior 1
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.10.09 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3384,7 +3457,7 @@ Begin
 											--Verifica se ha Donator Direita Inferior s
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.1 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.10.10 entrou em DonatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3397,17 +3470,17 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --FIM INDICATOR ESQUERDA
 
 										--**********************Segunda Passagem Caso nao seja incluido acima *******************************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @DireitaFinalizada = 'true' Or  @EsquerdaFinalizada = 'true'))
 										Begin
-											Set @log = @log + '|34.4.1 Pai eh master:' + @PosicaoPai
+											Set @log = @log + '|34.11.0 Pai eh master:' + @PosicaoPai
 											--*********** COORDINATOR **************
 											--Verifica se ha coordinator, caso nao inclui usuario como coordinator na direita
 											if (@CoordinatorDir is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|14.2 COORDINATOR DIREITA'
+													Set @log = @log + '|34.11.01 entrou em CoordinatorDir no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3423,7 +3496,7 @@ Begin
 											--Verifica se ha coordinator, caso nao inclui usuario como coordinator na esquerda
 											if (@CoordinatorEsq is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|14.2 COORDINATOR ESQUERDA'
+													Set @log = @log + '|34.11.02 entrou em CoordinatorEsq no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3436,16 +3509,16 @@ Begin
 													Set @PosicaoFilho = 'CoordinatorEsq'
 													Set @PagoMaster = 'true'
 												End
-										End --Master
+										End --Fim Segunda Passagem Caso nao seja incluido acima
 			
 										--*********** COORDINATOR DIREITA 2 **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'  Or @IndicadorDireitaInferiorFinalizado = 'true'))
 										Begin
-											Set @log = @log + '|34.4.2 Pai eh master ou CoordinatorDir:' + @PosicaoPai
+											Set @log = @log + '|34.12.0 Pai eh master ou CoordinatorDir:' + @PosicaoPai
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior direita
 											if (@IndicatorDirSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.2 INDICATOR DIREITA SUP'
+													Set @log = @log + '|34.12.01 entrou em IndicatorDirSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3461,7 +3534,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior direita
 											if (@IndicatorDirInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|15.2 INDICATOR DIREITA Inf'
+													Set @log = @log + '|34.12.02 entrou em IndicatorDirInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3474,16 +3547,16 @@ Begin
 													Set @PosicaoFilho = 'IndicatorDirInf'
 													Set @PagoMaster = 'true'
 												End
-										End
+										End --Fim COORDINATOR DIREITA 2
 				
 										--*********** COORDINATOR ESQUERDA 2 **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'  Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
 										Begin
-											Set @log = @log + '|34.4.3 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
+											Set @log = @log + '|34.13.0 Pai eh master ou CoordinatorEsq:' + @PosicaoPai
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator superior esquerda
 											if (@IndicatorEsqSup is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.2 INDICATOR ESQUERDA Sup'
+													Set @log = @log + '|34.13.01 entrou em IndicatorEsqSup no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3499,7 +3572,7 @@ Begin
 											--Verifica se ha Indicator, caso nao inclui usuario como indicator inferior esquerda
 											if (@IndicatorEsqInf is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|16.2 INDICATOR ESQUERDA Inf'
+													Set @log = @log + '|34.13.02 entrou em IndicatorEsqInf no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3512,15 +3585,15 @@ Begin
 													Set @PosicaoFilho = 'IndicatorEsqInf'
 													Set @PagoMaster = 'true'
 												End
-										End
+										End --Fim COORDINATOR ESQUERDA 2
 				
 										--*********** INDICATOR DIREITA Superior 2 ************** 
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaInferiorFinalizado = 'true'))
 										Begin
-											Set @log = @log + '|34.4.4 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
+											Set @log = @log + '|34.14.0 Pai eh master ou CoordinatorEsq ou CoordinatorDir ou IndicatorDirSup:' + @PosicaoPai
 											if (@DonatorDirSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.2 DONATOR DIREITA Sup 1'
+													Set @log = @log + '|34.14.01 entrou em DonatorDirSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3535,7 +3608,7 @@ Begin
 												End
 											if (@DonatorDirSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|17.2 DONATOR DIREITA Sup 2'
+													Set @log = @log + '|34.14.01 entrou em DonatorDirSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3548,15 +3621,15 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirSup2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --Fim INDICATOR DIREITA Superior 2
 				
 										--*********** INDICATOR DIREITA Inferior 2 ************** 
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorDir' Or @PosicaoPai = 'IndicatorDirSup' Or @PosicaoPai = 'IndicatorDirInf' Or  @EsquerdaFinalizada = 'true' Or @IndicadorDireitaSuperiorFinalizado = 'true'))
 										Begin
-											Set @log = @log + '|34.4.5 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
+											Set @log = @log + '|34.15.0 Pai eh master ou CoordinatorDir ou IndicatorDirSup ou IndicatorDirInf:' + @PosicaoPai
 											if (@DonatorDirInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.2 DONATOR DIREITA Inf 1'
+													Set @log = @log + '|34.15.01 entrou em DonatorDirInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3571,7 +3644,7 @@ Begin
 												End
 											if (@DonatorDirInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|18.2 DONATOR DIREITA Inf 2'
+													Set @log = @log + '|34.15.02 entrou em DonatorDirInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3584,15 +3657,15 @@ Begin
 													Set @PosicaoFilho = 'DonatorDirInf2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --INDICATOR DIREITA Inferior 2
 				
 										--*********** INDICATOR ESQUERDA Superior 2 **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @DireitaFinalizada = 'true' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaInferiorFinalizado = 'true'))
 										Begin
-											Set @log = @log + '|34.4.6 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
+											Set @log = @log + '|34.16.0 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqSup:' + @PosicaoPai
 											if (@DonatorEsqSup1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19.2 DONATOR ESQUERDA Sup 1'
+													Set @log = @log + '|34.16.01 entrou em DonatorEsqSup1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3607,7 +3680,7 @@ Begin
 												End
 											if (@DonatorEsqSup2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|19.2 DONATOR ESQUERDA Sup 2'
+													Set @log = @log + '|34.16.02 entrou em DonatorEsqSup2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3620,15 +3693,15 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqSup2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --fim INDICATOR ESQUERDA Superior 2
 				
 										--*********** INDICATOR ESQUERDA Inferior 2 **************
 										if(@Incluido = 'false' and (@PosicaoPai = 'Master' Or @PosicaoPai = 'CoordinatorEsq' Or @PosicaoPai = 'IndicatorEsqSup' Or @PosicaoPai = 'IndicatorEsqInf' Or @DireitaFinalizada = 'true' Or @IndicadorEsquerdaSuperiorFinalizado = 'true'))
 										Begin
-											Set @log = @log + '|34.4.7 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
+											Set @log = @log + '|34.17.0 Pai eh master ou CoordinatorEsq ou IndicatorEsqSup ou IndicatorEsqInf:' + @PosicaoPai
 											if (@DonatorEsqInf1 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.2 DONATOR ESQUERDA inf 1'
+													Set @log = @log + '|34.17.01 entrou em DonatorEsqInf1 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3643,7 +3716,7 @@ Begin
 												End
 											if (@DonatorEsqInf2 is null and @Incluido = 'false')
 												Begin
-													Set @log = @log + '|20.2 DONATOR ESQUERDA inf 2'
+													Set @log = @log + '|34.17.02 entrou em DonatorEsqInf2 no Tabuleiro:' + TRIM(STR(@ID)) + ' UsuarioID=' + TRIM(STR(@UsuarioID)) + ' BoardID=' + TRIM(STR(@BoardID)) + ' Chamada=' + @Chamada
 													Update
 														Rede.Tabuleiro
 													Set
@@ -3656,7 +3729,18 @@ Begin
 													Set @PosicaoFilho = 'DonatorEsqInf2'
 													Set @PagoMaster = 'false'
 												End
-										End
+										End --fim INDICATOR ESQUERDA Inferior 2
+                                    
+                                        if(@PosicaoFilho is null)
+                                        Begin
+                                            --Não pode passar por aqui!!!!
+                                            Set @log = @log + '|34.2.2 PosicaoFilho é null'
+                                            set @PosicaoFilho = 'PosicaoFilho é null'
+                                        End
+                                        Else
+                                        Begin
+                                            Set @log = @log + '|34.2.3 PosicaoFilho=' + @PosicaoFilho
+                                        End
 
 										--Atualiza Rede.TabuleiroUsuario para o novo usuario no Tabuleiro
 										Update
@@ -3766,7 +3850,11 @@ Begin
 								Set @log = @log + '|50.5 nao teve 4 pagamentos'
 							End
 						End
-					End
+					    Else
+                        Begin
+                            Set @log = @log + '|05.0.2 Continua=false'
+                        End
+                    End
 					Else 
 					Begin
 						Set @log = @log + '|5.1 #temp nao tem conteudo'
@@ -3835,8 +3923,9 @@ Begin
 		Where 
 			ID = @ID
 		
+        --Verifica se usuario esta no rede.tabuleiro e não no rede.Tabuleirousuario, se sim remove ele do rede tabuleiro
 		--*****************************ESQUERDA*******************************
-		if(@esquerdaFechada = 'false')
+		if(@esquerdaFechada = 'false' and @Continua = 'true' and @chamada <> 'ConviteNew')
 		Begin
 			if(@DonatorEsqSup1 is not null)
 			Begin
@@ -3935,9 +4024,9 @@ Begin
 				End
 			End
 		End
-		
+		--Verifica se usuario esta no rede.tabuleiro e não no rede.Tabuleirousuario, se sim remove ele do rede tabuleiro
 		--*****************************DIREITA*******************************
-		if(@direitaFechada = 'false')
+		if(@direitaFechada = 'false' and @Continua = 'true' and @chamada <> 'ConviteNew')
 		Begin
 			if(@DonatorDirSup1 is not null)
 			Begin
@@ -4074,6 +4163,8 @@ Begin
 			UsuarioID = @UsuarioID and
 			BoardID = @BoardID
 
+        Set @log = @log + '||Fim spG_Tabuleiro|'
+
 		Insert Into Rede.TabuleiroLog
 		Select 
 			Coalesce(@UsuarioID,@UsuarioID,0) as UsuarioID,
@@ -4134,7 +4225,9 @@ Begin
 		
 		DECLARE @error int, @message varchar(4000), @xstate int;
 		SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE();
-        Set @log = 'Error SPGT: ' + TRIM(STR(@error)) + '-' + @message + ' - ' + @log
+        
+        Set @log = '|Error SPGT: ' + TRIM(STR(@error)) + '-' + @message + ' - ' + @log
+
 		Select 
 			'NOOK' as Retorno, 
 			@UsuarioID as UsuarioID, 
@@ -4145,6 +4238,26 @@ Begin
 			@Historico as Historico, 
 			@log as Debug, 
 			@chamada as Chamada
+
+        Insert Into Rede.TabuleiroLog
+		Select 
+			Coalesce(@UsuarioID,@UsuarioID,0) as UsuarioID,
+			Coalesce(@NomeUsuario,@NomeUsuario,'Sem Nome') as NomeUsuario,
+			Coalesce(@UsuarioPaiID,@UsuarioPaiID,0) as UsuarioPaiID,
+			Coalesce(@NomePai,@NomePai,'Sem Nome') as NomePai,
+			Coalesce(@MasterID,@MasterID,0) as Master,
+			Coalesce(@NomeMaster,@NomeMaster,'Sem Nome') as NomeMaster,
+			Coalesce(@BoardID,@BoardID,0) as BoardID,
+			Coalesce(@ID,@ID,0) as TabuleiroID,
+			Coalesce(@PosicaoAntiga,@PosicaoAntiga,'Sem posicao Antiga') as PosicaoAntiga,
+			Coalesce(@PosicaoNova,@PosicaoNova,'Sem posicao Nova') as PosicaoNova,
+			Coalesce(@TabuleiroIDAntigo,@TabuleiroIDAntigo,0) as TabuleiroIDAntigo,
+			Coalesce(@TabuleiroIDNovo,@TabuleiroIDNovo,0) as TabuleiroIDNovo,
+			@chamada as Chamada,
+			format(getdate(),'dd/MM/yyyy HH:mm:ss') as Data,
+			Coalesce(@Historico,@Historico,'Sem  Dados') as Mensagem,
+			Coalesce(@log,@log,'Sem Dados') as Debug
+
 	END CATCH     
 
     Set @Historico = ''
@@ -4158,7 +4271,7 @@ go
 /*
 Begin Tran
 
-Exec spG_Tabuleiro @UsuarioID=3831,@UsuarioPaiID=2692,@BoardID=1,@Chamada='ConviteNew'
+Exec spG_Tabuleiro @UsuarioID=5579,@UsuarioPaiID=5469,@BoardID=1,@Chamada='Completa'
 
 Select * from  Rede.TabuleiroLog order by id desc
 

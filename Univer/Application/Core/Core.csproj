@@ -777,7 +777,10 @@
     <Content Include="StoredProcedures\Racco\spOC_US_CalculaRede.sql" />
     <Content Include="StoredProcedures\Universol\spC_Tabuleiro.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroBoard.sql" />
+    <Content Include="StoredProcedures\Universol\spC_TabuleiroBoardID.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroConfirmarPagtoSistema.sql" />
+    <Content Include="StoredProcedures\Universol\spC_TabuleiroFechado.sql" />
+    <Content Include="StoredProcedures\Universol\spC_TabuleiroIndicados.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroIndicadosValidos.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroInformaramPagto.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroInformarPagto.sql" />
@@ -789,6 +792,8 @@
     <Content Include="StoredProcedures\Universol\spC_TabuleiroMasterRule.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroNaoPagaramSistema.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroObtemBoardIDByTabuleiroID.sql" />
+    <Content Include="StoredProcedures\Universol\spC_TabuleiroObtemUsuarioIDPag.sql" />
+    <Content Include="StoredProcedures\Universol\spC_TabuleiroPagos.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroUsuario.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroUsuarioID.sql" />
     <Content Include="StoredProcedures\Universol\spC_TabuleiroUsuarioRule.sql" />

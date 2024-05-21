@@ -41,7 +41,7 @@ BEGIN
 
 	if(@UsuarioID is null or @UsuarioID = 0)
 	Begin
-		--Obtem os 10 primeiros ativos no Board 1
+		--Obtem os 60 primeiros ativos no Board 1
 		Insert Into #temp
 		Select distinct top(60)
 			tab.UsuarioID,
@@ -71,9 +71,20 @@ BEGIN
 			tab.StatusID = 1 And
 			tab.BoardID = 1 and
             redtab.id = tab.TabuleiroID and
-            redtab.StatusID <> 2
+            tab.UsuarioID = tab.MasterID and
+            redtab.StatusID <> 2 and (
+                redtab.DonatorDirSup1 is null or
+                redtab.DonatorDirSup2 is null or
+                redtab.DonatorDirInf1 is null or
+                redtab.DonatorDirInf2 is null or
+                redtab.DonatorEsqSup1 is null or
+                redtab.DonatorEsqSup2 is null or
+                redtab.DonatorEsqInf1 is null or
+                redtab.DonatorEsqInf2 is null
+            )
 		Order By
 			TabuleiroID
+
 	End
 	Else 
 	Begin
@@ -180,7 +191,7 @@ go
 Grant Exec on spC_TabuleiroUsuario To public
 go
 
-Exec spC_TabuleiroUsuario @UsuarioID=2619
+--Exec spC_TabuleiroUsuario @UsuarioID=null
 
 
 

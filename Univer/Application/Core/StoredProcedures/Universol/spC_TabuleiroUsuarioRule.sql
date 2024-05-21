@@ -32,23 +32,20 @@ BEGIN
 		Declare
 			@totalBoard int,
 			@totalIndicados int
-
+        
 		Select 
-			Distinct BoardID
-		Into
-			#tempBoard
+			@totalBoard = Count(*)
 		from
 			Rede.TabuleiroUsuario (nolock)
 		Where
 			UsuarioID = @UsuarioID and
-			TabuleiroID is not null and
-			posicao not like 'Donator%'
-			
-		Select 
-			@totalBoard = Count(*)
-		From
-			#tempBoard
-        		
+			TabuleiroID is not null 
+
+        if(@totalBoard is null)
+        Begin
+            set @totalBoard = 0
+        End
+
 		Select 
 			@totalIndicados = count(*)
 		from
@@ -57,12 +54,24 @@ BEGIN
 		Where
 			usu.PatrocinadorDiretoID = @UsuarioID and
 			usu.ID = tab.UsuarioID and
+			tab.PagoMaster = 'true' and
 			tab.TabuleiroID is not null 
 		
-		if(@totalBoard > @totalIndicados)
+		if(@totalBoard > 1)
+		Begin
+			Set @totalBoard = @totalBoard -1
+		End
+
+		--Select @totalIndicados totalIndicados, @totalBoard totalBoard
+
+        if(@totalIndicados < @totalBoard)
 		Begin
 			--Usuario nao tem indicacoes maior ou igual ao numero de tabuleiros que ele pertence
 			Select @retorno = 'NOOK_SEM_INDICACAO'
+		End
+		Else
+		Begin
+			Select @retorno = 'OK'
 		End
 	End
 
@@ -72,8 +81,4 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroUsuarioRule To public
 go
---Exec spC_TabuleiroUsuarioRule @UsuarioID=2614
---Exec spC_TabuleiroUsuarioRule @UsuarioID=2822
-
-
-
+Exec spC_TabuleiroUsuarioRule @UsuarioID=5334

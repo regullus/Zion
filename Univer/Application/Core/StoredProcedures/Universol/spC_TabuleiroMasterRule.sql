@@ -26,8 +26,9 @@ BEGIN
         @PagoSistema bit,
 		@InfomePagSistema bit,
 		@quebraTabuleiro int
-
-	Set @quebraTabuleiro = 3	
+    
+    -- Quebra [para que em venus as regras recomecem, separando de mercurio a jupiter e depois de venus ao sol
+	Set @quebraTabuleiro = 5
 	--Obtem o MasterID do Tabuleiro do usuario informado
 	Select
 		@MasterID = MasterID
@@ -40,7 +41,7 @@ BEGIN
 	--Caso o usuarioId passado seja o master
 	if(@MasterID = @UsuarioID)
 	Begin
-		--Verifica se master nao pagou o sistema
+    	--Verifica se master nao pagou o sistema
 		Select
 			@PagoSistema = PagoSistema,
 			@InfomePagSistema = InformePagSistema
@@ -150,7 +151,7 @@ BEGIN
 			)
 			Begin
 			    --Não vale para venus
-			    if(@BoardID = @quebraTabuleiro) 
+			    if(@BoardID != @quebraTabuleiro) 
 				Begin
 					Set @retorno = 'NOOK_BOARD_SUPERIOR'
 				End
@@ -177,11 +178,11 @@ BEGIN
 		Begin
 			 --Não vale para venus
 			 --Tem que ver em que board o usuario esta se for maior q venus, da NOOK, se for menor da OK
-			if(@BoardID = @quebraTabuleiro and @BoardIDMax > @quebraTabuleiro) 
-			Begin
-				Set @retorno = 'NOOK_CONVITE'
-			End
-		End
+            if(@BoardID != @quebraTabuleiro) 
+            Begin
+                Set @retorno = 'NOOK_CONVITE'
+            End
+    	End
 		Else
 		Begin
 			Set @retorno = @retorno + '_CONVITE'
@@ -195,7 +196,7 @@ go
 Grant Exec on spC_TabuleiroMasterRule To public
 go
 
---Exec spC_TabuleiroMasterRule @UsuarioID=2584, @BoardID=1
+Exec spC_TabuleiroMasterRule @UsuarioID=2588, @BoardID=1
 
 
 

@@ -642,7 +642,7 @@ namespace Sistema.Controllers
                 }
             }
             //Login somente letras e numeros
-            if (!Regex.IsMatch(strLogin, @"^[a-zA-Z0-9]+$"))
+            if (!Regex.IsMatch(strLogin, @"^[a-zA-Z0-9]+$") || strLogin.Any(x => !char.IsLetterOrDigit(x)))
             {
                 lstMensagem.Add(traducaoHelper["LOGIN_LETRAS_NUMERO"]);
             }
@@ -668,69 +668,7 @@ namespace Sistema.Controllers
                     lstMensagem.Add(traducaoHelper["DATA"] + ": " + traducaoHelper["DATA_INVALIDA"]);
                 }
             }
-
-            //Documento
-            //string strDocumento = string.Empty;
-            //if (String.IsNullOrEmpty(strDocPF) && String.IsNullOrEmpty(strDocPJ))
-            //{
-            //    lstMensagem.Add(traducaoHelper["DOCUMENTO"] + ": " + traducaoHelper["CAMPO_REQUERIDO"]);
-            //}
-            //else
-            //{
-            //    string idioma = "pt-BR";
-            //    bool retorno = true;
-
-            //    if (strTpPessoa == "F")               
-            //        strDocumento = strDocPF;              
-            //    else               
-            //        strDocumento = strDocPJ;
-
-            //    Pais pais = (Pais)Session["pais"];
-
-            //    if (pais != null)
-            //    {
-            //        idioma = pais.Idioma.Sigla;
-            //    }
-
-            //    if (idioma == "pt-BR")
-            //    {
-            //        //se brasil valida CPF/CNPJ
-            //        if (strTpPessoa == "F")
-            //            retorno = cpUtilities.Validacoes.ValidaCPF(strDocumento);                    
-            //        else                    
-            //            retorno = cpUtilities.Validacoes.ValidaCNPJ(strDocumento);                  
-
-            //        if (!retorno)
-            //        {
-            //            lstMensagem.Add(traducaoHelper["DOCUMENTO"] + ": " + traducaoHelper["DOCUMENTO_INVALIDO"]);
-            //        }
-            //        else
-            //        {
-            //            if (ConfiguracaoHelper.TemChave("CADASTRO_VALIDA_DOCUMENTO_EM_USO") &&
-            //                ConfiguracaoHelper.GetBoolean("CADASTRO_VALIDA_DOCUMENTO_EM_USO"))
-            //            {
-            //                retorno = usuarioRepository.GetByDocumento(strDocumento) == null ? true : false;
-            //                if (!retorno)
-            //                {
-            //                    lstMensagem.Add(traducaoHelper["DOCUMENTO"] + ": " + traducaoHelper["DOCUMENTO_JA_CADASTRADO"]);
-            //                }
-            //            }
-            //            else
-            //            {
-            //                int QtdeRepeticoes = ConfiguracaoHelper.GetInt("CADASTRO_DOCUMENTO_QTDE_REPETICOES");
-            //                if (QtdeRepeticoes > 0)
-            //                {
-            //                    int TotalCadastros = usuarioRepository.CountByDocumento(strDocumento);
-            //                    if (TotalCadastros>= QtdeRepeticoes)
-            //                    {
-            //                        lstMensagem.Add(traducaoHelper["DOCUMENTO"] + ": " + traducaoHelper["DOCUMENTO_JA_ATINGIU_LIMITE_CADASTROS"]);
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
+            
             if (ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
             {
                 int cep;

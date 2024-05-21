@@ -1,15 +1,15 @@
 use UniverDev
 go
 declare @chave nvarchar(255), @TextoP nvarchar(255), @TextoE nvarchar(255), @TextoI nvarchar(255)
-select @chave = 'LOGIN_LETRAS_NUMERO'
+select @chave = 'NOOK_SEM_INDICACAO'
 Select * from Globalizacao.Traducao where chave like '%' + @chave + '%'
 
 delete Globalizacao.Traducao  where chave = @chave
 
 select 
-    @TextoP = 'Login pode somente conter letras e números',
-	@TextoE = 'El inicio de sesión solo puede contener letras y números.',
-	@TextoI = 'Login can only contain letters and numbers'
+    @TextoP = 'Para entrar na próxima gálaxia:',
+	@TextoE = 'Para ingresar a la siguiente galaxia:',
+	@TextoI = 'To enter the next galaxy:'
 	
 --update Globalizacao.Traducao set Texto = @TextoP where chave = @chave and IdiomaID = 1
 --update Globalizacao.Traducao set Texto = @TextoE where chave = @chave and IdiomaID = 2
