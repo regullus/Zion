@@ -169,8 +169,6 @@ BEGIN
 		    tab.UsuarioID
     End
 
-
-
     if(@tipo <> 'InformePagto' and @tipo <> 'Pagos' and @tipo <> 'ConfirmarRecebimento')
     Begin
         insert into #temp
@@ -268,7 +266,7 @@ go
 Grant Exec on spC_TabuleiroAdminUsuarios To public
 go
 
---Exec spC_TabuleiroAdminUsuarios @UsuarioID=null
+Exec spC_TabuleiroAdminUsuarios @tipo='InformePagto'
 
 
 
