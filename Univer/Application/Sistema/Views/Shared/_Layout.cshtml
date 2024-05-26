@@ -131,7 +131,6 @@
 </head>
 
 <body class="page-header-fixed bodyColorBackground" onload="startTime()" style="@(background.IsEmpty() ? "" : background)">
-    @*<body class="page-header-fixed " onload="startTime()" style="background-color: black; background: url(@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg")) no-repeat center center">*@
     <!-- BEGIN HEADER -->
     <div class="page-header navbar navbar-fixed-top">
         <!-- BEGIN HEADER INNER -->
@@ -202,7 +201,7 @@
 
                             <li class="dropdown dropdown-extended dropdown-notification dropdown-dark">
                                 <a class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                    <i class="fa fa-clock-o" title="@traducaoHelper["DATA_HORA_PAIS"]"></i> <small id="datahora"></small>
+                                    <i class="fa fa-clock-o" title="@traducaoHelper["DATA_HORA_PAIS"]"></i> <small style="font-size: 14px; font-weight: 700" id="datahora"></small>
                                 </a>
                             </li>
 
@@ -212,15 +211,20 @@
                             {
                                 <li class="dropdown dropdown-extended dropdown-notification dropdown-dark">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                        <i class="fa fa-user"></i> @if (!String.IsNullOrEmpty(Helpers.Local.nomeUsuario))
-                                        {@Helpers.Local.nomeUsuario}
-                                    </a>
+                                        <i class="fa fa-user"></i>
+                                        <span style="font-size: 14px; font-weight: 700">
+                                            @if (!String.IsNullOrEmpty(Helpers.Local.nomeUsuario))
+                                            {
+                                                @Helpers.Local.nomeUsuario
+                                            }
+                                            </span>
+                                    </a>    
                                 </li>
                             }
                             <!-- END USER LOGIN DROPDOWN -->
                             <!-- BEGIN USER LOGIN DROPDOWN -->
                             <li class="dropdown dropdown-extended dropdown-notification dropdown-dark">
-                                <a href="~/Account/Login/?Sair=true" class="dropdown-toggle" data-hover="dropdown"><i class="fa fa-sign-out"></i> @traducaoHelper["SAIR"] </a>
+                                <a href="~/Account/Login/?Sair=true" class="dropdown-toggle" data-hover="dropdown"><i class="fa fa-sign-out"></i><span style="font-size: 14px; font-weight: 700">@traducaoHelper["SAIR"].ToUpper()</span> </a>
                             </li>
                             <!-- END USER LOGIN DROPDOWN -->
                         </ul>

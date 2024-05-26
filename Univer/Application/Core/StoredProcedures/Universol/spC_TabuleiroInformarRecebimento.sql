@@ -13,7 +13,7 @@ As
 -- =============================================================================================
 -- Author.....: 
 -- Create date: 
--- Description: Obtem niveis no tabuleito de um usuario
+-- Description: 
 -- =============================================================================================
 BEGIN
    --Necessario para o entity reconhecer retorno de select com tabela temporaria
@@ -23,18 +23,19 @@ BEGIN
     Declare 
         @Count int,
         @MasterID int
-    
+   
     Update
         rede.TabuleiroUsuario 
     Set
 		PagoMaster = 'true',
 		InformePag = 'true',
+        ciclo = ciclo + 1,
         UsuarioIDPag = @UsuarioPaiID
     where 
         UsuarioID = @UsuarioID and 
         BoardID  = @BoardID 
     
-    --Atualiza recebimento do MAster
+    --Atualiza recebimento do Master
     Select
         @MasterID = MasterID
     From
@@ -83,7 +84,7 @@ BEGIN
 					BoardID  = @BoardID + 1
 				)
             Begin
-			    --Verifica se j� pagou o sistema
+			    --Verifica se jah pagou o sistema
 				if Exists (
 					Select 
 						'OK' 

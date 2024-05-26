@@ -5942,6 +5942,7 @@
     <Content Include="Content\icons\Sistema\MinersBits\mstile-70x70.png" />
     <Content Include="Content\icons\Sistema\MinersBits\open-graph-1200x630.png" />
     <Content Include="Content\icons\Sistema\Nextter\safari-pinned-tab.svg" />
+    <Content Include="Content\img\maintenance.png" />
     <Content Include="Content\img\Universol\Arquivo.png" />
     <Content Include="Content\img\Universol\Asset 2.png" />
     <Content Include="Content\img\Universol\Asset 3.png" />

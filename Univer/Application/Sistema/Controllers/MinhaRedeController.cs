@@ -30,6 +30,7 @@ using DocumentFormat.OpenXml.Drawing;
 using Core.Repositories.Loja;
 using PagedList;
 using System.Data.SqlClient;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 
 #endregion
@@ -433,6 +434,8 @@ namespace Sistema.Controllers
         {
             obtemMensagem();
 
+            #region variaveis
+
             string log = "";
 
             ViewBag.Background = "background-image: url(" + @Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "/fundo.jpg") + "); background-repeat: no-repeat; background-color: #000000; background-size: cover;";
@@ -463,6 +466,8 @@ namespace Sistema.Controllers
             ViewBag.ShowExitBoard = false;
 
             int idTabuleiro = idTab ?? 0;
+
+            #endregion
 
             if (idTabuleiro < 0)
             {
@@ -516,7 +521,7 @@ namespace Sistema.Controllers
                     //Verifica se o tabuleiro esta fechado
                     string tabuleiroFechado = tabuleiroRepository.TabuleiroFechado(tabuleiroUsuario.TabuleiroID ?? 0);
 
-                    if (tabuleiroFechado != "nao")
+                    if (tabuleiroFechado != "sim")
                     {
                         log = "target 01";
                         //Master não tendo pendencias
@@ -875,6 +880,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, 0, idTabuleiro, "Galaxy", "back", log + "|" + ex.Message);
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GAL_01", log, "[" + ex.Message + "]", traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return RedirectToAction("Index", "Home", new { strPopupTitle = "Erro", strPopupMessage = ex.Message, Sair = "true" });
@@ -892,17 +898,28 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            log = "parameter parse 01";
+            //Usuario Logado
+            int idUsuario = 0;
+            log = "parameter parse 02";
+            //Usuario no qual se quer as informações
+            int idTarget = 0;
+            log = "parameter parse 03";
+            //Tabuleiro que o usuario que se deseja informações esta
+            int idTabuleiro = 0;
+            int idBoard = 0;
+
             try
             {
                 log = "parameter parse 01";
                 //Usuario Logado
-                int idUsuario = int.Parse(usuarioID);
+                idUsuario = int.Parse(usuarioID);
                 log = "parameter parse 02";
                 //Usuario no qual se quer as informações
-                int idTarget = int.Parse(targetID);
+                idTarget = int.Parse(targetID);
                 log = "parameter parse 03";
                 //Tabuleiro que o usuario que se deseja informações esta
-                int idTabuleiro = int.Parse(tabuleiroID);
+                idTabuleiro = int.Parse(tabuleiroID);
 
                 log = "parameter parse 04";
                 if (idUsuario <= 0 || idTarget <= 0 || idTabuleiro <= 0)
@@ -933,7 +950,7 @@ namespace Sistema.Controllers
                 if (idUsuario == usuario.ID)
                 {
                     log = "user 02";
-                    int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+                    idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
                     log = "user 03";
                     if (idBoard == 0)
                     {
@@ -1093,6 +1110,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "GetData", "back", log + "|" + ex.Message);
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01", log, "[" + ex.Message + "]", traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_01 " + "[" + ex.Message + "]");
@@ -1100,10 +1118,29 @@ namespace Sistema.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetDataSysPag(string token)
+        public ActionResult GetDataSysPag(string usuarioID, string tabuleiroID, string token)
         {
+            int idUsuario = 0;
+            int idTabuleiro = 0;
+            int idBoard = 0;
+
             try
             {
+                if (usuarioID.IsNullOrEmpty() || usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty())
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+                //Usuario Logado
+                idUsuario = int.Parse(usuarioID);
+                idTabuleiro = int.Parse(tabuleiroID);
+
+                if (idUsuario <= 0 || idTabuleiro <= 0)
+                {
+                    string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
                 string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
                 string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
 
@@ -1134,6 +1171,78 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GD_02");
                 }
 
+                idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+
+                //Obtem os dados do tabuleiro do usuario que se quer informações
+                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(usuario.ID, idBoard);
+
+                string msgValor = "";
+                if (tabuleiroUsuario.Ciclo > 1)
+                {
+                    switch (idBoard)
+                    {
+                        case 1:
+                            msgValor = traducaoHelper["TAXA_VALOR_MERCURIO_2"];
+                            break;
+                        case 2:
+                            msgValor = traducaoHelper["TAXA_VALOR_SATURNO_2"];
+                            break;
+                        case 3:
+                            msgValor = traducaoHelper["TAXA_VALOR_MARTE_2"];
+                            break;
+                        case 4:
+                            msgValor = traducaoHelper["TAXA_VALOR_JUPITER_2"];
+                            break;
+                        case 5:
+                            msgValor = traducaoHelper["TAXA_VALOR_VENUS_2"];
+                            break;
+                        case 6:
+                            msgValor = traducaoHelper["TAXA_VALOR_URANO_2"];
+                            break;
+                        case 7:
+                            msgValor = traducaoHelper["TAXA_VALOR_TERRA_2"];
+                            break;
+                        case 8:
+                            msgValor = traducaoHelper["TAXA_VALOR_SOL_2"];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (idBoard)
+                    {
+                        case 1:
+                            msgValor = traducaoHelper["TAXA_VALOR_MERCURIO_1"];
+                            break;
+                        case 2:
+                            msgValor = traducaoHelper["TAXA_VALOR_SATURNO_1"];
+                            break;
+                        case 3:
+                            msgValor = traducaoHelper["TAXA_VALOR_MARTE_1"];
+                            break;
+                        case 4:
+                            msgValor = traducaoHelper["TAXA_VALOR_JUPITER_1"];
+                            break;
+                        case 5:
+                            msgValor = traducaoHelper["TAXA_VALOR_VENUS_1"];
+                            break;
+                        case 6:
+                            msgValor = traducaoHelper["TAXA_VALOR_URANO_1"];
+                            break;
+                        case 7:
+                            msgValor = traducaoHelper["TAXA_VALOR_TERRA_1"];
+                            break;
+                        case 8:
+                            msgValor = traducaoHelper["TAXA_VALOR_SOL_1"];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                obtemInfoUsuario.Valor = msgValor;
+
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = obtemInfoUsuario,
@@ -1145,6 +1254,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, 0, idTabuleiro, "GetDataSysPag", "back", ex.Message);
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01", "[" + ex.Message + "]", traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01" + "[" + ex.Message + "]");
@@ -1197,6 +1307,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, 0, 0, "GetDataSystem", "back", ex.Message);
                 string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDS_01", "[" + ex.Message + "]", traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam4, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GDSP_01" + "[" + ex.Message + "]");
@@ -1213,10 +1324,13 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            int idUsuario = 0;
+            int idTabuleiro = 0;
+
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idTabuleiro = int.Parse(tabuleiroID);
+                idUsuario = int.Parse(usuarioID);
+                idTabuleiro = int.Parse(tabuleiroID);
 
                 if (idUsuario <= 0 || idTabuleiro <= 0)
                 {
@@ -1267,6 +1381,7 @@ namespace Sistema.Controllers
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, 0, idTabuleiro, "GetTabuleiro", "back", ex.Message);
                 string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]", traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
@@ -1286,96 +1401,124 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            int idUsuario = 0;
+            int idBoard = 0;
+            string tabuleiroIncluir = "OK";
+            int idTabuleiro = 0;
+
+
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idBoard = int.Parse(boardID);
+                idUsuario = int.Parse(usuarioID);
+                idBoard = int.Parse(boardID);
+                tabuleiroIncluir = "OK";
+                idTabuleiro = 0;
 
-                //Seta para primeiro tabuleiro caso seja 0
-                if (idBoard == 0)
+                if (idUsuario <= 0)
                 {
-                    idBoard = 1;
-                }
-
-                if (idUsuario <= 0 || idBoard <= 0)
-                {
-                    log = "parameter 02";
+                    log = "Invalid parameter parse user 02";
                     string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                log = "tocken 01";
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "GetInvite");
 
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
-
-                if (token != tokenLocal)
+                if (getUltimoAcesso)
                 {
-                    log = "token 02";
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    //Seta para primeiro tabuleiro caso seja 0
+                    if (idBoard == 0)
+                    {
+                        idBoard = 1;
+                    }
+
+                    if (idUsuario <= 0 || idBoard <= 0)
+                    {
+                        log = "parameter 02";
+                        string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+
+                    log = "tocken 01";
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                    if (token != tokenLocal)
+                    {
+                        log = "token 02";
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    }
+
+                    if (idUsuario != usuario.ID)
+                    {
+                        log = "user 01";
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+
+                    log = "sponsor 01";
+                    //Caso não exista o patrocionador usa o usuario 2580 que é o primeiro alvo Veja a tabela usuario.usuario
+                    int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
+
+                    log = "user rule 01";
+
+                    string userRule = tabuleiroRepository.UsuarioRuleOK(usuario.ID);
+
+                    switch (userRule)
+                    {
+                        case "OK":
+                            tabuleiroIncluir = "OK";
+                            break;
+                        case "NOOK_PAGTO_SISTEMA":
+                            tabuleiroIncluir = traducaoHelper["PARA_ENTRAR_GALAXIA"] + " " + traducaoHelper["NOOK_PAGTO_SISTEMA"];
+                            break;
+                        case "NOOK_SEM_INDICACAO":
+                            tabuleiroIncluir = traducaoHelper["PARA_ENTRAR_GALAXIA"] + " " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                            break;
+                        case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
+                            tabuleiroIncluir = traducaoHelper["PARA_ENTRAR_GALAXIA"] + " " + traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                            break;
+                        default:
+                            tabuleiroIncluir = traducaoHelper[userRule];
+                            break;
+                    }
+
+                    if (userRule == "OK")
+                    {
+                        log = "board 01: usuarioID:" + usuario.ID + " BoardID:" + idBoard + " Convite";
+                        //Inclui usuario no novo tabuleiro
+                        tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idBoard, "Convite");
+                        log = "board 02";
+                        TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                        log = "board 03";
+                        idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
+                    }
+
+                    log = "json 01";
                 }
 
-                if (idUsuario != usuario.ID)
-                {
-                    log = "user 01";
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
-
-                string tabuleiroIncluir = "";
-
-                log = "sponsor 01";
-                //Caso não exista o patrocionador usa o usuario 2580 que é o primeiro alvo Veja a tabela usuario.usuario
-                int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
-
-                log = "user rule 01";
-
-                string userRule = tabuleiroRepository.UsuarioRuleOK(usuario.ID);
-
-                switch (userRule)
-                {
-                    case "OK":
-                        tabuleiroIncluir = "OK";
-                        break;
-                    case "NOOK_PAGTO_SISTEMA":
-                        tabuleiroIncluir = traducaoHelper["PARA_ENTRAR_GALAXIA"] + " " + traducaoHelper["NOOK_PAGTO_SISTEMA"];
-                        break;
-                    case "NOOK_SEM_INDICACAO":
-                        tabuleiroIncluir = traducaoHelper["PARA_ENTRAR_GALAXIA"] + " " + traducaoHelper["NOOK_SEM_INDICACAO"];
-                        break;
-                    case "NOOK_PAGTO_SISTEMA_SEM_INDICACAO":
-                        tabuleiroIncluir = traducaoHelper["PARA_ENTRAR_GALAXIA"] + " " + traducaoHelper["NOOK_PAGTO_SISTEMA"] + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
-                        break;
-                    default:
-                        tabuleiroIncluir = traducaoHelper[userRule];
-                        break;
-                }
-
-                if (userRule == "OK")
-                {
-                    log = "board 01";
-                    //Inclui usuario no novo tabuleiro
-                    tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idBoard, "Convite");
-                }
-
-                log = "json 01";
                 JsonResult jsonResult = new JsonResult
                 {
-                    Data = traducaoHelper[tabuleiroIncluir],
+                    Data = idTabuleiro.ToString(),
                     RecursionLimit = 1000
                 };
+
+                string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "GetInvite");
 
                 log = "result";
                 return jsonResult;
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "getInvite", "back", ex.Message);
+
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01", "[" + ex.Message + "]", log, traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GI_01" + "[" + ex.Message + "]");
@@ -1395,10 +1538,13 @@ namespace Sistema.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
+            int idUsuario = 0;
+
             try
             {
                 log = "Invalid parameter parse user 01";
-                int idUsuario = int.Parse(usuarioID);
+                idUsuario = int.Parse(usuarioID);
+                string tabuleiroIncluir = "OK";
 
                 if (idUsuario <= 0)
                 {
@@ -1408,51 +1554,59 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                log = "Invalid token 01";
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
-
-                log = "Invalid token 02";
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
-
-                if (token != tokenLocal)
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "GetInviteNew");
+                if (getUltimoAcesso)
                 {
-                    log = "Invalid token 03";
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    log = "Invalid token 04";
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    log = "Invalid token 01";
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                    log = "Invalid token 02";
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                    if (token != tokenLocal)
+                    {
+                        log = "Invalid token 03";
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        log = "Invalid token 04";
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    }
+
+                    if (idUsuario != usuario.ID)
+                    {
+                        log = "Invalid user 01";
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+
+                    log = "Invalid sponsor";
+                    //Caso não exista o patrocionador usa o usuario 2580 que é o primeiro alvo Veja a tabela usuario.usuario
+                    int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
+
+                    log = "Invalid include new";
+                    //Inclui usuario no novo tabuleiro
+                    tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiroNew(usuario.ID, patrocinadoID);
                 }
-
-                if (idUsuario != usuario.ID)
-                {
-                    log = "Invalid user 01";
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
-
-                log = "Invalid sponsor";
-                //Caso não exista o patrocionador usa o usuario 2580 que é o primeiro alvo Veja a tabela usuario.usuario
-                int patrocinadoID = usuario.PatrocinadorDiretoID ?? 2580; //2580 é o primeiro alvo
-
-                log = "Invalid include new";
-                //Inclui usuario no novo tabuleiro
-                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiroNew(usuario.ID, patrocinadoID);
 
                 log = "Invalid result 01";
+
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = traducaoHelper[tabuleiroIncluir],
                     RecursionLimit = 1000
                 };
 
+                string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "GetInviteNew");
+
                 log = "Invalid result 02";
                 return jsonResult;
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, 0, 0, "GetInviteNew", "back", ex.Message);
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GIN_01", log, "[" + ex.Message + "]", traducaoHelper["FAVOR_CONTATAR_SUPORTE"] };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GIN_01" + "[" + ex.Message + "]");
@@ -1472,11 +1626,15 @@ namespace Sistema.Controllers
 
             string retorno = "";
 
+            int idUsuario = 0;
+            int idTabuleiro = 0;
+            int idUsuarioPag = 0;
+            int idBoard = 0;
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idTabuleiro = int.Parse(tabuleiroID);
-                int idUsuarioPag = int.Parse(usuarioIDPag);
+                idUsuario = int.Parse(usuarioID);
+                idTabuleiro = int.Parse(tabuleiroID);
+                idUsuarioPag = int.Parse(usuarioIDPag);
 
                 if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioPag <= 0)
                 {
@@ -1485,88 +1643,104 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "ReportPayment");
 
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+                getUltimoAcesso = true; //panda
 
-                if (token != tokenLocal)
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
-                }
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
 
-                if (idUsuario != usuario.ID)
-                {
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
 
-                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
-
-                //Verifica se é realmente o master do tabuleiro
-                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
-                bool masterIDValido = false;
-                if (tabuleiroUsuario.MasterID == idUsuarioPag || idUsuarioPag == 2000)
-                {
-                    masterIDValido = true;
-                }
-
-                if (masterIDValido)
-                {
-                    //Verifica se master esta ok
-                    if (idUsuarioPag != 2000)
+                    if (token != tokenLocal)
                     {
-                        //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
-                        if (tabuleiroRepository.MasterRuleOK(idUsuarioPag, idBoard) != "OK")
-                        {
-                            //Não estando ok, a conta do sistema é usada para pagamento
-                            idUsuarioPag = 2000;
-                        }
-                        //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
-                        if (tabuleiroRepository.MasterIndicadosOK(idUsuarioPag, idBoard) != "OK")
-                        {
-                            //Não estando ok, a conta do sistema é usada para pagamento
-                            idUsuarioPag = 2000;
-                        }
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
                     }
 
-                    //Informar Pagamento
-                    retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idBoard, idUsuarioPag);
-                    switch (retorno)
+                    if (idUsuario != usuario.ID)
                     {
-                        case "OK":
-                            string[] strMensagem = new string[] { traducaoHelper["PAGAMENTO_INFORMADO_COM_SUCESSO"], traducaoHelper["ALVO_1H_DAR_ACEITE"] };
-                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                            break;
-                        case "NOOK":
-                            string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
-                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
-                        default:
-                            string[] strMensagemParam5 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
-                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+
+                    idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+
+                    //Verifica se é realmente o master do tabuleiro
+                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                    bool masterIDValido = false;
+                    if (tabuleiroUsuario.MasterID == idUsuarioPag || idUsuarioPag == 2000)
+                    {
+                        masterIDValido = true;
+                    }
+
+                    if (masterIDValido)
+                    {
+                        //Verifica se master esta ok
+                        if (idUsuarioPag != 2000)
+                        {
+                            //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
+                            if (tabuleiroRepository.MasterRuleOK(idUsuarioPag, idBoard) != "OK")
+                            {
+                                //Não estando ok, a conta do sistema é usada para pagamento
+                                idUsuarioPag = 2000;
+                            }
+                            //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
+                            if (tabuleiroRepository.MasterIndicadosOK(idUsuarioPag, idBoard) != "OK")
+                            {
+                                //Não estando ok, a conta do sistema é usada para pagamento
+                                idUsuarioPag = 2000;
+                            }
+                        }
+
+                        //Informar Pagamento
+                        retorno = tabuleiroRepository.InformarPagamento(usuario.ID, idBoard, idUsuarioPag);
+                        switch (retorno)
+                        {
+                            case "OK":
+                                string[] strMensagem = new string[] { traducaoHelper["PAGAMENTO_INFORMADO_COM_SUCESSO"], traducaoHelper["ALVO_1H_DAR_ACEITE"] };
+                                Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                                break;
+                            case "NOOK":
+                                string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
+                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
+                            default:
+                                string[] strMensagemParam5 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
+                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TEMPO_ESGOTADO"]);
+                        }
+                    }
+                    else
+                    {
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_03");
                     }
                 }
-                else
+
+                if (String.IsNullOrEmpty(retorno))
                 {
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_03");
+                    retorno = traducaoHelper["SERVIDOR_OCUPADO"];
                 }
+
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = retorno,
                     RecursionLimit = 1000
                 };
 
+                string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "ReportPayment");
+
                 return jsonResult;
 
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "ReportPayment", "back", ex.Message);
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
@@ -1577,6 +1751,7 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult ReportReceipt(string usuarioID, string UsuarioConvidadoID, string tabuleiroID, string token)
         {
+            string log = "";
             //Confirmar Recebimento
             if (usuarioID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || UsuarioConvidadoID.IsNullOrEmpty())
             {
@@ -1584,171 +1759,216 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            int idUsuario = 0;
+            int idUsuarioConvidado = 0;
+            int idTabuleiro = 0;
+            int idBoard = 0;
 
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idUsuarioConvidado = int.Parse(UsuarioConvidadoID);
-                int idTabuleiro = int.Parse(tabuleiroID);
+                idUsuario = int.Parse(usuarioID);
+                idUsuarioConvidado = int.Parse(UsuarioConvidadoID);
+                idTabuleiro = int.Parse(tabuleiroID);
 
+                string retorno = "";
+                log = "Inicio";
                 if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioConvidado <= 0)
                 {
                     string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
                     Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
+                log = "getUltimoAcesso";
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "ReportReceipt");
 
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+                getUltimoAcesso = true;
 
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
-
-                if (token != tokenLocal)
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
-                }
+                    log = "getUltimoAcesso=true";
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
 
-                if (idUsuario != usuario.ID)
-                {
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
-
-                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
-                int idUsuarioPag = tabuleiroRepository.ObtemUsuarioIDPag(idUsuarioConvidado, idBoard);
-
-                //Verifica se é realmente o master do tabuleiro
-                TabuleiroUsuarioModel tabuleiroUsuarioCheck = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
-
-                if (idUsuarioPag == 0)
-                {
-                    idUsuarioPag = tabuleiroUsuarioCheck.MasterID;
-                }
-
-                bool masterIDValido = false;
-                if (tabuleiroUsuarioCheck.MasterID == idUsuarioPag || idUsuarioPag == 2000)
-                {
-                    masterIDValido = true;
-                }
-
-                //Informar Recebimento
-                if (masterIDValido)
-                {
-                    //Verifica se master esta ok
-                    if (idUsuarioPag != 2000)
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+                    log = "Token";
+                    if (token != tokenLocal)
                     {
-                        //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
-                        if (tabuleiroRepository.MasterRuleOK(idUsuarioPag, idBoard) != "OK")
-                        {
-                            //Não estando ok, a conta do sistema é usada para pagamento
-                            idUsuarioPag = 2000;
-                        }
-                        //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
-                        if (tabuleiroRepository.MasterIndicadosOK(idUsuarioPag, idBoard) != "OK")
-                        {
-                            //Não estando ok, a conta do sistema é usada para pagamento
-                            idUsuarioPag = 2000;
-                        }
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
                     }
-                    string retorno = "";
-                    string retMaster = tabuleiroRepository.MasterRuleOK(usuario.ID, idBoard);
-                    string retIndicados = tabuleiroRepository.MasterIndicadosOK(usuario.ID, idBoard);
 
-                    if (retMaster == "OK" && retIndicados == "OK")
+                    if (idUsuario != usuario.ID)
                     {
-                        retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuarioPag, idBoard);
-                        switch (retorno)
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+                    log = "boardID";
+                    idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+                    int idUsuarioPag = tabuleiroRepository.ObtemUsuarioIDPag(idUsuarioConvidado, idBoard);
+                    log = "tabuleiroUsuarioCheck";
+                    //Verifica se é realmente o master do tabuleiro
+                    TabuleiroUsuarioModel tabuleiroUsuarioCheck = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                    log = "idUsuarioPag";
+                    if (idUsuarioPag == 0)
+                    {
+                        idUsuarioPag = tabuleiroUsuarioCheck.MasterID;
+                    }
+
+                    bool masterIDValido = false;
+                    if (tabuleiroUsuarioCheck.MasterID == idUsuarioPag || idUsuarioPag == 2000)
+                    {
+                        masterIDValido = true;
+                    }
+                    log = "masterIDValido";
+                    //Informar Recebimento
+                    if (masterIDValido)
+                    {
+                        log = "masterIDValido=true";
+                        //Verifica se master esta ok
+                        if (idUsuarioPag != 2000)
                         {
-                            case "OK":
-
-                                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
-                                Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
-                                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
-
-                                //Efetuar Credito no Master
-                                var lancamento = new Lancamento();
-                                lancamento.UsuarioID = idUsuarioPag;
-                                lancamento.Tipo = Lancamento.Tipos.Credito;
-                                lancamento.ReferenciaID = lancamento.UsuarioID;
-                                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuarioConvidado.Apelido.ToLower());
-                                lancamento.DataLancamento = App.DateTimeZion;
-                                lancamento.DataCriacao = App.DateTimeZion;
-                                lancamento.ContaID = 7; //Transferencia
-                                lancamento.CategoriaID = 7; //Transferencia
-                                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                                lancamentoRepository.Save(lancamento);
-
-                                //Efetuar Debito no Convidado
-                                lancamento = new Lancamento();
-                                lancamento.UsuarioID = idUsuarioConvidado;
-                                lancamento.Tipo = Lancamento.Tipos.Debito;
-                                lancamento.ReferenciaID = lancamento.UsuarioID;
-                                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuario.Apelido.ToLower());
-                                lancamento.DataLancamento = App.DateTimeZion;
-                                lancamento.DataCriacao = App.DateTimeZion;
-                                lancamento.ContaID = 7; //Transferencia
-                                lancamento.CategoriaID = 7; //Transferencia
-                                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                                lancamentoRepository.Save(lancamento);
-
-                                //Chama incluir no tabuleiro para ver se 
-                                //o tabuleiro esta completo
-                                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
-                                if (tabuleiroIncluir == "COMPLETO")
-                                {
-                                    string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
-                                    Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                                }
-                                else
-                                {
-                                    string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
-                                    Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                                }
-
-                                break;
-                            case "NOOK":
-                                string[] strMensagemParam4 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
-                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
-                            default:
-                                string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
-                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                            //Verifica se Master Esta ok com as regras, para que sua conta seja exibida
+                            if (tabuleiroRepository.MasterRuleOK(idUsuarioPag, idBoard) != "OK")
+                            {
+                                log = "idUsuarioPag=2000";
+                                //Não estando ok, a conta do sistema é usada para pagamento
+                                idUsuarioPag = 2000;
+                            }
+                            //Verifica se Master Esta ok com as regras de indicados, para que sua conta seja exibida
+                            if (tabuleiroRepository.MasterIndicadosOK(idUsuarioPag, idBoard) != "OK")
+                            {
+                                log = "idUsuarioPag=2000";
+                                //Não estando ok, a conta do sistema é usada para pagamento
+                                idUsuarioPag = 2000;
+                            }
                         }
+                        log = "retMaster";
+                        string retMaster = tabuleiroRepository.MasterRuleOK(usuario.ID, idBoard);
+                        log = "retIndicados";
+                        string retIndicados = tabuleiroRepository.MasterIndicadosOK(usuario.ID, idBoard);
+
+                        if (retMaster == "OK" && retIndicados == "OK")
+                        {
+                            log = "retMaster retIndicados = OK";
+                            retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuarioPag, idBoard);
+                            log = "InformarRecebimento: " + retorno;
+                            switch (retorno)
+                            {
+                                case "OK":
+                                    log = "lancamentos";
+                                    TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
+                                    Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
+                                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
+
+                                    //Efetuar Credito no Master
+                                    var lancamento = new Lancamento();
+                                    lancamento.UsuarioID = idUsuarioPag;
+                                    lancamento.Tipo = Lancamento.Tipos.Credito;
+                                    lancamento.ReferenciaID = lancamento.UsuarioID;
+                                    lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuarioConvidado.Apelido.ToLower());
+                                    lancamento.DataLancamento = App.DateTimeZion;
+                                    lancamento.DataCriacao = App.DateTimeZion;
+                                    lancamento.ContaID = 7; //Transferencia
+                                    lancamento.CategoriaID = 7; //Transferencia
+                                    lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                                    lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                                    lancamentoRepository.Save(lancamento);
+
+                                    //Efetuar Debito no Convidado
+                                    lancamento = new Lancamento();
+                                    lancamento.UsuarioID = idUsuarioConvidado;
+                                    lancamento.Tipo = Lancamento.Tipos.Debito;
+                                    lancamento.ReferenciaID = lancamento.UsuarioID;
+                                    lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuario.Apelido.ToLower());
+                                    lancamento.DataLancamento = App.DateTimeZion;
+                                    lancamento.DataCriacao = App.DateTimeZion;
+                                    lancamento.ContaID = 7; //Transferencia
+                                    lancamento.CategoriaID = 7; //Transferencia
+                                    lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                                    lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                                    lancamentoRepository.Save(lancamento);
+
+                                    //Chama incluir no tabuleiro para ver se 
+                                    //o tabuleiro esta completo
+                                    log = "IncluiTabuleiro Completo";
+                                    string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
+                                    log = "IncluiTabuleiro: " + tabuleiroIncluir;
+                                    if (tabuleiroIncluir == "COMPLETO")
+                                    {
+                                        string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
+                                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                                        retorno = "COMPLETO";
+                                    }
+                                    else
+                                    {
+                                        string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
+                                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                                    }
+
+                                    break;
+                                case "NOOK":
+                                    string[] strMensagemParam4 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
+                                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                                default:
+                                    string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
+                                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                            }
+                        }
+                        else
+                        {
+                            log = "NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO";
+                            retorno = traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"];
+                            if (retMaster != "OK")
+                            {
+                                retorno = retorno + " - " + traducaoHelper[retMaster];
+                            }
+                            if (retIndicados != "OK")
+                            {
+                                retorno = retorno + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                            }
+                        }
+
+                        string tabuleiroFechado = tabuleiroRepository.TabuleiroFechado(idTabuleiro);
+
+                        if (tabuleiroFechado == "ambos")
+                        {
+                            retorno = "COMPLETO";
+                        }
+                        
+                        JsonResult jsonResult = new JsonResult
+                        {
+                            Data = retorno,
+                            RecursionLimit = 1000
+                        };
+                        string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "ReportReceipt");
+
+                        return jsonResult;
                     }
                     else
                     {
-                        retorno = traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"];
-                        if (retMaster != "OK")
-                        {
-                            retorno = retorno + " - " + traducaoHelper[retMaster];
-                        }
-                        if (retIndicados != "OK")
-                        {
-                            retorno = retorno + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
-                        }
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RR_01");
                     }
-                    JsonResult jsonResult = new JsonResult
-                    {
-                        Data = retorno,
-                        RecursionLimit = 1000
-                    };
-
-                    return jsonResult;
                 }
                 else
                 {
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RR_01");
+                    log = log + "|getUltimoAcesso=false";
+                    JsonResult jsonResult = new JsonResult
+                    {
+                        Data = traducaoHelper["SERVIDOR_OCUPADO"],
+                        RecursionLimit = 1000
+                    };
+                    string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "ReportReceipt");
+                    return jsonResult;
                 }
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "ReportReceipt", "back", ex.Message);
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
@@ -1765,12 +1985,17 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
+            int idUsuario = 0;
+            int idUsuarioConvidado = 0;
+            int idTabuleiro = 0;
+            int idBoard = 0;
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idUsuarioConvidado = int.Parse(UsuarioConvidadoID);
-                int idTabuleiro = int.Parse(tabuleiroID);
+                idUsuario = int.Parse(usuarioID);
+                idUsuarioConvidado = int.Parse(UsuarioConvidadoID);
+                idTabuleiro = int.Parse(tabuleiroID);
+
+                string retorno = "";
 
                 if (idUsuario <= 0 || idTabuleiro <= 0 || idUsuarioConvidado <= 0)
                 {
@@ -1779,74 +2004,80 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
-
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
-
-                if (token != tokenLocal)
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "ReportReceipt");
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
-                }
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
 
-                if (idUsuario != usuario.ID)
-                {
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
 
-                string retorno = "";
-
-                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
-
-                string retMaster = tabuleiroRepository.MasterRuleOK(usuario.ID, idBoard);
-                string retIndicados = tabuleiroRepository.MasterIndicadosOK(usuario.ID, idBoard);
-
-                if (retMaster == "OK" && retIndicados == "OK")
-                {
-                    //Informar Recebimento
-                    retorno = tabuleiroRepository.RemoverUsuario(idUsuarioConvidado, idUsuario, idBoard);
-                    switch (retorno)
+                    if (token != tokenLocal)
                     {
-                        case "OK":
-                            string[] strMensagem = new string[] { traducaoHelper["CONVIDADO_REMOVIDO_SUCESSO"] };
-                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                            break;
-                        default:
-                            string[] strMensagemParam5 = new string[] { traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"] };
-                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"]);
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    }
+
+                    if (idUsuario != usuario.ID)
+                    {
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+
+                    idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+
+                    string retMaster = tabuleiroRepository.MasterRuleOK(usuario.ID, idBoard);
+                    string retIndicados = tabuleiroRepository.MasterIndicadosOK(usuario.ID, idBoard);
+
+                    if (retMaster == "OK" && retIndicados == "OK")
+                    {
+                        //Informar Recebimento
+                        retorno = tabuleiroRepository.RemoverUsuario(idUsuarioConvidado, idUsuario, idBoard);
+                        switch (retorno)
+                        {
+                            case "OK":
+                                string[] strMensagem = new string[] { traducaoHelper["CONVIDADO_REMOVIDO_SUCESSO"] };
+                                Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                                break;
+                            default:
+                                string[] strMensagemParam5 = new string[] { traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"] };
+                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"]);
+                        }
+                    }
+                    else
+                    {
+                        retorno = traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"];
+
+                        if (retMaster != "OK")
+                        {
+                            retorno = retorno + " - " + traducaoHelper[retMaster];
+                        }
+                        if (retIndicados != "OK")
+                        {
+                            retorno = retorno + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
+                        }
                     }
                 }
-                else
+                if (String.IsNullOrEmpty(retorno))
                 {
-                    retorno = traducaoHelper["NAO_FOI_POSSIVEL_REMOVIDO_CONVIDADO"];
-
-                    if (retMaster != "OK")
-                    {
-                        retorno = retorno + " - " + traducaoHelper[retMaster];
-                    }
-                    if (retIndicados != "OK")
-                    {
-                        retorno = retorno + " - " + traducaoHelper["NOOK_SEM_INDICACAO"];
-                    }
+                    retorno = traducaoHelper["SERVIDOR_OCUPADO"];
                 }
-
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = retorno,
                     RecursionLimit = 1000
                 };
-
+                string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "ReportReceipt");
                 return jsonResult;
 
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "DeleteUser", "back", ex.Message);
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RP_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
@@ -1864,11 +2095,15 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            int idUsuario = 0;
+            int idTabuleiro = 0;
+            int idBoard = 0;
 
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idTabuleiro = int.Parse(tabuleiroID);
+                idUsuario = int.Parse(usuarioID);
+                idTabuleiro = int.Parse(tabuleiroID);
+                string retorno = "";
 
                 if (idUsuario <= 0 || idTabuleiro <= 0)
                 {
@@ -1877,76 +2112,84 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
-
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
-
-                if (token != tokenLocal)
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "ReportPaymentSystem");
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
-                }
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
 
-                if (idUsuario != usuario.ID)
-                {
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
 
-                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
-
-                //Obtem os dados do tabuleiro do usuario que se quer informações
-                Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
-
-                string retorno = "";
-                //Se o UsuarioLogado é o Master,
-                //Somente master para o sistema
-                if (tabuleiroUsuario.MasterID == usuario.ID)
-                {
-                    //Informar Pagamento ao sistema
-                    retorno = tabuleiroRepository.InformarPagtoSistema(usuario.ID, idBoard);
-                    switch (retorno)
+                    if (token != tokenLocal)
                     {
-                        case "OK":
-                            string[] strMensagem = new string[] { traducaoHelper["PAGAMENTO_SISTEMA_INFORMADO_COM_SUCESSO"] };
-                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    }
 
-                            TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(1);
+                    if (idUsuario != usuario.ID)
+                    {
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
 
-                            //Efetuar Credito no Master
-                            var lancamento = new Lancamento();
-                            lancamento.UsuarioID = idUsuario;
-                            lancamento.Tipo = Lancamento.Tipos.Debito;
-                            lancamento.ReferenciaID = lancamento.UsuarioID;
-                            lancamento.Descricao = String.Format("{0}{1}{2}", tabuleiroBoard.Nome.ToLower(), " - ", traducaoHelper["PAGAMENTO_SISTEMA"]);
-                            lancamento.DataLancamento = App.DateTimeZion;
-                            lancamento.DataCriacao = App.DateTimeZion;
-                            lancamento.ContaID = 7; //Transferencia
-                            lancamento.CategoriaID = 7; //Transferencia
-                            lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                            lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
-                            lancamentoRepository.Save(lancamento);
+                    idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
 
-                            break;
-                        case "NOOK":
-                            string[] strMensagemParam4 = new string[] { traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"] };
-                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"]);
-                        default:
-                            string[] strMensagemParam5 = new string[] { traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"] };
-                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"]);
+                    //Obtem os dados do tabuleiro do usuario que se quer informações
+                    Core.Models.TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+
+                    //Se o UsuarioLogado é o Master,
+                    //Somente master para o sistema
+                    if (tabuleiroUsuario.MasterID == usuario.ID)
+                    {
+                        //Informar Pagamento ao sistema
+                        retorno = tabuleiroRepository.InformarPagtoSistema(usuario.ID, idBoard);
+                        switch (retorno)
+                        {
+                            case "OK":
+                                string[] strMensagem = new string[] { traducaoHelper["PAGAMENTO_SISTEMA_INFORMADO_COM_SUCESSO"] };
+                                Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+
+                                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(1);
+
+                                //Efetuar Credito no Master
+                                var lancamento = new Lancamento();
+                                lancamento.UsuarioID = idUsuario;
+                                lancamento.Tipo = Lancamento.Tipos.Debito;
+                                lancamento.ReferenciaID = lancamento.UsuarioID;
+                                lancamento.Descricao = String.Format("{0}{1}{2}", tabuleiroBoard.Nome.ToLower(), " - ", traducaoHelper["PAGAMENTO_SISTEMA"]);
+                                lancamento.DataLancamento = App.DateTimeZion;
+                                lancamento.DataCriacao = App.DateTimeZion;
+                                lancamento.ContaID = 7; //Transferencia
+                                lancamento.CategoriaID = 7; //Transferencia
+                                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
+                                lancamentoRepository.Save(lancamento);
+
+                                break;
+                            case "NOOK":
+                                string[] strMensagemParam4 = new string[] { traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"] };
+                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"]);
+                            default:
+                                string[] strMensagemParam5 = new string[] { traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"] };
+                                Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PAGAMENTO_NAO_CONFIRMADO"]);
+                        }
+                    }
+                    else
+                    {
+                        string[] strMensagemParam4 = new string[] { traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"]);
                     }
                 }
-                else
+
+                if (String.IsNullOrEmpty(retorno))
                 {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["SOMENTE_ALVO_PODE_EFETUAR_PAGAMENTO_SISTEMA"]);
+                    retorno = traducaoHelper["SERVIDOR_OCUPADO"];
                 }
 
                 JsonResult jsonResult = new JsonResult
@@ -1955,11 +2198,13 @@ namespace Sistema.Controllers
                     RecursionLimit = 1000
                 };
 
+                string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "ReportPaymentSystem");
                 return jsonResult;
 
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "ReportPaymentSystem", "back", ex.Message);
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");
@@ -1976,11 +2221,14 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
+            int idUsuario = 0;
+            int idTabuleiro = 0;
+            int idBoard = 0;
             try
             {
-                int idUsuario = int.Parse(usuarioID);
-                int idTabuleiro = int.Parse(tabuleiroID);
+                idUsuario = int.Parse(usuarioID);
+                idTabuleiro = int.Parse(tabuleiroID);
+                String retorno = "";
 
                 if (idUsuario <= 0 || idTabuleiro <= 0)
                 {
@@ -1989,57 +2237,68 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
-                string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
-
-                tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
-
-                if (token != tokenLocal)
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(idUsuario, "ExitNivel");
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
-                    //Devolve que tokem é invalido
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    string tokenDescript = CriptografiaHelper.Morpho(token, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                    string tokenLocal = usuario.ID.ToString() + "|" + usuario.Nome + "|" + DateTime.Now.ToString("yyyyMMdd");
+
+                    tokenLocal = CriptografiaHelper.Morpho(tokenLocal, CriptografiaHelper.TipoCriptografia.Criptografa);
+
+                    if (token != tokenLocal)
+                    {
+                        string[] strMensagemToken = new string[] { traducaoHelper["TOKEN_INVALIDO"], traducaoHelper["RELOAD"] + " " + traducaoHelper["PAGE"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemToken, "ale");
+                        //Devolve que tokem é invalido
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["TOKEN_INVALIDO"]);
+                    }
+
+                    if (idUsuario != usuario.ID)
+                    {
+                        string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    }
+
+                    idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
+                    //Remove usuario do tabuleiro informado
+                    retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idBoard);
+
+                    switch (retorno)
+                    {
+                        case "OK":
+                            string[] strMensagem = new string[] { traducaoHelper["SAIDA_REALIZADA_COM_SUCESSO"] };
+                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                            break;
+                        case "NOOK":
+                            string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
+                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]);
+                        default:
+                            string[] strMensagemParam5 = new string[] { traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] };
+                            Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]);
+                    }
                 }
 
-                if (idUsuario != usuario.ID)
+                if (String.IsNullOrEmpty(retorno))
                 {
-                    string[] strMensagemParam3 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam3, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                    retorno = traducaoHelper["SERVIDOR_OCUPADO"];
                 }
-
-                int idBoard = tabuleiroRepository.ObtemBoardIDByTabuleiroID(idUsuario, idTabuleiro);
-                //Remove usuario do tabuleiro informado
-                String retorno = tabuleiroRepository.TabuleiroSair(idUsuario, idBoard);
-
-                switch (retorno)
-                {
-                    case "OK":
-                        string[] strMensagem = new string[] { traducaoHelper["SAIDA_REALIZADA_COM_SUCESSO"] };
-                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                        break;
-                    case "NOOK":
-                        string[] strMensagemParam4 = new string[] { traducaoHelper["TEMPO_ESGOTADO"] };
-                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]);
-                    default:
-                        string[] strMensagemParam5 = new string[] { traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] };
-                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"]);
-                }
-
                 JsonResult jsonResult = new JsonResult
                 {
                     Data = retorno,
                     RecursionLimit = 1000
                 };
 
+                string setUltimoAcesso = tabuleiroRepository.SetUltimoAcesso(idUsuario, "ExitNivel");
+
                 return jsonResult;
 
             }
             catch (Exception ex)
             {
+                string ilog = tabuleiroRepository.SetLog(usuario.ID, idBoard, idTabuleiro, "ExitNivel", "back", ex.Message);
                 string erro = ex.Message;
                 string[] strMensagemParam1 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_RPS_01 [" + ex.Message + "]" };
                 Mensagem(traducaoHelper["ERRO"], strMensagemParam1, "err");

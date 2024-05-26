@@ -45,6 +45,7 @@ BEGIN
 		InformePagSistema bit,
 		ValorPagoSistema decimal(10,2),
 		TotalRecebimento int,
+        ConfirmarEmail bit,
 		DataInicio datetime,
 		DataFim int
 	)
@@ -81,6 +82,7 @@ BEGIN
 		    tab.InformePagSistema,
 			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
+            'true' ConfirmarEmail,
 		    tab.DataInicio,
 		    tab.DataFim
 	    From 
@@ -127,6 +129,7 @@ BEGIN
 		    tab.InformePagSistema,
 		    0.0 ValorPagoSistema,
 			tab.TotalRecebimento,
+            'true' ConfirmarEmail,
 		    tab.DataInicio,
 		    tab.DataFim
 	    From 
@@ -173,6 +176,7 @@ BEGIN
 		    tab.InformePagSistema,
 			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
+            'true' ConfirmarEmail,
 		    tab.DataInicio,
 		    tab.DataFim
 	    From 
@@ -218,6 +222,7 @@ BEGIN
 		    tab.InformePagSistema,
 			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
+            'true' ConfirmarEmail,
 		    tab.DataInicio,
 		    tab.DataFim
 	    From 
@@ -232,7 +237,104 @@ BEGIN
 		    tab.UsuarioID
     End
 
-    if(@tipo <> 'InformePagtoSistema' and @tipo <> 'PagosSistema' and @tipo <> 'InformePagtoMaster' and @tipo <> 'PagoMaster')
+    --Usuarios que pagaram o system e esperam confirmacao de que pagaram
+    if(@tipo = 'ConfirmarYellow')
+    Begin
+	    insert into #temp
+	    Select
+			'InformePagtoSistema',
+		    tab.UsuarioID,
+            '' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
+			0.0 ValorPagMaster,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+			0.0 ValorPagoSistema,
+		    tab.TotalRecebimento,
+            'true' ConfirmarEmail,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID And
+            tab.InformePag = 'true' and
+		    tab.PagoMaster = 'false' and
+            tab.UsuarioIDPag = 2000 --2000 é o usuario system que recebe pagamentos 
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
+
+    --Usuarios que pagaram o system, não informaram o pagamento e esperam confirmacao de que pagaram
+    if(@tipo = 'ConfirmarRed')
+    Begin
+	    insert into #temp
+	    Select
+			'InformePagtoSistema',
+		    tab.UsuarioID,
+            '' Nome,
+            '' Login,
+            '' Apelido,
+            '' Email,
+            '' Celular,
+            tab.Posicao,
+            Substring(tb.Nome,1,3) + '-' + FORMAT(tab.TabuleiroID, '000000') Galaxia,
+            '' Patrocinador,
+		    tab.TabuleiroID,
+		    tab.BoardID,
+		    tb.Nome as BoardNome,
+		    tb.Cor as BoardCor,
+		    tab.StatusID,
+		    'false' as Eterno,
+		    tab.MasterID,
+		    tab.InformePag,
+		    tab.UsuarioIDPag,
+			'' UsuarioPagNome,
+			0.0 ValorPagMaster,
+		    tab.Ciclo,
+		    tab.PagoMaster,
+		    tab.PagoSistema,
+		    tab.InformePagSistema,
+			0.0 ValorPagoSistema,
+		    tab.TotalRecebimento,
+            'true' ConfirmarEmail,
+		    tab.DataInicio,
+		    tab.DataFim
+	    From 
+		    Rede.TabuleiroUsuario tab (nolock),
+		    Rede.TabuleiroBoard tb (nolock)
+	    Where
+		    tab.BoardID = tb.ID And
+            tab.InformePag = 'false' and
+		    tab.PagoMaster = 'false' and
+            tab.UsuarioIDPag = 2000 --2000 é o usuario system que recebe pagamentos 
+	    Order By
+		    tab.BoardID,
+		    tab.UsuarioID
+    End
+
+    
+    if(@tipo <> 'InformePagtoSistema' and @tipo <> 'PagosSistema' and @tipo <> 'InformePagtoMaster' and @tipo <> 'PagoMaster' and @tipo <> 'ConfirmarYellow' and @tipo <> 'ConfirmarRed')
     Begin
         insert into #temp
 	    Select 
@@ -263,6 +365,7 @@ BEGIN
 		    tab.InformePagSistema,
 			0.0 ValorPagoSistema,
 		    tab.TotalRecebimento,
+            'true' ConfirmarEmail,
 		    tab.DataInicio,
 		    tab.DataFim
 	    From 
@@ -295,7 +398,8 @@ BEGIN
         tmp.Login = usu.Login,
         tmp.Apelido = usu.Apelido,
         tmp.Email = usu.Email,
-        tmp.Celular = usu.Celular
+        tmp.Celular = usu.Celular,
+        tmp.ConfirmarEmail = Case When ( usu.StatusEmailID = 2 ) Then 'true' Else 'false' End  
     From
         #temp tmp,
         Usuario.Usuario usu
@@ -341,12 +445,13 @@ BEGIN
 	    tipo,
 		UsuarioID,
         Nome,
-        Login,
+        LOWER(Login) Login,
+        LOWER(Apelido) Apelido,
         Email,
         Celular,
         Posicao,
         Galaxia,
-        Patrocinador,
+        LOWER(Patrocinador) Patrocinador,
 		TabuleiroID,
 		BoardID,
 		BoardNome,
@@ -356,7 +461,7 @@ BEGIN
 		MasterID,
 		InformePag,
 		UsuarioIDPag,
-		UsuarioPagNome,
+		LOWER(UsuarioPagNome) UsuarioPagNome,
 		ValorPagMaster,
 		Ciclo,
 		PagoMaster,
@@ -364,11 +469,12 @@ BEGIN
 		InformePagSistema,
 		ValorPagoSistema,
 		TotalRecebimento,
+        ConfirmarEmail,
 		DataInicio,
 		DataFim
 	From 
 		#temp
-
+    
 End -- Sp
 
 go
@@ -376,6 +482,7 @@ Grant Exec on spC_TabuleiroAdminUsuarios To public
 go
 
 --Exec spC_TabuleiroAdminUsuarios @tipo='InformePagtoSistema'
+--Exec spC_TabuleiroAdminUsuarios @tipo='ConfirmarYellow'
 --Exec spC_TabuleiroAdminUsuarios @tipo='PagosSistema'
 --Exec spC_TabuleiroAdminUsuarios @tipo='InformePagtoMaster'
 --Exec spC_TabuleiroAdminUsuarios @tipo='PagoMaster'

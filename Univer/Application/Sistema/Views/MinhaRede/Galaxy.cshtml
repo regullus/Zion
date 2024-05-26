@@ -729,6 +729,7 @@
                                 $("#infoNome").html(data.Nome);
                                 $("#infoApelido").html(data.Apelido);
                                 $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
+                                $("#infoValor").html(data.Valor);
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
                                 $("#infoID").html(data.UsuarioID);
                                 $("#infoID").val(data.UsuarioID);
@@ -860,20 +861,31 @@
                                 location.reload();
                             }
                         } else {
+                            if (data.toString() != "") {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            } else {
+                                if (idTabuleiro != null && idTabuleiro > 0) {
+                                    var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                    window.location.href = url;
+                                } else {
+                                    location.reload();
+                                }
+                            }
+                        }
+                    } else {
+                        if (data.toString() != "") {
                             Swal.fire({
                                 title: '@traducaoHelper["ALERTA"]',
-                                text: data.toString(),
+                                text: '@traducaoHelper["SEM_DADOS"]',
                                 icon: 'warning',
                                 confirmButtonText: 'OK'
                             });
                         }
-                    } else {
-                        Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]',
-                            text: '@traducaoHelper["SEM_DADOS"]',
-                            icon: 'warning',
-                            confirmButtonText: 'OK'
-                        });
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -912,34 +924,38 @@
                 },
                 success: function (data) {
                     if (data != null) {
-                        if (data.toString() == "OK") {
+                        if (data == "OK") {
                             if (idTabuleiro != null && idTabuleiro > 0) {
                                 var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
                                 window.location.href = url;
                             } else {
                                 if (idTabuleiro != null && idTabuleiro > 0) {
-                                    var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
-                                    window.location.href = url;
+                                    setTimeout(function () {
+                                        var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
+                                        window.location.href = url;
+                                    }, 2000);
                                 } else {
-                                    location.reload();
+                                    setTimeout(function () {
+                                        location.reload();
+                                    }, 2000);
                                 }
                             }
                         } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]',
-                                text: data.toString(),
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
+                            if (data != "") {
+                                if (data == "COMPLETO") {
+                                   location.reload();
+                                } else {
+                                    Swal.fire({
+                                        title: '@traducaoHelper["ALERTA"]',
+                                        text: data.toString(),
+                                        icon: 'warning',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            }
                         }
-                    } else {
-                        Swal.fire({
-                            title: '@traducaoHelper["ALERTA"]',
-                            text: '@traducaoHelper["SEM_DADOS"]',
-                            icon: 'warning',
-                            confirmButtonText: 'OK'
-                        });
                     }
+                    
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
@@ -968,6 +984,8 @@
                 url: "@Url.Action("GetDataSysPag")",
                 type: "POST",
                 data: {
+                    'usuarioID': '@(idUsuario)',
+                    'tabuleiroID': idTabuleiro,
                     'token': '@(ViewBag.Token)'
                 },
                 success: function (data) {
@@ -976,6 +994,7 @@
                         $("#infoApelido").html(data.Apelido);
                         $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
                         $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
+                        $("#infoValor").html(data.Valor);
 
                         if (data.Nome == 'Syspag') {
                             $('#infoObs').html('@traducaoHelper["SISTEM_PAGAMENTO"]')
@@ -1080,12 +1099,14 @@
                                 location.reload();
                             }
                         } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]',
-                                text: data.toString(),
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
+                            if (data.toString() != "") {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
                         }
                     } else {
                         Swal.fire({
@@ -1132,12 +1153,14 @@
                         if (data.toString() == "OK") {
                             location.reload();
                         } else {
-                            Swal.fire({
-                                title: '@traducaoHelper["ALERTA"]',
-                                text: data.toString(),
-                                icon: 'warning',
-                                confirmButtonText: 'OK'
-                            });
+                            if (data.toString() != "") {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
                         }
                     } else {
                         Swal.fire({
@@ -1169,7 +1192,8 @@
             });
         });
 
-        $('.invite').on('click', function () {
+        $('.invite').on('click', function (event) {
+            event.preventDefault();
             var idBoard = $(this).attr("data-id");
             var idTabuleiro = $('#tabuleiro').val();
             $.ajax({
@@ -1182,21 +1206,12 @@
                 },
                 success: function (data) {
                     if (data != null) {
-                        if (data == "OK") {
-                            if (idTabuleiro != null && idTabuleiro > 0) {
-                                var url = "/MinhaRede/Galaxy/?idTab=" + idTabuleiro;
-                                window.location.href = url;
-                            } else {
-                                location.reload();
-                            }
+                        if (data > 0) {
+                            var url = "/MinhaRede/Galaxy/?idTab=" + data;
+                            window.location.href = url;
                         } else {
-                            if (data != '@traducaoHelper["USUARIO_JA_POSICIONADO"]') {
-                                Swal.fire({
-                                    title: '@traducaoHelper["ALERTA"]',
-                                    text: data,
-                                    icon: 'warning',
-                                    confirmButtonText: 'OK'
-                                });
+                            if (data != 0) {
+                                location.reload();
                             }
                         }
                     } else {
@@ -1217,7 +1232,7 @@
                         } else {
                             location.reload();
                         }
-                    } 
+                    }
                 },
             });
         });
@@ -1323,12 +1338,14 @@
                                         location.reload();
                                     }
                                 } else {
-                                    Swal.fire({
-                                        title: '@traducaoHelper["ALERTA"]',
-                                        text: data.toString(),
-                                        icon: 'warning',
-                                        confirmButtonText: 'OK'
-                                    });
+                                    if (data.toString() != "") {
+                                        Swal.fire({
+                                            title: '@traducaoHelper["ALERTA"]',
+                                            text: data.toString(),
+                                            icon: 'warning',
+                                            confirmButtonText: 'OK'
+                                        });
+                                    }
                                 }
                             } else {
                                 Swal.fire({
@@ -1486,11 +1503,12 @@
                     <input type="hidden" class="form-control" id="tabuleiro" value="@idTabuleiro" />
 
                     <div class="tiles" id="planetBody" style="padding-left: 15px;">
-                        <div id="tab_select" class="tile double @tabuleiroAtivo.BoardCor" style="max-height: 80px; max-width: 200px;">
+                        <div id="tab_select" class="tile double @tabuleiroAtivo.BoardCor" style="max-height: 90px; max-width: 200px;">
                             <div class="tile-body" style="padding:5px;">
                                 <img id="tab_select_img" src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + tabuleiroAtivo.BoardID + ".png?v=" + @Helpers.Local.Versao)' style="vertical-align: top; height: 56px; margin: 0; padding: 0;" class="pull-right">
                                 <h3 id="tab_select_name">@(traducaoHelper[tabuleiroAtivo.BoardNome])</h3>
                                 <p id="tab_select_position">@(traducaoHelper[tabuleiroAtivo.Posicao].ToUpper())</p>
+                                <p id="tab_select_position">@(traducaoHelper["CICLO"]): @(tabuleiroAtivo.Ciclo)</p>
                             </div>
                         </div>
                     </div>
@@ -1661,6 +1679,7 @@ else
                         <h3 style="font-weight: 500; padding: 20px 20px;" class="pull-right" id="infoApelido"></h3>
                         <h3 style="font-weight: 500;" id="infoNome"></h3>
                         <h4 style="font-weight: 500;" id="infoCelular"></h4>
+                        <h4 style="font-weight: 500;" id="infoValor"></h4>
                         <h5 style="font-weight: 500; color: darkred;" id="infoObs"></h5>
                         <input type="hidden" id="infoID" />
                         <div class="panel-group accordion" id="accordion3">

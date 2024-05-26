@@ -19,6 +19,7 @@ namespace Core.Models
         public string PatrocinadorApelido { get; set; }
         public string PatrocinadorCelular { get; set; }
         public bool ConfirmarRecebimento { get; set; }
+        public string Valor { get; set; }
         public string Observacao { get; set; }
     }
 }

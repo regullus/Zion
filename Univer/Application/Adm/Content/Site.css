@@ -8,7 +8,7 @@ a.gridEdit {
    background: url(img/icon/gridEditar.png) no-repeat top left;
    display: inline-block;
    width: 18px;
-   height: 16px;
+   height: 18px;
    text-indent: -9999px; /* hides the link text */
 }
 
@@ -106,6 +106,46 @@ a.gridNovo {
    width: 18px;
    height: 16px;
    text-indent: -9999px; /* hides the link text */
+}
+
+a.gridPagtoSistem {
+    background: url(img/icon/gridPagtoSystem.png) no-repeat top left;
+    display: inline-block;
+    width: 18px;
+    height: 16px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+a.gridPagtoMaster {
+    background: url(img/icon/gridPagtoMaster.png) no-repeat top left;
+    display: inline-block;
+    width: 18px;
+    height: 16px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+a.gridConfimRed {
+    background: url(img/icon/gridComfirmRed.png) no-repeat top left;
+    display: inline-block;
+    width: 18px;
+    height: 16px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+a.gridConfimYellow {
+    background: url(img/icon/gridConfirmYellow.png) no-repeat top left;
+    display: inline-block;
+    width: 18px;
+    height: 16px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+a.gridConfimEmail {
+    background: url(img/icon/gridConfirmEmail.png) no-repeat top left;
+    display: inline-block;
+    width: 18px;
+    height: 16px;
+    text-indent: -9999px; /* hides the link text */
 }
 
 a.gridNew {

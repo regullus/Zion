@@ -163,6 +163,7 @@ namespace Sistema.Controllers
             Session["strTitulo"] = "";
             Session["strMensagem"] = "";
         }
+
         #endregion
 
         #region Helpers
@@ -320,23 +321,44 @@ namespace Sistema.Controllers
         #region Actions
 
         // GET: Usuarios
-        public ActionResult Index(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraPatrocinador, string ProcuraPatrocinador, int? NumeroPaginas, int? Page)
+        public ActionResult Index(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraPatrocinador, string Tipo, string ProcuraPatrocinador, int? NumeroPaginas, int? Page)
         {
             // return View(usuarios.ToList());
 
             //Verifica se a msg em popup para ser exibido na view
             obtemMensagem();
-
+            string percistenciaFake = "Fake";
+            string bkpCurrentProcuraLogin = CurrentProcuraLogin;
             //Persistencia dos paramentros da tela
             Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
             objFuncoes.Persistencia(ref SortOrder,
                                     ref CurrentProcuraLogin,
                                     ref ProcuraLogin,
-                                    ref CurrentProcuraPatrocinador,
-                                    ref ProcuraPatrocinador,
+                                    ref Tipo,
+                                    ref percistenciaFake,
                                     ref NumeroPaginas,
                                     ref Page,
                                     "Usuarios");
+
+            if (String.IsNullOrEmpty(bkpCurrentProcuraLogin))
+            {
+                CurrentProcuraLogin = null;
+            }
+
+            string tipoFiltro = string.Empty;
+
+            if (String.IsNullOrEmpty(Tipo))
+            {
+                tipoFiltro = "Todos";
+            }
+            else
+            {
+                tipoFiltro = Tipo;
+            }
+            if (!(tipoFiltro == "InformePagtoSistema" || tipoFiltro == "PagosSistema" || tipoFiltro == "InformePagtoMaster" || tipoFiltro == "PagoMaster" || tipoFiltro == "ConfirmarYellow" || tipoFiltro == "ConfirmarRed" || tipoFiltro == "Todos"))
+            {
+                tipoFiltro = "Todos";
+            }
 
             objFuncoes = null;
 
@@ -365,40 +387,21 @@ namespace Sistema.Controllers
             ViewBag.CurrentProcuraLogin = ProcuraLogin;
             ViewBag.CurrentProcuraPatrocinador = ProcuraPatrocinador;
 
-            IQueryable<Usuario> lista = null;
+            //Obtem lista de usuarioID que informaram o pagamento
+            IEnumerable<Core.Models.TabuleiroAdminUsuarios> lista = tabuleiroRepository.AdminUsuarios(tipoFiltro);
 
-            lista = db.Usuarios.Include(u => u.Pais).Include(u => u.PatrocinadorDireto).Include(u => u.PatrocinadorPosicao).Include(u => u.UltimoDireita).Include(u => u.UltimoEsquerda).Include(u => u.Filial).Include(u => u.Autenticacao);
-            lista = lista.Where(x => x.ID > 2500); //Anteriores são admins ou logins do Sistema que não podem ser alterados
 
             //Obtem lista de usuarioID que não efetuaram pagamento
             IEnumerable<Core.Models.TabuleiroUsuarioModel> tabuleirosUsuario = tabuleiroRepository.ObtemTabuleirosNaoPagaramSistema();
 
-            //Remove da lista os usuarios que não informaram um pagamento
-            foreach (var item in lista)
-            {
-                //Verifica se o usuario informou um pagamento ao sistema
-                var usuario = tabuleirosUsuario.Where(x => x.UsuarioID == item.ID).FirstOrDefault();
-                if (usuario != null)
-                {
-                    item.Documento = usuario.Posicao; //Usando o campo Documento para exibir a posição do usuario   
-                    item.SenhaLegado = usuario.BoardNome; //Usando o campo SenhaLegado para exibir o nome da galaxia que o usuario está
-                    item.TipoID = usuario.BoardID; //Usado o campo TipoID como BoardID
-                    item.Oculto = true; //Usado para exibir icone de confirmação de pagamento
-                }
-                else
-                {
-                    item.Oculto = false; //Usado para exibir icone de confirmação de pagamento
-                }
-            }
-
             if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
             {
-                lista = lista.Where(x => x.PatrocinadorDireto.Login.Contains(ProcuraPatrocinador) &&
-                                       (x.Login.Contains(ProcuraLogin) ||
-                                         x.Nome.Contains(ProcuraLogin) ||
-                                         x.Email.Contains(ProcuraLogin)
-                                       )
-                                    );
+                lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador) &&
+                                           (x.Login.Contains(ProcuraLogin) ||
+                                             x.Nome.Contains(ProcuraLogin) ||
+                                             x.Email.Contains(ProcuraLogin)
+                                           )
+                                        );
             }
             else
             {
@@ -411,7 +414,7 @@ namespace Sistema.Controllers
                 }
                 if (!String.IsNullOrEmpty(ProcuraPatrocinador))
                 {
-                    lista = lista.Where(x => x.PatrocinadorDireto.Nome.Contains(ProcuraPatrocinador));
+                    lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador));
                 }
             }
 
@@ -425,13 +428,13 @@ namespace Sistema.Controllers
                 case "patrocinador":
                     ViewBag.FirstSortParm = "login";
                     ViewBag.SecondSortParm = "patrocinador_desc";
-                    lista = lista.OrderBy(x => x.PatrocinadorDireto.Login);
+                    lista = lista.OrderBy(x => x.Patrocinador);
                     break;
                 case "patrocinador_desc":
                     ViewBag.FirstSortParm = "login";
                     ViewBag.SecondSortParm = "patrocinador";
 
-                    lista = lista.OrderByDescending(x => x.PatrocinadorDireto.Nome);
+                    lista = lista.OrderByDescending(x => x.Patrocinador);
                     break;
                 case "login":
                     ViewBag.FirstSortParm = "login_desc";
@@ -464,21 +467,357 @@ namespace Sistema.Controllers
             int intNumeroPaginas = (NumeroPaginas ?? 5);
 
             #region ViewBags
+            switch (tipoFiltro)
+            {
+                case "InformePagtoSistema":
+                    ViewBag.Title = traducaoHelper["INFORME_PGTO_SISTEMA"];
+                    break;
+                case "PagosSistema":
+                    ViewBag.Title = traducaoHelper["PGTO_SISTEMA"];
+                    break;
+                case "InformePagtoMaster":
+                    ViewBag.Title = traducaoHelper["INFORME_PGTO_MASTER"];
+                    break;
+                case "PagosMaster":
+                    ViewBag.Title = traducaoHelper["PGTO_MASTER"];
+                    break;
+                case "ConfirmarYellow":
+                    ViewBag.Title = traducaoHelper["INFORME_PGTO_MASTER"];
+                    break;
+                case "ConfirmarRed":
+                    ViewBag.Title = traducaoHelper["PGTO_MASTER"];
+                    break;
+                default:
+                    ViewBag.Title = traducaoHelper["TODOS"];
+                    break;
+            }
 
             ViewBag.UsuarioEntraOutraAba = ConfiguracaoHelper.GetBoolean("USUARIO_ENTRA_OUTRA_ABA");
-
             ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
-            ViewBag.Associacoes = associacaoRepository.GetAll().ToList();
-            ViewBag.Classificacoes = classificacaoRepository.GetAll().ToList();
-            ViewBag.Produtos = produtoRepository.GetAtivacao();
-            ViewBag.MeioPagamento = meioPagamentoRepository.GetAtivos();
             ViewBag.Lista = lista;
 
             #endregion
 
             return View(lista.ToPagedList(PageNumber, PageSize));
-
         }
+
+        //*************INICIO Tabuleiro***************
+
+        [HttpPost]
+        public ActionResult FoiPagoSistema(string usuarioID, string BoardID)
+        {
+            if (usuarioID.IsNullOrEmpty() || BoardID.IsNullOrEmpty())
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idBoard = int.Parse(BoardID);
+
+                if (idUsuario <= 0 || idBoard <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, true);
+
+                if (retorno == null)
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01");
+                }
+
+                if (retorno != "OK")
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02");
+                }
+
+                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
+
+                Usuario usuario = db.Usuarios.Find(idUsuario);
+
+                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
+
+                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                
+                //valor dobrado quando ciclo> 1
+                if (tabuleiroUsuario.Ciclo > 1)
+                {
+                    tabuleiroBoard.Licenca = tabuleiroBoard.Licenca * 2;
+                }
+
+                //Efetuar Credito no syspag
+                var lancamento = new Lancamento();
+                lancamento.UsuarioID = 2001; //Syspag
+                lancamento.Tipo = Lancamento.Tipos.Credito;
+                lancamento.ReferenciaID = lancamento.UsuarioID;
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - ", usuario.Nome);
+                lancamento.DataLancamento = App.DateTimeZion;
+                lancamento.DataCriacao = App.DateTimeZion;
+                lancamento.ContaID = 7; //Transferencia
+                lancamento.CategoriaID = 7; //Transferencia
+                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
+                lancamentoRepository.Save(lancamento);
+
+                //Efetuar Debito no Convidado
+                lancamento = new Lancamento();
+                lancamento.UsuarioID = idUsuario;
+                lancamento.Tipo = Lancamento.Tipos.Debito;
+                lancamento.ReferenciaID = lancamento.UsuarioID;
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - ", traducaoHelper["Board" + BoardID]);
+                lancamento.DataLancamento = App.DateTimeZion;
+                lancamento.DataCriacao = App.DateTimeZion;
+                lancamento.ContaID = 7; //Transferencia
+                lancamento.CategoriaID = 7; //Transferencia
+                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
+                lancamentoRepository.Save(lancamento);
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = retorno,
+                    RecursionLimit = 1000
+                };
+
+                return jsonResult;
+            }
+            catch (Exception ex)
+            {
+                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult NaoFoiPagoSistema(string usuarioID, string BoardID)
+        {
+            if (usuarioID.IsNullOrEmpty() || BoardID.IsNullOrEmpty())
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idBoard = int.Parse(BoardID);
+
+                if (idUsuario <= 0 || idBoard <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                string retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, false);
+
+                if (retorno == null)
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01");
+                }
+
+                if (retorno != "OK")
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02");
+                }
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = retorno,
+                    RecursionLimit = 1000
+                };
+
+                return jsonResult;
+
+            }
+            catch (Exception ex)
+            {
+                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult FoiPagoMaster(string usuarioID, string BoardID)
+        {
+            if (usuarioID.IsNullOrEmpty() || BoardID.IsNullOrEmpty())
+            {
+                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+                int idBoard = int.Parse(BoardID);
+
+                if (idUsuario <= 0 || idBoard <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                int idUsuarioPag = tabuleiroRepository.ObtemUsuarioIDPag(idUsuario, idBoard);
+
+                //Verifica se é realmente o master do tabuleiro
+                TabuleiroUsuarioModel tabuleiroUsuarioCheck = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+                if (idUsuarioPag == 0)
+                {
+                    idUsuarioPag = tabuleiroUsuarioCheck.MasterID;
+                }
+
+                string retMaster = tabuleiroRepository.MasterRuleOK(tabuleiroUsuario.MasterID, idBoard);
+                string retIndicados = tabuleiroRepository.MasterIndicadosOK(tabuleiroUsuario.MasterID, idBoard);
+
+                if (retMaster == "OK" && retIndicados == "OK" || true)
+                {
+                    idUsuarioPag = 2000;
+                }
+
+                string retorno = tabuleiroRepository.InformarRecebimento(idUsuario, idUsuarioPag, idBoard);
+
+                //string retorno = tabuleiroRepository.ConfirmarPagtoMaster(idUsuario, idBoard, true);
+
+                if (retorno == null)
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01");
+                }
+
+                if (retorno != "OK")
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02");
+                }
+
+                Usuario usuario = db.Usuarios.Find(idUsuario);
+
+                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
+                Usuario usuarioConvidado = usuarioRepository.Get(idUsuario);
+                tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+
+                //Efetuar Credito no Master
+                var lancamento = new Lancamento();
+                lancamento.UsuarioID = idUsuarioPag;
+                lancamento.Tipo = Lancamento.Tipos.Credito;
+                lancamento.ReferenciaID = lancamento.UsuarioID;
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuarioConvidado.Apelido.ToLower());
+                lancamento.DataLancamento = App.DateTimeZion;
+                lancamento.DataCriacao = App.DateTimeZion;
+                lancamento.ContaID = 7; //Transferencia
+                lancamento.CategoriaID = 7; //Transferencia
+                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                lancamentoRepository.Save(lancamento);
+
+                //Efetuar Debito no Convidado
+                lancamento = new Lancamento();
+                lancamento.UsuarioID = idUsuario;
+                lancamento.Tipo = Lancamento.Tipos.Debito;
+                lancamento.ReferenciaID = lancamento.UsuarioID;
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuario.Apelido.ToLower());
+                lancamento.DataLancamento = App.DateTimeZion;
+                lancamento.DataCriacao = App.DateTimeZion;
+                lancamento.ContaID = 7; //Transferencia
+                lancamento.CategoriaID = 7; //Transferencia
+                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                lancamentoRepository.Save(lancamento);
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = retorno,
+                    RecursionLimit = 1000
+                };
+
+                return jsonResult;
+            }
+            catch (Exception ex)
+            {
+                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
+            }
+        }
+
+        public ActionResult ReloadInformePgto()
+        {
+            Localizacao();
+
+            //Persistencia dos paramentros da tela
+            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
+            objFuncoes.LimparPersistencia();
+            objFuncoes = null;
+            return RedirectToAction("InformePagamento");
+        }
+
+        [HttpPost]
+        public ActionResult ConfirmarEmail(string usuarioID)
+        {
+            string retorno = string.Empty;
+            try
+            {
+                int idUsuario = int.Parse(usuarioID);
+
+                if (idUsuario <= 0)
+                {
+                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
+                }
+
+                retorno = tabuleiroRepository.ConfirmarEmmail(idUsuario);
+
+                if (retorno != "OK")
+                {
+                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_CE_01" };
+                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_CE_01");
+                }
+
+                string[] strMensagemParam = new string[] { traducaoHelper["EMAIL_CONFIRMADO"] };
+                Mensagem(traducaoHelper["SUCESSO"], strMensagemParam, "msg");
+
+                JsonResult jsonResult = new JsonResult
+                {
+                    Data = retorno,
+                    RecursionLimit = 1000
+                };
+
+                return jsonResult;
+            }
+            catch (Exception ex)
+            {
+                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
+                Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
+            }
+        }
+
+
+        //*************FIM Tabuleiro***************
 
         // GET: Usuarios/Details/5
         public ActionResult Details(int? id)
@@ -830,450 +1169,6 @@ namespace Sistema.Controllers
             }
             base.Dispose(disposing);
         }
-
-        //*************INICIO Tabuleiro***************
-
-        public ActionResult InformePagamento(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraPatrocinador, string ProcuraPatrocinador, int? NumeroPaginas, int? Page)
-        {
-            // return View(usuarios.ToList());
-
-            //Verifica se a msg em popup para ser exibido na view
-            obtemMensagem();
-
-            //Persistencia dos paramentros da tela
-            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
-            objFuncoes.Persistencia(ref SortOrder,
-                                    ref CurrentProcuraLogin,
-                                    ref ProcuraLogin,
-                                    ref CurrentProcuraPatrocinador,
-                                    ref ProcuraPatrocinador,
-                                    ref NumeroPaginas,
-                                    ref Page,
-                                    "Usuarios");
-
-            try
-            {
-
-                objFuncoes = null;
-
-                //List
-                if (String.IsNullOrEmpty(SortOrder))
-                {
-                    ViewBag.CurrentSort = "login";
-                }
-                else
-                {
-                    ViewBag.CurrentSort = SortOrder;
-                }
-
-                if (!(ProcuraLogin != null || ProcuraPatrocinador != null))
-                {
-                    if (ProcuraLogin == null)
-                    {
-                        ProcuraLogin = CurrentProcuraLogin;
-                    }
-                    if (ProcuraPatrocinador == null)
-                    {
-                        ProcuraPatrocinador = CurrentProcuraPatrocinador;
-                    }
-                }
-
-                ViewBag.CurrentProcuraLogin = ProcuraLogin;
-                ViewBag.CurrentProcuraPatrocinador = ProcuraPatrocinador;
-
-                //Obtem lista de usuarioID que informaram o pagamento
-                IEnumerable<Core.Models.TabuleiroInformaramPagtoModel> lista = tabuleiroRepository.ObtemTabuleirosInformaramPgto();
-
-                if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
-                {
-                    lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador) &&
-                                           (x.Login.Contains(ProcuraLogin) ||
-                                             x.Nome.Contains(ProcuraLogin) ||
-                                             x.Email.Contains(ProcuraLogin)
-                                           )
-                                        );
-                }
-                else
-                {
-                    if (!String.IsNullOrEmpty(ProcuraLogin))
-                    {
-                        lista = lista.Where(x => x.Login.Contains(ProcuraLogin) ||
-                                                 x.Nome.Contains(ProcuraLogin) ||
-                                                 x.Email.Contains(ProcuraLogin)
-                                           );
-                    }
-                    if (!String.IsNullOrEmpty(ProcuraPatrocinador))
-                    {
-                        lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador));
-                    }
-                }
-
-                switch (SortOrder)
-                {
-                    case "login_desc":
-                        ViewBag.FirstSortParm = "login";
-                        ViewBag.SecondSortParm = "patrocinador";
-                        lista = lista.OrderByDescending(x => x.Login);
-                        break;
-                    case "patrocinador":
-                        ViewBag.FirstSortParm = "login";
-                        ViewBag.SecondSortParm = "patrocinador_desc";
-                        lista = lista.OrderBy(x => x.Patrocinador);
-                        break;
-                    case "patrocinador_desc":
-                        ViewBag.FirstSortParm = "login";
-                        ViewBag.SecondSortParm = "patrocinador";
-
-                        lista = lista.OrderByDescending(x => x.Patrocinador);
-                        break;
-                    case "login":
-                        ViewBag.FirstSortParm = "login_desc";
-                        ViewBag.SecondSortParm = "date";
-
-                        lista = lista.OrderBy(x => x.Login);
-                        break;
-                    default:  // Name ascending 
-                        ViewBag.FirstSortParm = "login_desc";
-                        ViewBag.SecondSortParm = "patrocinador";
-                        lista = lista.OrderBy(x => x.Login);
-                        break;
-                }
-
-                //Numero de linhas por Pagina
-                int PageSize = (NumeroPaginas ?? 5);
-
-                //Caso seja selecionada toda a lista (-1), pega na verdade 1000
-                if (PageSize == -1)
-                {
-                    PageSize = 1000;
-                }
-                ViewBag.PageSize = PageSize;
-                ViewBag.CurrentNumeroPaginas = NumeroPaginas;
-
-                //Pagina corrente
-                int PageNumber = (Page ?? 1);
-
-                //DropDown de paginação
-                int intNumeroPaginas = (NumeroPaginas ?? 5);
-
-                #region ViewBags
-
-                ViewBag.UsuarioEntraOutraAba = ConfiguracaoHelper.GetBoolean("USUARIO_ENTRA_OUTRA_ABA");
-
-                ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
-                ViewBag.Lista = lista;
-
-                #endregion
-
-                return View(lista.ToPagedList(PageNumber, PageSize));
-
-            }
-            catch (Exception ex)
-            {
-                String erro = ex.Message;
-                return View();
-            }
-
-        }
-
-
-        public ActionResult PagamentoOK(string SortOrder, string CurrentProcuraLogin, string ProcuraLogin, string CurrentProcuraPatrocinador, string ProcuraPatrocinador, int? NumeroPaginas, int? Page)
-        {
-            //Verifica se a msg em popup para ser exibido na view
-            obtemMensagem();
-
-            //Persistencia dos paramentros da tela
-            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
-            objFuncoes.Persistencia(ref SortOrder,
-                                    ref CurrentProcuraLogin,
-                                    ref ProcuraLogin,
-                                    ref CurrentProcuraPatrocinador,
-                                    ref ProcuraPatrocinador,
-                                    ref NumeroPaginas,
-                                    ref Page,
-                                    "Usuarios");
-
-            try
-            {
-
-                objFuncoes = null;
-
-                //List
-                if (String.IsNullOrEmpty(SortOrder))
-                {
-                    ViewBag.CurrentSort = "login";
-                }
-                else
-                {
-                    ViewBag.CurrentSort = SortOrder;
-                }
-
-                if (!(ProcuraLogin != null || ProcuraPatrocinador != null))
-                {
-                    if (ProcuraLogin == null)
-                    {
-                        ProcuraLogin = CurrentProcuraLogin;
-                    }
-                    if (ProcuraPatrocinador == null)
-                    {
-                        ProcuraPatrocinador = CurrentProcuraPatrocinador;
-                    }
-                }
-
-                ViewBag.CurrentProcuraLogin = ProcuraLogin;
-                ViewBag.CurrentProcuraPatrocinador = ProcuraPatrocinador;
-
-                //Obtem lista de usuarioID que informaram o pagamento
-                IEnumerable<Core.Models.TabuleiroInformaramPagtoModel> lista = tabuleiroRepository.ObtemTabuleirosPagos();
-
-                if (!String.IsNullOrEmpty(ProcuraLogin) && !String.IsNullOrEmpty(ProcuraPatrocinador))
-                {
-                    lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador) &&
-                                           (x.Login.Contains(ProcuraLogin) ||
-                                             x.Nome.Contains(ProcuraLogin) ||
-                                             x.Email.Contains(ProcuraLogin)
-                                           )
-                                        );
-                }
-                else
-                {
-                    if (!String.IsNullOrEmpty(ProcuraLogin))
-                    {
-                        lista = lista.Where(x => x.Login.Contains(ProcuraLogin) ||
-                                                 x.Nome.Contains(ProcuraLogin) ||
-                                                 x.Email.Contains(ProcuraLogin)
-                                           );
-                    }
-                    if (!String.IsNullOrEmpty(ProcuraPatrocinador))
-                    {
-                        lista = lista.Where(x => x.Patrocinador.Contains(ProcuraPatrocinador));
-                    }
-                }
-
-                switch (SortOrder)
-                {
-                    case "login_desc":
-                        ViewBag.FirstSortParm = "login";
-                        ViewBag.SecondSortParm = "patrocinador";
-                        lista = lista.OrderByDescending(x => x.Login);
-                        break;
-                    case "patrocinador":
-                        ViewBag.FirstSortParm = "login";
-                        ViewBag.SecondSortParm = "patrocinador_desc";
-                        lista = lista.OrderBy(x => x.Patrocinador);
-                        break;
-                    case "patrocinador_desc":
-                        ViewBag.FirstSortParm = "login";
-                        ViewBag.SecondSortParm = "patrocinador";
-
-                        lista = lista.OrderByDescending(x => x.Patrocinador);
-                        break;
-                    case "login":
-                        ViewBag.FirstSortParm = "login_desc";
-                        ViewBag.SecondSortParm = "date";
-
-                        lista = lista.OrderBy(x => x.Login);
-                        break;
-                    default:  // Name ascending 
-                        ViewBag.FirstSortParm = "login_desc";
-                        ViewBag.SecondSortParm = "patrocinador";
-                        lista = lista.OrderBy(x => x.Login);
-                        break;
-                }
-
-                //Numero de linhas por Pagina
-                int PageSize = (NumeroPaginas ?? 5);
-
-                //Caso seja selecionada toda a lista (-1), pega na verdade 1000
-                if (PageSize == -1)
-                {
-                    PageSize = 1000;
-                }
-                ViewBag.PageSize = PageSize;
-                ViewBag.CurrentNumeroPaginas = NumeroPaginas;
-
-                //Pagina corrente
-                int PageNumber = (Page ?? 1);
-
-                //DropDown de paginação
-                int intNumeroPaginas = (NumeroPaginas ?? 5);
-
-                #region ViewBags
-
-                ViewBag.UsuarioEntraOutraAba = ConfiguracaoHelper.GetBoolean("USUARIO_ENTRA_OUTRA_ABA");
-
-                ViewBag.NumeroPaginas = new SelectList(db.Paginacao, "valor", "nome", intNumeroPaginas);
-                ViewBag.Lista = lista;
-
-                #endregion
-
-                return View(lista.ToPagedList(PageNumber, PageSize));
-
-            }
-            catch (Exception ex)
-            {
-                String erro = ex.Message;
-                return View();
-            }
-
-        }
-
-
-        [HttpPost]
-        public ActionResult FoiPago(string usuarioID, string BoardID)
-        {
-            if (usuarioID.IsNullOrEmpty() || BoardID.IsNullOrEmpty())
-            {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            try
-            {
-                int idUsuario = int.Parse(usuarioID);
-                int idBoard = int.Parse(BoardID);
-
-                if (idUsuario <= 0 || idBoard <= 0)
-                {
-                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
-
-                string retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, true);
-
-                if (retorno == null)
-                {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01");
-                }
-
-                if (retorno != "OK")
-                {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02");
-                }
-
-                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
-                
-                Usuario usuario = db.Usuarios.Find(idUsuario);
-
-                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
-
-                //Efetuar Credito no syspag
-                var lancamento = new Lancamento();
-                lancamento.UsuarioID = 2001; //Syspag
-                lancamento.Tipo = Lancamento.Tipos.Credito;
-                lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board"+BoardID], " - ", usuario.Nome);
-                lancamento.DataLancamento = App.DateTimeZion;
-                lancamento.DataCriacao = App.DateTimeZion;
-                lancamento.ContaID = 7; //Transferencia
-                lancamento.CategoriaID = 7; //Transferencia
-                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                lancamentoRepository.Save(lancamento);
-
-                //Efetuar Debito no Convidado
-                lancamento = new Lancamento();
-                lancamento.UsuarioID = idUsuario;
-                lancamento.Tipo = Lancamento.Tipos.Debito;
-                lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - ", traducaoHelper["Board" + BoardID]);
-                lancamento.DataLancamento = App.DateTimeZion;
-                lancamento.DataCriacao = App.DateTimeZion;
-                lancamento.ContaID = 7; //Transferencia
-                lancamento.CategoriaID = 7; //Transferencia
-                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                lancamentoRepository.Save(lancamento);
-
-                JsonResult jsonResult = new JsonResult
-                {
-                    Data = retorno,
-                    RecursionLimit = 1000
-                };
-
-                return jsonResult;
-            }
-            catch (Exception ex)
-            {
-                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
-                Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
-            }
-        }
-
-        [HttpPost]
-        public ActionResult NaoFoiPago(string usuarioID, string BoardID)
-        {
-            if (usuarioID.IsNullOrEmpty() || BoardID.IsNullOrEmpty())
-            {
-                string[] strMensagemParam1 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            try
-            {
-                int idUsuario = int.Parse(usuarioID);
-                int idBoard = int.Parse(BoardID);
-
-                if (idUsuario <= 0 || idBoard <= 0)
-                {
-                    string[] strMensagemParam2 = new string[] { traducaoHelper["PARAMETRO_INVALIDO"] };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
-                }
-
-                string retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, false);
-
-                if (retorno == null)
-                {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01");
-                }
-
-                if (retorno != "OK")
-                {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02");
-                }
-
-                JsonResult jsonResult = new JsonResult
-                {
-                    Data = retorno,
-                    RecursionLimit = 1000
-                };
-
-                return jsonResult;
-
-            }
-            catch (Exception ex)
-            {
-                string[] strMensagemParam5 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01", "[" + ex.Message + "]" };
-                Mensagem(traducaoHelper["ERRO"], strMensagemParam5, "err");
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_GT_01" + "[" + ex.Message + "]");
-            }
-        }
-
-        public ActionResult ReloadInformePgto()
-        {
-            Localizacao();
-
-            //Persistencia dos paramentros da tela
-            Helpers.Funcoes objFuncoes = new Helpers.Funcoes(this.HttpContext);
-            objFuncoes.LimparPersistencia();
-            objFuncoes = null;
-            return RedirectToAction("InformePagamento");
-        }
-
-        //*************FIM Tabuleiro***************
 
         public ActionResult Documentos(string login, bool? validado = null, DateTime? de = null, DateTime? ate = null)
         {

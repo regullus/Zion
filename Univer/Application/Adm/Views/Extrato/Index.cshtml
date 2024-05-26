@@ -36,7 +36,7 @@
 }
 
 @section PageLevelScripts{
-    
+
 }
 
 @section jQueryRead {
@@ -122,13 +122,13 @@
                                     </tr>
                                     <tr>
                                         <td style="background: #999999; color: #ffffff; font-size: 14px;" colspan="4">Saldo atual</td>
-                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;">@moedaPadrao.Simbolo @saldo.Value.ToString(moedaPadrao.MascaraOut) </td>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;"> @saldo.Value.ToString(moedaPadrao.MascaraOut) </td>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
                                         <td style="background: #999999; color: #ffffff; font-size: 14px;" colspan="4">Saldo atual</td>
-                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;">@moedaPadrao.Simbolo @saldo.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                        <td style="background: #999999; color: #ffffff; font-size: 14px; width: 120px;"> @saldo.Value.ToString(moedaPadrao.MascaraOut)</td>
                                     </tr>
                                 </tfoot>
                                 <tbody>
@@ -141,7 +141,16 @@
                                             <td>
                                                 @lancamento.Descricao.Replace("[NM1]", "Direto: ").Replace("[N]", "Nivel: ").Replace("[P]", "Produto: ").Replace("[NP]", "Nível Pago: ").Replace("[PT]", "Pontos: ").Replace("[%]", "%: ").Replace("[NM]", "Afiliado: ")
                                             </td>
-                                            <td>@moedaPadrao.Simbolo @lancamento.Valor.Value.ToString(moedaPadrao.MascaraOut)</td>
+
+                                            @if (ViewBag.Taxa != null && ViewBag.Taxa == "Sistema")
+                                            {
+                                                <td>@lancamento.Valor.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@lancamento.Valor.Value.ToString(moedaPadrao.MascaraOut)</td>
+                                            }
+
                                         </tr>
                                     }
                                 </tbody>

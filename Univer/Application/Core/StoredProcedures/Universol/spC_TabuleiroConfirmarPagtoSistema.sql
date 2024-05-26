@@ -1,10 +1,10 @@
 use UniverDev
 go
-If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroConfirmarPagtoSistema'))
-   Drop Procedure spC_TabuleiroConfirmarPagtoSistema
+If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_TabuleiroConfirmarPagtoMaster'))
+   Drop Procedure spC_TabuleiroConfirmarPagtoMaster
 go
 
-Create  Proc [dbo].[spC_TabuleiroConfirmarPagtoSistema]
+Create  Proc [dbo].[spC_TabuleiroConfirmarPagtoMaster]
    @UsuarioID int,
    @BoardID int,
    @Confirmar bit
@@ -152,7 +152,7 @@ BEGIN
 End -- Sp
 
 go
-Grant Exec on spC_TabuleiroConfirmarPagtoSistema To public
+Grant Exec on spC_TabuleiroConfirmarPagtoMaster To public
 go
 
 /*
@@ -160,7 +160,7 @@ Begin Tran
 
 Rollback tran
 
-Exec spC_TabuleiroConfirmarPagtoSistema @UsuarioID=2582, @BoardID=1, @confirmar='true'
+Exec spC_TabuleiroConfirmarPagtoMaster @UsuarioID=2582, @BoardID=1, @confirmar='true'
 
 Select * from Rede.TabuleiroUsuario where  UsuarioID = 2582
 

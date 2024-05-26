@@ -167,6 +167,16 @@
         {
             //2000    system
             //2001    syspag
+
+            if(idUsuario == 2000)
+            {
+                ViewBag.Taxa = "Sistema";
+            }
+            if (idUsuario == 2001)
+            {
+                ViewBag.Taxa = "Taxa";
+            }
+
             int usuarioID = idUsuario ?? 0;
 
             if (usuarioID == 0)

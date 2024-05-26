@@ -298,5 +298,5 @@ go
 Grant Exec on spD_TabuleiroExcluirUsuario To public
 go
 
---Exec spD_TabuleiroExcluirUsuario @UsuarioID=2590, @TabuleiroID =1
+
 

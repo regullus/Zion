@@ -23,7 +23,8 @@ namespace Core.Services.Sistema
 
             string strPassword = Helpers.ConfiguracaoHelper.GetString("SMTP_PASSWORD");
 
-            strPassword = objEncryption.Morpho(strPassword, "Ava2014", TipoCriptografia.Descriptografa);
+            //strPassword = objEncryption.Morpho(strPassword, "Ava2014", TipoCriptografia.Descriptografa);
+
             if (!smtp.UseDefaultCredentials)
             {
                 smtp.Credentials = new NetworkCredential(Helpers.ConfiguracaoHelper.GetString("SMTP_USERNAME"), strPassword);

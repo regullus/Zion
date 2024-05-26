@@ -984,6 +984,7 @@ namespace Core.Services.Usuario
                 cont++;
                 campos.Add(new KeyValuePair<string, string>("EMAIL_ENVIADO_PARA", traducaoHelper["EMAIL_ENVIADO_PARA"]));
                 cont++;
+                assunto = sistema + "-" +  assunto;
 
                 if (tipoEnvio.ToUpper() == "SMTP")
                 {

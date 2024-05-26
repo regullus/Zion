@@ -1,7 +1,6 @@
-﻿@model PagedList.IPagedList<Core.Entities.Usuario>
+﻿@model PagedList.IPagedList<Core.Models.TabuleiroAdminUsuarios>
 @using PagedList.Mvc;
 @{
-    ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
     var associacoes = (IEnumerable<Core.Entities.Associacao>)ViewBag.Associacoes;
@@ -20,13 +19,13 @@
 @section head {}
 @section pageScripts {
     <script>
-        $('.confirmarPagto').on('click', function () {
+        $('.confirmarPagtoSystem').on('click', function () {
             var idUsuario = $(this).attr("data-id");
             var idBoard = $(this).attr("data-board");
             $('.titulo').html(idUsuario);
 
             Swal.fire({
-                title: "@traducaoHelper["CONFIRMAR_PAGAMENTO"]",
+                title: "@traducaoHelper["CONFIRMAR_PAGAMENTO_SISTEMA"]",
                 icon: 'warning',
                 showDenyButton: true,
                 showCancelButton: true,
@@ -39,7 +38,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                    url: "@Url.Action("FoiPago")",
+                    url: "@Url.Action("FoiPagoSistema")",
                     type: "POST",
                     data: {
                         'usuarioID': idUsuario,
@@ -82,7 +81,7 @@
                     });
                 } else if (result.isDenied) {
                     $.ajax({
-                    url: "@Url.Action("NaoFoiPago")",
+                    url: "@Url.Action("NaoFoiPagoSistema")",
                     type: "POST",
                     data: {
                         'usuarioID': idUsuario,
@@ -128,14 +127,131 @@
 
         });
 
+        $('.confirmarPagtoMaster').on('click', function () {
+            var idUsuario = $(this).attr("data-id");
+            var idBoard = $(this).attr("data-board");
+            $('.titulo').html(idUsuario);
+
+            Swal.fire({
+                title: "@traducaoHelper["CONFIRMAR_PAGAMENTO_ALVO"]",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#1ba39c',
+                denyButtonColor: '#d91e18',
+                cancelButtonColor: '#555555',
+                confirmButtonText: '@traducaoHelper["FOI_PAGO"]',
+                cancelButtonText: '@traducaoHelper["CANCELAR"]',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                    url: "@Url.Action("FoiPagoMaster")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': idUsuario,
+                        'BoardID': idBoard
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data.toString() == "OK") {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    });
+                } 
+            });
+        });
+
+        $('.confirmarEmail').on('click', function () {
+            var idUsuario = $(this).attr("data-id");
+            Swal.fire({
+                title: "@traducaoHelper["CONFIRMAR_EMAIL"]",
+                icon: 'warning',
+                showDenyButton: false,
+                showCancelButton: true,
+                confirmButtonColor: '#1ba39c',
+                denyButtonColor: '#d91e18',
+                cancelButtonColor: '#555555',
+                confirmButtonText: '@traducaoHelper["SIM"]',
+                cancelButtonText: '@traducaoHelper["CANCELAR"]',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                    url: "@Url.Action("ConfirmarEmail")",
+                    type: "POST",
+                    data: {
+                        'usuarioID': idUsuario
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            if (data.toString() == "OK") {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: '@traducaoHelper["ALERTA"]',
+                                    text: data.toString(),
+                                    icon: 'warning',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ALERTA"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["SEM_DADOS"]',
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (thrownError.toString() == '@traducaoHelper["TOKEN_INVALIDO"]') {
+                            //Reload page
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: '@traducaoHelper["ERRO"]: ' + xhr.status + '!',
+                                text: '@traducaoHelper["ERRO"]:' + thrownError.toString(),
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    });
+                } 
+            });
+        });
+
     </script>
 
     <script>
-      $(".openAtivar").on("click", function () {
-         var persistIDUsusario = $(this).data('id');
-         $('#impIDUsuario').attr('value', persistIDUsusario);
-      });
-
+      
       $(".openAlterarSenha").on("click", function () {
          var id = $(this).data('id');
           $('#UsuarioIDAlterarSenha').attr('value', id);
@@ -182,56 +298,6 @@
          $('#impIDUsuario').attr('value', persistIDUsusario);
       });
 
-      $('.ConfirmarAtivar').on('click', function () {
-         var persistIDUsusario = $('#impIDUsuario').val();
-         $('#impIDUsuario').attr('value', persistIDUsusario);
-
-         swal({
-            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
-            text: '@Html.Raw(traducaoHelper["DESEJA_ATIVAR_USUARIO"])',
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
-            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
-            closeOnConfirm: false,
-            closeOnCancel: false
-         },
-         function (isConfirm) {
-            if (isConfirm) {
-               var skuProdutoAdesao = $("#cboProduto").val();
-               var meioPagamento = $('#cboPagamento').val();
-               var paraAvaliacao = 0;
-               if ($('#paraAvaliacao').prop('checked')) {
-                  paraAvaliacao = 1;
-               };
-
-               $.ajax({
-                  url: '@Url.Action("Ativar")',
-                  type: 'POST',
-                  data: { 'UsuAtivarID': persistIDUsusario, 'skuProdutoAdesao': skuProdutoAdesao, 'meioPagamento': meioPagamento, 'paraAvaliacao': paraAvaliacao },
-                  success: function (data) {
-                     if (data == 'OK') {
-                        $('[name=' + persistIDUsusario + ']').hide();
-                        swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@Html.Raw(traducaoHelper["USUARIO_ATIVADO_SUCESSO"])', 'success');
-                     }
-                     else {
-                        swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
-                     }
-                  },
-                  error: function (data) {
-                     swal('@Html.Raw(traducaoHelper["ERRO"])', data, 'error');
-                  }
-               });
-
-            } else {
-               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
-            };
-         });
-
-      });
-
       function Logar(usuarioID) {
          $.post('@Url.Action("Logar", "Usuarios")', { id: usuarioID }, function (data) {
             if (data != 'Index') {
@@ -260,20 +326,32 @@
 
 <div class="portlet box grey-gallery">
     <div class="portlet-title">
-        <div class="caption"><i class="fa fa-reorder"></i> @traducaoHelper["USUARIOS"]</div>
+        <div class="caption"><i class="fa fa-reorder"></i> @ViewBag.Title</div>
         <div class="tools">
             <a href="javascript:;" class="collapse" title="@traducaoHelper["FECHAR"]" />
             <a href='@Url.Action("Reload", "Usuarios")' class="atualizar" title="@traducaoHelper["RELER"]" />
         </div>
         <div class="actions">
-            <a href='@Url.Action("Excel", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm yellow-casablanca">
-                <i class="fa fa-file-excel-o"></i> Excel
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="Todos"} )' class="btn btn-sm blue-chambray">
+                <i class="fa fa-users"></i> @traducaoHelper["TODOS"]
             </a>
-            <a href='@Url.Action("InformePagamento", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm purple-soft">
-                <i class="fa fa-money"></i> @traducaoHelper["INFORME_PGTO"]
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="InformePagtoSistema"} )' class="btn btn-sm purple-soft">
+                <i class="fa fa-cogs"></i> @traducaoHelper["INFORME_PGTO_SISTEMA"]
             </a>
-            <a href='@Url.Action("PagamentoOK", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador} )' class="btn btn-sm green-meadow">
-                <i class="fa fa-money"></i> @traducaoHelper["PAGOS"]
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="PagosSistema"} )' class="btn btn-sm green-meadow">
+                <i class="fa fa-cogs"></i> @traducaoHelper["PGTO_SISTEMA"]
+            </a>
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="ConfirmarYellow"} )' class="btn btn-sm yellow-crusta">
+                <i class="fa fa-cogs"></i> @traducaoHelper["INFORME_PGTO_SYS"]
+            </a>
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="ConfirmarRed"} )' class="btn btn-sm red-mint">
+                <i class="fa fa-cogs"></i> @traducaoHelper["PGTO_MASTER_SYS"]
+            </a>
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="InformePagtoMaster"} )' class="btn btn-sm blue-soft">
+                <i class="fa fa-bullseye"></i> @traducaoHelper["INFORME_PGTO_MASTER"]
+            </a>
+            <a href='@Url.Action("Index", "Usuarios", new { CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, Tipo="PagoMaster"} )' class="btn btn-sm blue-steel">
+                <i class="fa fa-bullseye" "></i> @traducaoHelper["PGTO_MASTER"]
             </a>
             <label>&nbsp;</label>
         </div>
@@ -294,7 +372,7 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    @using (Html.BeginForm("Index", "Usuarios", FormMethod.Get))
+                    @using (Html.BeginForm("Index", "Usuarios", FormMethod.Post))
                     {
                         <div class="form-group pull-right">
                             <div class="input-group">
@@ -320,7 +398,7 @@
             <table class="table table-striped table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th scope="col" style="min-width:95px; width:95px;">&nbsp;@traducaoHelper["ACOES"]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        <th scope="col" style="min-width:90px; width:90px;">&nbsp;@traducaoHelper["ACOES"]</th>
                         <th scope="col">
                             @Html.ActionLink(traducaoHelper["LOGIN"], "Index", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize })
                             @switch ((string)ViewBag.CurrentSort.ToString())
@@ -335,27 +413,19 @@
                         </th>
                         <th scope="col">@traducaoHelper["NOME"]</th>
                         <th scope="col">@traducaoHelper["EMAIL"]</th>
-                        <th scope="col">
-                            @Html.ActionLink(@traducaoHelper["PATROCINADOR"], "Index", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize })
-                            @switch ((string)ViewBag.CurrentSort.ToString())
-                            {
-                                case "patrocinador":
-                                    {<i class="fa fa-chevron-down"></i>}
-                                    break;
-                                case "patrocinador_desc":
-                                    {<i class="fa fa-chevron-up"></i>}
-                                    break;
-                            }
-                        </th>
-                        <th scope="col">@traducaoHelper["LOGIN"] - @traducaoHelper["PATROCINADOR"]</th>
+                        <th scope="col">@traducaoHelper["CELULAR"]</th>
+                        <th scope="col">@traducaoHelper["POSICAO"]</th>
+                        <th scope="col">@traducaoHelper["GALAXIA"]</th>
+                        <th scope="col">@traducaoHelper["PATROCINADOR"]</th>
+                        <th scope="col">@traducaoHelper["PAGAMENTO"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th scope="col" style="min-width:80px; width:80px;">&nbsp;@traducaoHelper["ACOES"]&nbsp;</th>
+                        <th scope="col" style="min-width:90px; width:90px;">&nbsp;@traducaoHelper["ACOES"]</th>
                         <th scope="col">
-                            @Html.ActionLink(traducaoHelper["LOGIN"], "Index", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize })
+                            @Html.ActionLink(traducaoHelper["LOGIN"], "InformePagamento", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize })
                             @switch ((string)ViewBag.CurrentSort.ToString())
                             {
                                 case "login":
@@ -368,58 +438,55 @@
                         </th>
                         <th scope="col">@traducaoHelper["NOME"]</th>
                         <th scope="col">@traducaoHelper["EMAIL"]</th>
-                        <th scope="col">
-                            @Html.ActionLink(@traducaoHelper["PATROCINADOR"], "Index", new { SortOrder = ViewBag.FirstSortParm, CurrentProcuraLogin = ViewBag.CurrentProcuraLogin, CurrentProcuraPatrocinador = ViewBag.CurrentProcuraPatrocinador, NumeroPaginas = ViewBag.CurrentNumeroPaginas, PageSize = ViewBag.PageSize })
-                            @switch ((string)ViewBag.CurrentSort.ToString())
-                            {
-                                case "patrocinador":
-                                    {<i class="fa fa-chevron-down"></i>}
-                                    break;
-                                case "patrocinador_desc":
-                                    {<i class="fa fa-chevron-up"></i>}
-                                    break;
-                            }
-                        </th>
-                        <th scope="col">@traducaoHelper["LOGIN"] - @traducaoHelper["PATROCINADOR"]</th>
+                        <th scope="col">@traducaoHelper["CELULAR"]</th>
+                        <th scope="col">@traducaoHelper["POSICAO"]</th>
+                        <th scope="col">@traducaoHelper["GALAXIA"]</th>
+                        <th scope="col">@traducaoHelper["PATROCINADOR"]</th>
+                        <th scope="col">@traducaoHelper["PAGAMENTO"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
                     </tr>
                 </tfoot>
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        var associacao = associacoes.FirstOrDefault(a => a.Nivel == item.NivelAssociacao);
-                        var classificacao = classificacoes.FirstOrDefault(c => c.Nivel == item.NivelClassificacao);
                         <tr>
                             <td>
-                                @Html.ActionLink("Edit", "Edit", new { id = item.ID }, new { @class = "gridEdit", title = traducaoHelper["EDITAR"] })
-                                @Html.ActionLink("Details", "Details", new { id = item.ID }, new { @class = "gridDetail", title = traducaoHelper["DETALHES"] })
+                                @Html.ActionLink("Details", "Details", new { id = item.UsuarioID }, new { @class = "gridDetail", title = traducaoHelper["DETALHES"] + ":" + item.UsuarioID })
                                 @if (User.IsInRole("perfilMaster") || User.IsInRole("perfilAdministrador"))
                                 {
-                                    if (usuarioEntraOutraAba)
-                                    {
-                                        @Html.ActionLink("Entrar", "Entrar", new { id = item.ID }, new { target = "_blank", @class = "gridTrocar", title = traducaoHelper["ENTRAR_COM_LOGIN_USUARIO"] + item.Nome })
-                                    }
-                                    else
-                                    {
-                                        @Html.ActionLink("Entrar", "Entrar", new { id = item.ID }, new { @class = "gridTrocar", title = traducaoHelper["ENTRAR_COM_LOGIN_USUARIO"] + item.Nome })
-                                    }
-
                                     if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_TROCA_SENHA_RESETAR"))
                                     {
-                                        @Html.ActionLink("Senha", "Senha", new { id = item.ID }, new { @class = "gridLock", title = traducaoHelper["TROCAR_ENVIAR_SENHA"] })
+                                        @Html.ActionLink("Senha", "Senha", new { id = item.UsuarioID }, new { @class = "gridLock", title = traducaoHelper["TROCAR_ENVIAR_SENHA"] })
                                     }
                                     else
                                     {
-                                        <a class="gridLock openAlterarSenha" name="@item.ID" id="@item.ID" data-id="@item.ID" data-toggle="modal" title=@traducaoHelper["ALTERAR_SENHA"] href="#altearSenha">@traducaoHelper["ALTERAR_SENHA"] </a>
+                                        <a class="gridLock openAlterarSenha" name="@item.UsuarioID" id="@item.UsuarioID" data-id="@item.UsuarioID" data-toggle="modal" title=@traducaoHelper["ALTERAR_SENHA"] href="#altearSenha">@traducaoHelper["ALTERAR_SENHA"] </a>
                                     }
-                                }
-                                @if (item.Autenticacao.TwoFactorEnabled) //Verifica se usuario possui autenticação dois fatores
-                                {
-                                    @Html.ActionLink("DesabilitaAutenticacao", "DesabilitaAutenticacao", new { id = item.ID }, new { @class = "gridAutenticacao", title = traducaoHelper["DESABILITA_GOOGLE_AUTH"] })
-                                }
-                                @if (item.Oculto)
-                                {
-                                    <a class="gridNovo confirmarPagto" data-id="@item.ID" data-board="@item.TipoID" title="@(traducaoHelper["CONFIRMAR_PAGAMENTO"] + " " + item.Nome)"> @traducaoHelper["CONFIRMAR_PAGAMENTO"]</a>
+                                    if (usuarioEntraOutraAba)
+                                    {
+                                        @Html.ActionLink("Entrar", "Entrar", new { id = item.UsuarioID }, new { target = "_blank", @class = "gridTrocar", title = traducaoHelper["ENTRAR_COM_LOGIN_USUARIO"] + item.Nome })
+                                    }
+                                    else
+                                    {
+                                        @Html.ActionLink("Entrar", "Entrar", new { id = item.UsuarioID }, new { @class = "gridTrocar", title = traducaoHelper["ENTRAR_COM_LOGIN_USUARIO"] + item.Nome })
+                                    }
+
+                                    if (item.InformePagSistema && !item.PagoSistema)
+                                    {
+                                        <a class="gridPagtoSistem confirmarPagtoSystem" data-id="@item.UsuarioID" data-board="@item.BoardID" title="@(traducaoHelper["CONFIRMAR_PAGAMENTO"] + " " + traducaoHelper["SISTEMA"] +  ": " + item.Apelido)"></a>
+                                    }
+                                    if (!item.InformePag && !item.PagoMaster && item.StatusID == 1)
+                                    {
+                                        <a class="gridConfimRed confirmarPagtoMaster" data-id="@item.UsuarioID" data-board="@item.BoardID" title="@(traducaoHelper["ATIVAR"] + " " + traducaoHelper["SEM_INFORME_PAGAMENTO"] + " " + item.Apelido)"></a>
+                                    }
+                                    if (item.InformePag && !item.PagoMaster)
+                                    {
+                                        <a class="gridConfimYellow confirmarPagtoMaster" data-id="@item.UsuarioID" data-board="@item.BoardID" title="@(traducaoHelper["ATIVAR"] + " " + traducaoHelper["COM_INFORME_PAGAMENTO"] + " " + item.Apelido)"></a>
+                                    }
+                                    if (!item.ConfirmarEmail)
+                                    {
+                                        <a class="gridConfimEmail confirmarEmail" data-id="@item.UsuarioID" data-board="@item.BoardID" title="@(traducaoHelper["CONFIRMAR_EMAIL"] + " " + item.Apelido)"></a>
+                                    }
                                 }
                             </td>
                             <td>
@@ -432,22 +499,23 @@
                                 @Html.DisplayFor(modelItem => item.Email)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.PatrocinadorDireto.Nome)
+                                @Html.DisplayFor(modelItem => item.Celular)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.PatrocinadorDireto.Login)
+                                @Html.DisplayFor(modelItem => @traducaoHelper[item.Posicao])
                             </td>
                             <td>
-                                @if (item.Bloqueado)
-                                {
-                                    @traducaoHelper["BLOQUEADO"]
-                                }
-                                else
-                                {
-                                    @Html.DisplayFor(modelItem => item.Status)
-                                }
+                                @Html.DisplayFor(modelItem => item.Galaxia)
                             </td>
-
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Patrocinador)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UsuarioPagNome)
+                            </td>
+                            <td>
+                                @(item.StatusID == 0 ? traducaoHelper["INATIVO"] : item.StatusID == 1 ? traducaoHelper["ATIVO"] : item.StatusID == 2 ? traducaoHelper["CONVITE"] : traducaoHelper["SEM_DADOS"])
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -467,53 +535,6 @@
 
     </div>
 
-</div>
-
-<div id="ativar" class="modal fade openAtivar" tabindex="-1" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">@traducaoHelper["ATIVAR"]</h4>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="impIDUsuario" id="impIDUsuario" />
-                <div class="form-group">
-                    <label>@traducaoHelper["PRODUTO"]</label>
-                    <select class="form-control cbo" name="cboProduto" id="cboProduto">
-                        @foreach (var produto in produtos)
-                        {
-                            <option value="@produto.SKU">@produto.Nome</option>
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>@traducaoHelper["MEIO_PAGAMENTO"]</label>
-                    <select class="form-control cbo" name="cboPagamento" id="cboPagamento">
-                        @foreach (var meioPagamento in meioPagamentos)
-                        {
-                            <option value="@meioPagamento.ID">@meioPagamento.Descricao</option>
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label></label>
-                    <div class="mt-checkbox-list">
-                        <label class="mt-checkbox">
-                            @traducaoHelper["AVALIACAO"]
-                            <input type="checkbox" value="0" name="paraAvaliacao" id="paraAvaliacao" class="cbo" />
-                            <span></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" data-dismiss="modal" data-id="0" class="btn btn-circle btn-sm green-seagreen ConfirmarAtivar">@Html.Raw(traducaoHelper["ATIVAR"])</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div id="alterarSenha" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
