@@ -1895,6 +1895,7 @@ namespace Sistema.Controllers
                                     //o tabuleiro esta completo
                                     log = "IncluiTabuleiro Completo";
                                     string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
+                                    
                                     log = "IncluiTabuleiro: " + tabuleiroIncluir;
                                     if (tabuleiroIncluir == "COMPLETO")
                                     {

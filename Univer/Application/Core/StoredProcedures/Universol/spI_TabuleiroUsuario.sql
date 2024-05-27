@@ -66,7 +66,7 @@ BEGIN
 					0, --Ativa Depois dele aceitar o convite
 					@MasterID,
 					0,
-					null, --Altera depois dele entrar em um tabuleiroi
+					null, --Altera depois dele entrar em um tabuleiro
 					0, --Será incrementado depois
 					'', --Sem posicao ainda
 					'false', 
@@ -111,9 +111,9 @@ BEGIN
 					0, --Ativa Depois dele aceitar o convite
 					@MasterID,
 					0,
-					null, --Altera depois dele entrar em um tabuleiroi
+					null, --Altera depois dele entrar em um tabuleiro
 					0, --Será incrementado depois
-					'', --Sem posi�ao ainda
+					'', --Sem posicao ainda
 					'false', 
 					'false',
 					'false',
@@ -129,46 +129,46 @@ BEGIN
 			if Not Exists (Select 'OK' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and BoardID = 3)
 			Begin
 				INSERT INTO Rede.TabuleiroUsuario (
-						UsuarioID,
-						BoardID,
-						TabuleiroID,
-						StatusID,
-						MasterID,
-						InformePag,
-						UsuarioIDPag,
-						Ciclo,
-						Posicao,
-						PagoMaster,
-						InformePagSistema,
-						PagoSistema,
-						DireitaFechada,
-						EsquerdaFechada,
-						TotalRecebimento,
-						DataInicio,
-						DataFim,
-						Debug
-					) 
-					Values 
-					(
-						@UsuarioID,
-						3, --Marte
-						null, --So muda o master quando ele aceitar o convite
-						0, --Ativa Depois dele aceitar o convite
-						@MasterID,
-						0,
-						null, --Altera depois dele entrar em um tabuleiroi
-						0, --Será incrementado depois
-						'', --Sem posi�ao ainda
-						'false', 
-						'false',
-						'false',
-						'false',
-						'false',
-						0,
-						GetDate(),
-						null,
-						'Usuario Iniciado'
-					)
+					UsuarioID,
+					BoardID,
+					TabuleiroID,
+					StatusID,
+					MasterID,
+					InformePag,
+					UsuarioIDPag,
+					Ciclo,
+					Posicao,
+					PagoMaster,
+					InformePagSistema,
+					PagoSistema,
+					DireitaFechada,
+					EsquerdaFechada,
+					TotalRecebimento,
+					DataInicio,
+					DataFim,
+					Debug
+				) 
+				Values 
+				(
+					@UsuarioID,
+					3, --Marte
+					null, --So muda o master quando ele aceitar o convite
+					0, --Ativa Depois dele aceitar o convite
+					@MasterID,
+					0,
+					null, --Altera depois dele entrar em um tabuleiro
+					0, --Será incrementado depois
+					'', --Sem posicao ainda
+					'false', 
+					'false',
+					'false',
+					'false',
+					'false',
+					0,
+					GetDate(),
+					null,
+					'Usuario Iniciado'
+				)
 			End
 			--Board 4 de 8 - Jupiter
 			if Not Exists (Select 'OK' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and BoardID = 4)
@@ -201,9 +201,9 @@ BEGIN
 					0, --Ativa Depois dele aceitar o convite
 					@MasterID,
 					0,
-					null, --Altera depois dele entrar em um tabuleiroi
+					null, --Altera depois dele entrar em um tabuleiro
 					0, --Será incrementado depois
-					'', --Sem posi�ao ainda
+					'', --Sem posicao ainda
 					'false', 
 					'false',
 					'false',
@@ -219,92 +219,92 @@ BEGIN
 			if Not Exists (Select 'OK' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and BoardID = 5)
 			Begin
 				INSERT INTO Rede.TabuleiroUsuario (
-				UsuarioID,
-				BoardID,
-				TabuleiroID,
-				StatusID,
-				MasterID,
-				InformePag,
-				UsuarioIDPag,
-				Ciclo,
-				Posicao,
-				PagoMaster,
-				InformePagSistema,
-				PagoSistema,
-				DireitaFechada,
-				EsquerdaFechada,
-				TotalRecebimento,
-				DataInicio,
-				DataFim,
-				Debug
-			) 
-			Values 
-			(
-				@UsuarioID,
-				5, --Venus
-				null, --So muda o master quando ele aceitar o convite
-				0, --Ativa Depois dele aceitar o convite
-				@MasterID,
-				0,
-				null, --Altera depois dele entrar em um tabuleiroi
-				0, --Será incrementado depois
-				'', --Sem posi�ao ainda
-				'false', 
-				'false',
-				'false',
-				'false',
-				'false',
-				0,
-				GetDate(),
-				null,
-				'Usuario Iniciado'
-			)
+					UsuarioID,
+					BoardID,
+					TabuleiroID,
+					StatusID,
+					MasterID,
+					InformePag,
+					UsuarioIDPag,
+					Ciclo,
+					Posicao,
+					PagoMaster,
+					InformePagSistema,
+					PagoSistema,
+					DireitaFechada,
+					EsquerdaFechada,
+					TotalRecebimento,
+					DataInicio,
+					DataFim,
+					Debug
+				) 
+				Values 
+				(
+					@UsuarioID,
+					5, --Venus
+					null, --So muda o master quando ele aceitar o convite
+					0, --Ativa Depois dele aceitar o convite
+					@MasterID,
+					0,
+					null, --Altera depois dele entrar em um tabuleiro
+					0, --Será incrementado depois
+					'', --Sem posicao ainda
+					'false', 
+					'false',
+					'false',
+					'false',
+					'false',
+					0,
+					GetDate(),
+					null,
+					'Usuario Iniciado'
+				)
 			End
 
 			--Board 6 de 8 - Urano
 			if Not Exists (Select 'OK' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and BoardID = 6)
 			Begin
 				INSERT INTO Rede.TabuleiroUsuario (
-				UsuarioID,
-				BoardID,
-				TabuleiroID,
-				StatusID,
-				MasterID,
-				InformePag,
-				UsuarioIDPag,
-				Ciclo,
-				Posicao,
-				PagoMaster,
-				InformePagSistema,
-				PagoSistema,
-				DireitaFechada,
-				EsquerdaFechada,
-				TotalRecebimento,
-				DataInicio,
-				DataFim,
-				Debug
-			) 
-			Values 
-			(
-				@UsuarioID,
-				6, --Urano
-				null, --So muda o master quando ele aceitar o convite
-				0, --Ativa Depois dele aceitar o convite
-				@MasterID,
-				0,
-				null, --Altera depois dele entrar em um tabuleiroi
-				0, --Será incrementado depois
-				'', --Sem posi�ao ainda
-				'false', 
-				'false',
-				'false',
-				'false',
-				'false',
-				0,
-				GetDate(),
-				null,
-				'Usuario Iniciado'
-			)
+					UsuarioID,
+					BoardID,
+					TabuleiroID,
+					StatusID,
+					MasterID,
+					InformePag,
+					UsuarioIDPag,
+					Ciclo,
+					Posicao,
+					PagoMaster,
+					InformePagSistema,
+					PagoSistema,
+					DireitaFechada,
+					EsquerdaFechada,
+					TotalRecebimento,
+					DataInicio,
+					DataFim,
+					Debug
+				) 
+				Values 
+				(
+					@UsuarioID,
+					6, --Urano
+					null, --So muda o master quando ele aceitar o convite
+					0, --Ativa Depois dele aceitar o convite
+					@MasterID,
+					0,
+					null, --Altera depois dele entrar em um tabuleiro
+					0, --Será incrementado depois
+					'', --Sem posicao ainda
+					'false', 
+					'false',
+					'false',
+					'false',
+					'false',
+					0,
+					GetDate(),
+					null,
+					'Usuario Iniciado'
+				)
 			End
 			--Board 7 de 8 - Terra
 			if Not Exists (Select 'OK' From Rede.TabuleiroUsuario Where UsuarioID = @UsuarioID and BoardID = 7)
@@ -337,9 +337,9 @@ BEGIN
 				0, --Ativa Depois dele aceitar o convite
 				@MasterID,
 				0,
-				null, --Altera depois dele entrar em um tabuleiroi
+				null, --Altera depois dele entrar em um tabuleiro
 				0, --Será incrementado depois
-				'', --Sem posi�ao ainda
+				'', --Sem posicao ainda
 				'false', 
 				'false',
 				'false',
@@ -382,9 +382,9 @@ BEGIN
 				0, --Ativa Depois dele aceitar o convite
 				@MasterID,
 				0,
-				null, --Altera depois dele entrar em um tabuleiroi
+				null, --Altera depois dele entrar em um tabuleiro
 				0, --Será incrementado depois
-				'', --Sem posi�ao ainda
+				'', --Sem posicao ainda
 				'false', 
 				'false',
 				'false',
@@ -398,27 +398,26 @@ BEGIN
 			End
 		End
 
-		Update
-			Rede.TabuleiroUsuario
-		Set
-			TabuleiroID = null,
-			StatusID = 0,
-			MasterID = @MasterID,
-			InformePag = 0,
-			UsuarioIDPag = null,
-			Ciclo = 0,
-			Posicao = '',
-			PagoMaster = 'false',
-			InformePagSistema = 'false',
-			PagoSistema = 'false',
-			DireitaFechada = 'false',
-			EsquerdaFechada = 'false',
-			TotalRecebimento = 0,
-			DataInicio = GetDate(),
-			DataFim = null,
-			Debug = 'Usuario Iniciado'
-		Where
-			UsuarioID = @UsuarioID
+		-- Update
+		-- 	Rede.TabuleiroUsuario
+		-- Set
+		-- 	tabuleiroID = null,
+		-- 	StatusID = 0,
+		-- 	MasterID = @MasterID,
+		-- 	InformePag = 0,
+		-- 	UsuarioIDPag = null,
+		-- 	Posicao = '',
+		-- 	PagoMaster = 'false',
+		-- 	InformePagSistema = 'false',
+		-- 	PagoSistema = 'false',
+		-- 	DireitaFechada = 'false',
+		-- 	EsquerdaFechada = 'false',
+		-- 	TotalRecebimento = 0,
+		-- 	DataInicio = GetDate(),
+		-- 	DataFim = null,
+		-- 	Debug = 'Usuario Iniciado no ciclo:' + TRIM(STR(ciclo))
+		-- Where
+		-- 	UsuarioID = @UsuarioID
 			
 		Select 'OK'
 		COMMIT TRANSACTION

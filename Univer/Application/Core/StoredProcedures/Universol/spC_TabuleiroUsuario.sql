@@ -28,13 +28,13 @@ BEGIN
 		Eterno bit,
 		MasterID int,
 		InformePag bit,
-		UsuarioIDPag int, --*
+		UsuarioIDPag int, 
 		Ciclo int,
 		Posicao nvarchar(100),
 		PagoMaster bit,
-		PagoSistema bit, --*
+		PagoSistema bit,
 		InformePagSistema bit,
-		TotalRecebimento int, --*
+		TotalRecebimento int, 
 		DataInicio datetime,
 		DataFim int
 	)

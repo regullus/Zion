@@ -696,8 +696,6 @@ namespace Sistema.Controllers
 
                 string retorno = tabuleiroRepository.InformarRecebimento(idUsuario, idUsuarioPag, idBoard);
 
-                //string retorno = tabuleiroRepository.ConfirmarPagtoMaster(idUsuario, idBoard, true);
-
                 if (retorno == null)
                 {
                     string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01" };
@@ -745,6 +743,8 @@ namespace Sistema.Controllers
                 lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
                 lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
                 lancamentoRepository.Save(lancamento);
+
+                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, tabuleiroUsuario.MasterID, tabuleiroBoard.ID, "Completa");
 
                 JsonResult jsonResult = new JsonResult
                 {
