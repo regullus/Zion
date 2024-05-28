@@ -465,6 +465,7 @@ namespace Core.Repositories.Rede
             foreach (TabuleiroIndicados item in tabuleiroIndicados)
             {
                 item.Galaxia = item.BoardNome.Substring(0, 3).ToUpper() + "-" + (item.TabuleiroID.HasValue ? item.TabuleiroID.Value : 0).ToString("000000");
+                item.usuarioOK = UsuarioRuleOK(item.UsuarioID) == "OK";
             }
 
             return tabuleiroIndicados;

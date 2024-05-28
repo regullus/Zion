@@ -165,7 +165,7 @@ Begin
             Begin
                 if(@chamada <> @chamadaAntiga)
                 Begin
-                    if(@chamada <> 'Donator' and @chamadaAntiga <> 'Donator' and @chamada <> 'PaiValido' and @chamadaAntiga <> 'PaiValido')
+                    if(@chamada <> 'Donator' and @chamadaAntiga <> 'Donator' and @chamada <> 'PaiValido' and @chamadaAntiga <> 'PaiValido' and @chamada <> 'Reentrada' and @chamadaAntiga <> 'Reentrada')
                     Begin
                         set @continua = 'false'
                     End
@@ -402,6 +402,7 @@ Begin
 					    Rede.TabuleiroUsuario
 				    Where
 					    UsuarioID = @UsuarioID and
+                        BoardID = @BoardID and
 					    TabuleiroID is not null
 				    if(@count = 0)
 				    Begin
@@ -707,7 +708,7 @@ Begin
                             Where
 		                        UsuarioID = @UsuarioID and
 		                        BoardID = @BoardID
-						    Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = null, @BoardID = @BoardID, @chamada = 'Convite'
+						    Exec spG_Tabuleiro @UsuarioID = @UsuarioID, @UsuarioPaiID = null, @BoardID = @BoardID, @chamada = 'Reentrada'
 					    End
 					    Else
 					    Begin
@@ -4444,7 +4445,7 @@ go
 /*
 Begin Tran
 
-Exec spG_Tabuleiro @UsuarioID=3394,@UsuarioPaiID=2645,@BoardID=1,@Chamada='Completa'
+Exec spG_Tabuleiro @UsuarioID=6468,@UsuarioPaiID=null,@BoardID=1,@Chamada='Convite'
 
 Select debug, * from  Rede.TabuleiroLog order by id desc
 

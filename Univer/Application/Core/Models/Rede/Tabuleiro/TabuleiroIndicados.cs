@@ -28,6 +28,7 @@ namespace Core.Models
         public bool PagoSistema { get; set; }
         public bool InformePagSistema { get; set; }
         public int TotalRecebimento { get; set; }
+        public bool usuarioOK { get; set; }
         public string Posicao { get; set; }
         public DateTime DataInicio { get; set; }
     }

@@ -112,6 +112,7 @@
                         <th scope="col">@traducaoHelper["NOME"]</th>
                         <th scope="col">@traducaoHelper["CELULAR"]</th>
                         <th scope="col">@traducaoHelper["ALVO"]</th>
+                        <th scope="col">@traducaoHelper["INDICADOS"]</th>
                         <th scope="col">@traducaoHelper["PAGAMENTO_INFORME_ALVO"]</th>
                         <th scope="col">@traducaoHelper["ALVO_PAGO"]</th>
                         <th scope="col">@traducaoHelper["PAGAMENTO_INFORME_SISTEMA"]</th>
@@ -127,6 +128,7 @@
                         <th scope="col">@traducaoHelper["NOME"]</th>
                         <th scope="col">@traducaoHelper["CELULAR"]</th>
                         <th scope="col">@traducaoHelper["ALVO"]</th>
+                        <th scope="col">@traducaoHelper["INDICADOS"]</th>
                         <th scope="col">@traducaoHelper["PAGAMENTO_INFORME_ALVO"]</th>
                         <th scope="col">@traducaoHelper["ALVO_PAGO"]</th>
                         <th scope="col">@traducaoHelper["PAGAMENTO_INFORME_SISTEMA"]</th>
@@ -157,6 +159,16 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Master)
+                            </td>
+                            <td>
+                                @if (item.usuarioOK)
+                                {
+                                    <i class="fa fa-check font-green"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-close font-red"></i>
+                                }
                             </td>
                             <td>
                                 @if (item.InformePag)
@@ -198,7 +210,6 @@
                                     <i class="fa fa-minus font-blue"></i>
                                 }
                             </td>
-
                         </tr>
                     }
                 </tbody>
