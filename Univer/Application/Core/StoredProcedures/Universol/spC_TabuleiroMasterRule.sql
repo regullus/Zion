@@ -27,7 +27,7 @@ BEGIN
 		@InfomePagSistema bit,
 		@quebraTabuleiro int
     
-    -- Quebra [para que em venus as regras recomecem, separando de mercurio a jupiter e depois de venus ao sol
+    -- Quebra para que em venus as regras recomecem, separando de mercurio a jupiter e depois de venus ao sol
 	Set @quebraTabuleiro = 5
 	--Obtem o MasterID do Tabuleiro do usuario informado
 	Select

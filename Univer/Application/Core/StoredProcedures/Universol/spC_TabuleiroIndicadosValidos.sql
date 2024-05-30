@@ -26,7 +26,10 @@ BEGIN
         @PagoSistema bit,
 		@totalBoard int,
 		@totalPagoMaster int,
-		@count int
+		@count int,
+        @indicadoDoIndicado nvarchar(10)
+
+        set @indicadoDoIndicado = 'OK'
 
 	set @retorno = 'OK'	
 	set @count = 0
@@ -43,13 +46,15 @@ BEGIN
 		Declare
 			curRegistro 
 		Cursor Local For
-			Select
-				ID
-			From
-				usuario.usuario (nolock)
-			Where
-				PatrocinadorDiretoID = @UsuarioID
-
+            Select distinct
+		        usu.ID ID
+	        From
+		        Usuario.Usuario usu,
+		        Rede.TabuleiroUsuario tab
+	        Where
+		        usu.PatrocinadorDiretoID = @UsuarioID and
+		        usu.id = tab.UsuarioID and
+		        tab.TabuleiroID is not null
 		Open curRegistro
 		Fetch Next From curRegistro Into  @ID
 		Select @AntFetch = @@fetch_status
@@ -83,16 +88,22 @@ BEGIN
 			
 			if(@totalBoard > @totalPagoMaster)
 			Begin
-				--Usuario nao tem indicacoes maior ou igual ao numero de tabuleiros que ele pertence
+				--Usuario nao tem pagamento maior ou igual ao numero de tabuleiros que ele pertence
 				Set @retornoCursor = 'NOOK'
 			End
 		
 			if (@retornoCursor = 'OK')
 			Begin
+            
 			    --Só efetua o acrecimo de usuarios filhos que estão ok
-				set @count = @count + 1
+                exec spC_TabuleiroIndicadosValidosUnico @UsuarioID=@ID, @BoardID=@BoardID, @retorno = @indicadoDoIndicado output
+                --select @id,@indicadoDoIndicado
+                if(@indicadoDoIndicado = 'OK')
+                Begin
+                    set @count = @count + 1
+                End
 			End
-
+            
 			--Proxima linha do cursor
 			Fetch Next From curRegistro Into @ID
 			Select @AntFetch = @@fetch_status       
@@ -112,11 +123,14 @@ BEGIN
 		MasterID = @UsuarioID and
 		TabuleiroID is not null
 	
-	if(@totalBoard > @totalPagoMaster)
+    --Select @totalBoard totalBoard, @count counta
+    
+	if(@totalBoard > @count)
 	Begin
 		--Usuario nao tem indicacoes maior ou igual ao numero de tabuleiros que ele pertence
 		Set @retorno = 'NOOK'
 	End
+    
 	--Se for o 1º pagamento tudo bem ele receber
 	if Exists (
 		Select 
@@ -144,8 +158,8 @@ End -- Sp
 go
 Grant Exec on spC_TabuleiroIndicadosValidos To public
 go
-
---Exec spC_TabuleiroIndicadosValidos @UsuarioID=2581, @BoardID=1
+Exec spC_TabuleiroIndicadosValidos @UsuarioID=2842, @BoardID=2
+--Exec spC_TabuleiroIndicadosValidos @UsuarioID=5531, @BoardID=1
 
 
 

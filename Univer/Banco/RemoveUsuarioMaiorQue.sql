@@ -45,8 +45,14 @@ delete Autenticacao where  username in (select login from usuario.usuario where 
 
 delete Financeiro.ContaDeposito Where IDUsuario > @usuarioID
 
+delete Rede.TabuleiroLog
+
 delete usuario.usuario where id > @usuarioId
 
---select login from usuario.usuario where Id > @usuarioId
+delete Autenticacao where id > @usuarioId
+
+select login from usuario.usuario where Id > @usuarioId
+
+select * from Autenticacao
 
 

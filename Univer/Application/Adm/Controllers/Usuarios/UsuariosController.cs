@@ -560,7 +560,7 @@ namespace Sistema.Controllers
                 lancamento.UsuarioID = 2001; //Syspag
                 lancamento.Tipo = Lancamento.Tipos.Credito;
                 lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - ", usuario.Nome);
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - ", usuario.Apelido.ToLower());
                 lancamento.DataLancamento = App.DateTimeZion;
                 lancamento.DataCriacao = App.DateTimeZion;
                 lancamento.ContaID = 7; //Transferencia

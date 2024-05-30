@@ -13,7 +13,7 @@ Update Autenticacao set PasswordHash = 'AFdh14qX3cC2KR5OLsCnYPVunVMzwAKzr2Z0r8Z0
 
 Declare @UsuarioID int, @BoardID int, @TabuleiroID int, @PatrocinadorID int, @MasterID int
 
-Select @UsuarioID = id from usuario.usuario where id > 2500 and apelido = 'cloacir010'
+Select @UsuarioID = id from usuario.usuario where id > 2500 and apelido = '15sto001'
 
 Set @PatrocinadorID = @UsuarioID
 Set @BoardID = 1
@@ -36,14 +36,14 @@ Select @TabuleiroID = TabuleiroID, @MasterID = MasterID from Rede.TabuleiroUsuar
 --Select 'TabuleiroUsuario' Query, * from Rede.TabuleiroUsuario where MasterID = @UsuarioID and BoardID = @BoardID
 
 --****************** Usuario esta nos tabuleiros: ******************
---Select 'Tabuleiro' Query, * From Rede.Tabuleiro Where (Master = @UsuarioID Or CoordinatorDir = @UsuarioID Or IndicatorDirSup = @UsuarioID Or IndicatorDirInf = @UsuarioID Or DonatorDirSup1 = @UsuarioID Or DonatorDirSup2 = @UsuarioID Or DonatorDirInf1 = @UsuarioID Or DonatorDirInf2 = @UsuarioID Or CoordinatorEsq = @UsuarioID Or IndicatorEsqSup = @UsuarioID Or IndicatorEsqInf = @UsuarioID Or DonatorEsqSup1 = @UsuarioID Or DonatorEsqSup2 = @UsuarioID Or DonatorEsqInf1 = @UsuarioID Or DonatorEsqInf2 = @UsuarioID) and StatusID = 1
+Select 'Tabuleiro' Query, * From Rede.Tabuleiro Where (Master = @UsuarioID Or CoordinatorDir = @UsuarioID Or IndicatorDirSup = @UsuarioID Or IndicatorDirInf = @UsuarioID Or DonatorDirSup1 = @UsuarioID Or DonatorDirSup2 = @UsuarioID Or DonatorDirInf1 = @UsuarioID Or DonatorDirInf2 = @UsuarioID Or CoordinatorEsq = @UsuarioID Or IndicatorEsqSup = @UsuarioID Or IndicatorEsqInf = @UsuarioID Or DonatorEsqSup1 = @UsuarioID Or DonatorEsqSup2 = @UsuarioID Or DonatorEsqInf1 = @UsuarioID Or DonatorEsqInf2 = @UsuarioID) and StatusID = 1
 --Select count(*) From Rede.Tabuleiro Where (Master = @UsuarioID Or CoordinatorDir = @UsuarioID Or IndicatorDirSup = @UsuarioID Or IndicatorDirInf = @UsuarioID Or DonatorDirSup1 = @UsuarioID Or DonatorDirSup2 = @UsuarioID Or DonatorDirInf1 = @UsuarioID Or DonatorDirInf2 = @UsuarioID Or CoordinatorEsq = @UsuarioID Or IndicatorEsqSup = @UsuarioID Or IndicatorEsqInf = @UsuarioID Or DonatorEsqSup1 = @UsuarioID Or DonatorEsqSup2 = @UsuarioID Or DonatorEsqInf1 = @UsuarioID Or DonatorEsqInf2 = @UsuarioID) and StatusID =2 and BoardID = 1
 
 --****************** tabuleiro ******************
 --Select * from  Rede.Tabuleiro where ID = @TabuleiroID
 
 --****************** lOG ******************
-Select 'LOG' Query, * from  Rede.TabuleiroLog where UsuarioID = @UsuarioID order By id Desc
+--Select 'LOG' Query, * from  Rede.TabuleiroLog where UsuarioID = @UsuarioID order By id Desc
 
 --****************** Inidcados ******************
 --Select 'indicado', id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id > 2500 and PatrocinadorDiretoID = @UsuarioID

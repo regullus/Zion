@@ -7312,6 +7312,9 @@
     <Content Include="Content\ptjs\demo\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="libman.json" />
     <Content Include="Content\icons\Sistema\MettaBull\Modelo.psd" />
+    <Content Include="cdn\terms_en.pdf" />
+    <Content Include="cdn\terms_es.pdf" />
+    <Content Include="cdn\terms_pt.pdf" />
     <None Include="ReadMe.html" />
     <Content Include="Content\img\propaganda\branco.jpg" />
     <Content Include="Content\img\Site\Cabecalho1.jpg" />
