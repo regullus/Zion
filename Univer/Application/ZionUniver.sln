@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cpUtilities", "cpUtilities\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "adm", "Adm\adm.csproj", "{6020F000-2E18-4849-8DBF-41377A8F1261}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinpaymentsApi", "CoinpaymentsApi\CoinpaymentsApi.csproj", "{AEFF78B5-F458-4929-9DD2-1447F16D13F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,14 @@ Global
 		{6020F000-2E18-4849-8DBF-41377A8F1261}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6020F000-2E18-4849-8DBF-41377A8F1261}.Release|x86.ActiveCfg = Release|Any CPU
 		{6020F000-2E18-4849-8DBF-41377A8F1261}.Release|x86.Build.0 = Release|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Debug|x86.Build.0 = Debug|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{AEFF78B5-F458-4929-9DD2-1447F16D13F6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

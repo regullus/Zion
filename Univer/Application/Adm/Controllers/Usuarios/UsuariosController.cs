@@ -548,7 +548,7 @@ namespace Sistema.Controllers
                 TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
 
                 TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
-                
+
                 //valor dobrado quando ciclo> 1
                 if (tabuleiroUsuario.Ciclo > 1)
                 {
@@ -560,7 +560,7 @@ namespace Sistema.Controllers
                 lancamento.UsuarioID = 2001; //Syspag
                 lancamento.Tipo = Lancamento.Tipos.Credito;
                 lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - ", usuario.Apelido.ToLower());
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - " + traducaoHelper["CICLO"] + ":" + tabuleiroUsuario.Ciclo + " - ", usuario.Apelido.ToLower());
                 lancamento.DataLancamento = App.DateTimeZion;
                 lancamento.DataCriacao = App.DateTimeZion;
                 lancamento.ContaID = 7; //Transferencia
@@ -574,7 +574,7 @@ namespace Sistema.Controllers
                 lancamento.UsuarioID = idUsuario;
                 lancamento.Tipo = Lancamento.Tipos.Debito;
                 lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - ", traducaoHelper["Board" + BoardID]);
+                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - " + traducaoHelper["Board" + BoardID], " - " + traducaoHelper["CICLO"] + ":" + tabuleiroUsuario.Ciclo);
                 lancamento.DataLancamento = App.DateTimeZion;
                 lancamento.DataCriacao = App.DateTimeZion;
                 lancamento.ContaID = 7; //Transferencia
@@ -973,17 +973,21 @@ namespace Sistema.Controllers
             {
                 msg.Add(traducaoHelper["LOGIN"]);
             }
-            //if (string.IsNullOrEmpty(usuario.Apelido))
-            //{
-            //    msg.Add(traducaoHelper["APELIDO"]);
-            //}
+            if (!string.IsNullOrEmpty(usuario.Login))
+            {
+                if (usuario.Login.Length > 12)
+                {
+                    msg.Add(traducaoHelper["LOGIN"] + ": " + traducaoHelper["MAXIMO_12_CARACTERES"]);
+                }
+            }
             if (string.IsNullOrEmpty(usuario.Nome))
             {
                 msg.Add(traducaoHelper["NOME"]);
             }
             if (string.IsNullOrEmpty(usuario.NomeFantasia))
             {
-                msg.Add(traducaoHelper["NOME_FANTASIA"]);
+                usuario.NomeFantasia = usuario.Login;
+                //msg.Add(traducaoHelper["NOME_FANTASIA"]);
             }
             if (string.IsNullOrEmpty(usuario.Documento))
             {
@@ -994,10 +998,6 @@ namespace Sistema.Controllers
             {
                 msg.Add(traducaoHelper["EMAIL"]);
             }
-            if (string.IsNullOrEmpty(usuario.Telefone))
-            {
-                msg.Add(traducaoHelper["TELEFONE"]);
-            }
             if (string.IsNullOrEmpty(usuario.Celular))
             {
                 msg.Add(traducaoHelper["CELULAR"]);
@@ -1007,15 +1007,17 @@ namespace Sistema.Controllers
                 msg.Add(traducaoHelper["BONUS"]);
             }
 
-            if (!string.IsNullOrEmpty(usuario.Telefone))
+            if (string.IsNullOrEmpty(usuario.Telefone))
             {
                 usuario.Telefone = "0";
             }
 
-            if (!string.IsNullOrEmpty(usuario.Celular))
+            if (string.IsNullOrEmpty(usuario.Celular))
             {
                 usuario.Celular = "0";
             }
+            
+            usuario.FilialID = 1;
 
             if (msg.Count > 1)
             {
@@ -1024,8 +1026,28 @@ namespace Sistema.Controllers
             }
             else
             {
-                db.Entry(usuario).State = EntityState.Modified;
-                db.SaveChanges();
+                try
+                {
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                catch (DbEntityValidationException e)
+                {
+                    string errors = "";
+                    foreach (var eve in e.EntityValidationErrors)
+                    {
+                        errors += "Entity of type " + eve.Entry.Entity.GetType().Name +" in state " + eve.Entry.State+ " has the following validation errors:";
+                        foreach (var ve in eve.ValidationErrors)
+                        {
+                            errors += "|" + " Property: " + ve.PropertyName +", Error: " + ve.ErrorMessage;
+                        }
+                    }
+
+                    msg.Add(errors);
+                    string[] erro = msg.ToArray();
+                    Mensagem("Users", erro, "err");
+                    //throw;
+                }
 
                 Autenticacao autenticacao = db.Autenticacao.Find(usuario.IdAutenticacao);
                 if (autenticacao != null)
@@ -1035,8 +1057,6 @@ namespace Sistema.Controllers
                     return RedirectToAction("Index");
                 }
             }
-
-
 
             obtemMensagem();
 

@@ -1,4 +1,4 @@
-﻿//using Coinpayments.Api;
+﻿using Coinpayments.Api;
 using Core.Entities;
 using Core.Helpers;
 using DomainExtension.Repositories;
@@ -99,7 +99,7 @@ namespace Core.Repositories.Globalizacao
             var bitcoinValue = ConfiguracaoHelper.GetDouble("COTACAO_BTC_USD_DEFAULT");
 
             var cotacao = this.GetByExpression(e => e.MoedaOrigemID == (int)Moeda.Moedas.BTC && e.MoedaDestinoID == (int)Moeda.Moedas.USD && e.TipoID == (int)tipo).FirstOrDefault();
-            if(cotacao != null)
+            if (cotacao != null)
             {
                 bitcoinValue = (double)cotacao.Valor;
             }
@@ -120,48 +120,48 @@ namespace Core.Repositories.Globalizacao
         //    return valor;
         //}
 
-        //public async Task<double> GetBTCDolar1Async()
-        //{
-        //    var bitcoinValue = ConfiguracaoHelper.GetDouble("COTACAO_BTC_USD_DEFAULT");
+        public async Task<double> GetBTCDolar1Async()
+        {
+            var bitcoinValue = ConfiguracaoHelper.GetDouble("COTACAO_BTC_USD_DEFAULT");
 
-        //    try
-        //    {
-        //        var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
-        //        return (double)cotacao.BtcUsd;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return bitcoinValue;
-        //    }
-        //}
+            try
+            {
+                var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
+                return (double)cotacao.BtcUsd;
+            }
+            catch (Exception ex)
+            {
+                return bitcoinValue;
+            }
+        }
 
-        //public async Task<double> GetLTCDolar1Async()
-        //{
-        //    var litecoinValue = ConfiguracaoHelper.GetDouble("COTACAO_BTC_USD_DEFAULT");
+        public async Task<double> GetLTCDolar1Async()
+        {
+            var litecoinValue = ConfiguracaoHelper.GetDouble("COTACAO_BTC_USD_DEFAULT");
 
-        //    try
-        //    {
-        //        var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
-        //        return (double)cotacao.LtcUsd;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return litecoinValue;
-        //    }
-        //}
-        
-        //public async Task<double> GetTetherDolar1Async()
-        //{
-        //    try
-        //    {
-        //        var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
-        //        return (double)cotacao.UsdtUsd;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return 1;
-        //    }
-        //}
+            try
+            {
+                var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
+                return (double)cotacao.LtcUsd;
+            }
+            catch (Exception ex)
+            {
+                return litecoinValue;
+            }
+        }
+
+        public async Task<double> GetTetherDolar1Async()
+        {
+            try
+            {
+                var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
+                return (double)cotacao.UsdtUsd;
+            }
+            catch (Exception ex)
+            {
+                return 1;
+            }
+        }
 
 
     }

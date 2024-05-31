@@ -8246,6 +8246,7 @@
     <Content Include="Views\Shared\_LayoutLimpo.cshtml" />
     <Content Include="Views\MinhaRede\Galaxy.cshtml" />
     <Content Include="Views\MinhaRede\Indicados.cshtml" />
+    <Content Include="Views\MinhaRede\Rules.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -8270,6 +8271,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CoinpaymentsApi\CoinpaymentsApi.csproj">
+      <Project>{aeff78b5-f458-4929-9dd2-1447f16d13f6}</Project>
+      <Name>CoinpaymentsApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{465f69eb-40a1-4add-b7a1-b77b150854e8}</Project>
       <Name>Core</Name>

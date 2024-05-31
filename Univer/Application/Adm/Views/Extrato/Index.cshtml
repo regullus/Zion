@@ -18,7 +18,11 @@
     int intN = 0;
     var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
     var saldoInvestimento = "";
-    String mascaraData = "dd/MM/yyyy";
+    string mascaraData = traducaoHelper["MASCARA_DATA"];
+    if (String.IsNullOrEmpty(mascaraData))
+    {
+        mascaraData = "dd/MM/yyyy";
+    }
 
     #endregion
 }

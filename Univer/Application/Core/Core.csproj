@@ -889,6 +889,10 @@
     <Content Include="StoredProcedures\Zion\StoredProcedure\spOC_US_ObtemUltimaAssinaturaPerna.sql" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CoinpaymentsApi\CoinpaymentsApi.csproj">
+      <Project>{aeff78b5-f458-4929-9dd2-1447f16d13f6}</Project>
+      <Name>CoinpaymentsApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\cpUtilities\cpUtilities.csproj">
       <Project>{BBEAE12F-8B0D-4703-B137-B6569E1A4312}</Project>
       <Name>cpUtilities</Name>

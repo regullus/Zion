@@ -1,5 +1,5 @@
 ﻿using Base32;
-//using Coinpayments.Api;
+using Coinpayments.Api;
 using Core.Entities;
 using Core.Entities.Loja;
 using Core.Factories;
@@ -205,271 +205,271 @@ namespace Sistema.Areas.Loja.Controllers
             return View(carrinho);
         }
 
-        //public ActionResult Pagamento(CarrinhoModel carrinho)
-        //{
-        //    if (carrinho.Vazio)
-        //    {
-        //        return RedirectToAction("Index", "Home");
-        //    }
-        //    else
-        //    {
-        //        if (usuario.StatusID == 2) //Ativo
-        //        {
-        //            //Valor minimo de inverstimento para quem esta ativo
-        //            ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO_USUARIO_ATIVO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
-        //        }
-        //        else
-        //        {
-        //            //Valor minimo de inverstimento para quem não esta ativo
-        //            ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
-        //        }
-        //        if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
-        //        {
-        //            if (carrinho.EnderecoEntrega == null || carrinho.EnderecoEntrega.ID == 0)
-        //            //|| carrinho.EnderecoFaturamento == null   || carrinho.EnderecoFaturamento.ID == 0)
-        //            {
-        //                Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
-        //                Session["Erro"] = traducaoHelper["COMPRA_MENSAGEM_ENDERECO_FATURAMENTO"];
-        //                return RedirectToAction("entrega-e-faturamento", "pedido");
-        //            }
-        //        }
-        //    }
+        public ActionResult Pagamento(CarrinhoModel carrinho)
+        {
+            if (carrinho.Vazio)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                if (usuario.StatusID == 2) //Ativo
+                {
+                    //Valor minimo de inverstimento para quem esta ativo
+                    ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO_USUARIO_ATIVO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
+                }
+                else
+                {
+                    //Valor minimo de inverstimento para quem não esta ativo
+                    ViewBag.ValorMinimo = ConfiguracaoHelper.GetMoedaPadrao().Simbolo + " " + ConfiguracaoHelper.GetDouble("PRODUTO_VALOR_VARIAVEL_MINIMO").ToString(ConfiguracaoHelper.GetMoedaPadrao().MascaraOut);
+                }
+                if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+                {
+                    if (carrinho.EnderecoEntrega == null || carrinho.EnderecoEntrega.ID == 0)
+                    //|| carrinho.EnderecoFaturamento == null   || carrinho.EnderecoFaturamento.ID == 0)
+                    {
+                        Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
+                        Session["Erro"] = traducaoHelper["COMPRA_MENSAGEM_ENDERECO_FATURAMENTO"];
+                        return RedirectToAction("entrega-e-faturamento", "pedido");
+                    }
+                }
+            }
 
-        //    //Verifica se frete está habilitado e valor do frete para o tipo Correio
-        //    if (ConfiguracaoHelper.TemChave("FRETE_HABILITADO") && ConfiguracaoHelper.GetBoolean("FRETE_HABILITADO"))
-        //    {
-        //        if (carrinho.Total > 0 && carrinho.Frete == null && ConfiguracaoHelper.TemChave("TIPO_FRETE") && ConfiguracaoHelper.GetString("TIPO_FRETE").ToUpper() == "CORREIO")
-        //        {
-        //            carrinho.SetarFrete(CarrinhoTipoFrete.Correio);
-        //        }
-        //    }
+            //Verifica se frete está habilitado e valor do frete para o tipo Correio
+            if (ConfiguracaoHelper.TemChave("FRETE_HABILITADO") && ConfiguracaoHelper.GetBoolean("FRETE_HABILITADO"))
+            {
+                if (carrinho.Total > 0 && carrinho.Frete == null && ConfiguracaoHelper.TemChave("TIPO_FRETE") && ConfiguracaoHelper.GetString("TIPO_FRETE").ToUpper() == "CORREIO")
+                {
+                    carrinho.SetarFrete(CarrinhoTipoFrete.Correio);
+                }
+            }
 
-        //    //Verifica se existem mensagens a serem exibidas.
-        //    obtemMensagem();
+            //Verifica se existem mensagens a serem exibidas.
+            obtemMensagem();
 
-        //    ViewBag.UsuarioContainer = this.usuarioContainer;
+            ViewBag.UsuarioContainer = this.usuarioContainer;
 
-        //    #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
-        //    if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
-        //    {
-        //        var produto = carrinho.Itens.FirstOrDefault();
+            #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
+            if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
+            {
+                var produto = carrinho.Itens.FirstOrDefault();
 
-        //        if (produto != null)
-        //        {
-        //            Produto pacoteAtualUsuario;
+                if (produto != null)
+                {
+                    Produto pacoteAtualUsuario;
 
-        //            if (usuario.NivelAssociacao == 1)
-        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
-        //            else
-        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+                    if (usuario.NivelAssociacao == 1)
+                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+                    else
+                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
 
-        //            ViewBag.DiferencaValorUpgrade = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
-        //        }
-        //    }
-        //    #endregion
+                    ViewBag.DiferencaValorUpgrade = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
+                }
+            }
+            #endregion
 
-        //    if (Session["Erro"] != null)
-        //    {
-        //        ViewBag.AlertErroTitulo = Session["ErroTitulo"];
-        //        ViewBag.AlertErro = Session["Erro"];
-        //        Session["Erro"] = null;
-        //        Session["ErroTitulo"] = null;
-        //    }
+            if (Session["Erro"] != null)
+            {
+                ViewBag.AlertErroTitulo = Session["ErroTitulo"];
+                ViewBag.AlertErro = Session["Erro"];
+                Session["Erro"] = null;
+                Session["ErroTitulo"] = null;
+            }
 
-        //    if (Session["Sucesso"] != null)
-        //    {
-        //        ViewBag.AlertSucessoTitulo = Session["SucessoTitulo"];
-        //        ViewBag.AlertSucesso = Session["Sucesso"];
-        //        Session["Sucesso"] = null;
-        //        Session["SucessoTitulo"] = null;
-        //        Session["CartaoNome"] = null;
-        //        Session["CartaoBandeira"] = null;
-        //        Session["CartaoNumero"] = null;
-        //        Session["CartaoCodSeguranca"] = null;
-        //        Session["CartaoMes"] = null;
-        //        Session["CartaoAno"] = null;
-        //        Session["CodePagSeguro"] = null;
-        //        Session["CartaoTelefone"] = null;
-        //        Session["CartaoCPF"] = null;
-        //        Session["CartaoEmail"] = null;
-        //        Session["Parcelamento"] = null;
-        //    }
+            if (Session["Sucesso"] != null)
+            {
+                ViewBag.AlertSucessoTitulo = Session["SucessoTitulo"];
+                ViewBag.AlertSucesso = Session["Sucesso"];
+                Session["Sucesso"] = null;
+                Session["SucessoTitulo"] = null;
+                Session["CartaoNome"] = null;
+                Session["CartaoBandeira"] = null;
+                Session["CartaoNumero"] = null;
+                Session["CartaoCodSeguranca"] = null;
+                Session["CartaoMes"] = null;
+                Session["CartaoAno"] = null;
+                Session["CodePagSeguro"] = null;
+                Session["CartaoTelefone"] = null;
+                Session["CartaoCPF"] = null;
+                Session["CartaoEmail"] = null;
+                Session["Parcelamento"] = null;
+            }
 
-        //    if (Session["Info"] != null)
-        //    {
-        //        ViewBag.AlertInfoTitulo = Session["InfoTitulo"];
-        //        ViewBag.AlertInfo = Session["Info"];
-        //        Session["Info"] = null;
-        //        Session["InfoTitulo"] = null;
-        //    }
+            if (Session["Info"] != null)
+            {
+                ViewBag.AlertInfoTitulo = Session["InfoTitulo"];
+                ViewBag.AlertInfo = Session["Info"];
+                Session["Info"] = null;
+                Session["InfoTitulo"] = null;
+            }
 
-        //    if (Session["ShowCartao"] != null)
-        //    {
-        //        ViewBag.ShowCartao = Session["ShowCartao"];
-        //        Session["ShowCartao"] = null;
-        //    }
+            if (Session["ShowCartao"] != null)
+            {
+                ViewBag.ShowCartao = Session["ShowCartao"];
+                Session["ShowCartao"] = null;
+            }
 
-        //    ViewBag.CodePagSeguro = Session["CodePagSeguro"];
+            ViewBag.CodePagSeguro = Session["CodePagSeguro"];
 
-        //    ViewBag.CartaoNome = Session["CartaoNome"];
-        //    ViewBag.CartaoBandeira = Session["CartaoBandeira"];
-        //    ViewBag.CartaoNumero = Session["CartaoNumero"];
-        //    ViewBag.CartaoCodSeguranca = Session["CartaoCodSeguranca"];
-        //    ViewBag.CartaoMes = Session["CartaoMes"];
-        //    ViewBag.CartaoAno = Session["CartaoAno"];
-        //    ViewBag.CartaoTelefone = Session["CartaoTelefone"];
-        //    ViewBag.CartaoCPF = Session["CartaoCPF"];
-        //    ViewBag.CartaoEmail = Session["CartaoEmail"];
-        //    ViewBag.TipoPagtoCartao = Session["TipoPagtoCartao"];
-        //    ViewBag.Parcelamento = Session["Parcelamento"];
-        //    ViewBag.ShowBitCripto = null;
+            ViewBag.CartaoNome = Session["CartaoNome"];
+            ViewBag.CartaoBandeira = Session["CartaoBandeira"];
+            ViewBag.CartaoNumero = Session["CartaoNumero"];
+            ViewBag.CartaoCodSeguranca = Session["CartaoCodSeguranca"];
+            ViewBag.CartaoMes = Session["CartaoMes"];
+            ViewBag.CartaoAno = Session["CartaoAno"];
+            ViewBag.CartaoTelefone = Session["CartaoTelefone"];
+            ViewBag.CartaoCPF = Session["CartaoCPF"];
+            ViewBag.CartaoEmail = Session["CartaoEmail"];
+            ViewBag.TipoPagtoCartao = Session["TipoPagtoCartao"];
+            ViewBag.Parcelamento = Session["Parcelamento"];
+            ViewBag.ShowBitCripto = null;
 
-        //    #region Parcelamento
-        //    if (ViewBag.Parcelamento != null && ViewBag.CartaoBandeira != null && carrinho.Total > 0)
-        //    {
-        //        ViviPay serviceViviPay = new ViviPay();
-        //        var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(ViewBag.CartaoBandeira, carrinho.Total.ToString("N2"));
-        //        List<Object> parcela = new List<object>();
+            #region Parcelamento
+            //if (ViewBag.Parcelamento != null && ViewBag.CartaoBandeira != null && carrinho.Total > 0)
+            //{
+            //    ViviPay serviceViviPay = new ViviPay();
+            //    var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(ViewBag.CartaoBandeira, carrinho.Total.ToString("N2"));
+            //    List<Object> parcela = new List<object>();
 
-        //        foreach (var item in retornoViviPay)
-        //        {
-        //            parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
-        //        }
+            //    foreach (var item in retornoViviPay)
+            //    {
+            //        parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
+            //    }
 
-        //        ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto", ViewBag.Parcelamento);
-        //    }
-        //    else
-        //    {
-        //        List<Object> parcela = new List<object>();
-        //        ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto");
-        //    }
-        //    #endregion
+            //    ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto", ViewBag.Parcelamento);
+            //}
+            //else
+            //{
+            //    List<Object> parcela = new List<object>();
+            //    ViewBag.ccParcelamento = new SelectList(parcela, "parcelas", "texto");
+            //}
+            #endregion
 
-        //    #region Bandeira
+            #region Bandeira
 
-        //    List<Object> bandeira = new List<object>();
-        //    bandeira.Add(new { nome = "Visa", id = "visa" });
-        //    bandeira.Add(new { nome = "Mastercard", id = "mastercard" });
-        //    bandeira.Add(new { nome = "American Express", id = "amex" });
-        //    bandeira.Add(new { nome = "Elo", id = "elo" });
-        //    bandeira.Add(new { nome = "Diners Club", id = "diners" });
+            List<Object> bandeira = new List<object>();
+            bandeira.Add(new { nome = "Visa", id = "visa" });
+            bandeira.Add(new { nome = "Mastercard", id = "mastercard" });
+            bandeira.Add(new { nome = "American Express", id = "amex" });
+            bandeira.Add(new { nome = "Elo", id = "elo" });
+            bandeira.Add(new { nome = "Diners Club", id = "diners" });
 
-        //    if (ViewBag.CartaoBandeira != null)
-        //    {
-        //        ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome", ViewBag.CartaoBandeira);
-        //    }
-        //    else
-        //    {
-        //        ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome");
-        //    }
+            if (ViewBag.CartaoBandeira != null)
+            {
+                ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome", ViewBag.CartaoBandeira);
+            }
+            else
+            {
+                ViewBag.ccBandeira = new SelectList(bandeira, "id", "nome");
+            }
 
-        //    #endregion
+            #endregion
 
-        //    #region Mes
+            #region Mes
 
-        //    List<Object> mes = new List<object>();
-        //    mes.Add(new { nome = traducaoHelper["JANEIRO"], id = "01" });
-        //    mes.Add(new { nome = traducaoHelper["FEVEREIRO"], id = "02" });
-        //    mes.Add(new { nome = traducaoHelper["MARCO"], id = "03" });
-        //    mes.Add(new { nome = traducaoHelper["ABRIL"], id = "04" });
-        //    mes.Add(new { nome = traducaoHelper["MAIO"], id = "05" });
-        //    mes.Add(new { nome = traducaoHelper["JUNHO"], id = "06" });
-        //    mes.Add(new { nome = traducaoHelper["JULHO"], id = "07" });
-        //    mes.Add(new { nome = traducaoHelper["AGOSTO"], id = "08" });
-        //    mes.Add(new { nome = traducaoHelper["SETEMBRO"], id = "09" });
-        //    mes.Add(new { nome = traducaoHelper["OUTUBRO"], id = "10" });
-        //    mes.Add(new { nome = traducaoHelper["NOVEMBRO"], id = "11" });
-        //    mes.Add(new { nome = traducaoHelper["DEZEMBRO"], id = "12" });
+            List<Object> mes = new List<object>();
+            mes.Add(new { nome = traducaoHelper["JANEIRO"], id = "01" });
+            mes.Add(new { nome = traducaoHelper["FEVEREIRO"], id = "02" });
+            mes.Add(new { nome = traducaoHelper["MARCO"], id = "03" });
+            mes.Add(new { nome = traducaoHelper["ABRIL"], id = "04" });
+            mes.Add(new { nome = traducaoHelper["MAIO"], id = "05" });
+            mes.Add(new { nome = traducaoHelper["JUNHO"], id = "06" });
+            mes.Add(new { nome = traducaoHelper["JULHO"], id = "07" });
+            mes.Add(new { nome = traducaoHelper["AGOSTO"], id = "08" });
+            mes.Add(new { nome = traducaoHelper["SETEMBRO"], id = "09" });
+            mes.Add(new { nome = traducaoHelper["OUTUBRO"], id = "10" });
+            mes.Add(new { nome = traducaoHelper["NOVEMBRO"], id = "11" });
+            mes.Add(new { nome = traducaoHelper["DEZEMBRO"], id = "12" });
 
-        //    if (ViewBag.CartaoMes != null)
-        //    {
-        //        ViewBag.ccMes = new SelectList(mes, "id", "nome", ViewBag.CartaoMes);
-        //    }
-        //    else
-        //    {
-        //        ViewBag.ccMes = new SelectList(mes, "id", "nome");
-        //    }
+            if (ViewBag.CartaoMes != null)
+            {
+                ViewBag.ccMes = new SelectList(mes, "id", "nome", ViewBag.CartaoMes);
+            }
+            else
+            {
+                ViewBag.ccMes = new SelectList(mes, "id", "nome");
+            }
 
-        //    #endregion
+            #endregion
 
-        //    #region Ano
+            #region Ano
 
-        //    List<Object> ano = new List<object>();
-        //    ano.Add(new { nome = App.DateTimeZion.Year.ToString(), id = App.DateTimeZion.Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(1).Year.ToString(), id = App.DateTimeZion.AddYears(1).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(2).Year.ToString(), id = App.DateTimeZion.AddYears(2).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(3).Year.ToString(), id = App.DateTimeZion.AddYears(3).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(4).Year.ToString(), id = App.DateTimeZion.AddYears(4).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(5).Year.ToString(), id = App.DateTimeZion.AddYears(5).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(6).Year.ToString(), id = App.DateTimeZion.AddYears(6).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(7).Year.ToString(), id = App.DateTimeZion.AddYears(7).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(8).Year.ToString(), id = App.DateTimeZion.AddYears(8).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(9).Year.ToString(), id = App.DateTimeZion.AddYears(9).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(10).Year.ToString(), id = App.DateTimeZion.AddYears(10).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(11).Year.ToString(), id = App.DateTimeZion.AddYears(11).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(12).Year.ToString(), id = App.DateTimeZion.AddYears(12).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(13).Year.ToString(), id = App.DateTimeZion.AddYears(13).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(14).Year.ToString(), id = App.DateTimeZion.AddYears(14).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(15).Year.ToString(), id = App.DateTimeZion.AddYears(15).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(16).Year.ToString(), id = App.DateTimeZion.AddYears(16).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(17).Year.ToString(), id = App.DateTimeZion.AddYears(17).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(18).Year.ToString(), id = App.DateTimeZion.AddYears(18).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(19).Year.ToString(), id = App.DateTimeZion.AddYears(19).Year.ToString() });
-        //    ano.Add(new { nome = App.DateTimeZion.AddYears(20).Year.ToString(), id = App.DateTimeZion.AddYears(20).Year.ToString() });
+            List<Object> ano = new List<object>();
+            ano.Add(new { nome = App.DateTimeZion.Year.ToString(), id = App.DateTimeZion.Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(1).Year.ToString(), id = App.DateTimeZion.AddYears(1).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(2).Year.ToString(), id = App.DateTimeZion.AddYears(2).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(3).Year.ToString(), id = App.DateTimeZion.AddYears(3).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(4).Year.ToString(), id = App.DateTimeZion.AddYears(4).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(5).Year.ToString(), id = App.DateTimeZion.AddYears(5).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(6).Year.ToString(), id = App.DateTimeZion.AddYears(6).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(7).Year.ToString(), id = App.DateTimeZion.AddYears(7).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(8).Year.ToString(), id = App.DateTimeZion.AddYears(8).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(9).Year.ToString(), id = App.DateTimeZion.AddYears(9).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(10).Year.ToString(), id = App.DateTimeZion.AddYears(10).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(11).Year.ToString(), id = App.DateTimeZion.AddYears(11).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(12).Year.ToString(), id = App.DateTimeZion.AddYears(12).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(13).Year.ToString(), id = App.DateTimeZion.AddYears(13).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(14).Year.ToString(), id = App.DateTimeZion.AddYears(14).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(15).Year.ToString(), id = App.DateTimeZion.AddYears(15).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(16).Year.ToString(), id = App.DateTimeZion.AddYears(16).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(17).Year.ToString(), id = App.DateTimeZion.AddYears(17).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(18).Year.ToString(), id = App.DateTimeZion.AddYears(18).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(19).Year.ToString(), id = App.DateTimeZion.AddYears(19).Year.ToString() });
+            ano.Add(new { nome = App.DateTimeZion.AddYears(20).Year.ToString(), id = App.DateTimeZion.AddYears(20).Year.ToString() });
 
-        //    if (ViewBag.CartaoAno != null)
-        //    {
-        //        ViewBag.ccAno = new SelectList(ano, "id", "nome", ViewBag.CartaoAno);
-        //    }
-        //    else
-        //    {
-        //        ViewBag.ccAno = new SelectList(ano, "id", "nome");
-        //    }
+            if (ViewBag.CartaoAno != null)
+            {
+                ViewBag.ccAno = new SelectList(ano, "id", "nome", ViewBag.CartaoAno);
+            }
+            else
+            {
+                ViewBag.ccAno = new SelectList(ano, "id", "nome");
+            }
 
-        //    #endregion
+            #endregion
 
-        //    #region Sessions
+            #region Sessions
 
-        //    Session["CartaoNome"] = null;
-        //    Session["CartaoBandeira"] = null;
-        //    Session["CartaoNumero"] = null;
-        //    Session["CartaoCodSeguranca"] = null;
-        //    Session["CartaoMes"] = null;
-        //    Session["CartaoAno"] = null;
-        //    Session["CodePagSeguro"] = null;
-        //    Session["CartaoTelefone"] = null;
-        //    Session["CartaoCPF"] = null;
-        //    Session["CartaoEmail"] = null;
-        //    Session["TipoPagtoCartao"] = null;
-        //    Session["Parcelamento"] = null;
+            Session["CartaoNome"] = null;
+            Session["CartaoBandeira"] = null;
+            Session["CartaoNumero"] = null;
+            Session["CartaoCodSeguranca"] = null;
+            Session["CartaoMes"] = null;
+            Session["CartaoAno"] = null;
+            Session["CodePagSeguro"] = null;
+            Session["CartaoTelefone"] = null;
+            Session["CartaoCPF"] = null;
+            Session["CartaoEmail"] = null;
+            Session["TipoPagtoCartao"] = null;
+            Session["Parcelamento"] = null;
 
-        //    #endregion
+            #endregion
 
-        //    //#region SaldoAtivo
+            //#region SaldoAtivo
 
-        //    //ViewBag.PagarSaldo = true;
+            //ViewBag.PagarSaldo = true;
 
-        //    //if (usuario.ExibeSaque == 0 || Core.Helpers.ConfiguracaoHelper.GetString("MEIO_PGTO_SALDO_ATIVO") != "true")
-        //    //{
-        //    //    ViewBag.PagarSaldo = false;
-        //    //}
+            //if (usuario.ExibeSaque == 0 || Core.Helpers.ConfiguracaoHelper.GetString("MEIO_PGTO_SALDO_ATIVO") != "true")
+            //{
+            //    ViewBag.PagarSaldo = false;
+            //}
 
-        //    //#endregion
+            //#endregion
 
-        //    if (ConfiguracaoHelper.GetBoolean("TAXAS_PAGAMENTO_PRODUTO_ATIVO"))
-        //    {
-        //        carrinho.Taxas = new List<CarrinhoTaxaModel>();
+            if (ConfiguracaoHelper.GetBoolean("TAXAS_PAGAMENTO_PRODUTO_ATIVO"))
+            {
+                carrinho.Taxas = new List<CarrinhoTaxaModel>();
 
-        //        var taxas = taxaRepository.GetByExpression(e => e.CategoriaID == 22).ToList();
+                var taxas = taxaRepository.GetByExpression(e => e.CategoriaID == 22).ToList();
 
-        //        foreach (var taxa in taxas.Where(w => w.Valor.HasValue))
-        //        {
-        //            carrinho.Taxas.Add(new CarrinhoTaxaModel { Taxa = taxa, Valor = taxa.Valor.Value });
-        //        }
-        //    }
+                foreach (var taxa in taxas.Where(w => w.Valor.HasValue))
+                {
+                    carrinho.Taxas.Add(new CarrinhoTaxaModel { Taxa = taxa, Valor = taxa.Valor.Value });
+                }
+            }
 
-        //    return View(carrinho);
-        //}
+            return View(carrinho);
+        }
 
         public ActionResult Pagar(CarrinhoModel carrinho, PedidoPagamento.MeiosPagamento meioPagamento, string token2FA = null, string rendimento = null, string bonus = null, string transferencia = null, string chamada = null, string pedidoID = null)
         {
@@ -2229,7 +2229,7 @@ namespace Sistema.Areas.Loja.Controllers
         //                string chave = pedido.ID.ToString() + "_" + App.DateTimeZion.Ticks.ToString().Substring(10, 5);
 
         //                //cripto = "LTCT";    //testar com LTC
-        //                //var purchase = await CoinpaymentsApi.GetCallbackAddress(cripto);
+        //                var purchase = await CoinpaymentsApi.GetCallbackAddress(cripto);
         //                //troca por causa do pagamento parcial. O metodo abaixo chama o cmd create_transation da api da coinpayments. E recomendado para pagamento com valor fixo                     
         //                //var purchase = await CoinpaymentsApi.CreateTransaction(valorUsdComTaxa, "USD", cripto, usuario.Email, custom: chave, itemNumber: pedido.Codigo);
 
