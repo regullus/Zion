@@ -6,6 +6,33 @@
     var fundos = (IEnumerable<string>)ViewBag.Fundos;
     var captchaKey = Core.Helpers.ConfiguracaoHelper.GetString("RECAPTCHA_SITE_KEY"); // "6LegpsUUAAAAACAAg-PdfR7OZE-N2cp1-XtA8JKd";
 }
+<style>
+    #senha {
+        width: 150px;
+        padding-right: 20px;
+    }
+
+    .olho {
+        cursor: pointer;
+        position: relative;
+        left: 300px;
+        width: 20px;
+        top: -26px;
+        color: #ff6a00;
+    }
+</style>
+<script>
+    function mouseoverPass(obj) {
+        var obj = document.getElementById('senha');
+        obj.type = "text";
+    }
+    function mouseoutPass(obj) {
+        var obj = document.getElementById('senha');
+        obj.type = "password";
+    }
+</script>
+
+
 
 @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
@@ -20,7 +47,7 @@
 
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     <div class="form-group">
-        <label class="control-label visible-ie8 visible-ie9">Usuário</label>
+        <label class="control-label visible-ie8 visible-ie9">@traducaoHelper["USUARIO"]</label>
         <div class="input-icon">
             <i class="fa fa-user"></i>
             @Html.TextBoxFor(m => m.Email, new { @class = "form-control placeholder-no-fix", @id = "nome", @autofocus = "" })
@@ -29,24 +56,25 @@
     </div>
 
     <div class="form-group">
-        <label class="control-label visible-ie8 visible-ie9">Senha</label>
+        <label class="control-label visible-ie8 visible-ie9">@traducaoHelper["SENHA"]</label>
         <div class="input-icon">
             <i class="fa fa-lock"></i>
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control placeholder-no-fix", @id = "senha" })
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control placeholder-no-fix", @id = "senha", style = "width:326px;" })
             @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
         </div>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABDUlEQVQ4jd2SvW3DMBBGbwQVKlyo4BGC4FKFS4+TATKCNxAggkeoSpHSRQbwAB7AA7hQoUKFLH6E2qQQHfgHdpo0yQHX8T3exyPR/ytlQ8kOhgV7FvSx9+xglA3lM3DBgh0LPn/onbJhcQ0bv2SHlgVgQa/suFHVkCg7bm5gzB2OyvjlDFdDcoa19etZMN8Qp7oUDPEM2KFV1ZAQO2zPMBERO7Ra4JQNpRa4K4FDS0R0IdneCbQLb4/zh/c7QdH4NL40tPXrovFpjHQr6PJ6yr5hQV80PiUiIm1OKxZ0LICS8TWvpyyOf2DBQQtcXk8Zi3+JcKfNafVsjZ0WfGgJlZZQxZjdwzX+ykf6u/UF0Fwo5Apfcq8AAAAASUVORK5CYII=" onclick="mouseoverPass();" onmouseout="mouseoutPass();" id="olho" class="olho" />
     </div>
 
     @:
     if (Helpers.Local.Ambiente != "dev")
     {
         <div class="form-group">
-            <div class="g-recaptcha" data-sitekey="@captchaKey")"></div>
+            <div class="g-recaptcha" data-sitekey="@captchaKey" )"></div>
         </div>
     }
     <div class="form-actions" style="height: 46px;">
         <button type="submit" class="btn green-haze pull-right btn-login" id="Entrar" style="color: #000;">
-            @traducaoHelper["ENTRAR"] <i class="m-icon-swapright m-icon-black" ></i>
+            @traducaoHelper["ENTRAR"] <i class="m-icon-swapright m-icon-black"></i>
         </button>
     </div>
     <div class="forget-password" style="text-align: center;">
