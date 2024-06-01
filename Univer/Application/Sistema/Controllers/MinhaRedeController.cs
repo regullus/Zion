@@ -998,7 +998,23 @@ namespace Sistema.Controllers
                             }
                         }
                         log = "user info 07";
-                        obtemInfoUsuario.Pix = CriptografiaHelper.Morpho(obtemInfoUsuario.Pix, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                        
+                        //Em produção teve essa mudança: não exibe pix para usuario comum, somente para o sistema
+                        if(ConfiguracaoHelper.GetBoolean("TABULEIRO_EXIBE_PIX"))
+                        {
+                            obtemInfoUsuario.Pix = CriptografiaHelper.Morpho(obtemInfoUsuario.Pix, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                        }
+                        else
+                        {
+                            if(obtemInfoUsuario.Nome == "System")
+                            {
+                                obtemInfoUsuario.Pix = CriptografiaHelper.Morpho(obtemInfoUsuario.Pix, CriptografiaHelper.TipoCriptografia.Descriptografa);
+                            } else
+                            {
+                                obtemInfoUsuario.Pix = "";
+                            }
+                        }
+
                         obtemInfoUsuario.Carteira = CriptografiaHelper.Morpho(obtemInfoUsuario.Carteira, CriptografiaHelper.TipoCriptografia.Descriptografa);
                     }
                     else
