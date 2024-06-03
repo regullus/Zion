@@ -16,6 +16,8 @@
     #region Variaveis
 
     var blnLido = ViewBag.AvisoLido;
+    
+    bool retornoSuporte = false;
 
     #endregion
 }
@@ -82,14 +84,11 @@
 
 
     </script>
-
-
 }
 
 @section PageLevelScripts {
     @Scripts.Render("~/scripts/sweetAlert")
     <script src="~/Content/scripts/uploadfile/jquery.uploadfile.min.js"></script>
-
 }
 
 @section jQueryRead {
@@ -142,11 +141,15 @@
                 </div>
             </div>
 
+
             @foreach (var item in Model.SuporteMensagem.OrderBy(o => o.ID))
             {
+                if (item.AdministradorID.HasValue)
+                {
+                    retornoSuporte = true;
+                }
 
                 <hr />
-
                 <div class="row">
                     <div class="col-md-9">
 
@@ -175,7 +178,6 @@
                 {
                     <div class="row">
                         <div class="col-lg-12">
-
                             @{
                                 var imagensString = String.Join(";", item.Imagens);
 
@@ -189,44 +191,44 @@
                 }
 
             }
-
             <hr />
 
-            <div class="row" id="row-upload-link">
-                <div class="col-md-12">
-                    <a href="#" id="btn-add-image">@traducaoHelper["ANEXAR_IMAGENS"]</a>
-                </div>
-            </div>
-
-            <div class="row" id="row-upload-form" style="display:none">
-                <div class="col-md-12">
-                    <div id="fileuploader">@traducaoHelper["SELECIONAR_IMAGENS"]</div>
-                </div>
-            </div>
-
-            @using (Html.BeginForm())
+            @if (!retornoSuporte)
             {
-                @Html.AntiForgeryToken()
-
-                <input type="hidden" name="Guid" value="@ViewBag.Guid" />
-
-                <div class="row">
-
-                    <div class="col-md-12"  style="margin-top:10px">
-                        <textarea class="form-control" name="conteudo" id="conteudo" rows="5" placeholder="@traducaoHelper["TEXTO"]">@ViewBag.Conteudo</textarea>
-                    </div>
-
+                <div class="row" id="row-upload-link">
                     <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-offset-2 col-md-10" style="margin-top:10px">
-                                <input type="submit" value=@traducaoHelper["ENVIAR"] class="btn green-haze pull-right" />
+                        <a href="#" id="btn-add-image">@traducaoHelper["ANEXAR_IMAGENS"]</a>
+                    </div>
+                </div>
+
+                <div class="row" id="row-upload-form" style="display:none">
+                    <div class="col-md-12">
+                        <div id="fileuploader">@traducaoHelper["SELECIONAR_IMAGENS"]</div>
+                    </div>
+                </div>
+
+                using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="Guid" value="@ViewBag.Guid" />
+
+                    <div class="row">
+
+                        <div class="col-md-12" style="margin-top:10px">
+                            <textarea class="form-control" name="conteudo" id="conteudo" rows="5" placeholder="@traducaoHelper["TEXTO"]">@ViewBag.Conteudo</textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-offset-2 col-md-10" style="margin-top:10px">
+                                    <input type="submit" value=@traducaoHelper["ENVIAR"] class="btn green-haze pull-right" />
+                                </div>
                             </div>
                         </div>
+
                     </div>
-
-                </div>
-
-
+                }
             }
         </div>
     </div>

@@ -1,7 +1,6 @@
 ﻿@model PagedList.IPagedList<Sistema.Models.SuporteViewModel>
 @using PagedList.Mvc;
 
-
 @{
     #region Layout
 
@@ -43,6 +42,11 @@
             <!-- BEGIN PAGE TITLE -->
             <div class="page-title">
                 <h2>@ViewBag.Title <small></small></h2>
+                <br />
+                <a href="mailto:suporte@universol.global">@traducaoHelper["EMAIL"]: suporte@universol.global</a>
+                <br />
+                <br />
+                <a class="whatsapp-link" href="https://api.whatsapp.com/send?phone=5547997210089" target="_blank"><i class="fa fa-whatsapp"></i> Whatsapp (+5547997210089)</a>
             </div>
             <!-- END PAGE TITLE -->
         </div>

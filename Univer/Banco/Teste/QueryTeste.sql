@@ -13,7 +13,7 @@ Update Autenticacao set PasswordHash = 'AFdh14qX3cC2KR5OLsCnYPVunVMzwAKzr2Z0r8Z0
 
 Declare @UsuarioID int, @BoardID int, @TabuleiroID int, @PatrocinadorID int, @MasterID int
 
-Select @UsuarioID = id from usuario.usuario where id > 2500 and apelido = '15sto001'
+Select @UsuarioID = id from usuario.usuario where id > 2500 and apelido = 'gabi24'
 
 Set @PatrocinadorID = @UsuarioID
 Set @BoardID = 1
@@ -22,6 +22,7 @@ Set @TabuleiroID = 154
 
 --****************** Usuario ******************
 Select 'Usuario' Query, id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id = @UsuarioID
+Select 'Usuario' Query, id,login, apelido, PatrocinadorDiretoID  From usuario.usuario where id = 2736
 
 --****************** Tempo Usuario ******************
 --Select 'Tempo' Query, * from Rede.TabuleiroUltimoAcesso where UsuarioID = @UsuarioID

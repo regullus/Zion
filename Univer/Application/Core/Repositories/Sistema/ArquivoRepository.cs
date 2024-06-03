@@ -57,7 +57,6 @@ namespace Core.Repositories.Sistema
             }
             return resultado;
         }
-
     }
 }
 

@@ -8,6 +8,12 @@
     var produtos = (IEnumerable<Core.Entities.Produto>)ViewBag.Produtos;
     var meioPagamentos = (IEnumerable<Core.Entities.MeioPagamento>)ViewBag.MeioPAgamento;
     var usuarioEntraOutraAba = ViewBag.UsuarioEntraOutraAba;
+
+    string mascaraData = traducaoHelper["MASCARA_DATA"];
+    if (String.IsNullOrEmpty(mascaraData))
+    {
+        mascaraData = "dd/MM/yyyy hh:mm";
+    }
 }
 @section pageStyles {
     <link rel="stylesheet" href="~/Content/home/bootstrap.min.css">
@@ -247,7 +253,6 @@
                 } 
             });
         });
-
     </script>
 
     <script>
@@ -419,6 +424,7 @@
                         <th scope="col">@traducaoHelper["PATROCINADOR"]</th>
                         <th scope="col">@traducaoHelper["PAGAMENTO"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
+                        <th scope="col">@traducaoHelper["DATA"]</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -444,6 +450,7 @@
                         <th scope="col">@traducaoHelper["PATROCINADOR"]</th>
                         <th scope="col">@traducaoHelper["PAGAMENTO"]</th>
                         <th scope="col">@traducaoHelper["STATUS"]</th>
+                        <th scope="col">@traducaoHelper["DATA"]</th>
                     </tr>
                 </tfoot>
                 <tbody>
@@ -515,6 +522,9 @@
                             </td>
                             <td>
                                 @(item.StatusID == 0 ? traducaoHelper["INATIVO"] : item.StatusID == 1 ? traducaoHelper["ATIVO"] : item.StatusID == 2 ? traducaoHelper["CONVITE"] : traducaoHelper["SEM_DADOS"])
+                            </td>
+                            <td>
+                                @item.DataInicio.ToString(mascaraData)
                             </td>
                         </tr>
                     }

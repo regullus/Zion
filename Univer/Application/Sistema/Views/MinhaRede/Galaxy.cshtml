@@ -726,9 +726,10 @@
                     success: function (data) {
                         if (data != null) {
                             if (data != 'NoValue') {
+                                var celLimpo = data.Celular.replace(/\D/g, '');
                                 $("#infoNome").html(data.Nome);
                                 $("#infoApelido").html(data.Apelido);
-                                $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular);
+                                $("#infoCelular").html('@(traducaoHelper["CELULAR"]): ' + data.Celular + ' <a class="whatsapp-link" href="https://api.whatsapp.com/send?phone=' + celLimpo + '" target="_blank"><i class="fa fa-whatsapp"></i></a>');
                                 $("#infoValor").html(data.Valor);
                                 $("#infoTitulo").html('@(traducaoHelper["DADOS"])');
                                 $("#infoID").html(data.UsuarioID);
@@ -1732,7 +1733,7 @@ else
                                         <h4 id="patrocinadorNome" style="font-weight: 500;"></h4>
                                         <h3 style="font-weight: 500;" id="patrocinadorApelidoHeader">@(traducaoHelper["APELIDO"])</h3>
                                         <h4 id="patrocinadorApelido" style="font-weight: 500;"></h4>
-                                        <h3 style="font-weight: 500;" id="patrocinadorCelularHeader">@(traducaoHelper["CELULAR"])</h3>
+                                        <h3 style="font-weight: 500;" id="patrocinadorCelularHeader">@(traducaoHelper["CELULAR"]) </h3>
                                         <h4 id="patrocinadorCelular" style="font-weight: 500;"></h4>
                                     </div>
                                 </div>

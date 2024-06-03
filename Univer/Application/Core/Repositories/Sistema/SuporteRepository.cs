@@ -23,27 +23,25 @@ namespace Core.Repositories.Sistema
 
         public void CriarChamado(int UsuarioId, Guid guid, string assunto, string texto)
         {
-            var procedure = string.Format("EXEC sp_OC_SUP_NovoChamado '{0}', '{1}', N'{2}', N'{3}'", UsuarioId, guid, assunto, texto);
+            var procedure = string.Format("EXEC sp_I_SuporteNovoChamado '{0}', '{1}', N'{2}', N'{3}'", UsuarioId, guid, assunto, texto);
 
             this._context.Database.SqlQuery<decimal>(procedure).FirstOrDefault();
         }
 
         public void NovaInteracao(int SuporteId, Guid guid, string texto)
         {
-            var procedure = string.Format("EXEC sp_OC_SUP_NovaInteracao '{0}', '{1}', N'{2}'", SuporteId, guid, texto);
+            var procedure = string.Format("EXEC sp_I_SuporteNovaInteracao '{0}', '{1}', N'{2}'", SuporteId, guid, texto);
 
             this._context.Database.SqlQuery<decimal>(procedure).FirstOrDefault();
         }
 
         public int Resposta(int SuporteId, int AdministradorId, Guid guid, string texto)
         {
-            var procedure = string.Format("EXEC sp_OC_SUP_Resposta {0}, {1}, '{2}', N'{3}'", SuporteId, AdministradorId, guid, texto);
+            var procedure = string.Format("EXEC sp_I_SuporteResposta {0}, {1}, '{2}', N'{3}'", SuporteId, AdministradorId, guid, texto);
 
             var id = (int)this._context.Database.SqlQuery<decimal>(procedure).FirstOrDefault();
 
             return id;
         }
-
-
     }
 }

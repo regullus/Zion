@@ -14,6 +14,8 @@ using PagedList;
 using Core.Entities;
 using System.IO;
 using System.Web;
+using System.Web.Configuration;
+using System.Net;
 
 namespace Sistema.Controllers
 {
@@ -28,7 +30,7 @@ namespace Sistema.Controllers
         private Core.Helpers.TraducaoHelper traducaoHelper;
 
         private YLEVELEntities db = new YLEVELEntities();
-        
+
         string strIdiomaSigla = "pt-BR";
         public string PathImages { get; set; }
 
@@ -48,9 +50,18 @@ namespace Sistema.Controllers
             {
                 strIdiomaSigla = usuario.Pais.Idioma.Sigla;
             }
-
-
-            PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), ConfiguracaoHelper.GetString("PASTA_SUPORTE_ANEXOS"));
+            if (WebConfigurationManager.AppSettings["Ambiente"] == "dev")
+            {
+                PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), "d\\");
+            }
+            else if (WebConfigurationManager.AppSettings["Ambiente"] == "homol")
+            {
+                PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), "h\\");
+            }
+            else
+            {
+                PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), "p\\");
+            }
         }
 
         #endregion
@@ -266,7 +277,6 @@ namespace Sistema.Controllers
             return View(suporte);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Ler(int id, FormCollection form)
@@ -318,7 +328,6 @@ namespace Sistema.Controllers
             return RedirectToAction("ler", new { id });
         }
 
-
         #endregion
 
         #region UPLOAD 
@@ -326,20 +335,27 @@ namespace Sistema.Controllers
         [HttpPost]
         public ActionResult uploaddelete(ImagemUploadSuporteMensagem image)
         {
-            var pathAndFile = PathAndFileImage(image);
-
-            if (System.IO.File.Exists(pathAndFile))
+            try
             {
-                System.IO.File.Delete(pathAndFile);
+                var pathAndFile = PathAndFileImage(image);
+
+                if (System.IO.File.Exists(pathAndFile))
+                {
+                    System.IO.File.Delete(pathAndFile);
+                }
+
+                var path = PathImage(image.Guid);
+
+                var dic = new System.IO.DirectoryInfo(path);
+
+                if (dic.GetFiles().Count() == 0)
+                {
+                    System.IO.Directory.Delete(path);
+                }
             }
-
-            var path = PathImage(image.Guid);
-
-            var dic = new System.IO.DirectoryInfo(path);
-
-            if (dic.GetFiles().Count() == 0)
+            catch (Exception)
             {
-                System.IO.Directory.Delete(path);
+                return Json(null);
             }
 
             return Json(null);
@@ -347,14 +363,14 @@ namespace Sistema.Controllers
 
         private string PathAndFileImage(ImagemUploadSuporteMensagem image)
         {
-            return PathAndFileImage(image.Guid, image.FileName);
+            return PathAndFileImage(image.Guid, image.FileName.ToLower());
         }
 
         private string PathAndFileImage(Guid guid, string fileName)
         {
             var path = PathImage(guid);
 
-            return Path.Combine(path, fileName);
+            return Path.Combine(path, fileName.ToLower());
         }
 
         private string PathImage(Guid guid)
@@ -367,6 +383,7 @@ namespace Sistema.Controllers
         {
             var fileName = string.Empty;
             var guid = Guid.Empty;
+            Localizacao();
 
             try
             {
@@ -384,16 +401,27 @@ namespace Sistema.Controllers
                     HttpPostedFileBase file = Request.Files[i]; //Uploaded file
                                                                 //Use the following properties to get file's name, size and MIMEType
                     int fileSize = file.ContentLength;
-                    fileName = file.FileName;
-                    string mimeType = file.ContentType;
-                    System.IO.Stream fileContent = file.InputStream;
-                    //To save file, use SaveAs method
+                    fileName = file.FileName.ToLower();
+                    if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg"))
+                    {
+                        string mimeType = file.ContentType;
+                        System.IO.Stream fileContent = file.InputStream;
+                        //To save file, use SaveAs method
 
-                    string pathAndFile = Path.Combine(path, fileName);
+                        string pathAndFile = Path.Combine(path, fileName);
 
-                    file.SaveAs(pathAndFile); //File will be saved in application root
+                        file.SaveAs(pathAndFile); //File will be saved in application root    
+                    }
+                    else
+                    {
+                        Response.ClearHeaders();
+                        Response.ClearContent();
+                        Response.Status = "503 ServiceUnavailable";
+                        Response.StatusCode = 503;
+                        Response.StatusDescription = traducaoHelper["IMAGENS_PERMITIDAS"];
+                        return null;
+                    }
                 }
-
             }
             catch (Exception ex)
             {
@@ -405,7 +433,5 @@ namespace Sistema.Controllers
         }
 
         #endregion
-
-
     }
 }

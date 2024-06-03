@@ -84,9 +84,7 @@
 
 @section PageLevelScripts {
     @Scripts.Render("~/scripts/sweetAlert")
-
     <script src="http://hayageek.github.io/jQuery-Upload-File/4.0.11/jquery.uploadfile.min.js"></script>
-
 }
 
 @section jQueryRead {
@@ -126,12 +124,9 @@
 
             @foreach (var item in Model.SuporteMensagem.OrderBy(o => o.ID))
             {
-
                 <hr />
-
                 <div class="row">
                     <div class="col-md-9">
-
                         @if (item.AdministradorID.HasValue)
                         {
                             <b>@traducaoHelper["SUPORTE_RETORNO"]</b>
@@ -140,7 +135,6 @@
                         {
                             <b>@Model.Usuario.Nome</b> <span>(@Model.Usuario.Login)</span>
                         }
-
                     </div>
                     <div class="col-md-3">
                         <i class="right">@item.Data</i>
@@ -149,17 +143,14 @@
 
                 <div class="row">
                     <div class="col-lg-12">
-                        @Html.Raw(item.Texto.Replace(Environment.NewLine, "<br />"))
-                        @Html.Raw(item.Guid.ToString())
+                        @Html.Raw(item.Texto.Replace(Environment.NewLine, "<br/>"))
                     </div>
                 </div>
 
                 if (item.Imagens.Any())
                 {
-
                     <div class="row">
                         <div class="col-lg-12">
-
                             @{
                                 var imagensString = String.Join(";", item.Imagens);
 
@@ -168,11 +159,9 @@
                                     <img src="@imagem" width="100" class="anexo-img" style="cursor:pointer" onclick="abrirAnexos('@imagensString')" />
                                 }
                             }
-
                         </div>
                     </div>
                 }
-
             }
 
             <hr />
@@ -195,25 +184,18 @@
                 @Html.AntiForgeryToken()
 
                 <input type="hidden" name="Guid" value="@ViewBag.Guid" />
-
                 <div class="row">
-
-
                     <div class="col-md-12">
                         <textarea class="form-control" name="conteudo" id="conteudo" rows="5" placeholder="@traducaoHelper["TEXTO"]">@ViewBag.Conteudo</textarea>
                     </div>
-
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="col-md-offset-2 col-md-10">
+                            <div class="col-md-offset-2 col-md-10" style="padding-top: 10px;">
                                 <input type="submit" value=@traducaoHelper["ENVIAR"] class="btn green-haze pull-right" />
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-
             }
         </div>
     </div>
@@ -228,7 +210,6 @@
                 <h4 class="modal-title" id="myModalLabel">@traducaoHelper["ANEXOS"]</h4>
             </div>
             <div class="modal-body" id="anexos-itens">
-
             </div>
         </div>
     </div>

@@ -12,11 +12,6 @@
     ViewBag.Title = traducaoHelper["ENVIAR_MENSAGEM"];
 
     #endregion
-
-    #region Variaveis
-
-    #endregion
-
 }
 
 @section pageStyles {
@@ -27,7 +22,6 @@
 @section pageScripts {
 
     <script>
-
         function abrirAnexos(stringImagens) {
             var imagens = stringImagens.split(';')
             $("#anexos-itens").html('');
@@ -38,9 +32,7 @@
             $("#Anexos").modal('show');
         }
 
-
         $(function () {
-
             $("#fileuploader").uploadFile({
                 url: "/suporte/upload",
                 fileName: "myfile",
@@ -52,7 +44,6 @@
                 previewHeight: "100px",
                 previewWidth: "100px",
                 deleteCallback: function (data, pd) {
-
                     console.log(">>>", data)
 
                     $.post("/suporte/uploaddelete", data,
@@ -61,30 +52,22 @@
                             });
 
                     pd.statusbar.hide(); //You choice.
-
                 },
             });
 
-
             $("#btn-add-image").on("click", (e) => {
-
                 e.preventDefault();
-
                 $("#row-upload-link").hide();
                 $("#row-upload-form").fadeIn();
             });
 
         })
 
-
     </script>
-
-
 }
 
 @section PageLevelScripts {
     <script src="~/Content/scripts/uploadfile/jquery.uploadfile.min.js"></script>
-
 }
 
 <div class="portlet solid grey-cararra">
@@ -118,8 +101,8 @@
 
     <div class="portlet-title">
         <div class="caption">
-                <i class="fa fa-send"></i>@traducaoHelper["ENVIAR_MENSAGEM"]
-            </div>
+            <i class="fa fa-send"></i>@traducaoHelper["ENVIAR_MENSAGEM"]
+        </div>
         <div class="tools">
             <a href="javascript:;" class="collapse"></a>
         </div>
@@ -130,59 +113,53 @@
         @using (Html.BeginForm("Enviar", "Suporte", FormMethod.Post, new { role = "form" }))
         {
             @Html.AntiForgeryToken()
-        <div class="form-body">
-            <div class="row">
-                <div class="col-md-10"><h4>@traducaoHelper["NOVA"]</h4></div>
-                <div class="col-md-2">
-                    @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
-                </div>
-            </div>
-            <hr />
-            <input type="hidden" name="Guid" value="@ViewBag.Guid" />
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group form-md-line-input form-md-floating-label ">
-                        <input type="text" class="form-control form-md-line-input form-md-floating-label has-info" name="assunto" id="assunto" maxlength="100" value="@ViewBag.Assunto">
-                        <label for="assunto">@traducaoHelper["ASSUNTO"]</label>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-10"><h4>@traducaoHelper["NOVA"]</h4></div>
+                    <div class="col-md-2">
+                        @Html.ActionLink("Back to List", "Index", new { id = 0 }, new { @class = "Voltar pull-right", title = traducaoHelper["VOLTAR_PARA_A_LISTA"] })
                     </div>
                 </div>
-
                 <hr />
+                <input type="hidden" name="Guid" value="@ViewBag.Guid" />
 
-                <div class="col-md-12" id="row-upload-link">
-                    <a href="#" id="btn-add-image">@traducaoHelper["ANEXAR_IMAGENS"]</a>
-                </div>
-
-                <div class="col-md-12" id="row-upload-form" style="display:none;">
+                <div class="row">
                     <div class="col-md-12">
-                        <div id="fileuploader">@traducaoHelper["SELECIONAR_IMAGENS"]</div>
-                    </div>
-                </div>
-
-                <div class="col-md-12" style="margin-top:10px;">
-                    <textarea class="form-control" name="conteudo" id="conteudo" rows="5" placeholder="@traducaoHelper["TEXTO"]">@ViewBag.Conteudo</textarea>
-                </div>
-
-                @*<div class="col-md-12">
-                <div class="form-group form-md-line-input form-md-floating-label ">
-                    <textarea class="form-control form-md-line-input form-md-floating-label has-info" name="conteudo" id="conteudo" rows="3" placeholder="">@ViewBag.Conteudo</textarea>
-                    <label for="conteudo">@Idiomas.resGlobal.texto</label>
-                </div>
-            </div>*@
-
-                <div class="col-md-12"><br /></div>
-
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value=@traducaoHelper["ENVIAR"] class="btn green-haze pull-right" />
+                        <div class="form-group form-md-line-input form-md-floating-label ">
+                            <input type="text" class="form-control form-md-line-input form-md-floating-label has-info" name="assunto" id="assunto" maxlength="100" value="@ViewBag.Assunto">
+                            <label for="assunto">@traducaoHelper["ASSUNTO"]</label>
                         </div>
                     </div>
-                </div>
 
+                    <hr />
+
+                    <div class="col-md-12" id="row-upload-link">
+                        <a href="#" id="btn-add-image">@traducaoHelper["ANEXAR_IMAGENS"]</a>
+                        <p>@traducaoHelper["IMAGENS_PERMITIDAS"]</p>
+                    </div>
+
+                    <div class="col-md-12" id="row-upload-form" style="display:none;">
+                        <div class="col-md-12">
+                            <div id="fileuploader">@traducaoHelper["SELECIONAR_IMAGENS"]</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="margin-top:10px;">
+                        <textarea class="form-control" name="conteudo" id="conteudo" rows="5" placeholder="@traducaoHelper["TEXTO"]">@ViewBag.Conteudo</textarea>
+                    </div>
+
+                    <div class="col-md-12"><br /></div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="submit" value=@traducaoHelper["ENVIAR"] class="btn green-haze pull-right" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
         }
         <!-- Fim FORM-->
     </div>

@@ -65,6 +65,7 @@
 
 <div class="portlet box grey-gallery" style="max-width: 1600px;">
     <div class="portlet-body">
+
         <div class="table-toolbar">
             <div class="row">
                 <div class="col-md-4">
@@ -138,6 +139,7 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
+                        string celLimpo = item.Celular.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "").Replace("+","");
                         <tr>
                             <td>
                                 <img src='@Url.Content("~/Content/img/" + Helpers.Local.Sistema + "/Pins/" + item.BoardID + ".png?v=" + @Helpers.Local.Versao)' style="width: 40px;">
@@ -155,7 +157,8 @@
                                 @Html.DisplayFor(modelItem => item.Nome)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Celular)
+                                @(item.Celular) <a class="whatsapp-link" href='https://api.whatsapp.com/send?phone=@(celLimpo)' target="_blank"><i class="fa fa-whatsapp"></i></a>
+                                @*<a href="sms:+@(celLimpo)"><i class="fa fa-mobile-phone"></i></a>*@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Master)
@@ -228,5 +231,4 @@
         </div>
 
     </div>
-
 </div>

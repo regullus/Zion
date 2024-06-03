@@ -11,8 +11,6 @@ namespace Core.Entities
             {
                 item.ObtemImagens();
             }
-
         }
-
     }
 }

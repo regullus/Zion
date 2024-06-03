@@ -16,6 +16,7 @@ using Core.Entities;
 using Core.Repositories.Globalizacao;
 using System.IO;
 using System.Web;
+using System.Web.Configuration;
 
 #endregion
 
@@ -43,7 +44,18 @@ namespace Sistema.Controllers
             suporteRepository = new SuporteRepository(context);
             idiomaRepository = new IdiomaRepository(context);
 
-            PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), ConfiguracaoHelper.GetString("PASTA_SUPORTE_ANEXOS"));
+            if (WebConfigurationManager.AppSettings["Ambiente"] == "dev")
+            {
+                PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), "d\\");
+            }
+            else if (WebConfigurationManager.AppSettings["Ambiente"] == "homol")
+            {
+                PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), "h\\");
+            }
+            else
+            {
+                PathImages = Path.Combine(ConfiguracaoHelper.GetString("CAMINHO_FISICO"), "p\\");
+            }
 
             Localizacao();
         }
@@ -185,7 +197,6 @@ namespace Sistema.Controllers
             return View(suporte);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Ler(int id, FormCollection form)
@@ -282,6 +293,7 @@ namespace Sistema.Controllers
         {
             var fileName = string.Empty;
             var guid = Guid.Empty;
+            Localizacao();
 
             try
             {
@@ -299,16 +311,27 @@ namespace Sistema.Controllers
                     HttpPostedFileBase file = Request.Files[i]; //Uploaded file
                                                                 //Use the following properties to get file's name, size and MIMEType
                     int fileSize = file.ContentLength;
-                    fileName = file.FileName;
-                    string mimeType = file.ContentType;
-                    System.IO.Stream fileContent = file.InputStream;
-                    //To save file, use SaveAs method
+                    fileName = file.FileName.ToLower();
+                    if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg"))
+                    {
+                        string mimeType = file.ContentType;
+                        System.IO.Stream fileContent = file.InputStream;
+                        //To save file, use SaveAs method
 
-                    string pathAndFile = Path.Combine(path, fileName);
+                        string pathAndFile = Path.Combine(path, fileName);
 
-                    file.SaveAs(pathAndFile); //File will be saved in application root
+                        file.SaveAs(pathAndFile); //File will be saved in application root
+                    }
+                    else
+                    {
+                        Response.ClearHeaders();
+                        Response.ClearContent();
+                        Response.Status = "503 ServiceUnavailable";
+                        Response.StatusCode = 503;
+                        Response.StatusDescription = traducaoHelper["IMAGENS_PERMITIDAS"];
+                        return null;
+                    }
                 }
-
             }
             catch (Exception ex)
             {
