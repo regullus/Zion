@@ -1870,70 +1870,73 @@ namespace Sistema.Controllers
                         {
                             log = "retMaster retIndicados = OK";
                             retorno = tabuleiroRepository.InformarRecebimento(idUsuarioConvidado, idUsuarioPag, idBoard);
-                            log = "InformarRecebimento: " + retorno;
-                            switch (retorno)
+                            if (retorno == "OK")
                             {
-                                case "OK":
-                                    log = "lancamentos";
-                                    TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
-                                    Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
-                                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
+                                log = "InformarRecebimento: " + retorno;
+                                switch (retorno)
+                                {
+                                    case "OK":
+                                        log = "lancamentos";
+                                        TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoard(idTabuleiro);
+                                        Usuario usuarioConvidado = usuarioRepository.Get(idUsuarioConvidado);
+                                        TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuarioConvidado, idBoard);
 
-                                    //Efetuar Credito no Master
-                                    var lancamento = new Lancamento();
-                                    lancamento.UsuarioID = idUsuarioPag;
-                                    lancamento.Tipo = Lancamento.Tipos.Credito;
-                                    lancamento.ReferenciaID = lancamento.UsuarioID;
-                                    lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuarioConvidado.Apelido.ToLower());
-                                    lancamento.DataLancamento = App.DateTimeZion;
-                                    lancamento.DataCriacao = App.DateTimeZion;
-                                    lancamento.ContaID = 7; //Transferencia
-                                    lancamento.CategoriaID = 7; //Transferencia
-                                    lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                                    lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                                    lancamentoRepository.Save(lancamento);
+                                        //Efetuar Credito no Master
+                                        var lancamento = new Lancamento();
+                                        lancamento.UsuarioID = idUsuarioPag;
+                                        lancamento.Tipo = Lancamento.Tipos.Credito;
+                                        lancamento.ReferenciaID = lancamento.UsuarioID;
+                                        lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuarioConvidado.Apelido.ToLower());
+                                        lancamento.DataLancamento = App.DateTimeZion;
+                                        lancamento.DataCriacao = App.DateTimeZion;
+                                        lancamento.ContaID = 7; //Transferencia
+                                        lancamento.CategoriaID = 7; //Transferencia
+                                        lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                                        lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                                        lancamentoRepository.Save(lancamento);
 
-                                    //Efetuar Debito no Convidado
-                                    lancamento = new Lancamento();
-                                    lancamento.UsuarioID = idUsuarioConvidado;
-                                    lancamento.Tipo = Lancamento.Tipos.Debito;
-                                    lancamento.ReferenciaID = lancamento.UsuarioID;
-                                    lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuario.Apelido.ToLower());
-                                    lancamento.DataLancamento = App.DateTimeZion;
-                                    lancamento.DataCriacao = App.DateTimeZion;
-                                    lancamento.ContaID = 7; //Transferencia
-                                    lancamento.CategoriaID = 7; //Transferencia
-                                    lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                                    lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
-                                    lancamentoRepository.Save(lancamento);
+                                        //Efetuar Debito no Convidado
+                                        lancamento = new Lancamento();
+                                        lancamento.UsuarioID = idUsuarioConvidado;
+                                        lancamento.Tipo = Lancamento.Tipos.Debito;
+                                        lancamento.ReferenciaID = lancamento.UsuarioID;
+                                        lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper[tabuleiroBoard.Nome].ToLower(), " - ", usuario.Apelido.ToLower());
+                                        lancamento.DataLancamento = App.DateTimeZion;
+                                        lancamento.DataCriacao = App.DateTimeZion;
+                                        lancamento.ContaID = 7; //Transferencia
+                                        lancamento.CategoriaID = 7; //Transferencia
+                                        lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                                        lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Transferencia);
+                                        lancamentoRepository.Save(lancamento);
 
-                                    //Chama incluir no tabuleiro para ver se 
-                                    //o tabuleiro esta completo
-                                    log = "IncluiTabuleiro Completo";
-                                    string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
-                                    
-                                    log = "IncluiTabuleiro: " + tabuleiroIncluir;
-                                    if (tabuleiroIncluir == "COMPLETO")
-                                    {
-                                        string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
-                                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                                        retorno = "COMPLETO";
-                                    }
-                                    else
-                                    {
-                                        string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
-                                        Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
-                                    }
+                                        //Chama incluir no tabuleiro para ver se 
+                                        //o tabuleiro esta completo
+                                        log = "IncluiTabuleiro Completo";
+                                        string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuarioConvidado, idUsuario, tabuleiroBoard.ID, "Completa");
 
-                                    break;
-                                case "NOOK":
-                                    string[] strMensagemParam4 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
-                                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
-                                default:
-                                    string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
-                                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
-                                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                                        log = "IncluiTabuleiro: " + tabuleiroIncluir;
+                                        if (tabuleiroIncluir == "COMPLETO")
+                                        {
+                                            string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_1"], traducaoHelper["MENSAGEM_TABULEIRO_COMPLETO_2"] };
+                                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                                            retorno = "COMPLETO";
+                                        }
+                                        else
+                                        {
+                                            string[] strMensagem = new string[] { traducaoHelper["RECEBIMENTO_CONFIMADO_COM_SUCESSO"] };
+                                            Mensagem(traducaoHelper["SUCESSO"], strMensagem, "msg");
+                                        }
+
+                                        break;
+                                    case "NOOK":
+                                        string[] strMensagemParam4 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
+                                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                                    default:
+                                        string[] strMensagemParam5 = new string[] { traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"] };
+                                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam5, "ale");
+                                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["RECEBIMENTO_NAO_CONFIMADO"]);
+                                }
                             }
                         }
                         else

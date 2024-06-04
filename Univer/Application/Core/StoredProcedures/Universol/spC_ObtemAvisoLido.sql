@@ -1,4 +1,4 @@
-Use univerDev
+Use univer
 go
 If Exists (Select 'Sp' From sysobjects Where id = object_id('spC_ObtemAvisoLido'))
    Drop Procedure spC_ObtemAvisoLido
@@ -111,6 +111,6 @@ go
    Grant Exec on spC_ObtemAvisoLido To public
 go
 
-Exec spC_ObtemAvisoLido 2593
+Exec spC_ObtemAvisoLido @UsuarioID=2586,@AvisoID=1
 
 

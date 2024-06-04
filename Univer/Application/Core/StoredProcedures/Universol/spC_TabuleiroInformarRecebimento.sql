@@ -23,96 +23,111 @@ BEGIN
     Declare 
         @Count int,
         @MasterID int
-   
-    Update
-        rede.TabuleiroUsuario 
-    Set
-		PagoMaster = 'true',
-		InformePag = 'true',
-        ciclo = ciclo + 1,
-        UsuarioIDPag = @UsuarioPaiID
-    where 
-        UsuarioID = @UsuarioID and 
-        BoardID  = @BoardID 
-    
-    --Atualiza recebimento do Master
-    Select
-        @MasterID = MasterID
-    From
-        rede.TabuleiroUsuario (nolock)
-    Where
-        UsuarioID = @UsuarioID and 
-        BoardID  = @BoardID 
 
-	Update
-		rede.TabuleiroUsuario 
-	Set
-		TotalRecebimento = TotalRecebimento + 1
-    Where
-        UsuarioID = @MasterID and 
-        BoardID  = @BoardID 
-
-    if Exists (
-		Select 
-			'OK' 
-		From 
-			rede.TabuleiroUsuario (nolock)
-		Where 
-			UsuarioID = @MasterID and 
-			BoardID  = @BoardID and 
-			StatusID = 1
-		)
-    Begin
+    if not exists(
         Select 
-            @Count = TotalRecebimento
+            'OK' 
+        From 
+            rede.TabuleiroUsuario 
+        Where 
+            UsuarioID = @UsuarioID and 
+            BoardID  = @BoardID and
+            PagoMaster = 'true'
+    )
+    Begin
+        Update
+            rede.TabuleiroUsuario 
+        Set
+		    PagoMaster = 'true',
+		    InformePag = 'true',
+            ciclo = ciclo + 1,
+            UsuarioIDPag = @UsuarioPaiID
+        where 
+            UsuarioID = @UsuarioID and 
+            BoardID  = @BoardID 
+    
+        --Atualiza recebimento do Master
+        Select
+            @MasterID = MasterID
         From
             rede.TabuleiroUsuario (nolock)
         Where
-            MasterID = @MasterID and 
+            UsuarioID = @UsuarioID and 
             BoardID  = @BoardID 
 
-        if(@count>=4)
+	    Update
+		    rede.TabuleiroUsuario 
+	    Set
+		    TotalRecebimento = TotalRecebimento + 1
+        Where
+            UsuarioID = @MasterID and 
+            BoardID  = @BoardID 
+
+        if Exists (
+		    Select 
+			    'OK' 
+		    From 
+			    rede.TabuleiroUsuario (nolock)
+		    Where 
+			    UsuarioID = @MasterID and 
+			    BoardID  = @BoardID and 
+			    StatusID = 1
+		    )
         Begin
-            --Verifica se ja nao esta no proximo nivel
-            if not Exists (
-				Select 
-					'OK' 
-				From 
-					rede.TabuleiroUsuario (nolock) 
-				Where 
-					UsuarioID = @MasterID and 
-					BoardID  = @BoardID + 1
-				)
+            Select 
+                @Count = TotalRecebimento
+            From
+                rede.TabuleiroUsuario (nolock)
+            Where
+                MasterID = @MasterID and 
+                BoardID  = @BoardID 
+
+            if(@count>=4)
             Begin
-			    --Verifica se jah pagou o sistema
-				if Exists (
-					Select 
-						'OK' 
-					From 
-						rede.TabuleiroUsuario (nolock)
-					Where 
-						UsuarioID = @MasterID and 
-						BoardID  = @BoardID and
-						PagoSistema = 'true'
-					)
-				Begin
-					--Atualiza para criar o convite para o proximo nivel
-					Update
-						rede.TabuleiroUsuario
-					Set 
-						StatusID = 2, --Convite Proximo Nivel
-                        DataInicio = GetDate()
-					Where
-						UsuarioID = @MasterID and 
-						BoardID  = @BoardID + 1 and
-						PagoSistema = 'true' --tem q ter pago o sistema
-				End
+                --Verifica se ja nao esta no proximo nivel
+                if not Exists (
+				    Select 
+					    'OK' 
+				    From 
+					    rede.TabuleiroUsuario (nolock) 
+				    Where 
+					    UsuarioID = @MasterID and 
+					    BoardID  = @BoardID + 1
+				    )
+                Begin
+			        --Verifica se jah pagou o sistema
+				    if Exists (
+					    Select 
+						    'OK' 
+					    From 
+						    rede.TabuleiroUsuario (nolock)
+					    Where 
+						    UsuarioID = @MasterID and 
+						    BoardID  = @BoardID and
+						    PagoSistema = 'true'
+					    )
+				    Begin
+					    --Atualiza para criar o convite para o proximo nivel
+					    Update
+						    rede.TabuleiroUsuario
+					    Set 
+						    StatusID = 2, --Convite Proximo Nivel
+                            DataInicio = GetDate()
+					    Where
+						    UsuarioID = @MasterID and 
+						    BoardID  = @BoardID + 1 and
+						    PagoSistema = 'true' --tem q ter pago o sistema
+				    End
+                End
             End
         End
+
+        Select 'OK'
     End
-
-    Select 'OK'
-
+    Else
+    Begin
+        Select 'NOOK'
+    End
 End -- Sp
 
 go

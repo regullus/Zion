@@ -107,7 +107,8 @@ BEGIN
    From 
       #TAvisos A,
 	  Usuario.AvisoLido L (nolock)
-   Where A.ID = L.AvisoID
+   Where 
+        A.ID = L.AvisoID
 
    -- Retorna os dados
    Select Distinct 

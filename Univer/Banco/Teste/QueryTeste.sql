@@ -13,16 +13,14 @@ Update Autenticacao set PasswordHash = 'AFdh14qX3cC2KR5OLsCnYPVunVMzwAKzr2Z0r8Z0
 
 Declare @UsuarioID int, @BoardID int, @TabuleiroID int, @PatrocinadorID int, @MasterID int
 
-Select @UsuarioID = id from usuario.usuario where id > 2500 and apelido = 'gabi24'
+Select @UsuarioID = id from usuario.usuario where id > 2500 and apelido = 'cabralmoney2'
 
 Set @PatrocinadorID = @UsuarioID
 Set @BoardID = 1
-Set @TabuleiroID = 154
---Set @UsuarioID = 4820
+Set @TabuleiroID = 0
 
 --****************** Usuario ******************
 Select 'Usuario' Query, id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id = @UsuarioID
-Select 'Usuario' Query, id,login, apelido, PatrocinadorDiretoID  From usuario.usuario where id = 2736
 
 --****************** Tempo Usuario ******************
 --Select 'Tempo' Query, * from Rede.TabuleiroUltimoAcesso where UsuarioID = @UsuarioID
@@ -53,4 +51,10 @@ Select 'Tabuleiro' Query, * From Rede.Tabuleiro Where (Master = @UsuarioID Or Co
 --****************** REGRAS ******************
 --Exec spC_TabuleiroUsuarioRule @UsuarioID=@UsuarioID
 --Exec spC_TabuleiroMasterRule @UsuarioID=@UsuarioID, @BoardID=1
+
+--****************** LANCAMENTOS ******************
+--Select * from Financeiro.Lancamento Where UsuarioID = @UsuarioID
+
+--****************** ACESSO ******************
+--Select * From Rede.TabuleiroUltimoAcesso Where UsuarioID = @UsuarioID
 

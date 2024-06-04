@@ -1,15 +1,15 @@
 use UniverDev
 go
 declare @chave nvarchar(255), @TextoP nvarchar(255), @TextoE nvarchar(255), @TextoI nvarchar(255)
-select @chave = 'CICLO'
+select @chave = 'MARCAR_COMO_NAO_LIDO'
 Select * from Globalizacao.Traducao where chave like '%' + @chave + '%'
 
 delete Globalizacao.Traducao  where chave = @chave
 
 select 
-    @TextoP = 'Ciclo',
-	@TextoE = 'Ciclo',
-	@TextoI = 'Cycle'
+    @TextoP = 'Lido/Não Lido',
+	@TextoE = 'Leído/No leído',
+	@TextoI = 'Read/Unread'
 	
 --update Globalizacao.Traducao set Texto = @TextoP where chave = @chave and IdiomaID = 1
 --update Globalizacao.Traducao set Texto = @TextoE where chave = @chave and IdiomaID = 2
@@ -25,8 +25,8 @@ Select * from Globalizacao.Traducao where chave = @chave
 use UniverDev
 go
 declare @chaveC nvarchar(255), @dados nvarchar(255)
-select @chaveC = 'ADM_HOME_DASHBOARD_USUARIOS_ASSOCIACAO'
-select @dados = 'false'
+select @chaveC = 'MENU_OFFICE_AVISO'
+select @dados = 'true'
 --delete Sistema.Configuracao where chave = @chaveC 
 select * from Sistema.Configuracao where chave like '%' + @chaveC + '%'
 
