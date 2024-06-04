@@ -30,12 +30,14 @@ namespace Sistema.Controllers
         public Usuario usuario;
         public List<Idioma> idiomas;
         public Containers.UsuarioContainer usuarioContainer;
+        private AvisoRepository avisoRepository;
 
         public SecurityController(DbContext context)
         {
             repository = new PersistentRepository<T>(context);
             usuarioRepository = new UsuarioRepository(context);
             idiomaRepository = new IdiomaRepository(context);
+            avisoRepository = new AvisoRepository(context);
         }
 
         protected override IAsyncResult BeginExecuteCore(AsyncCallback callback, object state)
@@ -70,6 +72,20 @@ namespace Sistema.Controllers
                     usuarioContainer = new Containers.UsuarioContainer(usuario);
                     ViewBag.Usuario = usuario;
                     ViewBag.UsuarioContainer = usuarioContainer;
+
+                    if (ConfiguracaoHelper.GetString("MENU_OFFICE_AVISO").ToLower() == "true")
+                    {
+                        List<Core.Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos> listaAviso = avisoRepository.GetNaoLidosByUsuario(usuario.ID);
+
+                        if (listaAviso != null && listaAviso.Count() > 0)
+                        {
+                            ViewBag.Avisos = listaAviso;
+                        }
+                        else
+                        {
+                            ViewBag.Avisos = null;
+                        }
+                    }
                 }
                 catch (Exception)
                 {

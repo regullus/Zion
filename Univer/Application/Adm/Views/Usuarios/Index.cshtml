@@ -456,6 +456,7 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
+                        string celLimpo = item.Celular.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "").Replace("+", "");
                         <tr>
                             <td>
                                 @Html.ActionLink("Details", "Details", new { id = item.UsuarioID }, new { @class = "gridDetail", title = traducaoHelper["DETALHES"] + ":" + item.UsuarioID })
@@ -506,7 +507,7 @@
                                 @Html.DisplayFor(modelItem => item.Email)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Celular)
+                                @(item.Celular) <a class="whatsapp-link" href='https://api.whatsapp.com/send?phone=@(celLimpo)' target="_blank"><i class="fa fa-whatsapp"></i></a>
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => @traducaoHelper[item.Posicao])

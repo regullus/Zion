@@ -25,7 +25,20 @@ namespace Core.Repositories.Usuario
         {
             try
             {
-                var sql = string.Format("Exec spOC_US_ObtemAvisoNaoLidos {0}", usuarioID);
+                var sql = string.Format("Exec spC_ObtemAvisoNaoLidos {0}", usuarioID);
+                return _context.Database.SqlQuery<Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos>(sql).ToList();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public List<Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos> GetLidosByUsuario(int usuarioID, int avisoID)
+        {
+            try
+            {
+                var sql = string.Format("Exec spC_ObtemAvisoLido @UsuarioID={0}, @AvisoID={1}", usuarioID, avisoID);
                 return _context.Database.SqlQuery<Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos>(sql).ToList();
             }
             catch (Exception ex)
@@ -38,7 +51,7 @@ namespace Core.Repositories.Usuario
         {
             try
             {
-                var sql = string.Format("Exec spOC_US_ObtemAvisos {0}", usuarioID);
+                var sql = string.Format("Exec spC_ObtemAvisos {0}", usuarioID);
                 return _context.Database.SqlQuery<Models.StoredProcedures.spOC_US_ObtemAvisos>(sql).ToList();
             }
             catch (Exception ex)

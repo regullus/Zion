@@ -133,11 +133,6 @@ namespace Sistema.Controllers
             IList<Core.Models.StoredProcedures.spOC_US_ObtemAvisos> lista = null;
             lista = avisoRepository.GetByUsuario(Local.idUsuario);
 
-            //lista = db.Aviso;
-
-            //i<spOC_US_ObtemAvisoNaoLidos_Result> lista = null;
-            //lista = avisoRepository.GetByUsuario(Local.idUsuario, 1);
-
             if (lista != null)
             {
                 if (!String.IsNullOrEmpty(ProcuraTitulo))
@@ -184,33 +179,27 @@ namespace Sistema.Controllers
             return View(lista.ToPagedList(PageNumber, PageSize));
         }
 
-        //public ActionResult Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-        //    }
-        //    AvisoLido avisoLido = db.AvisoLido.Where(x => x.AvisoID == id).FirstOrDefault();
-        //    if (avisoLido == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-        //    return View(avisoLido);
-        //}
-
-        public ActionResult Ler(int? id, int avisoLido)
+        public ActionResult Ler(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Aviso aviso = db.Aviso.Find(id);
+
             if (aviso == null)
             {
                 return HttpNotFound();
             }
-
-            ViewBag.AvisoLido = (avisoLido == 1 ? true : false);
+            List<Core.Models.StoredProcedures.spOC_US_ObtemAvisoNaoLidos> listaAvisoLido = avisoRepository.GetLidosByUsuario(usuario.ID, id ?? 0);
+            if (listaAvisoLido != null)
+            {
+                ViewBag.AvisoLido = true;
+            }
+            else
+            {
+                ViewBag.AvisoLido = false;
+            }
 
             return View(aviso);
         }
@@ -275,18 +264,6 @@ namespace Sistema.Controllers
             
             return Json("OK");
         }
-
-
-        // POST: Filiais/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult DeleteConfirmed(int id)
-        //{
-        //    Aviso aviso = db.Aviso.Find(id);
-        //    db.Aviso.Remove(aviso);
-        //    db.SaveChanges();
-        //    return RedirectToAction("Index");
-        //}
 
         public ActionResult Reload()
         {       

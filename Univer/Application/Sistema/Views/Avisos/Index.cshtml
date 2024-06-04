@@ -137,8 +137,7 @@
                             <td>
                                 @if (item.DataLeitura != null)
                                 {
-                                    @Html.ActionLink("Ler", "Ler", new { id = item.ID, avisoLido = 1 }, new { @class = "gridEnvelopeAberto", title = traducaoHelper["LER"] })
-                                    @*@Html.ActionLink("Delete", "Delete", new { id = item.ID }, new { @class = "gridDelete", title = traducaoHelper["EXCLUIR"] })*@
+                                    @Html.ActionLink("Ler", "Ler", new { id = item.ID }, new { @class = "gridEnvelopeAberto", title = traducaoHelper["LER"] })
                                 }
                                 else
                                 {

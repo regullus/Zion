@@ -124,7 +124,7 @@ namespace Sistema.Controllers
         #endregion
 
         #region Actions
-        // GET: Filiais
+
         public ActionResult Index(string SortOrder, string CurrentProcuraTitulo, string ProcuraTitulo, int? NumeroPaginas, int? Page)
         {
             Localizacao();
@@ -201,8 +201,6 @@ namespace Sistema.Controllers
             return View(lista.ToPagedList(PageNumber, PageSize));
         }
 
-
-        // GET: Ativo/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -221,24 +219,12 @@ namespace Sistema.Controllers
             return View(aviso);
         }
 
-        //// GET: Ativo/Create
-        //public ActionResult Create()
-        //{
-        //    this.SetViewBag();
-
-        //    var aviso = new Aviso();
-        //    return View(aviso);
-        //}
-
         private void SetViewBag()
         {
             ViewBag.TipoID = new SelectList(db.AvisoTipo.Where(x => x.ID > 1), "ID", "Nome");
             ViewBag.IdiomaID = new SelectList(db.Idiomas, "ID", "Nome");
         }
 
-        // POST: Filiais/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind] Aviso aviso)
@@ -290,7 +276,6 @@ namespace Sistema.Controllers
             return View(aviso);
         }
 
-        // GET: Filiais/Edit/5
         public ActionResult Create(int? id)
         {
             this.SetViewBag();
@@ -334,33 +319,60 @@ namespace Sistema.Controllers
                 ViewBag.UsuariosIDs = usuariosIDs;
                 ViewBag.UsuariosJson = new JavaScriptSerializer().Serialize(usuariosIDs);
             }
-
         }
 
-
-
-        // GET: Filiais/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Ativo Ativo = db.Ativo.Find(id);
-            if (Ativo == null)
+            Aviso aviso = db.Aviso.Find(id);
+            if (aviso == null)
             {
                 return HttpNotFound();
             }
-            return View(Ativo);
+            return View(aviso);
         }
 
-        // POST: Filiais/Delete/5
+        public ActionResult Alterar(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            int avisoID = int.Parse(id);
+
+            AvisoLido avisoLido = db.AvisoLido.Where(x => x.AvisoID == avisoID).FirstOrDefault();
+            if (avisoLido == null)
+            {
+                avisoLido = new AvisoLido();
+                avisoLido.AvisoID = avisoID;
+                avisoLido.DataLeitura = Core.Helpers.App.DateTimeZion;
+                avisoLido.AvisoExcluido = false;
+                avisoLido.UsuarioID = Helpers.Local.idUsuario;
+
+                db.AvisoLido.Add(avisoLido);
+            }
+            else
+            {
+                db.AvisoLido.Remove(avisoLido);
+                db.SaveChanges();
+            }
+
+            db.SaveChanges();
+
+            return Json("OK");
+        }
+
+
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Ativo Ativo = db.Ativo.Find(id);
-            db.Ativo.Remove(Ativo);
+            Aviso aviso = db.Aviso.Find(id);
+            db.Aviso.Remove(aviso);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

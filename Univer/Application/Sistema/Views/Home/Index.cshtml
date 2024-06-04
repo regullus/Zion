@@ -108,6 +108,7 @@
     <link rel="stylesheet" href="~/Content/global/plugins/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700,900" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/global/plugins/bootstrap-toastr/toastr.min.css" />
     <link rel="stylesheet" href="~/Content/home/styles.css">
     <style>
         .container {
@@ -125,143 +126,49 @@
 }
 
 @section pageScripts {
-    @if (!ViewBag.RedeTabuleiro)
-    {
-        <script type="text/javascript">
-            $(document).ready(function () {
-                //$('.owl-carousel').owlCarousel({
-                //    items: 1,
-                //    loop: true,
-                //    margin: 10,
-                //    autoplay: true,
-                //    autoplayTimeout: 5000,
-                //    autoplayHoverPause: false,
-                //    dots: true,
-                //});
 
-                if ('@ViewBag.BolqueioRenovacao' == 'true') {
-                    blink("#bolqueioRenovacao");
-                }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var btnCopiarCadastro = $("#cadastroLinkCopiar");
+            var copiado = $("#copiado");
+            var copiadoTemp = 0;
+            copiado.hide();
+            btnCopiarCadastro.on('click', function () {
+                var el = document.createElement('textarea');
 
-                @*if ('@usuario.DataMigracao.HasValue' == 'True'  && '@Core.Helpers.ConfiguracaoHelper.GetString("EXIGI_MIGRACAO")' == 'true' ) {*@
-                if ('@usuarioContainer.PendenteMigracao' == 'True') {
-                    blink("#migracao");
-                }
+                el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)';
 
-                $(function () {
-                  $('[data-toggle="tooltip"]').tooltip({
-                    template: '<div class="tooltip md-tooltip" role="tooltip"><div class="tooltip-arrow md-arrow"></div><div class="tooltip-inner md-inner" style="font-size:medium; border-radius:5px!important;"></div></div>'
-                  })
-                })
+                el.setAttribute('readonly', '');
+                el.style = { position: 'absolute', left: '-9999px' };
+                document.body.appendChild(el);
 
-                var btnCopiarCadastro = $("#cadastroLinkCopiar");
-                var copiado = $("#copiado");
-                var copiadoTemp = 0;
-                copiado.hide();
+                el.select();
 
-                var btnCopiarLojaExterna = $("#lojaExternaLinkCopiar");
-                var copiadoLojaExterna = $("#copiadoLojaExterna");
-                var copiadoTempLojaExterna = 0;
-                copiadoLojaExterna.hide();
+                document.execCommand('copy');
 
-                btnCopiarCadastro.on('click', function () {
+                copiado.fadeIn();
+                clearTimeout(copiadoTemp);
+                copiadoTemp = setTimeout(function () { copiado.fadeOut(); }, 1000);
 
-                    var el = document.createElement('textarea');
-
-                    el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)';
-
-                    el.setAttribute('readonly', '');
-                    el.style = { position: 'absolute', left: '-9999px' };
-                    document.body.appendChild(el);
-
-                    el.select();
-
-                    document.execCommand('copy');
-
-                    copiado.fadeIn();
-                    clearTimeout(copiadoTemp);
-                    copiadoTemp = setTimeout(function () { copiado.fadeOut(); }, 1000);
-
-                    document.body.removeChild(el);
-                });
-
-                btnCopiarLojaExterna.on('click', function () {
-
-                    var el = document.createElement('textarea');
-
-                    el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("URL_SITE_LOJA") + Helpers.Local.nomeUsuario)';
-
-                    el.setAttribute('readonly', '');
-                    el.style = { position: 'absolute', left: '-9999px' };
-                    document.body.appendChild(el);
-
-                    el.select();
-
-                    document.execCommand('copy');
-
-                    copiadoLojaExterna.fadeIn();
-                    clearTimeout(copiadoTempLojaExterna);
-                    copiadoTempLojaExterna = setTimeout(function () { copiadoLojaExterna.fadeOut(); }, 1000);
-
-                    document.body.removeChild(el);
-                });
-
+                document.body.removeChild(el);
             });
-        </script>
 
-        <script type="text/javascript">
-            function blink(selector) {
-                setTimeout(function () {
-                    $(selector).fadeOut("slow", function () {
-                        $(this).fadeIn("slow", function () {
-                            blink(this); // recursive function will call after fadeIn finish
-                        });
-                    });
-
-                }, 500);
+            @if (ViewBag.Avisos != null)
+            {
+                <text>toastr.info('@traducaoHelper["VOCE_POSSUI_NOVOS_AVISOS"]');</text>
             }
-        </script>
-    }
-    else
-    {
-        <script type="text/javascript">
-            $(document).ready(function () {
 
-                var btnCopiarCadastro = $("#cadastroLinkCopiar");
-                var copiado = $("#copiado");
-                var copiadoTemp = 0;
-                copiado.hide();
-
-                btnCopiarCadastro.on('click', function () {
-
-                    var el = document.createElement('textarea');
-
-                    el.value = '@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)';
-
-                    el.setAttribute('readonly', '');
-                    el.style = { position: 'absolute', left: '-9999px' };
-                    document.body.appendChild(el);
-
-                    el.select();
-
-                    document.execCommand('copy');
-
-                    copiado.fadeIn();
-                    clearTimeout(copiadoTemp);
-                    copiadoTemp = setTimeout(function () { copiado.fadeOut(); }, 1000);
-
-                    document.body.removeChild(el);
-                });
-
-
-            });
-        </script>
-
-    }
+        });
+    </script>
 
     <script type="text/javascript" src="~/Content/scripts/jquery.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Content/scripts/countUp.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/Content/global/plugins/jquery.pulsate.min.js" type="text/javascript"></script>
+    <script src="~/Content/global/plugins/jquery-bootpag/jquery.bootpag.min.js" type="text/javascript"></script>
+    <script src="~/Content/pages/scripts/ui-general.min.js" type="text/javascript"></script>
+    <script src="~/Content/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
 }
 
 @section PageLevelScripts{
@@ -360,7 +267,7 @@ else
                     <div class="col-md-7">
                         <div class="input-group">
                             <input type="text" id="cadastroLinkURL" data-provide="typeahead" disabled class="form-control" placeholder="" value="@(Core.Helpers.ConfiguracaoHelper.GetString("DOMINIO") + "p/" + Helpers.Local.nomeUsuario)">
-                            <span class="input-group-btn" style="padding-left: 10px;" >
+                            <span class="input-group-btn" style="padding-left: 10px;">
                                 <input class="btn btn-info" id="cadastroLinkCopiar" value="@traducaoHelper["COPIAR"]">
                             </span>
                         </div>

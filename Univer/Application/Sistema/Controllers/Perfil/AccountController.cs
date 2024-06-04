@@ -285,8 +285,8 @@ namespace Sistema.Controllers
                     strErro = "blnAtivo";
                     if (blnAtivo)
                     {
-
                         #region Usuario
+
                         strErro = "Usuario";
                         //Checa se usuario existe
                         var context = new YLEVELEntities();

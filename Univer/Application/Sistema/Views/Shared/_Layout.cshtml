@@ -159,46 +159,45 @@
                             </li>
 
                             <!-- BEGIN NOTIFICATION DROPDOWN -->
-                            @*@if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_AVISO"))
-                                {
-                                    <li class="dropdown dropdown-extended dropdown-notification dropdown-dark" id="header_notification_bar">
-                                        @if (avisos != null && avisos.Count > 0)
-                                        {
-                                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                                <i class="icon-bell"></i>
-                                                <span class="badge badge-success"> @avisos.Count </span>
-                                            </a>
+                            @if (Core.Helpers.ConfiguracaoHelper.GetBoolean("MENU_OFFICE_AVISO"))
+                            {
+                                <li class="dropdown dropdown-extended dropdown-notification dropdown-dark" id="header_notification_bar">
+                                    @if (avisos != null)
+                                    {
+                                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                            <i class="icon-bell"></i>
+                                            <span class="badge badge-success"> @avisos.Count </span>
+                                        </a>
 
-                                            <ul class="dropdown-menu">
-                                                <li class="external">
-                                                    <h3>
-                                                        <span class="bold">@avisos.Count</span> @traducaoHelper["AVISOS_NAO_LIDOS"]
-                                                    </h3>*@
-                            @*<a href="page_user_profile_1.html">view all</a>*@
-                            @*</li>
-                                                <li>
-                                                    <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
-                                                        @foreach (var aviso in avisos)
-                                                        {
-                                                            <li>
-                                                                <a href="@Url.Action("index", "avisos")">
-                                                                    <span class="details">
-                                                                        <span class="label label-sm label-icon label-info">
-                                                                            <i class="fa fa-envelope"></i>
-                                                                        </span> @aviso.Titulo
-                                                                    </span>
-                                                                </a>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                        }
-                                    </li>
-
-                                }*@
+                                        <ul class="dropdown-menu">
+                                            <li class="external">
+                                                <h3>
+                                                    <span class="bold">@avisos.Count</span> @traducaoHelper["AVISOS_NAO_LIDOS"]
+                                                </h3>
+                                                <a href="page_user_profile_1.html">view all</a>
+                                            </li>
+                                            <li>
+                                                <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
+                                                    @foreach (var aviso in avisos)
+                                                    {
+                                                        <li>
+                                                            <a href="@Url.Action("index", "avisos")">
+                                                                <span class="details">
+                                                                    <span class="label label-sm label-icon label-info">
+                                                                        <i class="fa fa-envelope"></i>
+                                                                    </span> @aviso.Titulo
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    }
+                                </li>
+                            }
                             <!-- END NOTIFICATION DROPDOWN -->
-
+                            
                             <li class="dropdown dropdown-extended dropdown-notification dropdown-dark">
                                 <a class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <i class="fa fa-clock-o" title="@traducaoHelper["DATA_HORA_PAIS"]"></i> <small style="font-size: 14px; font-weight: 700" id="datahora"></small>
@@ -217,8 +216,8 @@
                                             {
                                                 @Helpers.Local.nomeUsuario
                                             }
-                                            </span>
-                                    </a>    
+                                        </span>
+                                    </a>
                                 </li>
                             }
                             <!-- END USER LOGIN DROPDOWN -->
@@ -256,6 +255,7 @@
 
                     <div class="profile-usermenu margem-0 padding-lateral-10">
                         <ul class="nav margem-0 padding-0 ">
+
                             <li>
                                 <span class="text-primary sizetxtuser">
                                     <i class="icon-star"></i>
@@ -347,7 +347,7 @@
     <!-- BEGIN MSG -->
     <div id="modMsg" class="modal fade modalPosition" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" >
+            <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                     <h4 class="modal-title">@ViewBag.PopupTitle</h4>

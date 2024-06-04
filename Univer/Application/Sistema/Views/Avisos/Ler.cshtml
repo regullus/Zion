@@ -31,53 +31,53 @@
 
     <script type="text/javascript">
 
-         function Alterar() {
-         swal({
-            title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
-            text: '@Html.Raw( (blnLido ? traducaoHelper["MARCAR_COMO_NAO_LIDO"] : traducaoHelper["MARCAR_COMO_LIDO"]) )',
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
-            cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
-            closeOnConfirm: false,
-            closeOnCancel: false
-         },
-         function (isConfirm) {
-            if (isConfirm) {
-               var cod = '@Model.ID';
-               $.ajax({
-                  url: '@Url.Action("Alterar")',
-                  type: 'POST',
-                  data: { 'id': cod },
-                  success: function (data) {
-                     if (data == 'OK') {
-                        swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])', 'success');
-                        swal({
-                           title: '@Html.Raw(traducaoHelper["SUCESSO"])',
-                           text: '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])',
-                           type: 'success'
-                        },
-                        function (isConfirm) {
-                           if (isConfirm) {
-                              window.location.href = "@Url.Action("index", "Avisos")";
-                           }
-                        });
-                     }
-                     else {
-                        swal('@Html.Raw(traducaoHelper["ERRO"] + " 1")', data, 'error');
-                     }
-                  },
-                  error: function (data) {
-                     swal('@Html.Raw(traducaoHelper["ERRO"] + " 2")', data, 'error');
-                  }
-               });
-            } else {
-               swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
-            };
-         });
-    };
+        function Alterar() {
+             swal({
+                title: '@Html.Raw(traducaoHelper["TEM_CERTEZA"])',
+                text: '@Html.Raw( (blnLido ? traducaoHelper["MARCAR_COMO_NAO_LIDO"] : traducaoHelper["MARCAR_COMO_LIDO"]) )',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '@Html.Raw(traducaoHelper["SIM"])',
+                cancelButtonText: '@Html.Raw(traducaoHelper["NAO"])',
+                closeOnConfirm: false,
+                closeOnCancel: false
+             },
+             function (isConfirm) {
+                if (isConfirm) {
+                   var cod = '@Model.ID';
+                   $.ajax({
+                      url: '@Url.Action("Alterar")',
+                      type: 'POST',
+                      data: { 'id': cod },
+                      success: function (data) {
+                         if (data == 'OK') {
+                            swal('@Html.Raw(traducaoHelper["SUCESSO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])', 'success');
+                            swal({
+                               title: '@Html.Raw(traducaoHelper["SUCESSO"])',
+                               text: '@Html.Raw(traducaoHelper["SOLICITACAO_EFETUADA_SUCESSO"])',
+                               type: 'success'
+                            },
+                            function (isConfirm) {
+                               if (isConfirm) {
+                                  window.location.href = "@Url.Action("index", "Avisos")";
+                               }
+                            });
+                         }
+                         else {
+                            swal('@Html.Raw(traducaoHelper["ERRO"] + " 1")', data, 'error');
+                         }
+                      },
+                      error: function (data) {
+                         swal('@Html.Raw(traducaoHelper["ERRO"] + " 2")', data, 'error');
+                      }
+                   });
+                } else {
+                   swal('@Html.Raw(traducaoHelper["CANCELADO"])', '@Html.Raw(traducaoHelper["SOLICITACAO_CANCELADA"])', 'error');
+                };
+             });
+        };
 
     function Excluir() {
          swal({
