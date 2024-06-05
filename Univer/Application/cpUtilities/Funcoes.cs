@@ -2567,7 +2567,7 @@ namespace cpUtilities
                 }
                 catch (Exception ex)
                 {
-                    LoggerHelper.WriteFile("ERROR DEScriptografar1 (" + text + ") : " + ex.Message, "CriptografiaHelper");
+                    LoggerHelper.WriteFile("ERROR DEScriptografar1.1 (" + text + ") : " + ex.Message, "CriptografiaHelper");
                     return text;
                 }
                 finally
@@ -2579,7 +2579,7 @@ namespace cpUtilities
             }
             catch (Exception e)
             {
-                LoggerHelper.WriteFile("ERROR DEScriptografar2 (" + text + ") : " + e.Message, "CriptografiaHelper");
+                LoggerHelper.WriteFile("ERROR DEScriptografar2.1 (" + text + ") : " + e.Message, "CriptografiaHelper");
                 return text;
             }
         }
