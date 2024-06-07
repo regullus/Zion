@@ -5,11 +5,11 @@ go
 --Delete Rede.TabuleiroUltimoAcesso
 
 /*
-Update Usuario.usuario set senha = 'YWbWJ3CI34EG1FB1eU6Ryg==' where id>2586
-Update Autenticacao set PasswordHash = 'AFdh14qX3cC2KR5OLsCnYPVunVMzwAKzr2Z0r8Z0+oRYezufFNVs+WM+y4tWXMsk4w==', SecurityStamp = '95c37d77-4bab-4b44-827f-b7a72a2a73db' where id>2586
+Update Usuario.usuario set senha = 'YWbWJ3CI34EG1FB1eU6Ryg==' where id>2001
+Update Autenticacao set PasswordHash = 'AFdh14qX3cC2KR5OLsCnYPVunVMzwAKzr2Z0r8Z0+oRYezufFNVs+WM+y4tWXMsk4w==', SecurityStamp = '95c37d77-4bab-4b44-827f-b7a72a2a73db' where id>2001
 */
-
---Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id = 2584
+select * from Usuario.usuario
+--Select id,login, apelido, PatrocinadorDiretoID from usuario.usuario where id = 2579
 
 Declare @UsuarioID int, @BoardID int, @TabuleiroID int, @PatrocinadorID int, @MasterID int
 
