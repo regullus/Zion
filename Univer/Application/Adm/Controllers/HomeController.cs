@@ -5,10 +5,13 @@
 
     using Core.Entities;
     using Core.Helpers;
+    using Core.Models;
+    using Core.Repositories.Rede;
     using Core.Repositories.Usuario;
     using Helpers;
     using Sistema.Constants;
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.Entity;
     using System.Threading;
@@ -26,17 +29,17 @@
         private double cdblLongitude = 0;
         private YLEVELEntities db = new YLEVELEntities();
         private Core.Helpers.TraducaoHelper traducaoHelper;
-
+        private TabuleiroRepository tabuleiroRepository;
+        
         #endregion
 
         #region Core
 
-        private UsuarioAssociacaoRepository usuarioAssociacaoRepository;
+
 
         public HomeController(DbContext context)
         {
-            usuarioAssociacaoRepository = new UsuarioAssociacaoRepository(context);
-
+            tabuleiroRepository = new TabuleiroRepository(context);
             Localizacao();
         }
 
@@ -157,7 +160,6 @@
         [AllowAnonymous]
         public ActionResult Index(string login)
         {
-
             #region Funcoes
             //Verifica se a msg em popup para ser exibido na view
             obtemMensagem();
@@ -200,17 +202,13 @@
                 //var usuariosNivel = usuarioAssociacaoRepository.ObtemListaTotalUsuarioAssociacao();
                 ViewBag.UsuariosNivel = null; // Json(usuariosNivel);
             }
-            if (Core.Helpers.ConfiguracaoHelper.GetBoolean("ADM_HOME_DASHBOARD_EVOLUCAO_USUARIOS_ASSOCIADOS"))
-            {
-                var usuariosAssocDia = usuarioAssociacaoRepository.ObtemListaTotalUsuarioAssociadosDia(App.DateTimeZion.ToString("yyyyMMdd"));
-                ViewBag.UsuariosAssocDia = Json(usuariosAssocDia);
-                ViewBag.UsuariosAssocDiaPer = App.DateTimeZion.ToString("MMM/yyyy");
-            }
+
+            IEnumerable<UsuariosPaisesModel> usuariosPaises = tabuleiroRepository.ObtemUsuariosPaises();
+            ViewBag.UsuariosPaises = usuariosPaises;
 
             return View();
         }
 
         #endregion
-
     }
 }

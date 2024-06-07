@@ -23,15 +23,26 @@
     };
 
     var traducaoHelper = (Core.Helpers.TraducaoHelper)ViewBag.TraducaoHelper;
-    var usuariosNivel = ViewBag.UsuariosNivel;
-    var usuariosAssocDia = ViewBag.UsuariosAssocDia;
-    var usuariosAssocDiaPer = ViewBag.UsuariosAssocDiaPer;
+
+    IEnumerable<Core.Models.UsuariosPaisesModel> usuariosPaises = (IEnumerable<Core.Models.UsuariosPaisesModel>)ViewBag.UsuariosPaises;
 
     #endregion
 
 }
 
-@section pageStyles {}
+@section pageStyles {
+    <style>
+    .container {
+        @*background: url('@Url.Content("~/Arquivos/banners/" + Helpers.Local.Sistema + "//logo-vertical.png?v=" + @Helpers.Local.Versao)') no-repeat center  ;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        min-height: 1024px;*@
+        max-width: 1000px;
+    }
+    </style>
+}
 
 @section head {}
 
@@ -39,68 +50,6 @@
 
 @section PageLevelScripts{
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-    <script type="text/javascript">
-
-        if ('@usuariosNivel' != null) {
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(drawChartUsuariosNivel);
-        }
-        function drawChartUsuariosNivel() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Nivel');
-            data.addColumn('number', 'Qtde');
-
-            var dados = JSON.parse('@Html.Raw(Json.Encode(@usuariosNivel))')
-            var total = 0;
-
-            for (var i = 0; i < dados.Data.length; i++) {
-                data.addRow([dados.Data[i].Name, dados.Data[i].Value]);
-                total = total + dados.Data[i].Value;
-            }
-
-            var options = {
-                title: '@traducaoHelper["TOTAL_USUARIOS"]' +  ' ' + total,
-                legend: 'bottom',
-                is3D: true,
-            };
-
-            var chart = new google.visualization.PieChart(document.getElementById('chartUsuarioNivel'));
-            chart.draw(data, options);
-        }
-
-
-        if ('@usuariosAssocDiaPer' != null) {
-            google.charts.load('current', { 'packages': ['line'] });
-            google.charts.setOnLoadCallback(drawChartUsuariosAssocDia);
-        }
-        function drawChartUsuariosAssocDia() {
-
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', '@usuariosAssocDiaPer' );
-            data.addColumn('number', '');
-
-            var dados = JSON.parse('@Html.Raw(Json.Encode(@usuariosAssocDia))')
-
-            for (var i = 0; i < dados.Data.length; i++) {
-                data.addRow([dados.Data[i].Name, dados.Data[i].Value]);
-            }
-
-            var options = {
-                //chart: {
-                //    title: 'Box Office Earnings in First Two Weeks of Opening',
-                //    //subtitle: 'in millions of dollars (USD)'
-                //},
-
-                //width: 900,
-                //height: 500
-            };
-
-            var chart = new google.charts.Line(document.getElementById('linechart_material'));
-            chart.draw(data, google.charts.Line.convertOptions(options));
-        };
-
-    </script>
 }
 
 @section jQueryRead {}
@@ -115,17 +64,11 @@
                         <h2>@ViewBag.Title</h2>
                     </div>
                 </div>
-                <div class="column col-md-2">
-                    <div class="page-title">
-                        <span id="minutes" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
-                        <span id="pontos" class="hidden" style="font-size: 18px; font-weight: 500;">:</span>
-                        <span id="seconds" class="hidden" style="font-size: 18px; font-weight: 500;">00</span>
-                    </div>
-                </div>
             </div>
 
             <!-- END PAGE TITLE -->
         </div>
+
         <ul class="page-breadcrumb breadcrumb">
             <li>
                 <a href="@Url.Action("Index", "Home")">home</a>
@@ -138,5 +81,40 @@
                 <a href="" class="txtTitle"></a>
             </li>
         </ul>
+    </div>
+</div>
+
+<div class="portlet solid grey-cararra container">
+    <div class="portlet-title">
+        <div class="caption">@traducaoHelper["USUARIOS"] / @traducaoHelper["PAIS"]</div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse grey" title="@traducaoHelper["FECHAR"]" />
+        </div>
+        <div class="actions">
+            <a href='#'>&nbsp;</a>
+            <label>&nbsp;</label>
+        </div>
+    </div>
+    <div class="portlet-body content">
+        <table class="table table-striped table-bordered table-hover" style="background-color: #eee;">
+            <thead>
+                <tr>
+                    <th>@traducaoHelper["TOTAL"]</th>
+                    <th>@traducaoHelper["PAIS"]</th>
+                    <th>IDIOMA</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                @foreach (var item in usuariosPaises)
+                {
+                    <tr>
+                        <td>@item.Total</td>
+                        <td>@item.Nome</td>
+                        <td>@item.Idioma</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

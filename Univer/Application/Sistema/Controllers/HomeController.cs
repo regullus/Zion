@@ -253,7 +253,7 @@
                 #endregion
 
                 #region ViewBags
-               
+
                 #endregion
 
             }
@@ -264,129 +264,106 @@
             return View();
         }
 
-        public ActionResult Dashboar()
+        public ActionResult MediaTron()
         {
-            #region Funcoes
-            //Verifica se a msg em popup para ser exibido na view
-            obtemMensagem();
-            #endregion
-
-            ViewBag.RedeBinaria = (Core.Helpers.ConfiguracaoHelper.GetString("REDE_BINARIA") == "true");
-
-            ViewBag.DashboardPontos = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_PONTOS") == "true");
-            ViewBag.DashboardSaldo = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_SALDO") == "true");
-            ViewBag.DashboardContatos = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_CONTATOS_PENDENTES") == "true");
-            ViewBag.DashboardUsuarios = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_USUARIOS") == "true");
-            ViewBag.DashboardAtivos = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_ATIVOS") == "true");
-            ViewBag.DashboardBinAcumulado = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_BINARIO_ACUMULADO") == "true");
-            ViewBag.DashboardBinDiario = (Core.Helpers.ConfiguracaoHelper.GetString("HOME_DASHBOARD_BINARIO_DIARIO") == "true");
-
-            //ViewBag.Associacoes = associacaoRepository.GetAll();
-            ViewBag.Classificacoes = classificacaoRepository.GetAll();
-            ViewBag.Categorias = categoriaRepository.GetByTipo(Core.Entities.Lancamento.Tipos.Bonificacao);
-            // AdamastorVer  ViewBag.Filiais = filialRepository.GetAll();
-            ViewBag.AtivoMensal = usuarioRepository.GetAtivoMensal(usuario.ID);
-
-            #region Usuario
-
-            var statusAssociado = Core.Entities.Usuario.TodosStatus.Associado.GetHashCode();
-            var usuarioEsquerda = usuarioRepository.GetByExpression(u => u.Assinatura == usuario.Assinatura + "0").FirstOrDefault();
-            var usuarioDireta = usuarioRepository.GetByExpression(u => u.Assinatura == usuario.Assinatura + "1").FirstOrDefault();
-            var idUsuarioEsquerda = usuarioEsquerda != null ? usuarioEsquerda.ID : 0;
-            var idUsuarioDireita = usuarioDireta != null ? usuarioDireta.ID : 0;
-
-            var usuarioIDsEsquerda = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado).Select(u => u.ID);
-            var usuarioIDsDireita = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado).Select(u => u.ID);
-            var qtdeEsquerdo = usuarioIDsEsquerda.Count();
-            var qtdeDireito = usuarioIDsDireita.Count();
-            var qtdeTotal = qtdeEsquerdo + qtdeDireito;
-            ViewBag.RedeEsquerdo = qtdeEsquerdo;
-            ViewBag.RedeDireito = qtdeDireito;
-            ViewBag.RedeTotal = qtdeTotal;
-
-            #endregion
-
-            #region Quantidades
-
-            // AdamastorVer double _PONTUACAO_NIVEL_1 = produtoRepository.Bonificacao("Kit Promocional");
-            // AdamastorVer double _PONTUACAO_NIVEL_2 = produtoRepository.Bonificacao("Kit Adesão 1");
-            // AdamastorVer double _PONTUACAO_NIVEL_3 = produtoRepository.Bonificacao("Kit Adesão 2");
-            // AdamastorVer double _PONTUACAO_NIVEL_4 = produtoRepository.Bonificacao("Kit Adesão 3");
-            // AdamastorVer double _PONTUACAO_NIVEL_5 = produtoRepository.Bonificacao("");
-
-            // var hoje = new DateTime(App.DateTimeZion.Year, App.DateTimeZion.Month, App.DateTimeZion.Day, 0, 0, 0, 0);
-            // AdamastorVer var bronzeEsquerdaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 2 && usuarioIDsEsquerda.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioEsquerda).Count();
-            // AdamastorVer var bronzeDireitaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 2 && usuarioIDsDireita.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioDireita).Count();
-            // AdamastorVer var silverEsquerdaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 3 && usuarioIDsEsquerda.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioEsquerda).Count();
-            // AdamastorVer var silverDireitaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 3 && usuarioIDsDireita.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioDireita).Count();
-            // AdamastorVer var goldEsquerdaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 4 && usuarioIDsEsquerda.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioEsquerda).Count();
-            // AdamastorVer var goldDireitaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 4 && usuarioIDsDireita.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioDireita).Count();
-            // AdamastorVer var goldPlusEsquerdaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 5 && usuarioIDsEsquerda.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioEsquerda).Count();
-            // AdamastorVer var goldPlusDireitaHoje = usuarioAssociacaoRepository.GetByExpression(a => a.Data >= hoje && a.NivelAssociacao == 5 && usuarioIDsDireita.Contains(a.UsuarioID) && a.UsuarioID != idUsuarioDireita).Count();
-
-            // AdamastorVer ViewBag.PontuacaoEsquerdoHoje = (bronzeEsquerdaHoje * _PONTUACAO_NIVEL_2) + (silverEsquerdaHoje * _PONTUACAO_NIVEL_3) + (goldEsquerdaHoje * _PONTUACAO_NIVEL_4) + (goldPlusEsquerdaHoje * _PONTUACAO_NIVEL_5);
-            // AdamastorVer ViewBag.PontuacaoDireitoHoje = (bronzeDireitaHoje * _PONTUACAO_NIVEL_2) + (silverDireitaHoje * _PONTUACAO_NIVEL_3) + (goldDireitaHoje * _PONTUACAO_NIVEL_4) + (goldPlusDireitaHoje * _PONTUACAO_NIVEL_5);
-
-            /*MELHORAR ISSO!*/
-            //var AdamastorVer qtdeEsquerdo1 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 1).Count();
-            //var AdamastorVer qtdeDireito1 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 1).Count();
-
-            //var AdamastorVer qtdeEsquerdo2 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 2).Count();
-            //var AdamastorVer qtdeDireito2 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 2).Count();
-
-            //var AdamastorVer qtdeEsquerdo3 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 3).Count();
-            //var AdamastorVer qtdeDireito3 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 3).Count();
-
-            //var AdamastorVer qtdeEsquerdo4 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 4).Count();
-            //var AdamastorVer qtdeDireito4 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 4).Count();
-
-            //var AdamastorVer qtdeEsquerdo5 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "0") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 5).Count();
-            //var AdamastorVer qtdeDireito5 = usuarioRepository.GetByExpression(u => u.Assinatura.StartsWith(usuario.Assinatura + "1") && u.GeraBonus == true && u.RecebeBonus == true && u.StatusID == statusAssociado && u.NivelAssociacao == 5).Count();
-
-            var statusPago = (int)Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago;
-            var pagamentos = pedidoPagamentoRepository.GetByExpression(p => p.Pedido.Usuario.GeraBonus == true && p.Pedido.Usuario.RecebeBonus == true && p.PedidoPagamentoStatus.FirstOrDefault(s => s.StatusID == statusPago) != null && p.Pedido.Usuario.Assinatura.StartsWith(usuario.Assinatura));
-            double acumuladoBonusEsquerda = 0;
-
-            try //Para caso de null - valor fica zero
+            //id da empresa Prospera (4) no MediaTron 
+            string strIdEmpresa = "4";
+            //URL do sistema mediatron
+            string strURL = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_ADM_URL");
+            //URL de Retorno, url desse sistema
+            string strURLRetorno = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_REDIRECT");
+            //Esse sistema utiliza o mediatron? (true, false)
+            string strMediaTronAtivo = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_EM_USO");
+            //Token para comunucacao entre os sistemas
+            string strMediaTronToken = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_TOKEN");
+            //Determina se o processamento deve continuar
+            bool blnContinua = false;
+            //Se o sistema utiliza o mediatron continua o processamento
+            if (!String.IsNullOrEmpty(strMediaTronAtivo))
             {
-                //Deixou de calcular para pegar campos [AcumuladoEsquerda] e [AcumuladoDireita] da tabela [Rede].[Posicao]
-                //acumuladoBonusEsquerda = pagamentos.Where(p => p.Usuario.Assinatura.StartsWith(usuario.Assinatura + "0")).Sum(p => p.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
-                acumuladoBonusEsquerda = posicaoRepository.AcumuladoEsquerda(usuario.ID);
-
-            }
-            catch (Exception)
-            {
-                acumuladoBonusEsquerda = 0;
+                if (strMediaTronAtivo == "true")
+                {
+                    blnContinua = true;
+                }
             }
 
-            double acumuladoBonusDireita = 0;
-            try //Para caso de null - valor fica zero
+            if (blnContinua)
             {
-                //Deixou de calcular para pegar campos [AcumuladoEsquerda] e [AcumuladoDireita] da tabela [Rede].[Posicao]
-                //acumuladoBonusDireita = pagamentos.Where(p => p.Usuario.Assinatura.StartsWith(usuario.Assinatura + "1")).Sum(p => p.Pedido.PedidoItem.Sum(i => i.Quantidade * i.BonificacaoUnitaria));
-                acumuladoBonusDireita = posicaoRepository.AcumuladoDireita(usuario.ID);
+                //Criptografa dados para envio ao mediatron
+                string strIdEmpresaGet = CriptografiaHelper.Morpho(strIdEmpresa, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strNome = CriptografiaHelper.Morpho(usuario.Nome, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strTelefone = CriptografiaHelper.Morpho(usuario.Telefone, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strCelular = CriptografiaHelper.Morpho(usuario.Celular, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strEmail = CriptografiaHelper.Morpho(usuario.Email, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strEndereco = CriptografiaHelper.Morpho("---", CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strBairro = CriptografiaHelper.Morpho("---", CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strCEP = CriptografiaHelper.Morpho("00000000", CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strLogin = CriptografiaHelper.Morpho(usuario.Login, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strSenha = CriptografiaHelper.Descriptografar(usuario.Senha);
+                strSenha = CriptografiaHelper.Morpho(strSenha, CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strKey = CriptografiaHelper.Morpho(usuario.ID.ToString(), CriptografiaHelper.TipoCriptografia.Criptografa);
+                string strRedirect = CriptografiaHelper.Morpho(strURLRetorno, CriptografiaHelper.TipoCriptografia.Criptografa);
+                strMediaTronToken = CriptografiaHelper.Morpho(strMediaTronToken + strIdEmpresa, CriptografiaHelper.TipoCriptografia.Criptografa);
+                //Monta parametros para serem passados por get
+                strURL += "?IdEmpresa=" + strIdEmpresaGet + "&" +
+                   "Nome=" + strNome + "&" +
+                   "Telefone=" + strTelefone + "&" +
+                   "Celular=" + strCelular + "&" +
+                   "Email=" + strEmail + "&" +
+                   "Endereco=" + strEndereco + "&" +
+                   "Bairro=" + strBairro + "&" +
+                   "CEP=" + strCEP + "&" +
+                   "Login=" + strLogin + "&" +
+                   "Senha=" + strSenha + "&" +
+                   "Key=" + strKey + "&" +
+                   "Redirect=" + strRedirect + "&" +
+                   "Token=" + strMediaTronToken;
+                //envia dados ao mediatron
+                return Redirect(strURL);
+
             }
-            catch (Exception)
-            {
-                acumuladoBonusDireita = 0;
-            }
-
-            #endregion
-
-            #region Titulo
-
-            if (Session["TituloMensagem"] != null)
-            {
-                ViewBag.TituloMensagem = Session["TituloMensagem"];
-                ViewBag.Mensagem = Session["Mensagem"];
-                Session["TituloMensagem"] = null;
-                Session["Mensagem"] = null;
-            }
-
-            #endregion
 
             return View();
         }
+
+        public ActionResult MediaTronRetorno(string retorno)
+        {
+            //Mediatron retorna caso ocorra problemas
+
+            //Exibe mensagem de retorno do MediaTron
+            Session["TituloMensagem"] = "Mediatron";
+            Session["Mensagem"] = retorno;
+
+            return RedirectToAction("index", "home");
+        }
+
+        public ActionResult EnviarValidacaoEmail()
+        {
+            try
+            {
+                usuarioService.EnviarValidacaoEmail(usuario, Helpers.Local.Sistema);
+                string[] strMensagemParam1 = new string[] { traducaoHelper["EMAIL_ENVIADO_PARA"], usuario.Email };
+                Mensagem(traducaoHelper["SUCESSO"], strMensagemParam1, "msg");
+
+                //    Session["TituloMensagem"] = traducaoHelper["SUCESSO"];
+                //    Session["Mensagem"] = traducaoHelper["EMAIL_ENVIADO_PARA"] + ": " + usuario.Email;
+            }
+            catch (Exception ex)
+            {
+                cpUtilities.LoggerHelper.WriteFile("erro envio de email " + usuario.Email + " : " + ex.Message, "HomeEnvioEmail");
+                string[] strMensagemParam2 = new string[] { traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] };
+                Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
+
+                //Session["TituloMensagem"] = traducaoHelper["ALERTA"];
+                //Session["Mensagem"] = traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] + ": " + usuario.Email;
+            }
+
+            return RedirectToAction("index", "home");
+        }
+
+        #endregion
+
+        #region AboutContact
 
         [Route("about", Name = HomeControllerRoute.GetAbout)]
         public ActionResult About()
@@ -399,6 +376,10 @@
         {
             return this.View(HomeControllerAction.Contact);
         }
+
+        #endregion
+
+        #region security
 
         /// <summary>
         /// Gets the Atom 1.0 feed for the current site. Note that Atom 1.0 is used over RSS 2.0 because Atom 1.0 is a 
@@ -538,139 +519,6 @@
 
             return this.Content(content, ContentType.Xml, Encoding.UTF8);
         }
-
-        public ContentResult Derramamento(int id)
-        {
-            usuario.DerramamentoID = id;
-            this.repository.Save(usuario);
-
-            Core.Entities.UsuarioDerramamentoLog log = new Core.Entities.UsuarioDerramamentoLog();
-            log.UsuarioID = usuario.ID;
-            log.Lado = id;
-            log.DataCriacao = Core.Helpers.App.DateTimeZion;
-            usuarioDerramamentoLogRepository.Save(log);
-
-            return Content("OK");
-        }
-
-        public ActionResult SalvarFilial(int idFilial)
-        {
-            string strRetorno = "";
-            try
-            {
-                usuario.FilialID = idFilial;
-                repository.Save(usuario);
-                strRetorno = traducaoHelper["FILIAL_SALVAR_SUCESSO"];
-            }
-            catch (Exception ex)
-            {
-                strRetorno = "err: " + ex.Message;
-            }
-
-            Session["TituloMensagem"] = traducaoHelper["FILIAL"];
-            Session["Mensagem"] = strRetorno;
-
-            return RedirectToAction("index", "home");
-
-        }
-
-        //public ActionResult MediaTron()
-        //{
-        //    //id da empresa Prospera (4) no MediaTron 
-        //    string strIdEmpresa = "4";
-        //    //URL do sistema mediatron
-        //    string strURL = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_ADM_URL");
-        //    //URL de Retorno, url desse sistema
-        //    string strURLRetorno = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_REDIRECT");
-        //    //Esse sistema utiliza o mediatron? (true, false)
-        //    string strMediaTronAtivo = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_EM_USO");
-        //    //Token para comunucacao entre os sistemas
-        //    string strMediaTronToken = Core.Helpers.ConfiguracaoHelper.GetString("MEDIATRON_TOKEN");
-        //    //Determina se o processamento deve continuar
-        //    bool blnContinua = false;
-        //    //Se o sistema utiliza o mediatron continua o processamento
-        //    if (!String.IsNullOrEmpty(strMediaTronAtivo))
-        //    {
-        //        if (strMediaTronAtivo == "true")
-        //        {
-        //            blnContinua = true;
-        //        }
-        //    }
-
-        //    if (blnContinua)
-        //    {
-        //        //Criptografa dados para envio ao mediatron
-        //        string strIdEmpresaGet = CriptografiaHelper.Morpho(strIdEmpresa, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strNome = CriptografiaHelper.Morpho(usuario.Nome, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strTelefone = CriptografiaHelper.Morpho(usuario.Telefone, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strCelular = CriptografiaHelper.Morpho(usuario.Celular, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strEmail = CriptografiaHelper.Morpho(usuario.Email, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strEndereco = CriptografiaHelper.Morpho("---", CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strBairro = CriptografiaHelper.Morpho("---", CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strCEP = CriptografiaHelper.Morpho("00000000", CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strLogin = CriptografiaHelper.Morpho(usuario.Login, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strSenha = CriptografiaHelper.Descriptografar(usuario.Senha);
-        //        strSenha = CriptografiaHelper.Morpho(strSenha, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strKey = CriptografiaHelper.Morpho(usuario.ID.ToString(), CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        string strRedirect = CriptografiaHelper.Morpho(strURLRetorno, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        strMediaTronToken = CriptografiaHelper.Morpho(strMediaTronToken + strIdEmpresa, CriptografiaHelper.TipoCriptografia.Criptografa);
-        //        //Monta parametros para serem passados por get
-        //        strURL += "?IdEmpresa=" + strIdEmpresaGet + "&" +
-        //           "Nome=" + strNome + "&" +
-        //           "Telefone=" + strTelefone + "&" +
-        //           "Celular=" + strCelular + "&" +
-        //           "Email=" + strEmail + "&" +
-        //           "Endereco=" + strEndereco + "&" +
-        //           "Bairro=" + strBairro + "&" +
-        //           "CEP=" + strCEP + "&" +
-        //           "Login=" + strLogin + "&" +
-        //           "Senha=" + strSenha + "&" +
-        //           "Key=" + strKey + "&" +
-        //           "Redirect=" + strRedirect + "&" +
-        //           "Token=" + strMediaTronToken;
-        //        //envia dados ao mediatron
-        //        return Redirect(strURL);
-
-        //    }
-
-        //    return View();
-        //}
-
-        //public ActionResult MediaTronRetorno(string retorno)
-        //{
-        //    //Mediatron retorna caso ocorra problemas
-
-        //    //Exibe mensagem de retorno do MediaTron
-        //    Session["TituloMensagem"] = "Mediatron";
-        //    Session["Mensagem"] = retorno;
-
-        //    return RedirectToAction("index", "home");
-        //}
-
-        public ActionResult EnviarValidacaoEmail()
-        {
-            try
-            {
-                usuarioService.EnviarValidacaoEmail(usuario, Helpers.Local.Sistema);
-                string[] strMensagemParam1 = new string[] { traducaoHelper["EMAIL_ENVIADO_PARA"], usuario.Email };
-                Mensagem(traducaoHelper["SUCESSO"], strMensagemParam1, "msg");
-
-                //    Session["TituloMensagem"] = traducaoHelper["SUCESSO"];
-                //    Session["Mensagem"] = traducaoHelper["EMAIL_ENVIADO_PARA"] + ": " + usuario.Email;
-            }
-            catch (Exception ex)
-            {
-                cpUtilities.LoggerHelper.WriteFile("erro envio de email " + usuario.Email + " : " + ex.Message, "HomeEnvioEmail");
-                string[] strMensagemParam2 = new string[] { traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] };
-                Mensagem(traducaoHelper["ALERTA"], strMensagemParam2, "ale");
-
-                //Session["TituloMensagem"] = traducaoHelper["ALERTA"];
-                //Session["Mensagem"] = traducaoHelper["LOGIN_NAO_FOI_POSSIVEL_COMPLETAR_REQUISICAO"] + ": " + usuario.Email;
-            }
-
-            return RedirectToAction("index", "home");
-        }
-
 
         #endregion
 

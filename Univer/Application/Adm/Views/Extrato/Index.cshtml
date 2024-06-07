@@ -19,10 +19,13 @@
     var moedaPadrao = Core.Helpers.ConfiguracaoHelper.GetMoedaPadrao();
     var saldoInvestimento = "";
     string mascaraData = traducaoHelper["MASCARA_DATA"];
+
     if (String.IsNullOrEmpty(mascaraData))
     {
         mascaraData = "dd/MM/yyyy hh:mm";
     }
+    string titulo = ViewBag.Taxa;
+    titulo = traducaoHelper[titulo.ToUpper()];
 
     #endregion
 }
@@ -78,7 +81,7 @@
             <li class="@(i==1 ? "active" : "")">
                 <a href="@("#tab_" + @i)" data-toggle="tab">
                     <i class="fa fa-reorder"></i>
-                    @conta.Nome.ToUpper()
+                    @titulo
                 </a>
             </li>
             i++;

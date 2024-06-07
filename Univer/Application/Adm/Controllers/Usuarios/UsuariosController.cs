@@ -512,7 +512,6 @@ namespace Sistema.Controllers
                 Mensagem(traducaoHelper["ALERTA"], strMensagemParam1, "ale");
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
             try
             {
                 int idUsuario = int.Parse(usuarioID);
@@ -525,63 +524,74 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                string retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, true);
+                string retorno = "";
 
-                if (retorno == null)
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(Local.idUsuario, "FoiPagoSistema");
+
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01");
-                }
+                    retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, true);
 
-                if (retorno != "OK")
+                    if (retorno == null)
+                    {
+                        string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01" };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_01");
+                    }
+
+                    if (retorno != "OK")
+                    {
+                        string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02" };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02");
+                    }
+
+                    string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
+
+                    Usuario usuario = db.Usuarios.Find(idUsuario);
+
+                    TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
+
+                    TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+
+                    //valor dobrado quando ciclo> 1
+                    if (tabuleiroUsuario.Ciclo > 1)
+                    {
+                        tabuleiroBoard.Licenca = tabuleiroBoard.Licenca * 2;
+                    }
+
+                    //Efetuar Credito no syspag
+                    var lancamento = new Lancamento();
+                    lancamento.UsuarioID = 2001; //Syspag
+                    lancamento.Tipo = Lancamento.Tipos.Credito;
+                    lancamento.ReferenciaID = lancamento.UsuarioID;
+                    lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - " + traducaoHelper["CICLO"] + ":" + tabuleiroUsuario.Ciclo + " - ", usuario.Apelido.ToLower());
+                    lancamento.DataLancamento = App.DateTimeZion;
+                    lancamento.DataCriacao = App.DateTimeZion;
+                    lancamento.ContaID = 7; //Transferencia
+                    lancamento.CategoriaID = 7; //Transferencia
+                    lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                    lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
+                    lancamentoRepository.Save(lancamento);
+
+                    //Efetuar Debito no Convidado
+                    lancamento = new Lancamento();
+                    lancamento.UsuarioID = idUsuario;
+                    lancamento.Tipo = Lancamento.Tipos.Debito;
+                    lancamento.ReferenciaID = lancamento.UsuarioID;
+                    lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - " + traducaoHelper["Board" + BoardID], " - " + traducaoHelper["CICLO"] + ":" + tabuleiroUsuario.Ciclo);
+                    lancamento.DataLancamento = App.DateTimeZion;
+                    lancamento.DataCriacao = App.DateTimeZion;
+                    lancamento.ContaID = 7; //Transferencia
+                    lancamento.CategoriaID = 7; //Transferencia
+                    lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
+                    lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
+                    lancamentoRepository.Save(lancamento);
+                }
+                else
                 {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_FP_02");
+                    retorno = traducaoHelper["SERVIDOR_OCUPADO"];
                 }
-
-                string tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(idUsuario, idUsuario, idBoard, "Completa");
-
-                Usuario usuario = db.Usuarios.Find(idUsuario);
-
-                TabuleiroBoardModel tabuleiroBoard = tabuleiroRepository.ObtemTabuleiroBoardID(idBoard);
-
-                TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
-
-                //valor dobrado quando ciclo> 1
-                if (tabuleiroUsuario.Ciclo > 1)
-                {
-                    tabuleiroBoard.Licenca = tabuleiroBoard.Licenca * 2;
-                }
-
-                //Efetuar Credito no syspag
-                var lancamento = new Lancamento();
-                lancamento.UsuarioID = 2001; //Syspag
-                lancamento.Tipo = Lancamento.Tipos.Credito;
-                lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["Board" + BoardID], " - " + traducaoHelper["CICLO"] + ":" + tabuleiroUsuario.Ciclo + " - ", usuario.Apelido.ToLower());
-                lancamento.DataLancamento = App.DateTimeZion;
-                lancamento.DataCriacao = App.DateTimeZion;
-                lancamento.ContaID = 7; //Transferencia
-                lancamento.CategoriaID = 7; //Transferencia
-                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
-                lancamentoRepository.Save(lancamento);
-
-                //Efetuar Debito no Convidado
-                lancamento = new Lancamento();
-                lancamento.UsuarioID = idUsuario;
-                lancamento.Tipo = Lancamento.Tipos.Debito;
-                lancamento.ReferenciaID = lancamento.UsuarioID;
-                lancamento.Descricao = String.Format("{0}{1}{2}", traducaoHelper["PAGAMENTO_SISTEMA"], " - " + traducaoHelper["Board" + BoardID], " - " + traducaoHelper["CICLO"] + ":" + tabuleiroUsuario.Ciclo);
-                lancamento.DataLancamento = App.DateTimeZion;
-                lancamento.DataCriacao = App.DateTimeZion;
-                lancamento.ContaID = 7; //Transferencia
-                lancamento.CategoriaID = 7; //Transferencia
-                lancamento.MoedaIDCripto = (int)Moeda.Moedas.USD; //Nenhum
-                lancamento.Valor = decimal.ToDouble(tabuleiroBoard.Licenca);
-                lancamentoRepository.Save(lancamento);
 
                 JsonResult jsonResult = new JsonResult
                 {
@@ -621,20 +631,32 @@ namespace Sistema.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["PARAMETRO_INVALIDO"]);
                 }
 
-                string retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, false);
+                bool getUltimoAcesso = tabuleiroRepository.GetUltimoAcesso(Local.idUsuario, "FoiPagoSistema");
 
-                if (retorno == null)
+                string retorno = "";
+
+                if (getUltimoAcesso)
                 {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01");
+
+                    retorno = tabuleiroRepository.ConfirmarPagtoSistema(idUsuario, idBoard, false);
+
+                    if (retorno == null)
+                    {
+                        string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01" };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_01");
+                    }
+
+                    if (retorno != "OK")
+                    {
+                        string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02" };
+                        Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
+                        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02");
+                    }
                 }
-
-                if (retorno != "OK")
+                else
                 {
-                    string[] strMensagemParam4 = new string[] { traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02" };
-                    Mensagem(traducaoHelper["ALERTA"], strMensagemParam4, "ale");
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, traducaoHelper["MENSAGEM_ERRO"] + " COD MRC_NFP_02");
+                    retorno = traducaoHelper["SERVIDOR_OCUPADO"];
                 }
 
                 JsonResult jsonResult = new JsonResult
@@ -1016,7 +1038,7 @@ namespace Sistema.Controllers
             {
                 usuario.Celular = "0";
             }
-            
+
             usuario.FilialID = 1;
 
             if (msg.Count > 1)
@@ -1036,10 +1058,10 @@ namespace Sistema.Controllers
                     string errors = "";
                     foreach (var eve in e.EntityValidationErrors)
                     {
-                        errors += "Entity of type " + eve.Entry.Entity.GetType().Name +" in state " + eve.Entry.State+ " has the following validation errors:";
+                        errors += "Entity of type " + eve.Entry.Entity.GetType().Name + " in state " + eve.Entry.State + " has the following validation errors:";
                         foreach (var ve in eve.ValidationErrors)
                         {
-                            errors += "|" + " Property: " + ve.PropertyName +", Error: " + ve.ErrorMessage;
+                            errors += "|" + " Property: " + ve.PropertyName + ", Error: " + ve.ErrorMessage;
                         }
                     }
 

@@ -523,6 +523,14 @@ namespace Core.Repositories.Rede
             return retorno;
         }
 
+        public IEnumerable<UsuariosPaisesModel> ObtemUsuariosPaises()
+        {
+            string sql = "Exec spC_UsuariosPaises";
+
+            IEnumerable<UsuariosPaisesModel> paises = _context.Database.SqlQuery<UsuariosPaisesModel>(sql).ToList();
+
+            return paises;
+        }
 
     }
 }
