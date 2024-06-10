@@ -2128,6 +2128,13 @@ namespace Sistema.Controllers
             return View(lista.ToPagedList(PageNumber, PageSize));
         }
 
+        public ActionResult Rules()
+        {
+            //Verifica se a msg em popup para ser exibido na view
+            obtemMensagem();
+            return View();
+        }
+
         public ActionResult Pedido() {          
             obtemMensagem();
 

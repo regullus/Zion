@@ -42,6 +42,8 @@ namespace Sistema.Controllers
     public class AvisosController : Controller
     {
         #region Variaveis
+        
+        private DbContext _context;
 
         #endregion
 
@@ -55,6 +57,7 @@ namespace Sistema.Controllers
         {
             usuarioRepository = new UsuarioRepository(context);
             Localizacao();
+            _context = context;
         }
 
         private YLEVELEntities db = new YLEVELEntities();
@@ -365,15 +368,18 @@ namespace Sistema.Controllers
             return Json("OK");
         }
 
-
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Aviso aviso = db.Aviso.Find(id);
-            db.Aviso.Remove(aviso);
-            db.SaveChanges();
+            //Aviso aviso = db.Aviso.Find(id);
+            //db.Aviso.Remove(aviso);
+            //db.SaveChanges();
+
+            string sql = "Exec spD_Aviso @ID=" + id;
+
+            var retorno = _context.Database.SqlQuery<string>(sql).FirstOrDefault();
+
             return RedirectToAction("Index");
         }
 
