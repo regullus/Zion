@@ -73,5 +73,11 @@ select * from Sistema.Configuracao where chave = @chaveC
 --update Sistema.Configuracao set Dados = 'https://homol.universol.global/office//Home/MTRetorno' where Dados = 'https://donation.universol.global/office//Home/MTRetorno'
 --update Sistema.Configuracao set Dados = 'https://homol.universol.global/account/loginexterno' where Dados = 'https://donation.universol.global/account/loginexterno'
 
+--homol -> dev
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/office//Home/MTRetorno' where Dados = 'https://homol.universol.global/office//Home/MTRetorno'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global' where Dados = 'https://homol.universol.global'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/' where Dados = 'https://homol.universol.global/'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/office//Home/MTRetorno' where Dados = 'https://homol.universol.global/office//Home/MTRetorno'
+--update Sistema.Configuracao set Dados = 'https://dev.universol.global/account/loginexterno' where Dados = 'https://homol.universol.global/account/loginexterno'
 
 

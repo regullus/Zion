@@ -162,6 +162,96 @@ BEGIN
 				BoardID = 1 --Mercurio
 		End
 	End
+    
+    --Verifica se Status2 esta ok para enviar convite
+	--Declare
+	--	@UsuarioIDCur int,
+ --       @BoardIDCur int,
+ --       @total int,
+	--	@AntFetch int
+    
+	----Cursor
+	--Declare
+	--	curRegistro 
+	--Cursor Local For
+ --       Select 
+ --           UsuarioID,
+ --           BoardID
+	--    From
+	--	    #temp
+	--    Where
+ --           StatusID = 2 and
+ --           BoardID > 1
+
+	--Open curRegistro
+	--Fetch Next From curRegistro Into  @UsuarioIDCur, @BoardIDCur
+	--Select @AntFetch = @@fetch_status
+	--While @AntFetch = 0
+	--Begin
+ --       --Verifica se ele é master no board anterior
+
+
+ --       --Verifica se ha 4 pagamentos mesmo, par liberar o convite
+ --       Select 
+ --           @total = Count(*)
+ --       From
+ --           Rede.TabuleiroUsuario
+ --       Where
+ --           MasterID = @UsuarioIDCur and
+ --           BoardID = @BoardIDCur - 1 and
+ --           UsuarioID <> @UsuarioIDCur and
+ --           PagoMaster = 'true' and
+ --           Posicao like 'Donator%'
+
+ --       --Caso Tenha Fechado algum lado, este não entram no count do select acima
+	--	--Daí soma 4 no @total, pois já fechou um lado
+	--	if Exists (
+	--		Select 
+	--			'OK' 
+	--			From 
+	--				Rede.TabuleiroUsuario (nolock)
+	--			Where
+	--				MasterID = @UsuarioIDCur and
+	--				BoardID = @BoardIDCur - 1 and
+	--				DireitaFechada = 'true'
+	--		)
+	--	Begin
+ --       	Set @total = @total + 4
+	--	End
+
+	--	if Exists (
+	--		Select 
+	--			'OK' 
+	--			From 
+	--				Rede.TabuleiroUsuario (nolock)
+	--			Where
+	--				MasterID = @UsuarioIDCur and
+	--				BoardID = @BoardIDCur - 1 and
+	--				EsquerdaFechada = 'true'
+	--		)
+	--	Begin
+ --       	Set @total = @total + 4
+	--	End
+        
+ --       if(@total < 4)
+ --       Begin
+ --           --Se for menor que 4, não envia convite para entrar na proxima galaxia
+ --           Update
+ --               #temp
+ --           Set
+ --               StatusID = 0
+ --           Where
+ --               UsuarioID = @UsuarioIDCur and
+ --               BoardID = @BoardIDCur
+ --       End
+            
+	--	--Proxima linha do cursor
+	--	Fetch Next From curRegistro Into @UsuarioIDCur, @BoardIDCur
+	--	Select @AntFetch = @@fetch_status       
+	--End -- While
+      
+	--Close curRegistro
+	--Deallocate curRegistro
 
 	Select 
 		UsuarioID,
@@ -193,7 +283,6 @@ go
 
 --Exec spC_TabuleiroUsuario @UsuarioID=null
 
-
-
+Exec spC_TabuleiroUsuario @UsuarioID=2599
 
 

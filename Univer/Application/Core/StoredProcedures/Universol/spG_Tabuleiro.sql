@@ -114,7 +114,7 @@ Begin
     Set @PagoMasterDireita = 'false'
     Set @PagoMasterEsquerda = 'false'
 	Set @PagoMaster = 'false'
-    Set @log = '||Inicio spG_Tabuleiro|'
+    Set @log = '|Inicio spG_Tabuleiro|'
     Set @Historico = ''
     Set @direitaFechada = 'false'
     Set @esquerdaFechada = 'false'
@@ -632,7 +632,7 @@ Begin
 				
 				    --*************FIM POPULA #temp***********
 
-				    --Ferifica se usuario jah se encontra no tabuleiro selecionado
+				    --Verifica se usuario jah se encontra no tabuleiro selecionado
 				    Set @aux = 0
 				    if(@chamada = 'Convite')
 				    Begin
@@ -4445,7 +4445,7 @@ go
 /*
 Begin Tran
 
-Exec spG_Tabuleiro @UsuarioID=6468,@UsuarioPaiID=null,@BoardID=1,@Chamada='Convite'
+Exec spG_Tabuleiro @UsuarioID=2590,@UsuarioPaiID=null,@BoardID=2,@Chamada='Convite'
 
 Select debug, * from  Rede.TabuleiroLog order by id desc
 

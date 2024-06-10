@@ -37,6 +37,8 @@ BEGIN
         ''
     From
         Usuario.usuario
+    Where
+        id > 2570
     Group By
         PaisID
     Order By

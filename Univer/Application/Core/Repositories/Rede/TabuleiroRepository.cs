@@ -116,13 +116,23 @@ namespace Core.Repositories.Rede
 
             try
             {
-                if (Chamada == "Convite" && idBoard == 1) //Força a entradanum tabuleiro mais antigo
+                if (Chamada == "Convite" && idBoard == 1)
                 {
+                    //Força a entrada num tabuleiro mais antigo
                     sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=null,@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
                 }
                 else
                 {
-                    sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
+                    if (idPai == 0)
+                    {
+                        //Força a entrada num tabuleiro mais antigo
+                        sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=null,@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
+                    }
+                    else
+                    {
+                        sql = "Exec spG_Tabuleiro @UsuarioID=" + idUsuario + ",@UsuarioPaiID=" + idPai + ",@BoardID=" + idBoard + ",@Chamada='" + Chamada + "'";
+                    }
+
                 }
 
                 TabuleiroInclusao retorno = _context.Database.SqlQuery<TabuleiroInclusao>(sql).FirstOrDefault();
@@ -186,7 +196,7 @@ namespace Core.Repositories.Rede
             catch (Exception ex)
             {
                 //Todo log
-                string log = SetLog(idUsuario,idBoard,0,"back", "IncluirTabuleiro", ex.Message);
+                string log = SetLog(idUsuario, idBoard, 0, "back", "IncluirTabuleiro", ex.Message);
                 ret = "SEM_DADOS";
             }
 

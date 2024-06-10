@@ -1111,7 +1111,6 @@ namespace Sistema.Controllers
             string tabuleiroIncluir = "OK";
             int idTabuleiro = 0;
 
-
             try
             {
                 idUsuario = int.Parse(usuarioID);
@@ -1198,10 +1197,24 @@ namespace Sistema.Controllers
                     if (userRule == "OK")
                     {
                         log = "board 01: usuarioID:" + usuario.ID + " BoardID:" + idBoard + " Convite";
-                        //Inclui usuario no novo tabuleiro
-                        tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idBoard, "Convite");
-                        log = "board 02";
+
                         TabuleiroUsuarioModel tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
+
+                        //Verifica se é uma reentrada
+                        if (tabuleiroUsuario.Ciclo > 0)
+                        {
+                            //Força a entrada num tabuleiro mais antigo, pois é uma reentrada
+                            patrocinadoID = 0;
+                            tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idBoard, "Convite");
+                        } 
+                        else
+                        {
+                            //Inclui usuario no novo tabuleiro, onde se encontra seu pai
+                            tabuleiroIncluir = tabuleiroRepository.IncluiTabuleiro(usuario.ID, patrocinadoID, idBoard, "Convite");
+                        }
+                        
+                        log = "board 02";
+                        tabuleiroUsuario = tabuleiroRepository.ObtemTabuleiroUsuario(idUsuario, idBoard);
                         log = "board 03";
                         idTabuleiro = tabuleiroUsuario.TabuleiroID ?? 0;
                     }

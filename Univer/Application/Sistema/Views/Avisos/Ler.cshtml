@@ -205,14 +205,6 @@
             {
                 @Html.AntiForgeryToken()
                 <div class="form-actions no-color" style="margin-top:10px;">
-                    @if (blnLido)
-                    {
-                        <input type="button" value="@(traducaoHelper["MARCAR_COMO_NAO_LIDO"])" class="btn green-haze pull-right" onclick="return Alterar();" />
-                    }
-                    else
-                    {
-                        <input type="button" value="@(traducaoHelper["MARCAR_COMO_LIDO"])" class="btn green-haze pull-right" onclick="return Alterar();" />
-                    }
                     <input type="button" value="@(traducaoHelper["EXCLUIR"])" class="btn btn-danger" onclick="return Excluir();" />
                 </div>
             }
