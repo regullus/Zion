@@ -1346,428 +1346,6 @@ namespace Sistema.Areas.Loja.Controllers
             }
         }
 
-        [HttpPost]
-        //public ActionResult PagamentoCartao(CarrinhoModel carrinho, FormCollection form)
-        //{
-        //    if (!carrinho.Vazio && carrinho.EnderecoEntrega != null && carrinho.EnderecoFaturamento != null)
-        //    {
-        //        try
-        //        {
-        //            #region Variáveis
-        //            string strTelefone = string.Empty;
-        //            string strEmail = string.Empty;
-        //            string strCPF = string.Empty;
-        //            string strParcela = string.Empty;
-        //            #endregion
-
-        //            #region Dados via form
-        //            string tipoPagtoCartao = form["tipoPagtoCartao"];
-        //            string strNome = form["ccNome"];
-        //            string strBandeira = form["ccBandeira"];
-        //            string strNumero = form["ccNumero"];
-        //            string strCodSeguranca = form["ccCodSeguranca"];
-        //            string strMes = form["ccMes"];
-        //            string strAno = form["ccAno"];
-        //            int totalPedido = Convert.ToInt32((carrinho.Total * 100));
-
-        //            Session["ShowCartao"] = "true";
-        //            Session["ValorFrete"] = carrinho.ValorFrete;
-        //            Session["TipoPagtoCartao"] = tipoPagtoCartao;
-        //            Session["CartaoNome"] = strNome;
-        //            Session["CartaoBandeira"] = strBandeira;
-        //            Session["CartaoNumero"] = strNumero;
-        //            Session["CartaoCodSeguranca"] = strCodSeguranca;
-        //            Session["CartaoMes"] = strMes;
-        //            Session["CartaoAno"] = strAno;
-
-        //            if (carrinho.Frete != null)
-        //                Session["DiasFrete"] = carrinho.Frete.PrazoDias;
-
-        //            if (tipoPagtoCartao == "ViviPay")
-        //            {
-        //                strTelefone = form["ccTelefone"];
-        //                strEmail = form["ccEmail"];
-        //                strCPF = form["ccCPF"];
-        //                strParcela = form["ccParcelamento"];
-
-        //                Session["CartaoTelefone"] = strTelefone;
-        //                Session["CartaoEmail"] = strEmail;
-        //                Session["CartaoCPF"] = strCPF;
-        //                Session["Parcelamento"] = strParcela;
-        //            }
-
-        //            #endregion
-
-        //            #region  Consistencias
-
-        //            bool blnContinua = true;
-        //            string strMensagem = "";
-
-        //            if (string.IsNullOrEmpty(strNome))
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NOME"] + " ";
-        //            }
-
-        //            if (string.IsNullOrEmpty(strBandeira))
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_BANDEIRA"] + " ";
-        //            }
-
-        //            if (string.IsNullOrEmpty(strNumero))
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NUMERO"] + " ";
-        //            }
-        //            else
-        //            {
-        //                //Remove espaçõs em branco na digitação
-        //                strNumero = strNumero.Replace(" ", "");
-
-        //                //Cartão deve possuir 16 digitos
-        //                if (strNumero.Length < 12)
-        //                {
-        //                    blnContinua = false;
-        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_NUMERO"] + " ";
-        //                }
-        //            }
-        //            if (string.IsNullOrEmpty(strCodSeguranca))
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_CODSEGURANCA"] + " ";
-        //            }
-
-        //            if (string.IsNullOrEmpty(strMes))
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_MES"] + " ";
-        //            }
-
-        //            if (string.IsNullOrEmpty(strAno))
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_ANO"] + " ";
-        //            }
-
-        //            if (totalPedido <= 0)
-        //            {
-        //                blnContinua = false;
-        //                strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_VALOR"] + " ";
-        //            }
-
-        //            if (tipoPagtoCartao == "ViviPay")
-        //            {
-        //                if (string.IsNullOrEmpty(strCPF))
-        //                {
-        //                    blnContinua = false;
-        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_CPF"] + " ";
-        //                }
-
-        //                if (string.IsNullOrEmpty(strTelefone))
-        //                {
-        //                    blnContinua = false;
-        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_TELEFONE"] + " ";
-        //                }
-
-        //                if (string.IsNullOrEmpty(strEmail))
-        //                {
-        //                    blnContinua = false;
-        //                    strMensagem += traducaoHelper["CARTAO_CONSISTENCIA_EMAIL"] + " ";
-        //                }
-        //            }
-
-        //            #endregion
-
-        //            if (blnContinua)
-        //            {
-        //                if (tipoPagtoCartao == "Cartao")
-        //                {
-        //                    #region Cielo
-        //                    try
-        //                    {
-        //                        //Gera o código do Pedido para atrelar a solicitação de pagamento
-        //                        carrinho.CodigoPedido = CriarCodigoPedido();
-
-        //                        //Chama serviço de pagamento por cartão de credito
-        //                        var retornoCielo = Cielo.PagamentoCredito(strBandeira, strNome, strNumero, strCodSeguranca, strMes, strAno, carrinho.CodigoPedido, totalPedido);
-
-        //                        //Retorno da Cielo, deu certo
-        //                        if (retornoCielo.Payment.ReturnCode == "00")
-        //                        {
-        //                            #region Sucesso
-
-        //                            #region Cria Pedido Cielo
-        //                            carrinho.Adicionar(PedidoPagamento.MeiosPagamento.Cartao, Core.Entities.PedidoPagamento.FormasPagamento.Padrao);
-        //                            var pedidoCielo = pedidoFactory.Criar(carrinho);
-        //                            var pagamentoCielo = pedidoCielo.PedidoPagamento.FirstOrDefault();
-        //                            #endregion
-
-        //                            Session["SucessoTitulo"] = traducaoHelper["PAGAMENTO"];
-        //                            Session["Sucesso"] = traducaoHelper["OPERACAO_SUCESSO"];
-        //                            //Armazenar em banco
-        //                            pedidoService.ProcessarPagamento(pagamentoCielo.ID, Core.Entities.PedidoPagamentoStatus.TodosStatus.Pago);
-
-        //                            //Salvar transação com cartao
-        //                            CartaoCredito cartaoCredito = new CartaoCredito()
-        //                            {
-        //                                UsuarioID = usuario.ID,
-        //                                PedidoPagamentoID = pagamentoCielo.ID,
-        //                                PedidoID = pedidoCielo.ID,
-        //                                Bandeira = strBandeira,
-        //                                FinalCartao = strNumero.Substring(strNumero.Length - 4),
-        //                                Token = "",
-        //                                Valor = (totalPedido / 100),
-        //                                Descricao = "Código Pedido: " + carrinho.CodigoPedido,
-        //                                DataCriacao = App.DateTimeZion,
-        //                                DataPagamento = App.DateTimeZion,
-        //                                CodigoAutorizacao = retornoCielo.Payment.AuthorizationCode,
-        //                                ComprovantePagamento = retornoCielo.Payment.ProofOfSale,
-        //                                PagamentoID = retornoCielo.Payment.PaymentId.Value,
-        //                                TransacaoID = retornoCielo.Payment.Tid,
-        //                                CodigoRetorno = retornoCielo.Payment.ReturnCode,
-        //                                MensagemRetorno = retornoCielo.Payment.ReturnMessage
-        //                            };
-        //                            cartaoCreditoRepository.Save(cartaoCredito);
-
-        //                            //Ir para proximo passo
-        //                            carrinho.Limpar();
-        //                            return RedirectToAction("finalizado", new { pedidoID = pedidoCielo.ID });
-
-        //                            #endregion
-        //                        }
-        //                        //Retorno da Cielo, deu erro
-        //                        else
-        //                        {
-        //                            #region Erro
-
-        //                            carrinho.CodigoPedido = string.Empty;
-
-        //                            //Salvar transação com erro para log
-        //                            CartaoCredito cartaoCredito = new CartaoCredito()
-        //                            {
-        //                                UsuarioID = usuario.ID,
-        //                                PedidoPagamentoID = null,
-        //                                PedidoID = null,
-        //                                Bandeira = strBandeira,
-        //                                FinalCartao = strNumero.Substring(strNumero.Length - 4),
-        //                                Token = "",
-        //                                Valor = (totalPedido / 100),
-        //                                Descricao = "Falha na solicitação de pagamento - Cielo",
-        //                                DataCriacao = App.DateTimeZion,
-        //                                DataPagamento = null,
-        //                                CodigoAutorizacao = string.Empty,
-        //                                ComprovantePagamento = string.Empty,
-        //                                PagamentoID = retornoCielo.Payment.PaymentId.Value,
-        //                                TransacaoID = retornoCielo.Payment.Tid,
-        //                                CodigoRetorno = retornoCielo.Payment.ReturnCode,
-        //                                MensagemRetorno = retornoCielo.Payment.ReturnMessage
-        //                            };
-        //                            cartaoCreditoRepository.Save(cartaoCredito);
-        //                            Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-        //                            Session["Erro"] = traducaoHelper["CARTAO_RETORNO_ERRO"];
-
-        //                            #endregion
-        //                        }
-        //                    }
-        //                    catch (Exception ex)
-        //                    {
-        //                        #region Exception
-
-        //                        //Erro devolvido pela Cielo para a requisição solicitada
-        //                        string[] erro = ex.Message.Split(',');
-
-        //                        carrinho.CodigoPedido = string.Empty;
-
-        //                        //Salvar transação com erro para log
-        //                        CartaoCredito cartaoCredito = new CartaoCredito()
-        //                        {
-        //                            UsuarioID = usuario.ID,
-        //                            PedidoPagamentoID = null,
-        //                            PedidoID = null,
-        //                            Bandeira = strBandeira,
-        //                            FinalCartao = strNumero.Substring(strNumero.Length - 4),
-        //                            Token = "",
-        //                            Valor = (totalPedido / 100),
-        //                            Descricao = "Ocorreu uma exceção na solicitação de pagamento - Cielo",
-        //                            DataCriacao = App.DateTimeZion,
-        //                            DataPagamento = null,
-        //                            CodigoAutorizacao = string.Empty,
-        //                            ComprovantePagamento = string.Empty,
-        //                            PagamentoID = null,
-        //                            TransacaoID = string.Empty,
-        //                            CodigoRetorno = erro[0],
-        //                            MensagemRetorno = erro[1]
-        //                        };
-        //                        cartaoCreditoRepository.Save(cartaoCredito);
-        //                        Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-        //                        Session["Erro"] = traducaoHelper["CARTAO_RETORNO_ERRO"];
-
-        //                        #endregion
-
-        //                        return RedirectToAction("pagamento", "pedido");
-        //                    }
-        //                    #endregion
-        //                }
-
-        //                if (tipoPagtoCartao == "ViviPay")
-        //                {
-        //                    #region ViviPay
-
-        //                    #region Parcelamento
-        //                    var juros = 0;
-        //                    var parcela = 0;
-
-        //                    //Verifica se compra é parcelada e atribui valor com juros para a transação
-        //                    if (int.TryParse(strParcela, out parcela))
-        //                    {
-        //                        if (Session["ParcelamentosDisponiveisViviPay"] != null && parcela > 1)
-        //                        {
-        //                            var listaParcelamentos = (List<brandCard>)Session["ParcelamentosDisponiveisViviPay"];
-        //                            var totalComJuros = Convert.ToInt32(listaParcelamentos.FirstOrDefault(l => l.quantity == parcela).totalAmount * 100);
-
-        //                            //Calcula o juros do parcelamento
-        //                            juros = totalComJuros - totalPedido;
-
-        //                            //Atribui o valor do Pedido com o valor do parcelamento total
-        //                            if (totalComJuros >= totalPedido)
-        //                                totalPedido = totalComJuros;
-        //                        }
-        //                    }
-        //                    #endregion
-
-        //                    try
-        //                    {
-        //                        #region Tratamento Dados
-        //                        var parseTelefone = ParseTelefone(strTelefone);
-
-        //                        Regex regex = new Regex(@"\d+");
-        //                        string cpf = string.Empty;
-        //                        foreach (Match m in regex.Matches(strCPF))
-        //                            cpf += m.Value;
-        //                        #endregion
-
-        //                        //Gera o código do Pedido para atrelar a solicitação de pagamento
-        //                        carrinho.CodigoPedido = CriarCodigoPedido();
-
-        //                        //Chama o serviço da ViviPay
-        //                        ViviPay serviceViviPay = new ViviPay();
-        //                        var retornoViviPay = serviceViviPay.PagamentoCredito(strBandeira, strNome, strNumero, strCodSeguranca, strMes, strAno, carrinho.CodigoPedido, totalPedido, cpf, parseTelefone.Item1, parseTelefone.Item2, strEmail, strParcela);
-
-        //                        #region Sucesso
-
-        //                        #region Cria Pedido ViviPay
-        //                        carrinho.Adicionar(PedidoPagamento.MeiosPagamento.ViviPay, PedidoPagamento.FormasPagamento.Padrao);
-
-        //                        if (parcela > 0 && juros > 0)
-        //                            carrinho.SetarDadosParcelamento(parcela, juros);
-
-        //                        var pedidoViviPay = pedidoFactory.Criar(carrinho);
-        //                        var pagamentoViviPay = pedidoViviPay.PedidoPagamento.FirstOrDefault();
-        //                        #endregion
-
-        //                        Session["SucessoTitulo"] = traducaoHelper["PAGAMENTO"];
-        //                        Session["Sucesso"] = traducaoHelper["OPERACAO_SUCESSO"];
-        //                        //Armazenar em banco
-        //                        pedidoService.ProcessarPagamento(pagamentoViviPay.ID, PedidoPagamentoStatus.TodosStatus.Pago);
-
-        //                        //Salvar transação com cartao
-        //                        CartaoCredito cartaoCredito = new CartaoCredito()
-        //                        {
-        //                            UsuarioID = usuario.ID,
-        //                            PedidoPagamentoID = pagamentoViviPay.ID,
-        //                            PedidoID = pedidoViviPay.ID,
-        //                            Bandeira = strBandeira,
-        //                            FinalCartao = strNumero.Substring(strNumero.Length - 4),
-        //                            Token = "",
-        //                            Valor = (totalPedido / 100),
-        //                            Descricao = "Código Pedido: " + carrinho.CodigoPedido,
-        //                            DataCriacao = App.DateTimeZion,
-        //                            DataPagamento = App.DateTimeZion,
-        //                            CodigoAutorizacao = string.Empty,
-        //                            ComprovantePagamento = string.Empty,
-        //                            PagamentoID = Guid.TryParse(retornoViviPay, out Guid newGuid) ? newGuid : Guid.NewGuid(),
-        //                            TransacaoID = retornoViviPay,
-        //                            CodigoRetorno = string.Empty,
-        //                            MensagemRetorno = "ViviPay - Pagamento OK"
-        //                        };
-        //                        cartaoCreditoRepository.Save(cartaoCredito);
-
-        //                        //Ir para proximo passo
-        //                        carrinho.Limpar();
-        //                        return RedirectToAction("finalizado", new { pedidoID = pedidoViviPay.ID });
-
-        //                        #endregion
-        //                    }
-        //                    catch (Exception ex)
-        //                    {
-        //                        #region Exception
-
-        //                        carrinho.CodigoPedido = string.Empty;
-
-        //                        //Salvar transação com erro para log
-        //                        CartaoCredito cartaoCredito = new CartaoCredito()
-        //                        {
-        //                            UsuarioID = usuario.ID,
-        //                            PedidoPagamentoID = null,
-        //                            PedidoID = null,
-        //                            Bandeira = strBandeira,
-        //                            FinalCartao = strNumero.Substring(strNumero.Length - 4),
-        //                            Token = "",
-        //                            Valor = (totalPedido / 100),
-        //                            Descricao = "Falha na solicitação de pagamento - ViviPay",
-        //                            DataCriacao = App.DateTimeZion,
-        //                            DataPagamento = null,
-        //                            CodigoAutorizacao = string.Empty,
-        //                            ComprovantePagamento = string.Empty,
-        //                            PagamentoID = null,
-        //                            TransacaoID = string.Empty,
-        //                            CodigoRetorno = string.Empty,
-        //                            MensagemRetorno = ex.Message
-        //                        };
-        //                        cartaoCreditoRepository.Save(cartaoCredito);
-        //                        Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-        //                        Session["Erro"] = ex.Message;
-
-        //                        #endregion
-
-        //                        return RedirectToAction("pagamento", "pedido");
-        //                    }
-        //                    #endregion
-        //                }
-        //            }
-        //            else
-        //            {
-        //                //Inconsitencia
-        //                Session["ErroTitulo"] = traducaoHelper["CARTAO"];
-        //                Session["Erro"] = strMensagem;
-        //                //Vota para a tela de pagamento por cartão
-        //                return RedirectToAction("pagamento", "pedido");
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            #region erro
-        //            Session["ErroTitulo"] = traducaoHelper["ERRO"];
-        //            Session["Erro"] = ex.Message;
-        //            return RedirectToAction("pagamento", "pedido");
-        //            #endregion
-        //        }
-        //    }
-        //    else
-        //    {
-        //        #region Carrinho Vazio
-        //        Session["ErroTitulo"] = traducaoHelper["DADOS_ENDERECO"];
-        //        Session["Erro"] = traducaoHelper["PREENCHA_DADOS"];
-        //        return RedirectToAction("pagamento", "pedido");
-        //        #endregion
-        //    }
-
-        //    //Retorna a tela de pagamento com cartão
-        //    return RedirectToAction("pagamento", "pedido");
-
-        //}
-
         public ActionResult Endereco(CarrinhoModel carrinho, int novo = 0)
         {
             if (carrinho.Vazio)
@@ -2087,184 +1665,155 @@ namespace Sistema.Areas.Loja.Controllers
             return Json(retorno);
         }
 
-        //public JsonResult ParcelamentosDisponiveisViviPay(string bandeira, double valor)
-        //{
-        //    try
-        //    {   //Busca dados de parcelamento na API da ViviPay
-        //        ViviPay serviceViviPay = new ViviPay();
-        //        var retornoViviPay = serviceViviPay.ParcelamentosDisponiveis(bandeira, valor.ToString("N2"));
+        public async System.Threading.Tasks.Task<JsonResult> CriaPedidoCriptoAsync(CarrinhoModel carrinho, string cripto)
+        {
+            var moedaCripto = Moeda.Moedas.LTC;
+            if (!(cripto == "BTC" || cripto == "LTC" || cripto == "USDT.TRC20"))
+            {
+                LogErro("CriaPedidoCriptoAsync - Acesso indevido, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+                return Json(new { erro = traducaoHelper["cripto_INVALIDA"] + " " + traducaoHelper["ACESSO_INDEVIDO_REPORTADO"] }, JsonRequestBehavior.AllowGet);
+            }
+            if (cripto == "LTC")
+            {
+                moedaCripto = Moeda.Moedas.LTC;
+                if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_LITECOIN_ATIVO") == "true"))
+                {
+                    LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+                    return Json(new { erro = traducaoHelper["LTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            if (cripto == "BTC")
+            {
+                moedaCripto = Moeda.Moedas.BTC;
+                if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_BITCOIN_ATIVO") == "true"))
+                {
+                    LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+                    return Json(new { erro = traducaoHelper["BTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            if (cripto == "USDT.TRC20")
+            {
+                moedaCripto = Moeda.Moedas.USDT;
+                if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_TETHER_ATIVO") == "true"))
+                {
+                    LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
+                    return Json(new { erro = traducaoHelper["USDT_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
+                }
+            }
 
-        //        //Armazena objeto em Session para uso no momento da criação do Pedido
-        //        Session["ParcelamentosDisponiveisViviPay"] = retornoViviPay;
+            //Verifica se já existe um pedido pendente
+            var ultimoPedido = pedidoRepository.GetPedidoUltimoStatus(usuario.ID, carrinho.Itens.FirstOrDefault().Produto.ID);
 
+            if (!(ultimoPedido == null || ultimoPedido.StatusId != (int)PedidoPagamentoStatus.TodosStatus.AguardandoPagamento))
+            {
+                return Json(new { erro = traducaoHelper["PEDIDO_JA_EXISTENTE_MENSAGEM"] }, JsonRequestBehavior.AllowGet);
+            }
 
-        //        //Cria objeto json para retornar para o DropDownList
-        //        List<Object> parcela = new List<object>();
+            #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
+            if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
+            {
+                var produto = carrinho.Itens.FirstOrDefault();
 
-        //        foreach (var item in retornoViviPay)
-        //        {
-        //            parcela.Add(new { parcelas = item.quantity, texto = item.quantity.ToString() + " X de R$" + String.Format("{0:0.00}", item.installmentAmount) });
-        //        }
+                if (produto != null)
+                {
+                    Produto pacoteAtualUsuario;
 
-        //        return Json(new { data = new SelectList(parcela, "parcelas", "texto") }, JsonRequestBehavior.AllowGet);
-        //    }
+                    if (usuario.NivelAssociacao == 1)
+                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+                    else
+                        pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
 
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new { erro = ex.Message }, JsonRequestBehavior.AllowGet);
-        //    }
+                    carrinho.Itens.First().Valor.Valor = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
+                }
+            }
+            #endregion
 
-        //}
+            //Cria Pedido no Sistema
+            if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
+            {
+                if (carrinho.EnderecoEntrega == null && carrinho.EnderecoEntrega.ID == 0)
+                {
+                    return Json(new { erro = "Falha ao no endereço de entrega" }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    if (carrinho.EnderecoFaturamento == null || carrinho.EnderecoFaturamento.ID == 0)
+                    {
+                        carrinho.EnderecoFaturamento = carrinho.EnderecoEntrega;
+                    }
+                }
+            }
+            else
+            {
+                carrinho.EnderecoEntrega = usuario.EnderecoPrincipal;
+                carrinho.EnderecoFaturamento = usuario.EnderecoPrincipal;
+            }
 
-        //public async System.Threading.Tasks.Task<JsonResult> CriaPedidoCriptoAsync(CarrinhoModel carrinho, string cripto)
-        //{
-        //    var moedaCripto = Moeda.Moedas.LTC;
-        //    if (!(cripto == "BTC" || cripto == "LTC" || cripto == "USDT.TRC20"))
-        //    {
-        //        LogErro("CriaPedidoCriptoAsync - Acesso indevido, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-        //        return Json(new { erro = traducaoHelper["cripto_INVALIDA"] + " " + traducaoHelper["ACESSO_INDEVIDO_REPORTADO"] }, JsonRequestBehavior.AllowGet);
-        //    }
-        //    if (cripto == "LTC")
-        //    {
-        //        moedaCripto = Moeda.Moedas.LTC;
-        //        if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_LITECOIN_ATIVO") == "true"))
-        //        {
-        //            LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-        //            return Json(new { erro = traducaoHelper["LTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
-        //        }
-        //    }
-        //    if (cripto == "BTC")
-        //    {
-        //        moedaCripto = Moeda.Moedas.BTC;
-        //        if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_BITCOIN_ATIVO") == "true"))
-        //        {
-        //            LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-        //            return Json(new { erro = traducaoHelper["BTC_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
-        //        }
-        //    }
-        //    if (cripto == "USDT.TRC20")
-        //    {
-        //        moedaCripto = Moeda.Moedas.USDT;
-        //        if (!(ConfiguracaoHelper.GetString("MEIO_PGTO_TETHER_ATIVO") == "true"))
-        //        {
-        //            LogErro("CriaPedidoCriptoAsync - cripto não esta ativa, com chamada à moeda: " + cripto + " do usuario:" + usuario.Login);
-        //            return Json(new { erro = traducaoHelper["USDT_NAO_ATIVO"] }, JsonRequestBehavior.AllowGet);
-        //        }
-        //    }
+            carrinho.Adicionar(PedidoPagamento.MeiosPagamento.CryptoPayments, PedidoPagamento.FormasPagamento.Padrao);
+            var pedido = pedidoFactory.Criar(carrinho);
 
-        //    //Verifica se já existe um pedido pendente
-        //    var ultimoPedido = pedidoRepository.GetPedidoUltimoStatus(usuario.ID, carrinho.Itens.FirstOrDefault().Produto.ID);
+            try
+            {
+                ViewBag.ShowCripto = "true";
 
-        //    if (!(ultimoPedido == null || ultimoPedido.StatusId != (int)PedidoPagamentoStatus.TodosStatus.AguardandoPagamento))
-        //    {
-        //        return Json(new { erro = traducaoHelper["PEDIDO_JA_EXISTENTE_MENSAGEM"] }, JsonRequestBehavior.AllowGet);
-        //    }
+                decimal cotacaoCripto = await BuscarCotacaoAsync(cripto);
 
-        //    #region Calcula Diferença de Preço do Pacote no caso de compra de Upgrade 
-        //    if (carrinho.Itens.Any(x => x.Produto.TipoID == 2))
-        //    {
-        //        var produto = carrinho.Itens.FirstOrDefault();
+                if (cotacaoCripto > 0)
+                {
+                    var taxaPlataforma = ConfiguracaoHelper.GetDouble("TAXA_PLATAFORMA");
+                    if (taxaPlataforma <= 0)
+                    {
+                        taxaPlataforma = 5.0;
+                    }
 
-        //        if (produto != null)
-        //        {
-        //            Produto pacoteAtualUsuario;
+                    if (taxaPlataforma > 0)
+                    {
+                        var valorUsdComTaxa = (decimal)pedido.Total.Value;
+                        if (cripto == "USDT.TRC20" && ConfiguracaoHelper.GetBoolean("HA_TAXA_PAGAMENTO_USDT"))
+                        {
+                            valorUsdComTaxa = (decimal)pedido.Total.Value * ((decimal)(taxaPlataforma / 100) + 1);
+                        }
 
-        //            if (usuario.NivelAssociacao == 1)
-        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 1 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
-        //            else
-        //                pacoteAtualUsuario = produtoRepository.GetByExpression(p => p.TipoID == 2 && p.NivelAssociacao == usuario.NivelAssociacao).FirstOrDefault();
+                        var valorCriptoComTaxa = Math.Round(valorUsdComTaxa / cotacaoCripto, 4);
+                        string chave = pedido.ID.ToString() + "_" + App.DateTimeZion.Ticks.ToString().Substring(10, 5);
 
-        //            carrinho.Itens.First().Valor.Valor = produto.Valor.Valor - pacoteAtualUsuario.ProdutoValor.FirstOrDefault().Valor;
-        //        }
-        //    }
-        //    #endregion
+                        //cripto = "LTCT";    //testar com LTC
+                        var purchase = await CoinpaymentsApi.GetCallbackAddress(cripto);
+                        //troca por causa do pagamento parcial. O metodo abaixo chama o cmd create_transation da api da coinpayments. E recomendado para pagamento com valor fixo                     
+                        //var purchase = await CoinpaymentsApi.CreateTransaction(valorUsdComTaxa, "USD", cripto, usuario.Email, custom: chave, itemNumber: pedido.Codigo);
 
-        //    //Cria Pedido no Sistema
-        //    if (Core.Helpers.ConfiguracaoHelper.GetString("CADASTRO_SOLICITA_ENDERECO") == "true")
-        //    {
-        //        if (carrinho.EnderecoEntrega == null && carrinho.EnderecoEntrega.ID == 0)
-        //        {
-        //            return Json(new { erro = "Falha ao no endereço de entrega" }, JsonRequestBehavior.AllowGet);
-        //        }
-        //        else
-        //        {
-        //            if (carrinho.EnderecoFaturamento == null || carrinho.EnderecoFaturamento.ID == 0)
-        //            {
-        //                carrinho.EnderecoFaturamento = carrinho.EnderecoEntrega;
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        carrinho.EnderecoEntrega = usuario.EnderecoPrincipal;
-        //        carrinho.EnderecoFaturamento = usuario.EnderecoPrincipal;
-        //    }
+                        if (purchase != null && purchase.HttpResponse != null && purchase.HttpResponse.ContentBody != null)
+                        {
+                            dynamic purchaseJson = JsonConvert.DeserializeObject(purchase.HttpResponse.ContentBody);
+                            string numero = purchaseJson.result.address;
 
-        //    carrinho.Adicionar(PedidoPagamento.MeiosPagamento.CryptoPayments, PedidoPagamento.FormasPagamento.Padrao);
-        //    var pedido = pedidoFactory.Criar(carrinho);
+                            int referenciaID = 0;
+                            string valor = valorCriptoComTaxa.ToString();
+                            string mensagem = traducaoHelper["MENSAGEM_CONFIRMACAO_HASH_BTC"];
+                            pedidoFactory.SalvarDadosPagamentoCripto(numero, referenciaID, Convert.ToDecimal(valor), cotacaoCripto, (decimal)pedido.Total.Value, (int)moedaCripto);
+                            return Json(new { numero, valor, mensagem }, JsonRequestBehavior.AllowGet);
+                        }
+                        else
+                        {
+                            pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
+                            LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
+                            return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                }
 
-        //    try
-        //    {
-        //        ViewBag.ShowCripto = "true";
-
-        //        decimal cotacaoCripto = await BuscarCotacaoAsync(cripto);
-
-        //        if (cotacaoCripto > 0)
-        //        {
-        //            var taxaPlataforma = ConfiguracaoHelper.GetDouble("TAXA_PLATAFORMA");
-        //            if (taxaPlataforma <= 0)
-        //            {
-        //                taxaPlataforma = 5.0;
-        //            }
-
-        //            if (taxaPlataforma > 0)
-        //            {
-        //                var valorUsdComTaxa = (decimal)pedido.Total.Value;
-        //                if (cripto == "USDT.TRC20" && ConfiguracaoHelper.GetBoolean("HA_TAXA_PAGAMENTO_USDT"))
-        //                {
-        //                    valorUsdComTaxa = (decimal)pedido.Total.Value * ((decimal)(taxaPlataforma / 100) + 1);
-        //                }
-
-        //                var valorCriptoComTaxa = Math.Round(valorUsdComTaxa / cotacaoCripto, 4);
-        //                string chave = pedido.ID.ToString() + "_" + App.DateTimeZion.Ticks.ToString().Substring(10, 5);
-
-        //                //cripto = "LTCT";    //testar com LTC
-        //                var purchase = await CoinpaymentsApi.GetCallbackAddress(cripto);
-        //                //troca por causa do pagamento parcial. O metodo abaixo chama o cmd create_transation da api da coinpayments. E recomendado para pagamento com valor fixo                     
-        //                //var purchase = await CoinpaymentsApi.CreateTransaction(valorUsdComTaxa, "USD", cripto, usuario.Email, custom: chave, itemNumber: pedido.Codigo);
-
-        //                if (purchase != null && purchase.HttpResponse != null && purchase.HttpResponse.ContentBody != null)
-        //                {
-        //                    dynamic purchaseJson = JsonConvert.DeserializeObject(purchase.HttpResponse.ContentBody);
-        //                    string numero = purchaseJson.result.address;
-
-        //                    int referenciaID = 0;
-        //                    string valor = valorCriptoComTaxa.ToString();
-        //                    string mensagem = traducaoHelper["MENSAGEM_CONFIRMACAO_HASH_BTC"];
-        //                    pedidoFactory.SalvarDadosPagamentoCripto(numero, referenciaID, Convert.ToDecimal(valor), cotacaoCripto, (decimal)pedido.Total.Value, (int)moedaCripto);
-        //                    return Json(new { numero, valor, mensagem }, JsonRequestBehavior.AllowGet);
-        //                }
-        //                else
-        //                {
-        //                    pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
-        //                    LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
-        //                    return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
-        //                }
-        //            }
-        //        }
-
-        //        pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
-        //        LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
-        //        return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
-        //        //throw new Exception();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
-        //        LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now + " - Exceção: " + ex.InnerException);
-        //        return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
-        //    }
-        //}
+                pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
+                LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now);
+                return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
+                //throw new Exception();
+            }
+            catch (Exception ex)
+            {
+                pedidoService.ProcessarPagamento(pedido.PedidoPagamento.FirstOrDefault().ID, PedidoPagamentoStatus.TodosStatus.Cancelado);
+                LogErro("CriaPedidoCriptoAsync - Pedido: " + pedido.PedidoPagamento.FirstOrDefault().ID + " - Data: " + DateTime.Now + " - Exceção: " + ex.InnerException);
+                return Json(new { erro = "Não foi possível efetuar o pagamento." }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
         #endregion
 
@@ -2321,27 +1870,27 @@ namespace Sistema.Areas.Loja.Controllers
             }
         }
 
-        //private async System.Threading.Tasks.Task<decimal> BuscarCotacaoAsync(string siglaMoeda)
-        //{
-        //    try
-        //    {
-        //        var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
-        //        switch (siglaMoeda.ToUpper())
-        //        {
-        //            case "BTC":
-        //                return cotacao.BtcUsd;
-        //            case "LTC":
-        //                return cotacao.LtcUsd;
-        //            case "USDT.TRC20":
-        //                return cotacao.UsdtUsd;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return 0;
-        //    }
-        //    return 0;
-        //}
+        private async System.Threading.Tasks.Task<decimal> BuscarCotacaoAsync(string siglaMoeda)
+        {
+            try
+            {
+                var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
+                switch (siglaMoeda.ToUpper())
+                {
+                    case "BTC":
+                        return cotacao.BtcUsd;
+                    case "LTC":
+                        return cotacao.LtcUsd;
+                    case "USDT.TRC20":
+                        return cotacao.UsdtUsd;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+            return 0;
+        }
 
         private bool ConsistenteVariacaoBTC(decimal cotacao)
         {

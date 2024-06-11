@@ -25,6 +25,8 @@ namespace Coinpayments.Api
             }
             catch (Exception ex)
             {
+                String erro = ex.Message;
+                var erro2 = ex.InnerException;
                 return null;
             }
         }

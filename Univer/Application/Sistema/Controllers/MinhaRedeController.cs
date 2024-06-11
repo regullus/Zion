@@ -18,6 +18,7 @@ using Core.Repositories.Financeiro;
 using Core.Models;
 using PagedList;
 using Coinpayments.Api;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -122,7 +123,7 @@ namespace Sistema.Controllers
         public ActionResult Galaxy(int? idTab)
         {
             obtemMensagem();
-
+            
             #region variaveis
 
             string log = "";
@@ -579,8 +580,10 @@ namespace Sistema.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetData(string usuarioID, string targetID, string tabuleiroID, string nivel, string token)
+        public async Task<ActionResult> GetData(string usuarioID, string targetID, string tabuleiroID, string nivel, string token)
         {
+            decimal cotacaoCripto = await BuscarCotacaoAsync("USDT.TRC20");
+
             string log = "parameter 01";
             if (usuarioID.IsNullOrEmpty() || targetID.IsNullOrEmpty() || tabuleiroID.IsNullOrEmpty() || nivel.IsNullOrEmpty())
             {
@@ -2135,14 +2138,41 @@ namespace Sistema.Controllers
             return View();
         }
 
-        public ActionResult Pedido() {          
-            obtemMensagem();
+        public async System.Threading.Tasks.Task<JsonResult> Pedido() {          
+            
+            decimal cotacaoCripto = await BuscarCotacaoAsync("BTC");
 
 
 
+            return null;
+        }
 
-            return View();
-        }   
+        private async System.Threading.Tasks.Task<decimal> BuscarCotacaoAsync(string siglaMoeda)
+        {
+            decimal retorno = 0;
+            try
+            {
+                var cotacao = await CoinpaymentsApiWrapper.ExchangeRatesAsHelper();
+                if (cotacao != null)
+                {
+
+                    switch (siglaMoeda.ToUpper())
+                    {
+                        case "BTC":
+                            return retorno = cotacao.BtcUsd;
+                        case "LTC":
+                            return retorno = cotacao.LtcUsd;
+                        case "USDT.TRC20":
+                            return retorno = cotacao.UsdtUsd;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                retorno = 0;
+            }
+            return retorno;
+        }
 
         #endregion Actions
 

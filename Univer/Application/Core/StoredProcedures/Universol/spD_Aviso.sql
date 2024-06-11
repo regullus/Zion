@@ -21,6 +21,8 @@ BEGIN
    Delete Usuario.AvisoLido Where AvisoID = @ID
    Delete Usuario.Aviso Where ID = @ID
 
+   Select 'OK' Retorno
+
 END  
 
 go

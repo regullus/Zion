@@ -25,7 +25,9 @@ namespace Core.Entities
             [Description("Bitcoin")]
             BTC = 6,
             [Description("USDT (TRC20)")]
-            USDT = 7
+            USDT = 7,
+            [Description("LTC")]
+            LTC = 7
         }
     }
 }
