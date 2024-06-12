@@ -28,6 +28,7 @@ namespace Coinpayments.Api
         }
 
         public string Method { get; set; }
+        
         public string RequestUrl { get; set; }
 
         public string RequestBody { get; set; }

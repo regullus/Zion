@@ -46,7 +46,6 @@ namespace Coinpayments.Api
                         throw new NotImplementedException("The supplied HTTP method is not supported: " + method ?? "(null)");
                 }
 
-
                 var contentBody = await response.Content.ReadAsStringAsync();
                 var headers = response.Headers.AsEnumerable();
                 var statusCode = response.StatusCode;

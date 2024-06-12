@@ -73,7 +73,6 @@ namespace Coinpayments.Api
             return process<ConvertCoinsResponse>(req);
         }
 
-
         public static Task<CreateTransactionResponse> CreateTransaction(CreateTransactionRequest request)
         {
             var req = new HttpUrlRequest(request);
@@ -137,7 +136,6 @@ namespace Coinpayments.Api
             var req = new HttpUrlRequest(request);
             return process<CoinBalancesResponse>(req);
         }
-
 
         private static async Task<T1> process<T1>(HttpUrlRequest request)
             where T1 : ResponseModel, new()
